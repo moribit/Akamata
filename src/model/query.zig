@@ -171,7 +171,8 @@ pub fn Repo(comptime T: type) type {
         /// (i.e. just prepared + bound); this drains all rows. The caller still
         /// owns the statement and must `deinit` it. Rows must SELECT the
         /// model's columns in declaration order, same as `queryRaw`.
-        pub fn mapStmt(arena: std.mem.Allocator, stmt: db_mod.Stmt) ![]T {
+        pub fn mapStmt(arena: std.mem.Allocator, stmt_value: db_mod.Stmt) ![]T {
+            var stmt = stmt_value;
             var out: std.ArrayList(T) = .empty;
             while ((try stmt.step()) == .row) {
                 try out.append(arena, try readRowDupe(arena, stmt));
@@ -189,7 +190,8 @@ pub fn Repo(comptime T: type) type {
         /// total — e.g. `..., COUNT(*) OVER () FROM ... LIMIT ? OFFSET ?`.
         /// The total is read from each row (constant across the window); on an
         /// empty result the total is 0.
-        pub fn mapStmtWithCount(arena: std.mem.Allocator, stmt: db_mod.Stmt) !RowsWithCount {
+        pub fn mapStmtWithCount(arena: std.mem.Allocator, stmt_value: db_mod.Stmt) !RowsWithCount {
+            var stmt = stmt_value;
             const count_idx = @typeInfo(T).@"struct".fields.len; // 0-based: right after model columns
             var out: std.ArrayList(T) = .empty;
             var total: i64 = 0;
