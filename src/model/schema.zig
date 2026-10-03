@@ -1,3 +1,4 @@
+const reflection = @import("../reflection.zig");
 // Comptime model introspection.
 //
 // Given a Zig struct that defines an Akamata model:
@@ -186,8 +187,8 @@ pub fn enumToText(comptime T: type, comptime field_name: []const u8, value: anyt
     const E = @TypeOf(value);
     const s = T.__schema;
     const map = @field(s.enums, field_name);
-    inline for (@typeInfo(E).@"enum".fields) |ef| {
-        if (@intFromEnum(value) == ef.value) {
+    inline for (reflection.fields(@typeInfo(E).@"enum")) |ef| {
+        if (@backingInt(value) == ef.value) {
             if (!@hasField(@TypeOf(map), ef.name)) {
                 @compileError("__schema.enums." ++ field_name ++ " missing entry for ." ++ ef.name);
             }
@@ -202,12 +203,12 @@ pub fn enumToText(comptime T: type, comptime field_name: []const u8, value: anyt
 pub fn enumFromText(comptime T: type, comptime field_name: []const u8, comptime E: type, text: []const u8) !E {
     const s = T.__schema;
     const map = @field(s.enums, field_name);
-    inline for (@typeInfo(E).@"enum".fields) |ef| {
+    inline for (reflection.fields(@typeInfo(E).@"enum")) |ef| {
         if (!@hasField(@TypeOf(map), ef.name)) {
             @compileError("__schema.enums." ++ field_name ++ " missing entry for ." ++ ef.name);
         }
         const mapped: []const u8 = @field(map, ef.name);
-        if (std.mem.eql(u8, text, mapped)) return @enumFromInt(ef.value);
+        if (std.mem.eql(u8, text, mapped)) return @fromBackingInt(@intCast(ef.value));
     }
     return error.UnknownEnumVariant;
 }
@@ -268,12 +269,12 @@ fn schemaIndexes(comptime T: type) []const Index {
     if (raw_info != .@"struct" or !raw_info.@"struct".is_tuple) {
         @compileError("__schema.indexes must be a tuple");
     }
-    const n = raw_info.@"struct".fields.len;
+    const n = reflection.fields(raw_info.@"struct").len;
     var out: [n]Index = undefined;
     inline for (raw, 0..) |entry, i| {
         const Entry = @TypeOf(entry);
         const ei = @typeInfo(Entry);
-        if (ei != .@"struct" or !ei.@"struct".is_tuple or ei.@"struct".fields.len != 2) {
+        if (ei != .@"struct" or !ei.@"struct".is_tuple or reflection.fields(ei.@"struct").len != 2) {
             @compileError("each index entry must be a 2-tuple: { columns, .unique|.index }");
         }
         const cols_raw = entry[0];
@@ -287,7 +288,7 @@ fn schemaIndexes(comptime T: type) []const Index {
             if (cti != .@"struct" or !cti.@"struct".is_tuple) {
                 @compileError("index columns must be a string or tuple of strings");
             }
-            const m = cti.@"struct".fields.len;
+            const m = reflection.fields(cti.@"struct").len;
             const arr: [m][]const u8 = comptime val: {
                 var tmp: [m][]const u8 = undefined;
                 for (cols_raw, 0..) |c, j| tmp[j] = c;
@@ -348,7 +349,7 @@ fn schemaIndexes(comptime T: type) []const Index {
 pub fn tableDef(comptime T: type) TableDef {
     const ti = @typeInfo(T);
     if (ti != .@"struct") @compileError("tableDef: expected struct, got " ++ @typeName(T));
-    const fields = ti.@"struct".fields;
+    const fields = reflection.fields(ti.@"struct");
     const pk = schemaPrimaryKey(T);
 
     // Find which non-pk columns also get the "unique" flag from a

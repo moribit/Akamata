@@ -81,7 +81,7 @@ const SockAddrIn = extern struct {
     sin_family: u8 = AF_INET,
     sin_port: u16,
     sin_addr: u32,
-    sin_zero: [8]u8 = [_]u8{0} ** 8,
+    sin_zero: [8]u8 = @as([8]u8, @splat(0)),
 };
 
 const Kevent = extern struct {

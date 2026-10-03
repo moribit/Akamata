@@ -337,7 +337,7 @@ test "header limit does not include request body" {
     defer arena_state.deinit();
     const arena = arena_state.allocator();
 
-    const body = "x" ** (65 * 1024);
+    const body = @as([65 * 1024]u8, @splat('x'));
     const request = "POST /upload HTTP/1.1\r\nhost: example.com\r\ncontent-length: 66560\r\n\r\n" ++ body;
     const parsed = try parseRequest(arena, request, .{});
 

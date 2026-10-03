@@ -4,12 +4,12 @@
 
 [日本語](README.ja.md) | English
 
-A minimal web framework for Zig 0.16. Akamata builds its HTTP and WebSocket
+A minimal web framework for Zig 0.17. Akamata builds its HTTP and WebSocket
 layers around Zig and its standard library, provides SQLite, D1, and Turso
 database backends, and targets native servers, Cloudflare Workers, and
 Cloudflare Containers.
 
-Latest release: **v0.1.4** · Requires **Zig 0.16.x** · [Release notes](CHANGELOG.md)
+Latest release: **v0.1.5** · Requires **Zig 0.17.x** · [Release notes](CHANGELOG.md)
 
 ```zig
 const std = @import("std");
@@ -81,7 +81,7 @@ zig build cli
 
 | Scope | Requirement |
 |---|---|
-| Core development | Zig 0.16.x, macOS or Linux, libc |
+| Core development | Zig 0.17.x, macOS or Linux, libc |
 | Native database | Bundled SQLite amalgamation; no system SQLite install required |
 | Workers | Node.js + Wrangler, a Cloudflare account; D1 is optional |
 | Containers | Docker; Cloudflare Containers requires an eligible Cloudflare plan |

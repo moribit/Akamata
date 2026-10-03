@@ -1,3 +1,4 @@
+const reflection = @import("../reflection.zig");
 // Validation rules. Read at comptime from `__schema.validates`, applied at
 // runtime via `validate(model, arena) []ValidationError`.
 //
@@ -112,7 +113,7 @@ pub fn validateAny(comptime T: type, value: anytype, arena: std.mem.Allocator) !
     if (!@hasField(@TypeOf(s), "validates")) return errs.toOwnedSlice(arena);
     const v = s.validates;
 
-    inline for (@typeInfo(@TypeOf(v)).@"struct".fields) |field_decl| {
+    inline for (reflection.fields(@typeInfo(@TypeOf(v)).@"struct")) |field_decl| {
         const field_name = field_decl.name;
         const rules_tuple = @field(v, field_name);
         const RulesType = @TypeOf(rules_tuple);

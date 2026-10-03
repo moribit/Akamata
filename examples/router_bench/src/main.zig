@@ -16,7 +16,7 @@ const NoopStatic = struct {
 };
 
 fn staticHandler() *const fn (*Ctx) anyerror!void {
-    const middlewares = [_]type{NoopStatic} ** opts.middleware_count;
+    const middlewares = @as([opts.middleware_count]type, @splat(NoopStatic));
     return am.static_middleware.Chain(Ctx, &middlewares, terminal).run;
 }
 

@@ -18,6 +18,7 @@
 //!     try std.testing.expectEqual(@as(u16, 200), resp.status);
 //!     try resp.expectJsonField("id", "42");
 
+const reflection = @import("reflection.zig");
 const std = @import("std");
 const req_mod = @import("http/request.zig");
 const res_mod = @import("http/response.zig");
@@ -363,7 +364,7 @@ pub fn Factory(comptime T: type, comptime Overrides: type) type {
                 }
             }
             // Apply caller overrides.
-            inline for (@typeInfo(Overrides).@"struct".fields) |f| {
+            inline for (reflection.fields(@typeInfo(Overrides).@"struct")) |f| {
                 @field(instance, f.name) = @field(self.overrides, f.name);
             }
             return instance;

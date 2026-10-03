@@ -1,4 +1,5 @@
 //! Shared positional SQL row mapper used by repositories, relations and DTO queries.
+const reflection = @import("../reflection.zig");
 const std = @import("std");
 const db = @import("../db/db.zig");
 const schema = @import("schema.zig");
@@ -6,7 +7,7 @@ const schema = @import("schema.zig");
 pub fn read(comptime T: type, allocator: std.mem.Allocator, stmt: db.Stmt) !T {
     if (@typeInfo(T) != .@"struct") @compileError("row mapper expects a struct DTO");
     var out: T = undefined;
-    inline for (@typeInfo(T).@"struct".fields, 0..) |field, index| {
+    inline for (reflection.fields(@typeInfo(T).@"struct"), 0..) |field, index| {
         @field(out, field.name) = try readField(T, field.name, field.type, allocator, stmt, index);
     }
     return out;
@@ -24,7 +25,7 @@ fn readField(comptime Owner: type, comptime name: []const u8, comptime T: type, 
         .@"enum" => if (@hasDecl(Owner, "__schema") and comptime schema.enumStringsLookup(Owner, name) != null)
             try schema.enumFromText(Owner, name, T, try stmt.columnText(index))
         else
-            @enumFromInt(try stmt.columnInt(index)),
+            @fromBackingInt(@intCast(try stmt.columnInt(index))),
         .pointer => |p| if (p.size == .slice and p.child == u8)
             try allocator.dupe(u8, try stmt.columnText(index))
         else

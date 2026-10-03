@@ -129,7 +129,7 @@ test "static routing handles trailing slash and paths over 256 bytes" {
     var app = am.App(State).init(alloc, .{});
     defer app.deinit();
     _ = try app.get("/trailing/", helloHandler);
-    const long_path = "/" ++ ("x" ** 300);
+    const long_path = "/" ++ (@as([300]u8, @splat('x')));
     _ = try app.get(long_path, helloHandler);
     var client = am.testing.Client(@TypeOf(app)).init(alloc, &app);
     defer client.deinit();

@@ -16,7 +16,7 @@ pub const Rs256Error = error{
 /// Sign `message` with the given PEM-encoded RSA private key and return the
 /// raw signature bytes.
 ///
-/// - Native + `-Dopenssl=true`: uses OpenSSL via `@cImport("openssl/evp.h")`.
+/// - Native + `-Dopenssl=true`: uses OpenSSL via build-time translated C bindings.
 ///   Required for FCM JWT signing. Zig 0.16 std.crypto only verifies
 ///   PKCS#1 v1.5 — it has no RSA sign — so OpenSSL stays opt-in here.
 /// - Native default / Workers: not available. The JS host (Workers) signs
@@ -30,12 +30,7 @@ pub fn signPem(
     return nativeSign(gpa, pem_private_key, message);
 }
 
-const c = if (has_openssl) @cImport({
-    @cInclude("openssl/bio.h");
-    @cInclude("openssl/evp.h");
-    @cInclude("openssl/pem.h");
-    @cInclude("openssl/err.h");
-}) else struct {};
+const c = if (has_openssl) @import("openssl") else struct {};
 
 fn nativeSign(
     gpa: std.mem.Allocator,

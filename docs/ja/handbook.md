@@ -1,6 +1,6 @@
 # Akamata ハンドブック — 15 分で始めるガイド
 
-Akamata は Zig 0.16 製の Web フレームワークです。**ひとつのソースコード**から
+Akamata は Zig 0.17 製の Web フレームワークです。**ひとつのソースコード**から
 2 通りのデプロイ形態を生成できます: native バイナリ (VPS / Cloudflare Containers)
 と Cloudflare Workers の wasm モジュール。DB 層は SQLite、Turso (libsql)、
 Cloudflare D1 を URL の違いだけで透過的に切り替えます — ハンドラのコードは

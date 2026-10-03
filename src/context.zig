@@ -1,3 +1,4 @@
+const reflection = @import("reflection.zig");
 const std = @import("std");
 const req_mod = @import("http/request.zig");
 const res_mod = @import("http/response.zig");
@@ -24,10 +25,10 @@ pub const ParamError = error{
 fn projectionOf(comptime T: type) type {
     const info = @typeInfo(T);
     if (info != .@"struct") return T;
-    const src_fields = info.@"struct".fields;
-    var names: [src_fields.len][]const u8 = undefined;
+    const src_fields = reflection.fields(info.@"struct");
+    var names: [src_fields.len][:0]const u8 = undefined;
     var types: [src_fields.len]type = undefined;
-    var attrs: [src_fields.len]std.builtin.Type.StructField.Attributes = undefined;
+    var attrs: [src_fields.len]std.lang.Type.Struct.FieldAttributes = undefined;
     inline for (src_fields, 0..) |f, i| {
         // Already optional? Keep as-is. Otherwise wrap in ?T.
         const Ft = if (@typeInfo(f.type) == .optional) f.type else ?f.type;
@@ -52,7 +53,7 @@ fn liftProjection(comptime T: type, proj: anytype) T {
     const info = @typeInfo(T);
     if (info != .@"struct") return proj;
     var out: T = undefined;
-    inline for (info.@"struct".fields) |f| {
+    inline for (reflection.fields(info.@"struct")) |f| {
         const proj_value = @field(proj, f.name);
         if (@typeInfo(f.type) == .optional) {
             // T's field is already optional — copy as-is.
@@ -371,7 +372,7 @@ pub fn Context(comptime State: type) type {
             // validation rule. Never manufacture zero values for missing
             // input, especially for pointers and enums.
             var missing: std.ArrayList(@import("model/validate.zig").ValidationError) = .empty;
-            inline for (@typeInfo(T).@"struct".fields) |f| {
+            inline for (reflection.fields(@typeInfo(T).@"struct")) |f| {
                 if (@typeInfo(f.type) != .optional and f.defaultValue() == null and @field(proj, f.name) == null) {
                     try missing.append(self.arena, .{
                         .field = f.name,

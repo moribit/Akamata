@@ -58,8 +58,22 @@ pub fn build(b: *std.Build) void {
             .flags = sqlite_flags,
         });
         am_mod.addIncludePath(b.path("third_party/sqlite"));
+        const sqlite_bindings = b.addTranslateC(.{
+            .root_source_file = b.path("third_party/sqlite/sqlite3.h"),
+            .target = target,
+            .optimize = optimize,
+        });
+        am_mod.addImport("sqlite3", sqlite_bindings.createModule());
         am_mod.link_libc = true;
         if (with_openssl) {
+            const openssl_bindings = b.addTranslateC(.{
+                .root_source_file = b.path("src/crypto/openssl.h"),
+                .target = target,
+                .optimize = optimize,
+            });
+            openssl_bindings.linkSystemLibrary("ssl", .{});
+            openssl_bindings.linkSystemLibrary("crypto", .{});
+            am_mod.addImport("openssl", openssl_bindings.createModule());
             am_mod.linkSystemLibrary("ssl", .{});
             am_mod.linkSystemLibrary("crypto", .{});
         }
@@ -107,13 +121,7 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(exe);
 
     const run = b.addRunArtifact(exe);
-    // 0.16 uses `b.args`; 0.17-dev replaced it with `run.addPassthruArgs()`.
-    // Comptime-branch so this builds on both (to A/B the master linker vs 0.16).
-    if (@hasField(std.Build, "args")) {
-        if (b.args) |args| run.addArgs(args);
-    } else {
-        run.addPassthruArgs();
-    }
+    run.addPassthruArgs();
     b.step("run", "run the selected example (native)").dependOn(&run.step);
 
     // === akamata-cli ===
@@ -167,6 +175,10 @@ pub fn build(b: *std.Build) void {
     const scaffold_smoke = b.addSystemCommand(&.{ "sh", "tests/scaffold_smoke.sh" });
     scaffold_smoke.addArtifactArg(cli_exe);
     b.step("scaffold-test", "generate and build a portable scaffold").dependOn(&scaffold_smoke.step);
+    const scaffold_local = b.addSystemCommand(&.{ "sh", "tests/scaffold_smoke.sh" });
+    scaffold_local.addArtifactArg(cli_exe);
+    scaffold_local.addDirectoryArg2(b.path("."), .{});
+    b.step("scaffold-local-test", "generate and build a scaffold against this checkout").dependOn(&scaffold_local.step);
     const project_update_sync = b.addSystemCommand(&.{ "sh", "tests/project_update_sync.sh" });
     project_update_sync.addArtifactArg(cli_exe);
     b.step("project-update-test", "upgrade and sync a legacy Native/Workers project safely").dependOn(&project_update_sync.step);

@@ -1,3 +1,4 @@
+const reflection = @import("../reflection.zig");
 // Eager loading helpers — defeat N+1 queries with a single batch fetch.
 //
 // Usage (has_many):
@@ -209,7 +210,7 @@ fn resolveHasManyFk(comptime Owner: type, comptime relation_name: []const u8) []
 /// Mirror of relations.readRowDupe — duped strings, optional support.
 fn readRowDupe(comptime T: type, arena: std.mem.Allocator, stmt: db_mod.Stmt) !T {
     var out: T = undefined;
-    inline for (@typeInfo(T).@"struct".fields, 0..) |f, i| {
+    inline for (reflection.fields(@typeInfo(T).@"struct"), 0..) |f, i| {
         const FT = f.type;
         switch (@typeInfo(FT)) {
             .optional => |o| switch (@typeInfo(o.child)) {

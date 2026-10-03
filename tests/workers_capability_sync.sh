@@ -28,7 +28,7 @@ run_case() {
   # All modern glue keeps the request framing fix and serialized ABI boundary.
   grep -F 'if (lower === "host" || lower === "content-length") continue' deploy/worker/index.mjs >/dev/null
   grep -F 'dispatchWasmUnlocked(request)' deploy/worker/index.mjs >/dev/null
-  zig build -Dbackend=workers -Doptimize=ReleaseSmall
+  zig build --fork="$repo_dir" -Dbackend=workers -Doptimize=ReleaseSmall
 }
 
 run_case d1_only --d1
@@ -43,7 +43,7 @@ grep -F 'binding = "FILES"' deploy/wrangler.toml >/dev/null
 # mimoc-parts contract: the generated Workers module and JS import namespace
 # jointly expose am.storage.Store -> Workers R2.
 printf '%s\n' 'comptime { _ = am.platform.workers.R2Store; _ = am.storage.Store; }' >> src/worker.zig
-zig build -Dbackend=workers -Doptimize=ReleaseSmall
+zig build --fork="$repo_dir" -Dbackend=workers -Doptimize=ReleaseSmall
 
 run_case queue_only --queue
 grep -F 'async queue(batch, env)' deploy/worker/index.mjs >/dev/null

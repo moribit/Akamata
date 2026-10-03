@@ -30,8 +30,8 @@ pub fn validate(comptime providers: []const type) void {
         }
     }
     inline for (providers, 0..) |_, i| {
-        comptime var visiting = [_]bool{false} ** providers.len;
-        comptime var visited = [_]bool{false} ** providers.len;
+        comptime var visiting = @as([providers.len]bool, @splat(false));
+        comptime var visited = @as([providers.len]bool, @splat(false));
         detectCycle(providers, i, &visiting, &visited);
     }
 }
@@ -76,7 +76,7 @@ fn valueTypes(comptime providers: []const type) [providers.len]type {
 
 fn topologicalOrder(comptime providers: []const type) [providers.len]usize {
     var result: [providers.len]usize = undefined;
-    var emitted = [_]bool{false} ** providers.len;
+    var emitted = @as([providers.len]bool, @splat(false));
     var count: usize = 0;
     while (count < providers.len) {
         var progress = false;
@@ -104,7 +104,7 @@ fn topologicalOrder(comptime providers: []const type) [providers.len]usize {
 pub fn Registry(comptime Types: []const type) type {
     return struct {
         const Self = @This();
-        values: std.meta.Tuple(pointerTypes(Types)) = undefined,
+        values: @Tuple(pointerTypes(Types)) = undefined,
         present: [Types.len]bool = @splat(false),
 
         pub fn provide(self: *Self, comptime T: type, value: *T) void {

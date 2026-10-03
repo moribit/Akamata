@@ -421,7 +421,7 @@ pub fn loadMigrationsFromDir(arena: std.mem.Allocator, dir_path: []const u8) ![]
         extern "c" fn closedir(d: *DIR) c_int;
     };
 
-    const dir_z = try arena.dupeZ(u8, dir_path);
+    const dir_z = try arena.dupeSentinel(u8, dir_path, 0);
     defer arena.free(dir_z);
     const d = dirent_lib.opendir(dir_z.ptr) orelse return error.MigrationsDirNotFound;
     defer _ = dirent_lib.closedir(d);
@@ -462,7 +462,7 @@ fn readFileToArena(arena: std.mem.Allocator, path: []const u8) ![]u8 {
         extern "c" fn ftell(s: *FILE) c_long;
         extern "c" fn fclose(s: *FILE) c_int;
     };
-    const path_z = try arena.dupeZ(u8, path);
+    const path_z = try arena.dupeSentinel(u8, path, 0);
     defer arena.free(path_z);
     const f = Lib.fopen(path_z.ptr, "rb") orelse return error.FileNotFound;
     defer _ = Lib.fclose(f);

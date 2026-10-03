@@ -18,6 +18,24 @@ cmp "$repo_dir/deploy/worker/realtime_object.mjs" "$repo_dir/tools/akamata/src/t
 tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/akamata-update-test.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT HUP INT TERM
 
+# Validate the checkout under test, including builds spawned by `akamata update`.
+# The published release pin intentionally remains unchanged in the fixture.
+AKAMATA_TEST_ZIG=$(command -v zig)
+AKAMATA_TEST_CHECKOUT=$repo_dir
+export AKAMATA_TEST_ZIG AKAMATA_TEST_CHECKOUT
+mkdir -p "$tmp_dir/zig-bin"
+cat > "$tmp_dir/zig-bin/zig" <<'ZIG_WRAPPER'
+#!/bin/sh
+if [ "$1" = build ]; then
+  shift
+  exec "$AKAMATA_TEST_ZIG" build --fork="$AKAMATA_TEST_CHECKOUT" "$@"
+fi
+exec "$AKAMATA_TEST_ZIG" "$@"
+ZIG_WRAPPER
+chmod +x "$tmp_dir/zig-bin/zig"
+PATH="$tmp_dir/zig-bin:$PATH"
+export PATH
+
 cd "$tmp_dir"
 "$cli" init legacyapp --target=both
 cd legacyapp
@@ -30,22 +48,22 @@ sed 's/{{NAME}}/legacyapp/g' "$repo_dir/tests/fixtures/v0.1.0_worker_index.mjs.t
 rm -f deploy/worker/wasm_dispatch.mjs deploy/worker/internal_routes.mjs deploy/worker/realtime_object.mjs
 rm -f .akamata/managed-files.json
 sed \
-  -e 's#moribit/Akamata/archive/refs/tags/v0.1.4#appleuser634/Akamata/archive/refs/tags/v0.1.0#' \
-  -e 's#akamata-0.1.4-uJIoIz4eLQGqoQAroTagXl8dVSYcQI4y-Pwxr2bGs9O_#akamata-0.1.0-uJIoI4fvKwH--xMKwulRpDc6xEEUfaP0oilU6-dfUqbw#' \
+  -e 's#moribit/Akamata/archive/refs/tags/v0.1.5#appleuser634/Akamata/archive/refs/tags/v0.1.0#' \
+  -e 's#akamata-0.1.5-[A-Za-z0-9_-]*#akamata-0.1.0-uJIoI4fvKwH--xMKwulRpDc6xEEUfaP0oilU6-dfUqbw#' \
   build.zig.zon > build.zig.zon.old
 mv build.zig.zon.old build.zig.zon
 
 before_zon=$(shasum -a 256 build.zig.zon)
 before_glue=$(shasum -a 256 deploy/worker/index.mjs)
-dry_output=$("$cli" update --to=v0.1.4 --sync --dry-run 2>&1)
+dry_output=$("$cli" update --to=v0.1.5 --sync --dry-run 2>&1)
 printf '%s\n' "$dry_output" | grep -F 'would update build.zig.zon' >/dev/null
 printf '%s\n' "$dry_output" | grep -F 'would update deploy/worker/index.mjs' >/dev/null
 test "$before_zon" = "$(shasum -a 256 build.zig.zon)"
 test "$before_glue" = "$(shasum -a 256 deploy/worker/index.mjs)"
 test ! -e deploy/worker/wasm_dispatch.mjs
 
-"$cli" update --to=v0.1.4 --sync
-grep -F 'refs/tags/v0.1.4.tar.gz' build.zig.zon >/dev/null
+"$cli" update --to=v0.1.5 --sync
+grep -F 'refs/tags/v0.1.5.tar.gz' build.zig.zon >/dev/null
 grep -F 'wasmDispatchQueue.run(() => dispatchWasmUnlocked(request))' deploy/worker/index.mjs >/dev/null
 grep -F 'await previous' deploy/worker/wasm_dispatch.mjs >/dev/null
 test ! -f deploy/worker/internal_routes.mjs

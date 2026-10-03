@@ -1,4 +1,5 @@
 //! Compile-time endpoint contracts and typed request inputs.
+const reflection = @import("reflection.zig");
 const std = @import("std");
 
 pub const FixedBytes = @import("contract/bounded.zig").FixedBytes;
@@ -143,11 +144,11 @@ pub fn BoundForPath(
     const info = @typeInfo(Inputs);
     if (info != .@"struct") @compileError("contract.Bound Inputs must be a struct");
     comptime var json_count: usize = 0;
-    inline for (info.@"struct".fields, 0..) |field, i| {
+    inline for (reflection.fields(info.@"struct"), 0..) |field, i| {
         if (!@hasDecl(field.type, "input_source") or !@hasDecl(field.type, "read"))
             @compileError("contract.Bound field `" ++ field.name ++ "` must use Path, Query, Header, Cookie, or Json");
         if (field.type.input_source == .json) json_count += 1;
-        inline for (info.@"struct".fields[0..i]) |prior| {
+        inline for (reflection.fields(info.@"struct")[0..i]) |prior| {
             if (prior.type.input_source == field.type.input_source and
                 std.mem.eql(u8, prior.type.input_name, field.type.input_name))
                 @compileError("duplicate typed input `" ++ field.type.input_name ++ "`");
@@ -166,7 +167,7 @@ pub fn BoundForPath(
     return struct {
         pub fn handle(c: *context.Context(State)) anyerror!void {
             var inputs: Inputs = undefined;
-            inline for (@typeInfo(Inputs).@"struct".fields) |field| {
+            inline for (reflection.fields(@typeInfo(Inputs).@"struct")) |field| {
                 @field(inputs, field.name) = try field.type.read(c);
             }
             return handler(c, inputs);
@@ -183,14 +184,14 @@ pub fn validateErrorMap(comptime handler: anytype, comptime mapping: anytype) vo
     const return_info = @typeInfo(return_type);
     if (return_info != .error_union) @compileError("typed error mapping requires an error-union handler return type");
     const errors = @typeInfo(return_info.error_union.error_set);
-    if (errors.error_set == null) @compileError("typed error mapping does not accept anyerror");
-    inline for (errors.error_set.?) |err| {
-        if (!@hasField(@TypeOf(mapping), err.name))
-            @compileError("missing HTTP mapping for handler error " ++ err.name);
+    if (errors.error_set.error_names == null) @compileError("typed error mapping does not accept anyerror");
+    inline for (errors.error_set.error_names.?) |err| {
+        if (!@hasField(@TypeOf(mapping), err))
+            @compileError("missing HTTP mapping for handler error " ++ err);
     }
-    inline for (@typeInfo(@TypeOf(mapping)).@"struct".fields) |field| {
+    inline for (reflection.fields(@typeInfo(@TypeOf(mapping)).@"struct")) |field| {
         comptime var exists = false;
-        inline for (errors.error_set.?) |err| if (std.mem.eql(u8, field.name, err.name)) {
+        inline for (errors.error_set.error_names.?) |err| if (std.mem.eql(u8, field.name, err)) {
             exists = true;
         };
         if (!exists) @compileError("HTTP mapping contains error not returned by handler: " ++ field.name);
@@ -217,11 +218,11 @@ pub fn TypedEndpoint(
     comptime details: TypedMeta,
 ) type {
     const fn_info = @typeInfo(@TypeOf(handler)).@"fn";
-    if (fn_info.params.len != 2) @compileError("typed endpoint handler must accept (Context, Inputs)");
+    if (fn_info.param_types.len != 2) @compileError("typed endpoint handler must accept (Context, Inputs)");
     const ExpectedContext = *context.Context(State);
-    if (fn_info.params[0].type == null or fn_info.params[0].type.? != ExpectedContext)
+    if (fn_info.param_types[0] == null or fn_info.param_types[0].? != ExpectedContext)
         @compileError("typed endpoint first parameter must be *Context(State)");
-    const Inputs = fn_info.params[1].type orelse @compileError("typed endpoint Inputs must have a concrete type");
+    const Inputs = fn_info.param_types[1] orelse @compileError("typed endpoint Inputs must have a concrete type");
     const return_type = fn_info.return_type orelse @compileError("typed endpoint handler must return an error union");
     const return_info = @typeInfo(return_type);
     if (return_info != .error_union) @compileError("typed endpoint handler must return ErrorSet!Response");
@@ -251,13 +252,13 @@ pub fn TypedEndpoint(
 
         pub fn handle(c: *context.Context(State)) anyerror!void {
             var inputs: Inputs = undefined;
-            inline for (@typeInfo(Inputs).@"struct".fields) |field| {
+            inline for (reflection.fields(@typeInfo(Inputs).@"struct")) |field| {
                 @field(inputs, field.name) = try field.type.read(c);
             }
             const value = handler(c, inputs) catch |err| {
                 const code = statusForError(error_map, err);
-                c.status(@intFromEnum(code));
-                try c.json(.{ .error_kind = @errorName(err) }, @intFromEnum(code));
+                c.status(@backingInt(code));
+                try c.json(.{ .error_kind = @errorName(err) }, @backingInt(code));
                 return;
             };
             if (Response == void) {
@@ -275,7 +276,7 @@ pub fn TypedEndpoint(
 
 fn jsonBodyType(comptime Inputs: type) ?type {
     comptime var result: ?type = null;
-    inline for (@typeInfo(Inputs).@"struct".fields) |field| {
+    inline for (reflection.fields(@typeInfo(Inputs).@"struct")) |field| {
         if (field.type.input_source == .json) result = field.type.Value;
     }
     return result;
@@ -283,15 +284,15 @@ fn jsonBodyType(comptime Inputs: type) ?type {
 
 fn errorResponses(comptime mapping: anytype) []const openapi.ResponseDoc {
     comptime var result: []const openapi.ResponseDoc = &.{};
-    inline for (@typeInfo(@TypeOf(mapping)).@"struct".fields) |field| {
+    inline for (reflection.fields(@typeInfo(@TypeOf(mapping)).@"struct")) |field| {
         const code = @field(mapping, field.name);
-        result = result ++ .{openapi.ResponseDoc{ .status = @intFromEnum(code), .description = field.name }};
+        result = result ++ .{openapi.ResponseDoc{ .status = @backingInt(code), .description = field.name }};
     }
     return result;
 }
 
 fn statusForError(comptime mapping: anytype, err: anyerror) @import("http/status.zig").Code {
-    inline for (@typeInfo(@TypeOf(mapping)).@"struct".fields) |field| {
+    inline for (reflection.fields(@typeInfo(@TypeOf(mapping)).@"struct")) |field| {
         if (std.mem.eql(u8, field.name, @errorName(err))) return @field(mapping, field.name);
     }
     unreachable; // validateErrorMap proves exhaustiveness for the typed handler.

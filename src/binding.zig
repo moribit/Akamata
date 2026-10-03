@@ -1,4 +1,5 @@
 //! Compile-time declarations for portable Workers/native application envs.
+const reflection = @import("reflection.zig");
 const capability = @import("capability.zig");
 const std = @import("std");
 
@@ -48,10 +49,10 @@ pub fn Secret(comptime name: []const u8) type {
 pub fn validate(comptime Env: type, comptime target: capability.Target) void {
     const info = @typeInfo(Env);
     if (info != .@"struct") @compileError("binding environment must be a struct");
-    inline for (info.@"struct".fields, 0..) |field, i| {
+    inline for (reflection.fields(info.@"struct"), 0..) |field, i| {
         if (!@hasDecl(field.type, "binding_kind") or !@hasDecl(field.type, "binding_name"))
             @compileError("environment field " ++ field.name ++ " is not an Akamata binding declaration");
-        inline for (info.@"struct".fields[0..i]) |previous| {
+        inline for (reflection.fields(info.@"struct")[0..i]) |previous| {
             if (comptime @hasDecl(previous.type, "binding_name") and
                 std.mem.eql(u8, @field(previous.type, "binding_name"), @field(field.type, "binding_name")))
                 @compileError("duplicate binding name: " ++ @field(field.type, "binding_name"));

@@ -8,6 +8,7 @@
 //! The generator only depends on Zig stdlib (std.json, comptime reflection).
 //! No runtime cost is paid by apps that don't call `generate`.
 
+const reflection = @import("reflection.zig");
 const std = @import("std");
 
 pub const ResponseDoc = struct {
@@ -112,7 +113,7 @@ pub fn Spec(comptime opts: SpecOpts) *const EndpointMeta {
             const info = @typeInfo(Q);
             if (info != .@"struct") return 0;
             var count: usize = 0;
-            inline for (info.@"struct".fields) |f| {
+            inline for (reflection.fields(info.@"struct")) |f| {
                 if (count > 0) try w.writeAll(",");
                 count += 1;
                 const required = @typeInfo(f.type) != .optional and f.defaultValue() == null;
@@ -130,7 +131,7 @@ pub fn Spec(comptime opts: SpecOpts) *const EndpointMeta {
             const Q = opts.query orelse return;
             const info = @typeInfo(Q);
             if (info != .@"struct") return;
-            inline for (info.@"struct".fields) |f| {
+            inline for (reflection.fields(info.@"struct")) |f| {
                 const optional = @typeInfo(f.type) == .optional or f.defaultValue() != null;
                 try w.print("    {s}{s}: ", .{ f.name, if (optional) "?" else "" });
                 try writeTsScalar(unwrapOptional(f.type), w);
@@ -584,7 +585,7 @@ fn writeTypeSchema(comptime T: type, ctx: *SpecBuilder, w: *std.Io.Writer) anyer
         .@"struct" => |s| {
             try w.writeAll("{\"type\":\"object\",\"properties\":{");
             var first = true;
-            inline for (s.fields) |f| {
+            inline for (reflection.fields(s)) |f| {
                 if (!first) try w.writeAll(",");
                 first = false;
                 try writeJsonString(w, f.name);
@@ -593,7 +594,7 @@ fn writeTypeSchema(comptime T: type, ctx: *SpecBuilder, w: *std.Io.Writer) anyer
             }
             try w.writeAll("},\"required\":[");
             var first_req = true;
-            inline for (s.fields) |f| {
+            inline for (reflection.fields(s)) |f| {
                 const is_optional = @typeInfo(f.type) == .optional;
                 if (is_optional or f.default_value_ptr != null) continue;
                 if (!first_req) try w.writeAll(",");
@@ -604,7 +605,7 @@ fn writeTypeSchema(comptime T: type, ctx: *SpecBuilder, w: *std.Io.Writer) anyer
         },
         .@"enum" => |e| {
             try w.writeAll("{\"type\":\"string\",\"enum\":[");
-            inline for (e.fields, 0..) |f, i| {
+            inline for (reflection.fields(e), 0..) |f, i| {
                 if (i > 0) try w.writeAll(",");
                 try writeJsonString(w, f.name);
             }
@@ -638,7 +639,7 @@ fn writeQueryFieldSchema(comptime T: type, w: *std.Io.Writer) !void {
         },
         .@"enum" => |e| {
             try w.writeAll("{\"type\":\"string\",\"enum\":[");
-            inline for (e.fields, 0..) |f, i| {
+            inline for (reflection.fields(e), 0..) |f, i| {
                 if (i > 0) try w.writeAll(",");
                 try writeJsonString(w, f.name);
             }

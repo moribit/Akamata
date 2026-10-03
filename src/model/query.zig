@@ -1,3 +1,4 @@
+const reflection = @import("../reflection.zig");
 // Active-Record-style query API built on top of `am.db.Db`.
 //
 // Usage:
@@ -56,7 +57,7 @@ pub fn Repo(comptime T: type) type {
             const Conds = @TypeOf(conds);
             const ci = @typeInfo(Conds);
             if (ci != .@"struct") @compileError("where: expected anon struct, got " ++ @typeName(Conds));
-            const fields = ci.@"struct".fields;
+            const fields = reflection.fields(ci.@"struct");
 
             var sql_buf: std.ArrayList(u8) = .empty;
             errdefer sql_buf.deinit(arena);
@@ -127,7 +128,7 @@ pub fn Repo(comptime T: type) type {
         pub fn updateFields(database: db_mod.Db, arena: std.mem.Allocator, id: i64, patch: anytype) !void {
             const P = @TypeOf(patch);
             if (@typeInfo(P) != .@"struct") @compileError("updateFields expects a struct patch");
-            const fields = @typeInfo(P).@"struct".fields;
+            const fields = reflection.fields(@typeInfo(P).@"struct");
             if (fields.len == 0) return;
             var sql: std.ArrayList(u8) = .empty;
             try sql.appendSlice(arena, "UPDATE " ++ table_def.table ++ " SET ");
@@ -192,7 +193,7 @@ pub fn Repo(comptime T: type) type {
         /// empty result the total is 0.
         pub fn mapStmtWithCount(arena: std.mem.Allocator, stmt_value: db_mod.Stmt) !RowsWithCount {
             var stmt = stmt_value;
-            const count_idx = @typeInfo(T).@"struct".fields.len; // 0-based: right after model columns
+            const count_idx = reflection.fields(@typeInfo(T).@"struct").len; // 0-based: right after model columns
             var out: std.ArrayList(T) = .empty;
             var total: i64 = 0;
             while ((try stmt.step()) == .row) {
@@ -254,7 +255,7 @@ pub fn Repo(comptime T: type) type {
         fn fetchAllStruct(database: db_mod.Db, arena: std.mem.Allocator, sql: []const u8, conds: anytype) ![]T {
             var stmt = try database.prepare(sql);
             defer stmt.deinit();
-            inline for (@typeInfo(@TypeOf(conds)).@"struct".fields, 0..) |f, i| {
+            inline for (reflection.fields(@typeInfo(@TypeOf(conds)).@"struct"), 0..) |f, i| {
                 const v = @field(conds, f.name);
                 try stmt.bind(i + 1, db_mod.Value.fromAny(v));
             }
@@ -305,7 +306,7 @@ pub fn Repo(comptime T: type) type {
             var val_buf: std.ArrayList(u8) = .empty;
             errdefer val_buf.deinit(arena);
             var first = true;
-            inline for (@typeInfo(T).@"struct".fields) |f| {
+            inline for (reflection.fields(@typeInfo(T).@"struct")) |f| {
                 const v = @field(value, f.name);
                 // Runtime-check whether to skip this field; can't `continue`
                 // because the inline-for body is partially comptime.
@@ -337,7 +338,7 @@ pub fn Repo(comptime T: type) type {
             // `idx` has to be a runtime var, because the number of *bound*
             // params depends on the runtime value of the optional fields.
             var idx: usize = 1;
-            inline for (@typeInfo(T).@"struct".fields) |f| {
+            inline for (reflection.fields(@typeInfo(T).@"struct")) |f| {
                 const v = @field(value, f.name);
                 const is_opt = comptime (@typeInfo(@TypeOf(v)) == .optional);
                 const skip: bool = if (is_opt) (v == null) else false;
@@ -352,7 +353,7 @@ pub fn Repo(comptime T: type) type {
             var set_buf: std.ArrayList(u8) = .empty;
             errdefer set_buf.deinit(arena);
             var first = true;
-            inline for (@typeInfo(T).@"struct".fields) |f| {
+            inline for (reflection.fields(@typeInfo(T).@"struct")) |f| {
                 if (comptime std.mem.eql(u8, f.name, table_def.primary_key)) continue;
                 if (!first) try set_buf.appendSlice(arena, ", ");
                 first = false;
@@ -368,7 +369,7 @@ pub fn Repo(comptime T: type) type {
 
         fn bindUpdateArgs(stmt: *db_mod.Stmt, value: T, pk_val: i64) !void {
             var idx: usize = 1;
-            inline for (@typeInfo(T).@"struct".fields) |f| {
+            inline for (reflection.fields(@typeInfo(T).@"struct")) |f| {
                 if (comptime std.mem.eql(u8, f.name, table_def.primary_key)) continue;
                 try stmt.bind(idx, fieldValue(f.name, value));
                 idx += 1;

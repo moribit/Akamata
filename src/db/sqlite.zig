@@ -19,7 +19,7 @@ pub const Backend = struct {
     pub fn open(gpa: std.mem.Allocator, path: []const u8) !db_mod.Db {
         const self = try gpa.create(Backend);
         errdefer gpa.destroy(self);
-        const path_z = try gpa.dupeZ(u8, path);
+        const path_z = try gpa.dupeSentinel(u8, path, 0);
         defer gpa.free(path_z);
         var handle: ?*c.sqlite3 = null;
         const flags = c.SQLITE_OPEN_READWRITE | c.SQLITE_OPEN_CREATE | c.SQLITE_OPEN_FULLMUTEX | c.SQLITE_OPEN_URI;
@@ -43,7 +43,7 @@ pub const Backend = struct {
 
     fn execBackend(ptr: *anyopaque, sql: []const u8) anyerror!void {
         const self: *Backend = @ptrCast(@alignCast(ptr));
-        const sql_z = try self.gpa.dupeZ(u8, sql);
+        const sql_z = try self.gpa.dupeSentinel(u8, sql, 0);
         defer self.gpa.free(sql_z);
         var errmsg: [*c]u8 = null;
         const rc = c.sqlite3_exec(self.handle, sql_z.ptr, null, null, &errmsg);

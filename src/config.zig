@@ -1,12 +1,13 @@
 //! Typed environment configuration with explicit defaults and secret metadata.
+const reflection = @import("reflection.zig");
 const std = @import("std");
 const env = @import("env.zig");
 
 pub const Error = error{ MissingRequired, InvalidValue, UnsupportedType };
 pub const Field = struct { name: []const u8, env_name: []const u8, required: bool, secret: bool };
 
-pub fn fields(comptime T: type) [@typeInfo(T).@"struct".fields.len]Field {
-    const info = @typeInfo(T).@"struct".fields;
+pub fn fields(comptime T: type) [reflection.fields(@typeInfo(T).@"struct").len]Field {
+    const info = reflection.fields(@typeInfo(T).@"struct");
     var out: [info.len]Field = undefined;
     inline for (info, 0..) |field, i| out[i] = .{
         .name = field.name,
@@ -20,7 +21,7 @@ pub fn fields(comptime T: type) [@typeInfo(T).@"struct".fields.len]Field {
 pub fn load(comptime T: type, allocator: std.mem.Allocator) !T {
     if (@typeInfo(T) != .@"struct") @compileError("config.load expects a struct");
     var result: T = undefined;
-    inline for (@typeInfo(T).@"struct".fields) |field| {
+    inline for (reflection.fields(@typeInfo(T).@"struct")) |field| {
         const raw = env.get(allocator, comptime envName(T, field.name));
         if (raw) |value| {
             @field(result, field.name) = try parse(field.type, value);

@@ -57,7 +57,7 @@ The same single source tree builds and deploys to both.
 
 ### Required
 
-- **Zig 0.16.0** — check via `zig version`. If missing, install from
+- **Zig 0.17.0** — check via `zig version`. If missing, install from
   [ziglang.org/download](https://ziglang.org/download/) (extract the official
   tarball into `$HOME/.local` and add it to `PATH`).
 - macOS or Linux terminal (Windows: use WSL2)
@@ -73,7 +73,7 @@ The same single source tree builds and deploys to both.
 
 ```bash
 zig version
-# Expected: 0.16.0 or 0.16.0-dev.NNN+xxxxxxx
+# Expected: 0.17.0
 ```
 
 ### Get Akamata itself

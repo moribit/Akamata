@@ -4,7 +4,7 @@ Create and run Akamata's generated Note API in about five minutes.
 
 ## Requirements
 
-- Zig 0.16.x
+- Zig 0.17.x
 - Git and a POSIX shell
 - Node.js and Wrangler only for Cloudflare Workers
 - Docker only for Cloudflare Containers
@@ -72,7 +72,7 @@ The scaffold is a working SQLite-backed Note API, not a Hello World placeholder.
 
 The native entry point computes and applies the model schema diff at startup. The Workers entry point uses `migrate.Once` so initialization runs once per isolate.
 
-The first build downloads the pinned Akamata source. To test a local Akamata checkout without editing `build.zig.zon`, use Zig 0.16's package override:
+The first build downloads the pinned Akamata source. To test a local Akamata checkout without editing `build.zig.zon`, use Zig 0.17's package override:
 
 ```bash
 zig build --fork=/path/to/Akamata

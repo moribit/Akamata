@@ -32,8 +32,8 @@ const tmpl_wasm_dispatch = @embedFile("templates/wasm_dispatch.mjs.tpl");
 const tmpl_internal_routes = @embedFile("templates/internal_routes.mjs.tpl");
 const tmpl_realtime_object = @embedFile("templates/realtime_object.mjs.tpl");
 
-const STABLE_VERSION = "v0.1.4";
-const STABLE_HASH = "akamata-0.1.4-uJIoIz4eLQGqoQAroTagXl8dVSYcQI4y-Pwxr2bGs9O_";
+const STABLE_VERSION = "v0.1.5";
+const STABLE_HASH = "akamata-0.1.5-uJIoI2fPLgH0EyO2hDIPBnQDQ1KvPP0rfneaP42rPIqN";
 const MANAGED_MANIFEST = ".akamata/managed-files.json";
 
 pub fn main(init: std.process.Init) !void {
@@ -118,7 +118,7 @@ pub fn main(init: std.process.Init) !void {
     }
 }
 
-const VERSION = "0.1.4";
+const VERSION = "0.1.5";
 
 fn isHelpArg(arg: []const u8) bool {
     return std.mem.eql(u8, arg, "--help") or std.mem.eql(u8, arg, "-h");
@@ -172,7 +172,7 @@ fn editDistance(a: []const u8, b: []const u8) usize {
 fn usage() !void {
     const msg =
         \\Usage: akamata <command> [args]
-        \\Version: akamata 0.1.4 (use `akamata --version` for the version)
+        \\Version: akamata 0.1.5 (use `akamata --version` for the version)
         \\
         \\Commands:
         \\  init <name> [--target=native|workers|containers|both] [--d1] [--r2] [--queue] [--realtime]
@@ -532,7 +532,7 @@ fn renderFile(
 
     const path = try std.fmt.allocPrint(alloc, "{s}/{s}", .{ root, rel });
     defer alloc.free(path);
-    const path_z = try alloc.dupeZ(u8, path);
+    const path_z = try alloc.dupeSentinel(u8, path, 0);
     defer alloc.free(path_z);
 
     const FILE = opaque {};
@@ -564,7 +564,7 @@ fn makeDirRecursive(path: []const u8) !void {
         if (seg.len == 0) continue;
         if (cur.items.len > 0) try cur.append(a, '/');
         try cur.appendSlice(a, seg);
-        const z = try a.dupeZ(u8, cur.items);
+        const z = try a.dupeSentinel(u8, cur.items, 0);
         _ = Lib.mkdir(z.ptr, 0o755);
     }
 }
@@ -642,7 +642,7 @@ fn cmdDev(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     defer alloc.free(bin);
     const bin_path = try std.fmt.allocPrint(alloc, "zig-out/bin/{s}", .{bin});
     defer alloc.free(bin_path);
-    const bin_path_z = try alloc.dupeZ(u8, bin_path);
+    const bin_path_z = try alloc.dupeSentinel(u8, bin_path, 0);
     defer alloc.free(bin_path_z);
 
     std.debug.print("==> akamata dev: watching ./src, ./migrations, build files, and .env ({d} migration(s)). Ctrl-C to stop.\n", .{countSqlMigrations("migrations")});
@@ -769,7 +769,7 @@ fn watchSignature(alloc: std.mem.Allocator) u64 {
     walkMtimes("migrations", &h);
     for ([_][]const u8{ "build.zig", "build.zig.zon", ".env" }) |f| {
         var st: stat_t = undefined;
-        const fz = alloc.dupeZ(u8, f) catch continue;
+        const fz = alloc.dupeSentinel(u8, f, 0) catch continue;
         defer alloc.free(fz);
         if (stat(fz.ptr, &st) == 0) foldMtime(&h, st.mtim);
     }
@@ -795,7 +795,7 @@ fn walkMtimes(dir: []const u8, h: *u64) void {
         const name = std.mem.sliceTo(@as([*:0]const u8, @ptrCast(&ent.name)), 0);
         if (name.len == 0 or name[0] == '.') continue; // skip ., .., dotfiles
         var path_buf: [4096]u8 = undefined;
-        const path = std.fmt.bufPrintZ(&path_buf, "{s}/{s}", .{ dir, name }) catch continue;
+        const path = std.fmt.bufPrintSentinel(&path_buf, "{s}/{s}", .{ dir, name }, 0) catch continue;
         if (ent.type == DT_DIR) {
             walkMtimes(path, h);
         } else if (ent.type == DT_REG) {
@@ -1130,8 +1130,8 @@ fn syncManaged(alloc: std.mem.Allocator, opts: SyncOptions) !void {
         try std.fmt.allocPrint(alloc, "{s}/internal_routes.mjs", .{managed_dir}),
         try std.fmt.allocPrint(alloc, "{s}/realtime_object.mjs", .{managed_dir}),
     };
-    var stale_delete = [_]bool{false} ** stale_paths.len;
-    var stale_modified = [_]bool{false} ** stale_paths.len;
+    var stale_delete = @as([stale_paths.len]bool, @splat(false));
+    var stale_modified = @as([stale_paths.len]bool, @splat(false));
     if (!capabilities.realtime) for (stale_paths, 0..) |path, i| {
         const recorded = try manifestHash(alloc, path) orelse continue;
         const current = readFileAlloc(alloc, path, 4 * 1024 * 1024) catch continue;
@@ -1432,7 +1432,7 @@ fn readD1FromConfig(alloc: std.mem.Allocator, path: []const u8) !?D1Info {
 }
 
 fn readFileAlloc(alloc: std.mem.Allocator, path: []const u8, max_bytes: usize) ![]u8 {
-    const path_z = try alloc.dupeZ(u8, path);
+    const path_z = try alloc.dupeSentinel(u8, path, 0);
     defer alloc.free(path_z);
     const FILE = opaque {};
     const Lib = struct {
@@ -1472,7 +1472,7 @@ fn writeFileBytes(path: []const u8, bytes: []const u8) !void {
 }
 
 fn deleteFile(path: []const u8) !void {
-    const z = try std.heap.smp_allocator.dupeZ(u8, path);
+    const z = try std.heap.smp_allocator.dupeSentinel(u8, path, 0);
     defer std.heap.smp_allocator.free(z);
     const Lib = struct {
         extern "c" fn unlink(p: [*:0]const u8) c_int;
@@ -1641,7 +1641,7 @@ test "scaffold dependency is remote, pinned, and locally overridable" {
 }
 
 test "scaffold dependency tracks the current stable release" {
-    try std.testing.expect(std.mem.indexOf(u8, tmpl_build_zon, "archive/refs/tags/v0.1.4.tar.gz") != null);
+    try std.testing.expect(std.mem.indexOf(u8, tmpl_build_zon, "archive/refs/tags/v0.1.5.tar.gz") != null);
     try std.testing.expect(std.mem.indexOf(u8, tmpl_build_zon, STABLE_HASH) != null);
 }
 
@@ -2167,7 +2167,7 @@ fn resourceGenerate(alloc: std.mem.Allocator, name: []const u8, args: []const [:
     try writeFileBytes(test_path, test_body);
     const migration_name = try std.fmt.allocPrint(alloc, "create_{s}s", .{name});
     defer alloc.free(migration_name);
-    const generated_args = [_][:0]const u8{try alloc.dupeZ(u8, migration_name)};
+    const generated_args = [_][:0]const u8{try alloc.dupeSentinel(u8, migration_name, 0)};
     defer alloc.free(generated_args[0]);
     try migrateGenerate(alloc, &generated_args);
     std.debug.print("generated resource `{s}`; import it from your app and register its routes\n", .{name});
@@ -2331,7 +2331,7 @@ fn countSqlMigrations(path: []const u8) usize {
 }
 fn removeFileIfExists(alloc: std.mem.Allocator, path: []const u8) !void {
     if (!fileExists(path)) return;
-    const z = try alloc.dupeZ(u8, path);
+    const z = try alloc.dupeSentinel(u8, path, 0);
     defer alloc.free(z);
     if (unlink(z.ptr) != 0) return error.RemoveFailed;
 }
@@ -2599,7 +2599,7 @@ const Sigaction = switch (builtin.os.tag) {
     },
     else => extern struct {
         handler: *const fn (c_int) callconv(.c) void,
-        mask: [16]c_ulong = [_]c_ulong{0} ** 16, // sigset_t (over-sized; zeroed)
+        mask: [16]c_ulong = @as([16]c_ulong, @splat(0)), // sigset_t (over-sized; zeroed)
         flags: c_int = 0,
         restorer: ?*const fn () callconv(.c) void = null,
     },
@@ -2646,7 +2646,7 @@ fn runChild(alloc: std.mem.Allocator, argv: []const []const u8, cwd: ?[]const u8
     }
 
     if (cwd) |c| {
-        const cwd_z = try alloc.dupeZ(u8, c);
+        const cwd_z = try alloc.dupeSentinel(u8, c, 0);
         defer alloc.free(cwd_z);
         if (chdir(cwd_z.ptr) != 0) return error.ChildFailed;
     }

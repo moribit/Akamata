@@ -1,3 +1,4 @@
+const reflection = @import("../reflection.zig");
 const std = @import("std");
 pub const Value = @import("value.zig").Value;
 const trace_mod = @import("../observability/trace.zig");
@@ -103,7 +104,7 @@ pub const Stmt = struct {
         const info = @typeInfo(T);
         if (info != .@"struct") @compileError("readRow: struct expected");
         var out: T = undefined;
-        inline for (info.@"struct".fields, 0..) |f, i| {
+        inline for (reflection.fields(info.@"struct"), 0..) |f, i| {
             const FT = f.type;
             if (@typeInfo(FT) == .optional) {
                 if (try self.columnIsNull(i)) {

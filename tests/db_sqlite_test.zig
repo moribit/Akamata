@@ -140,7 +140,7 @@ test "byte arrays, pointers, and slices bind their complete value" {
     defer db.close();
     try db.exec("CREATE TABLE bytes (kind TEXT, value TEXT)");
 
-    var mutable: [64]u8 = [_]u8{'x'} ** 64;
+    var mutable: [64]u8 = @as([64]u8, @splat('x'));
     const direct: [4]u8 = .{ 'a', 'b', 'c', 'd' };
     const mutable_slice: []u8 = mutable[0..5];
     const const_slice: []const u8 = mutable[0..7];
@@ -149,11 +149,13 @@ test "byte arrays, pointers, and slices bind their complete value" {
     try stmt.bindAll(.{ "array", direct, "pointer", &mutable, "mutable_slice", mutable_slice, "const_slice", const_slice });
     _ = try stmt.step();
 
-    var rows = try db.prepare("SELECT length(value) FROM bytes ORDER BY rowid");
+    var rows = try db.prepare("SELECT length(value), value FROM bytes ORDER BY rowid");
     defer rows.deinit();
     const expected = [_]i64{ 4, 64, 5, 7 };
-    for (expected) |length| {
+    const expected_values = [_][]const u8{ &direct, &mutable, mutable_slice, const_slice };
+    for (expected, expected_values) |length, bytes| {
         try std.testing.expectEqual(am.db.StepResult.row, try rows.step());
         try std.testing.expectEqual(length, try rows.columnInt(0));
+        try std.testing.expectEqualStrings(bytes, try rows.columnText(1));
     }
 }

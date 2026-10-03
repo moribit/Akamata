@@ -1,6 +1,6 @@
 # Akamata Handbook — 15-minute tour
 
-Akamata is a Zig 0.16 web framework that targets two deploy shapes from one
+Akamata is a Zig 0.17 web framework that targets two deploy shapes from one
 source: a native binary (VPS / Cloudflare Containers) and a Cloudflare Workers
 wasm module. The DB layer abstracts SQLite, Turso (libsql), and Cloudflare
 D1 behind a URL — your handler code doesn't know which one is live.

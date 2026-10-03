@@ -33,7 +33,7 @@ pub fn serveStatic(comptime State: type, comptime opts: Options) app_mod.Middlew
 
             const full = try std.fmt.allocPrint(c.arena, "{s}/{s}", .{ opts.root, safe });
 
-            const path_z = try c.arena.dupeZ(u8, full);
+            const path_z = try c.arena.dupeSentinel(u8, full, 0);
             const FILE = opaque {};
             const Lib = struct {
                 extern "c" fn fopen(p2: [*:0]const u8, m: [*:0]const u8) ?*FILE;

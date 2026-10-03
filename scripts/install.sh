@@ -8,7 +8,7 @@
 #   ./scripts/install.sh --uninstall     # remove the installed binary
 #
 # Requirements:
-#   - zig 0.16+ on PATH
+#   - zig 0.17+ on PATH
 #   - bash, install(1)
 
 set -euo pipefail
@@ -52,7 +52,7 @@ if [ "$ACTION" = "uninstall" ]; then
 fi
 
 if ! command -v zig >/dev/null 2>&1; then
-    echo "error: zig not found on PATH. Install Zig 0.16+ from https://ziglang.org/download/" >&2
+    echo "error: zig not found on PATH. Install Zig 0.17+ from https://ziglang.org/download/" >&2
     exit 1
 fi
 

@@ -52,7 +52,7 @@ pub const EventChannel = struct {
     /// Monotonic event id. Subscribers track the last id they've seen and
     /// only read newer slots.
     next_seq: u64 = 1,
-    slots: [ring_capacity]Slot = [_]Slot{.{ .seq = 0, .bytes = &.{} }} ** ring_capacity,
+    slots: [ring_capacity]Slot = @as([ring_capacity]Slot, @splat(.{ .seq = 0, .bytes = &.{} })),
 
     pub fn init(gpa: std.mem.Allocator) EventChannel {
         return .{

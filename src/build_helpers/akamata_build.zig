@@ -66,6 +66,6 @@ pub fn app(b: *std.Build, opts: AppOptions) void {
     b.installArtifact(exe);
 
     const run = b.addRunArtifact(exe);
-    if (b.args) |args| run.addArgs(args);
+    run.addPassthruArgs();
     b.step("run", "run the app (native)").dependOn(&run.step);
 }

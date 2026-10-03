@@ -4,11 +4,11 @@
 
 [English](README.md) | 日本語
 
-Zig 0.16向けのミニマルWebフレームワークです。Zigと標準ライブラリを中心に
+Zig 0.17向けのミニマルWebフレームワークです。Zigと標準ライブラリを中心に
 HTTP/WebSocket層を構成し、SQLite、D1、TursoのDBバックエンドと、native server、
 Cloudflare Workers、Cloudflare Containersへのデプロイをサポートします。
 
-最新release: **v0.1.4** · 必須Zig: **0.16.x** · [Release notes](CHANGELOG.md)
+最新release: **v0.1.5** · 必須Zig: **0.17.x** · [Release notes](CHANGELOG.md)
 
 ```zig
 const std = @import("std");
@@ -79,7 +79,7 @@ zig build cli
 
 | 対象 | 要件 |
 |---|---|
-| 基本開発環境 | Zig 0.16.x、macOSまたはLinux、libc |
+| 基本開発環境 | Zig 0.17.x、macOSまたはLinux、libc |
 | native DB | 同梱SQLite amalgamation。system SQLiteのinstallは不要 |
 | Workers | Node.js、Wrangler、Cloudflare account。D1は任意 |
 | Containers | Docker。Cloudflare Containersには対応planが必要 |

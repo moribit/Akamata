@@ -1,3 +1,4 @@
+const reflection = @import("reflection.zig");
 const std = @import("std");
 
 pub const ParseError = error{ Invalid, OutOfMemory };
@@ -95,7 +96,7 @@ pub fn appendValue(comptime T: type, value: T, w: *std.Io.Writer) !void {
         .@"struct" => |s| {
             try w.writeByte('{');
             comptime var first = true;
-            inline for (s.fields) |f| {
+            inline for (reflection.fields(s)) |f| {
                 if (!first) try w.writeByte(',');
                 first = false;
                 try w.writeByte('"');

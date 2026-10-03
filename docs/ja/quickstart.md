@@ -4,7 +4,7 @@
 
 ## 必要な環境
 
-- Zig 0.16.x
+- Zig 0.17.x
 - GitとPOSIX互換shell
 - Cloudflare Workersを利用する場合のみNode.jsとWrangler
 - Cloudflare Containersを利用する場合のみDocker
@@ -72,7 +72,7 @@ scaffoldはHello Worldではなく、SQLiteで動作するNote APIです。valid
 
 native entrypointは起動時にmodel schemaとの差分を計算して適用します。Workers entrypointは`migrate.Once`を使用し、isolateごとに初期化を1回実行します。
 
-初回buildでは固定済みAkamata sourceをdownloadします。`build.zig.zon`を編集せずlocal checkoutを試すには、Zig 0.16のpackage overrideを使用します。
+初回buildでは固定済みAkamata sourceをdownloadします。`build.zig.zon`を編集せずlocal checkoutを試すには、Zig 0.17のpackage overrideを使用します。
 
 ```bash
 zig build --fork=/path/to/Akamata

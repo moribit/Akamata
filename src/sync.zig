@@ -31,7 +31,7 @@ extern "c" fn pthread_mutex_unlock(m: *PthreadMutex) c_int;
 /// atomic-RW-lock or sharding instead, but for "rare writer / many readers"
 /// this is fine.
 pub const Mutex = struct {
-    raw: PthreadMutex = .{ ._opaque = [_]u8{0} ** native_storage_bytes },
+    raw: PthreadMutex = .{ ._opaque = @as([native_storage_bytes]u8, @splat(0)) },
     initialized: bool = false,
 
     pub fn init() Mutex {
@@ -93,7 +93,7 @@ extern "c" fn pthread_cond_broadcast(c: *PthreadCond) c_int;
 ///     mu.unlock();
 ///     cond.signal();
 pub const Condition = struct {
-    raw: PthreadCond = .{ ._opaque = [_]u8{0} ** native_storage_bytes },
+    raw: PthreadCond = .{ ._opaque = @as([native_storage_bytes]u8, @splat(0)) },
     initialized: bool = false,
 
     pub fn init() Condition {

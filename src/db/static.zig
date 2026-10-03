@@ -1,4 +1,5 @@
 //! Static database dispatch and Zig-side SQL shape validation.
+const reflection = @import("../reflection.zig");
 const std = @import("std");
 
 /// Specialize calls for a concrete backend value. Backend methods are called
@@ -36,15 +37,15 @@ pub fn Query(comptime sql: []const u8, comptime Args: type, comptime Row: type) 
 fn validateArgs(comptime sql: []const u8, comptime Args: type) void {
     const info = @typeInfo(Args);
     if (info != .@"struct" or !info.@"struct".is_tuple) @compileError("SQL Args must be a tuple type");
-    if (info.@"struct".fields.len != countPlaceholders(sql)) @compileError("SQL placeholder count does not match Args tuple length");
-    inline for (info.@"struct".fields) |field| validateScalar(field.type, "SQL argument");
+    if (reflection.fields(info.@"struct").len != countPlaceholders(sql)) @compileError("SQL placeholder count does not match Args tuple length");
+    inline for (reflection.fields(info.@"struct")) |field| validateScalar(field.type, "SQL argument");
 }
 
 fn validateRow(comptime Row: type) void {
     if (Row == void) return;
     const info = @typeInfo(Row);
     if (info != .@"struct") @compileError("SQL Row must be a struct or void");
-    inline for (info.@"struct".fields) |field| validateScalar(field.type, "SQL result field");
+    inline for (reflection.fields(info.@"struct")) |field| validateScalar(field.type, "SQL result field");
 }
 
 fn validateScalar(comptime T: type, comptime what: []const u8) void {
@@ -74,6 +75,6 @@ fn countPlaceholders(comptime sql: []const u8) usize {
 }
 
 test "query validates Zig-visible SQL shape" {
-    const Q = Query("select id, name from users where id = ?", std.meta.Tuple(&.{u64}), struct { id: u64, name: []const u8 });
+    const Q = Query("select id, name from users where id = ?", @Tuple(&.{u64}), struct { id: u64, name: []const u8 });
     try std.testing.expectEqual(@as(usize, 1), Q.placeholder_count);
 }

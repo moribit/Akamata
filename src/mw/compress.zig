@@ -143,7 +143,11 @@ test "compressBytes round-trips through gzip decompressor" {
     defer arena_state.deinit();
     const arena = arena_state.allocator();
 
-    const payload = "Lorem ipsum dolor sit amet " ** 64;
+    const payload = comptime blk: {
+        var text: []const u8 = "";
+        for (0..64) |_| text = text ++ "Lorem ipsum dolor sit amet ";
+        break :blk text;
+    };
     const out = try compressBytes(arena, payload, .gzip);
     try std.testing.expect(out.len < payload.len);
     try std.testing.expect(std.mem.startsWith(u8, out, "\x1f\x8b")); // gzip magic

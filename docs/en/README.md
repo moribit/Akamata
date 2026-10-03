@@ -1,8 +1,8 @@
 # Akamata Documentation
 
-This is the documentation home for Akamata v0.1.4 and Zig 0.16.x. Start with the Quick Start if you are evaluating the framework, then use the Handbook or Tutorial for a deeper walkthrough.
+This is the documentation home for Akamata v0.1.5 and Zig 0.17.x. Start with the Quick Start if you are evaluating the framework, then use the Handbook or Tutorial for a deeper walkthrough.
 
-**Release status:** v0.1.4 is the current public 0.x release. The `main` branch
+**Release status:** v0.1.5 is the current public 0.x release. The `main` branch
 is development-oriented; pin a tagged release for reproducible builds.
 
 [日本語](../ja/README.md) · [Project README](../../README.md)
@@ -16,6 +16,8 @@ is development-oriented; pin a tagged release for reproducible builds.
 - [Upgrade guide](upgrading.md) — behavior changes after v0.0.1
 - [Developer experience](developer-experience.md) — contracts, typed inputs/DI, project inspection, generators, API diff, and migration workflow
 - [CLI API client](cli-client.md) — direct and OpenAPI operation-based requests from `akamata`
+
+- [Zig 0.17 migration](zig-0.17-migration.md) — v0.1.5 changes, upgrade steps, and validation
 
 ## Guides
 

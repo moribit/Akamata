@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-10-03
+
+### Changed
+
+- Require Zig 0.17.0 and update CI, scaffold manifests, and container toolchains.
+- Replace removed C imports with build-time header translation, migrate array
+  repetition to `@splat`, and adapt reflection and standard library APIs.
+- Keep borrowed byte-array SQL values alive during optimized builds.
+- Forward `zig build run -- ...` arguments with `addPassthruArgs` in framework
+  builds, generated apps, and the public build helper.
+- Test generated apps against the current checkout with `scaffold-local-test`.
+
+See [Zig 0.17 migration guide](docs/ja/zig-0.17-migration.md) and
+[v0.1.5 release notes](docs/releases/v0.1.5.md).
+
 ## [0.1.4] - 2026-08-27
 
 ### Fixed

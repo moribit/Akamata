@@ -1,3 +1,4 @@
+const reflection = @import("reflection.zig");
 // Hono-style App. Routes, middlewares, and groupings are accumulated at
 // runtime via builder methods. `App(MyState)` is generic over the user-defined
 // state type, and handlers receive `*Context(State)`.
@@ -388,7 +389,7 @@ pub fn App(comptime State: type) type {
                         const info = @typeInfo(Fn);
                         // deinit(*Self) and deinit(*Self, Allocator) are
                         // the two shapes we know how to call.
-                        switch (info.@"fn".params.len) {
+                        switch (info.@"fn".param_types.len) {
                             1 => p.deinit(),
                             2 => p.deinit(gpa),
                             else => @compileError("app.own deinit must accept (*Self) or (*Self, Allocator)"),
@@ -795,16 +796,16 @@ pub fn App(comptime State: type) type {
 
             var method_not_allowed = false;
             if (matched == null) {
-                var allowed = [_]bool{false} ** @typeInfo(Method).@"enum".fields.len;
+                var allowed = @as([reflection.fields(@typeInfo(Method).@"enum").len]bool, @splat(false));
                 for (self.routes.items) |r| {
                     var scratch_names: [16][]const u8 = undefined;
                     var scratch_values: [16][]const u8 = undefined;
                     if (matchSegments(r.segments, request.path, &scratch_names, &scratch_values) == null) continue;
-                    allowed[@intFromEnum(r.method)] = true;
-                    if (r.method == .GET) allowed[@intFromEnum(Method.HEAD)] = true;
+                    allowed[@backingInt(r.method)] = true;
+                    if (r.method == .GET) allowed[@backingInt(Method.HEAD)] = true;
                 }
                 var allow: std.ArrayList(u8) = .empty;
-                inline for (@typeInfo(Method).@"enum".fields) |field| {
+                inline for (reflection.fields(@typeInfo(Method).@"enum")) |field| {
                     if (allowed[field.value]) {
                         if (allow.items.len > 0) try allow.appendSlice(arena, ", ");
                         try allow.appendSlice(arena, field.name);

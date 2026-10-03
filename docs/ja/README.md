@@ -1,8 +1,8 @@
 # Akamataドキュメント
 
-このページはAkamata v0.1.4／Zig 0.16.x向けドキュメントの入口です。フレームワークを初めて試す場合はクイックスタートから始め、HandbookまたはTutorialで理解を深めてください。
+このページはAkamata v0.1.5／Zig 0.17.x向けドキュメントの入口です。フレームワークを初めて試す場合はクイックスタートから始め、HandbookまたはTutorialで理解を深めてください。
 
-**リリース状況:** v0.1.4は現在の公開0.x releaseです。`main`は開発向け
+**リリース状況:** v0.1.5は現在の公開0.x releaseです。`main`は開発向け
 のため、再現可能な build が必要な場合はタグ付き release を固定してください。
 
 [English](../en/README.md) · [プロジェクトREADME](../../README.ja.md)
@@ -16,6 +16,8 @@
 - [アップグレードガイド](upgrading.md) — v0.0.1以降の挙動変更
 - [開発体験](developer-experience.md) — contract、型付きinput／DI、project検査、generator、API diff、migration workflow
 - [CLI API client](cli-client.md) — `akamata`から直接またはOpenAPI operation単位でrequestを実行
+
+- [Zig 0.17への移行](zig-0.17-migration.md) — v0.1.5の変更点、移行手順、検証結果
 
 ## Guide
 

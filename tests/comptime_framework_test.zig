@@ -116,7 +116,7 @@ test "static middleware preserves declaration order" {
 test "SQL descriptor validates placeholders and row types" {
     const Q = am.db.Query(
         "select id, name from users where id = ?",
-        std.meta.Tuple(&.{u64}),
+        @Tuple(&.{u64}),
         struct { id: u64, name: []const u8 },
     );
     try std.testing.expectEqual(@as(usize, 1), Q.placeholder_count);

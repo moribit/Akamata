@@ -1,8 +1,8 @@
 .{
     .name = .akamata,
-    .version = "0.1.4",
+    .version = "0.1.5",
     .fingerprint = 0x87735abe232892b8,
-    .minimum_zig_version = "0.16.0",
+    .minimum_zig_version = "0.17.0",
     .dependencies = .{},
     .paths = .{
         "build.zig",

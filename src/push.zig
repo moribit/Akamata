@@ -56,7 +56,7 @@ pub const Sender = struct {
     /// Load a Google service account JSON from disk via libc. Native only.
     pub fn loadServiceAccountFromFile(self: *Sender, path: []const u8) !void {
         if (!is_native) return PushError.UnsupportedOnTarget;
-        const path_z = try self.gpa.dupeZ(u8, path);
+        const path_z = try self.gpa.dupeSentinel(u8, path, 0);
         defer self.gpa.free(path_z);
 
         const FILE = opaque {};

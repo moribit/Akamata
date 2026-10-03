@@ -56,7 +56,7 @@ DB バックエンドは:
 
 ### 必須
 
-- **Zig 0.16.0** — `zig version` で確認できる。なければ
+- **Zig 0.17.0** — `zig version` で確認できる。なければ
   [ziglang.org/download](https://ziglang.org/download/) から取得 (公式 tarball を `$HOME/.local` に展開して `PATH` を通すのが一番安全)
 - macOS / Linux のターミナル (Windows は WSL2 推奨)
 - `curl` (Linux/macOS 標準)
@@ -73,7 +73,7 @@ DB バックエンドは:
 
 ```bash
 zig version
-# 期待出力: 0.16.0 もしくは 0.16.0-dev.NNN+xxxxxxx
+# 期待出力: 0.17.0
 ```
 
 ### Akamata 本体を入手

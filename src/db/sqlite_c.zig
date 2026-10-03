@@ -1,9 +1,7 @@
 const std = @import("std");
 
-// Isolated @cImport for sqlite3. Build script links sqlite3.c via addCSourceFile.
-pub const c = @cImport({
-    @cInclude("sqlite3.h");
-});
+// SQLite bindings are translated by build.zig.
+pub const c = @import("sqlite3");
 
 pub const SQLITE_OK = c.SQLITE_OK;
 pub const SQLITE_ROW = c.SQLITE_ROW;

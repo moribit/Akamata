@@ -90,7 +90,7 @@ pub fn loadDotEnv(gpa: std.mem.Allocator, path: []const u8) !void {
     if (!is_native) return;
     if (builtin.os.tag == .windows) return;
 
-    const path_z = try gpa.dupeZ(u8, path);
+    const path_z = try gpa.dupeSentinel(u8, path, 0);
     defer gpa.free(path_z);
 
     const FILE = opaque {};

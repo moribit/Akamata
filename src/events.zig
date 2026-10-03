@@ -1,4 +1,5 @@
 //! Transport-neutral typed events and realtime protocol metadata.
+const reflection = @import("reflection.zig");
 const std = @import("std");
 
 pub const EventOptions = struct {
@@ -63,7 +64,7 @@ pub fn Protocol(comptime EventUnion: type, comptime version: u16) type {
     return struct {
         pub const Events = EventUnion;
         pub const protocol_version = version;
-        pub const event_count = @typeInfo(EventUnion).@"union".fields.len;
+        pub const event_count = reflection.fields(@typeInfo(EventUnion).@"union").len;
 
         pub const DecodeError = error{
             MalformedEnvelope,
@@ -114,7 +115,7 @@ pub fn Protocol(comptime EventUnion: type, comptime version: u16) type {
             var payload_writer: std.Io.Writer.Allocating = .init(allocator);
             std.json.Stringify.value(wire.payload, .{}, &payload_writer.writer) catch return error.OutOfMemory;
             const payload_bytes = payload_writer.written();
-            inline for (@typeInfo(EventUnion).@"union".fields) |field| {
+            inline for (reflection.fields(@typeInfo(EventUnion).@"union")) |field| {
                 if (std.mem.eql(u8, wire.event_type, field.name)) {
                     const payload = std.json.parseFromSliceLeaky(field.type, allocator, payload_bytes, .{ .ignore_unknown_fields = true }) catch
                         return DecodeError.MalformedPayload;
@@ -130,7 +131,7 @@ pub fn validateProtocol(comptime T: type) void {
     const info = @typeInfo(T);
     if (info != .@"union" or info.@"union".tag_type == null)
         @compileError("Akamata realtime protocols must be tagged unions");
-    inline for (info.@"union".fields) |field| validateEventType(field.type);
+    inline for (reflection.fields(info.@"union")) |field| validateEventType(field.type);
 }
 
 pub fn stableId(comptime name: []const u8, comptime version: u16) u64 {
