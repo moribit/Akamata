@@ -33,7 +33,7 @@ const tmpl_internal_routes = @embedFile("templates/internal_routes.mjs.tpl");
 const tmpl_realtime_object = @embedFile("templates/realtime_object.mjs.tpl");
 
 const STABLE_VERSION = "v0.1.5";
-const STABLE_HASH = "akamata-0.1.5-uJIoI2fPLgH0EyO2hDIPBnQDQ1KvPP0rfneaP42rPIqN";
+const STABLE_HASH = "akamata-0.1.5-uJIoI1NfLQF6-Qs1SRcEg6mlm0XM5jC4rQ8jxqGuprie";
 const MANAGED_MANIFEST = ".akamata/managed-files.json";
 
 pub fn main(init: std.process.Init) !void {
