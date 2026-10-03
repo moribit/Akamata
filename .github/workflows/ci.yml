@@ -23,7 +23,7 @@ jobs:
           - name: cli-build
             cmd: zig build cli
           - name: package-archive
-            cmd: zig fetch .
+            cmd: zig fetch --global-cache-dir /tmp/akamata-package-cache .
           - name: chat-native
             cmd: zig build -Dexample=chat
           - name: chat-workers
