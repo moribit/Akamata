@@ -92,8 +92,8 @@ count はスレッド数とは無関係になります。ワーカープール�
 
 これをポータブル インターフェイスの背後に抽象化することは**しません**。各バックエンド
 独自のファイル (`reactor_kqueue.zig`、`reactor_epoll.zig`) を取得します。
-同じパブリック API。 `runtime/native.zig` モジュールはコンプタイム時に 1 つを選択します
-`builtin.os.tag`に基づいています。
+同じ内部transport interfaceを持ちます。productionでの選択は
+`App.serve`経由の`src/serve.zig`で行う設計とし、現在の`.reactor`は無効です。
 
 ### 2. ワーカープールのサイジング
 

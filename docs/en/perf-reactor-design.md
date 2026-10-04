@@ -93,8 +93,8 @@ count becomes irrelevant to thread count; the worker pool sizes for
 
 We **don't** abstract this behind a portable interface. Each backend
 gets its own file (`reactor_kqueue.zig`, `reactor_epoll.zig`) with the
-same public API. The `runtime/native.zig` module picks one at comptime
-based on `builtin.os.tag`.
+same internal transport interface. Any future production selection belongs
+in `src/serve.zig`, behind `App.serve`; `.reactor` is currently disabled.
 
 ### 2. Worker pool sizing
 
