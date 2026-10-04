@@ -8,7 +8,12 @@ fn observed(c: *am.Context(State)) !void {
     try std.testing.expect(c.requestId() != null);
     var custom = c.startSpan("r2.put");
     defer custom.end();
-    var stmt = try c.db().prepare("SELECT value FROM items WHERE id = ?");
+    // An indexed SELECT can finish within a single clock tick on macOS.
+    // Exercise measurable database work so timing-header assertions are stable.
+    var stmt = try c.db().prepare(
+        "WITH RECURSIVE ticks(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM ticks WHERE n<1000) " ++
+            "SELECT value FROM items WHERE id = ? AND (SELECT sum(n) FROM ticks) = 500500",
+    );
     defer stmt.deinit();
     try stmt.bind(1, .{ .int = 1 });
     _ = try stmt.step();
@@ -40,7 +45,7 @@ test "request id, route template, DB timing, span, metrics and Server-Timing" {
 
     try std.testing.expectEqualStrings("ok", res.body.items);
     try std.testing.expectEqual(@as(u64, 1), counters.requests_total.load(.monotonic));
-    try std.testing.expectEqual(@as(u64, 1), counters.db_operations[@intFromEnum(am.observability.Backend.sqlite)].load(.monotonic));
+    try std.testing.expectEqual(@as(u64, 1), counters.db_operations[@backingInt(am.observability.Backend.sqlite)].load(.monotonic));
     var saw_request_id = false;
     var saw_timing = false;
     for (res.headers.items) |h| {
@@ -50,6 +55,9 @@ test "request id, route template, DB timing, span, metrics and Server-Timing" {
         }
     }
     try std.testing.expect(saw_request_id);
+    if (!saw_timing) for (res.headers.items) |h| {
+        std.debug.print("observed header: {s}: {s}\n", .{ h.name, h.value });
+    };
     try std.testing.expect(saw_timing);
 }
 

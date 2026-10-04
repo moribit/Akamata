@@ -406,20 +406,7 @@ pub const Migrator = struct {
 /// version (the part before the first underscore) out of each filename.
 /// Native-only (uses libc readdir + fread).
 pub fn loadMigrationsFromDir(arena: std.mem.Allocator, dir_path: []const u8) ![]Migration {
-    const dirent_lib = struct {
-        const DIR = opaque {};
-        const dirent = extern struct {
-            d_ino: u64,
-            d_seekoff: u64,
-            d_reclen: u16,
-            d_namlen: u16,
-            d_type: u8,
-            d_name: [1024]u8,
-        };
-        extern "c" fn opendir(p: [*:0]const u8) ?*DIR;
-        extern "c" fn readdir(d: *DIR) ?*dirent;
-        extern "c" fn closedir(d: *DIR) c_int;
-    };
+    const dirent_lib = std.c;
 
     const dir_z = try arena.dupeSentinel(u8, dir_path, 0);
     defer arena.free(dir_z);
@@ -428,7 +415,7 @@ pub fn loadMigrationsFromDir(arena: std.mem.Allocator, dir_path: []const u8) ![]
 
     var names: std.ArrayList([]u8) = .empty;
     while (dirent_lib.readdir(d)) |entry| {
-        const name = std.mem.sliceTo(@as([*:0]const u8, @ptrCast(&entry.d_name)), 0);
+        const name = std.mem.sliceTo(@as([*:0]const u8, @ptrCast(&entry.name)), 0);
         if (!std.mem.endsWith(u8, name, ".sql")) continue;
         try names.append(arena, try arena.dupe(u8, name));
     }
@@ -678,4 +665,33 @@ test "migrate: schema evolution (add column + new index)" {
     // Third diff: clean.
     plan = try diff(arena, database, &.{td2});
     try testing.expect(plan.isEmpty());
+}
+
+test "migration files load complete names in order and apply once" {
+    if (builtin.cpu.arch == .wasm32) return error.SkipZigTest;
+    var temporary = testing.tmpDir(.{});
+    defer temporary.cleanup();
+    const io = testing.io;
+    // Write in reverse order to make filesystem ordering irrelevant.
+    try temporary.dir.writeFile(io, .{ .sub_path = "20260102_insert.sql", .data = "INSERT INTO loaded_files(id) VALUES(7);" });
+    try temporary.dir.writeFile(io, .{ .sub_path = "20260101_create.sql", .data = "CREATE TABLE loaded_files(id INTEGER PRIMARY KEY);" });
+    try temporary.dir.writeFile(io, .{ .sub_path = "README.txt", .data = "not SQL" });
+    var path_buffer: [4096]u8 = undefined;
+    const path_len = try temporary.dir.realPath(io, &path_buffer);
+    var arena_state: std.heap.ArenaAllocator = .init(testing.allocator);
+    defer arena_state.deinit();
+    const arena = arena_state.allocator();
+    const loaded = try loadMigrationsFromDir(arena, path_buffer[0..path_len]);
+    try testing.expectEqual(@as(usize, 2), loaded.len);
+    try testing.expectEqualStrings("20260101_create.sql", loaded[0].name);
+    try testing.expectEqualStrings("20260101", loaded[0].version);
+    try testing.expectEqualStrings("20260102_insert.sql", loaded[1].name);
+    try testing.expectEqualStrings("INSERT INTO loaded_files(id) VALUES(7);", loaded[1].sql);
+    var database = try Sqlite.open(testing.allocator, ":memory:");
+    defer database.close();
+    const migrator: Migrator = .{ .db = database, .arena = arena };
+    try migrator.applyAll(try migrator.pending(loaded));
+    try testing.expectEqual(@as(usize, 0), (try migrator.pending(loaded)).len);
+    try migrator.applyAll(try migrator.pending(loaded));
+    try testing.expectEqual(@as(usize, 2), (try migrator.appliedVersions()).len);
 }

@@ -45,32 +45,11 @@ pub const stat_t = switch (builtin.os.tag) {
 
 pub extern "c" fn stat(path: [*:0]const u8, buf: *stat_t) c_int;
 
-pub const DIR = opaque {};
-
-pub const dirent = switch (builtin.os.tag) {
-    .macos => extern struct {
-        ino: u64,
-        seekoff: u64,
-        reclen: u16,
-        namlen: u16,
-        type: u8,
-        name: [1024]u8,
-    },
-    else => extern struct {
-        ino: u64,
-        off: i64,
-        reclen: u16,
-        type: u8,
-        name: [256]u8,
-    },
-};
-
-pub extern "c" fn opendir(path: [*:0]const u8) ?*DIR;
-
-pub extern "c" fn readdir(d: *DIR) ?*dirent;
-
-pub extern "c" fn closedir(d: *DIR) c_int;
-
+const c = @import("std").c;
+pub const DIR = c.DIR;
+pub const dirent = c.dirent;
+pub const opendir = c.opendir;
+pub const readdir = c.readdir;
+pub const closedir = c.closedir;
 pub const DT_DIR = 4;
-
 pub const DT_REG = 8;
