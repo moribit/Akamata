@@ -58,8 +58,8 @@ pub fn build(b: *std.Build) void {
             .flags = sqlite_flags,
         });
         am_mod.addIncludePath(b.path("third_party/sqlite"));
+        const Translator = (b.lazyImport(@This(), "translate_c") orelse return).Translator;
         const translate_c = b.lazyDependency("translate_c", .{}) orelse return;
-        const Translator = @import("translate_c").Translator;
         const sqlite_bindings: Translator = .init(translate_c, .{
             .c_source_file = b.path("third_party/sqlite/sqlite3.h"),
             .target = target,
