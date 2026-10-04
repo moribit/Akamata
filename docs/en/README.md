@@ -51,6 +51,7 @@ Benchmark numbers are snapshots of the recorded environment, commands, and Akama
 - [Compile-time routing benchmark](comptime-benchmarks-2026-08-17.md) — route/middleware scaling and artifact-size comparison
 - [Architecture](architecture.md)
 - [v0.2 design record](v0.2-design.md)
-- [Historical API redesign record](hono-style-redesign.md)
 
 Design records describe the reasoning at a point in time and may contain superseded examples. Use the [Handler API](handler-api.md) and current source for the supported interface.
+
+- [v0.2 Phase 1](v0.2-phase1.md)

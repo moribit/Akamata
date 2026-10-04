@@ -167,24 +167,11 @@ fn connectionThread(comptime State: type, ctx: *LoopCtx(State), stream: net.Stre
     };
 }
 
-// === Socket-level timeout configuration ===
-//
-// HISTORICAL NOTE: we used to set SO_RCVTIMEO / SO_SNDTIMEO on each accepted
-// TCP socket as a slowloris defense — peers stuck in a half-open send would
-// then trip EAGAIN on read, which we wanted to surface as `error.Timeout`.
-//
-// That approach is incompatible with Zig 0.16's std.Io.Threaded: its
-// `netReadPosix` treats EAGAIN as a *programmer bug* (the std assumes the
-// fd is blocking-mode and that EAGAIN can only come from a missed non-block
-// flag) and panics through `errnoBug` in debug builds. The thread crash
-// reproduced cleanly from a real client timing out on a long-lived
-// keep-alive connection.
-//
-// We therefore no longer flip those socket options. Slowloris defense
-// should live one layer out (Cloudflare / reverse proxy / IPv4 firewall
-// rate limit / OS keepalive). The `read_timeout_ms` / `write_timeout_ms`
-// fields on `ServeOptions` are kept for future re-introduction via a
-// non-stdlib read path; setting them is currently a no-op.
+// === Socket configuration ===
+// std.Io.Threaded expects blocking connection descriptors; SO_RCVTIMEO and
+// SO_SNDTIMEO can produce EAGAIN that its socket reader treats as a programmer
+// error. Request read deadlines use poll readiness before blocking reads;
+// write_timeout_ms remains reserved until a bounded write path is implemented.
 const builtin = @import("builtin");
 
 extern "c" fn setsockopt(sockfd: c_int, level: c_int, optname: c_int, optval: *const anyopaque, optlen: u32) c_int;

@@ -117,9 +117,9 @@ Workers/Durable Object integration patternを使用します。
 backend対応状況とAPI詳細は、[Handler API](docs/ja/handler-api.md)、
 [DBバックエンド](docs/ja/db-backends.md)、[WebSocketガイド](docs/ja/websocket.md)を参照してください。
 
-`am.Router` / `am.Ctx` / `am.Server` は既存application向け互換APIです。新規実装は
-`am.App` / `am.Context` / `app.serve()`を使用してください。互換APIには新機能を追加せず、
-1.0までに段階的にnamespace内へ限定します。
+HTTP APIは`App → Context → endpoint/middleware → runtime`の単一系統です。
+`am.App(State)`、`am.Context(State)`、`app.serve()`を利用してください。
+削除したAPIは[v0.2 Phase 1変更内容](docs/ja/v0.2-phase1.md)を参照してください。
 
 ## Examples
 

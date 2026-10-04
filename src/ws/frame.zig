@@ -10,7 +10,7 @@ pub const Opcode = enum(u4) {
     _,
 
     pub fn isControl(self: Opcode) bool {
-        return (@intFromEnum(self) & 0x8) != 0;
+        return (@backingInt(self) & 0x8) != 0;
     }
 };
 
@@ -55,7 +55,7 @@ fn decodeMode(arena: std.mem.Allocator, bytes: []const u8, max_payload: usize, r
 
     const fin = (b0 & 0x80) != 0;
     if ((b0 & 0x70) != 0) return FrameError.UnsupportedReservedBits;
-    const opcode: Opcode = @enumFromInt(@as(u4, @truncate(b0 & 0x0F)));
+    const opcode: Opcode = @fromBackingInt(@as(u4, @truncate(b0 & 0x0F)));
     const masked = (b1 & 0x80) != 0;
     if (require_mask and !masked) return FrameError.InvalidFrame;
     var pos: usize = 2;
@@ -111,7 +111,7 @@ fn decodeMode(arena: std.mem.Allocator, bytes: []const u8, max_payload: usize, r
 pub fn encode(out: []u8, opcode: Opcode, fin: bool, payload: []const u8) ![]u8 {
     var pos: usize = 0;
     if (out.len < 2) return error.BufferTooSmall;
-    out[0] = (if (fin) @as(u8, 0x80) else 0) | @as(u8, @intFromEnum(opcode));
+    out[0] = (if (fin) @as(u8, 0x80) else 0) | @as(u8, @backingInt(opcode));
     pos = 1;
     if (payload.len < 126) {
         out[1] = @intCast(payload.len);

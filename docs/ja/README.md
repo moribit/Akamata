@@ -51,6 +51,7 @@ benchmark値は、記載された環境、command、Akamata revisionでの測定
 - [Compile-time routing benchmark](comptime-benchmarks-2026-08-17.md) — route/middleware scalingとartifact size比較
 - [Architecture](architecture.md)
 - [v0.2 design record](v0.2-design.md)
-- [過去のAPI redesign記録](hono-style-redesign.md)
 
 設計資料は特定時点の検討内容を記録したもので、現在は置き換えられた例を含む場合があります。対応中のinterfaceは[Handler API](handler-api.md)と現在のsource codeを確認してください。
+
+- [v0.2 Phase 1](v0.2-phase1.md)

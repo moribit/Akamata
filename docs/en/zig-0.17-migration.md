@@ -14,7 +14,7 @@ Akamata v0.1.5 requires Zig 0.17.0. Native, Workers, the CLI, and generated proj
 | Build run arguments | `b.args` | `run.addPassthruArgs()` |
 | Toolchain | Zig 0.16.0 | Zig 0.17.0 in manifests, CI, and Docker |
 
-SQLite headers are translated for Native; OpenSSL headers are translated only for Native with `-Dopenssl=true`. Workers do not gain these Native dependencies. The implementation uses `std.Build.addTranslateC`, which remains available in 0.17 but is deprecated. A future toolchain migration should consider the official external translate-c package.
+SQLite headers are translated for Native; OpenSSL headers only with `-Dopenssl=true`. v0.1.5 initially used the deprecated `std.Build.addTranslateC`; v0.2 Phase 1 replaces it with a pinned official external translate-c package. Workers do not instantiate that dependency. See [the binding comparison](v0.2-phase1.md#c-bindings).
 
 `src/reflection.zig` builds a shared field view from the new reflection arrays. Models, JSON, OpenAPI, contracts, and event/protocol generators retain names, types, enum values, and defaults. Input projections also use the new struct attribute type and sentinel field names.
 

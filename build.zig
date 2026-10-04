@@ -58,22 +58,23 @@ pub fn build(b: *std.Build) void {
             .flags = sqlite_flags,
         });
         am_mod.addIncludePath(b.path("third_party/sqlite"));
-        const sqlite_bindings = b.addTranslateC(.{
-            .root_source_file = b.path("third_party/sqlite/sqlite3.h"),
+        const translate_c = b.lazyDependency("translate_c", .{}) orelse return;
+        const Translator = @import("translate_c").Translator;
+        const sqlite_bindings: Translator = .init(translate_c, .{
+            .c_source_file = b.path("third_party/sqlite/sqlite3.h"),
             .target = target,
             .optimize = optimize,
         });
-        am_mod.addImport("sqlite3", sqlite_bindings.createModule());
+        am_mod.addImport("sqlite3", sqlite_bindings.mod);
         am_mod.link_libc = true;
         if (with_openssl) {
-            const openssl_bindings = b.addTranslateC(.{
-                .root_source_file = b.path("src/crypto/openssl.h"),
+            const openssl_bindings: Translator = .init(translate_c, .{
+                .link_system_libs = &.{ .{ .name = "ssl" }, .{ .name = "crypto" } },
+                .c_source_file = b.path("src/crypto/openssl.h"),
                 .target = target,
                 .optimize = optimize,
             });
-            openssl_bindings.linkSystemLibrary("ssl", .{});
-            openssl_bindings.linkSystemLibrary("crypto", .{});
-            am_mod.addImport("openssl", openssl_bindings.createModule());
+            am_mod.addImport("openssl", openssl_bindings.mod);
             am_mod.linkSystemLibrary("ssl", .{});
             am_mod.linkSystemLibrary("crypto", .{});
         }
@@ -186,6 +187,10 @@ pub fn build(b: *std.Build) void {
     workers_capability_sync.addArtifactArg(cli_exe);
     b.step("workers-capability-sync-test", "preserve Workers capabilities while regenerating managed glue").dependOn(&workers_capability_sync.step);
 
+    const cli_operations = b.addSystemCommand(&.{ "python3", "tests/cli_operations_smoke.py" });
+    cli_operations.addArtifactArg(cli_exe);
+    b.step("cli-operations-test", "verify external CLI contracts without deployment").dependOn(&cli_operations.step);
+
     // === Tests ===
     const test_step = b.step("test", "run unit tests");
     const compile_fail_command = b.addSystemCommand(&.{ "bash", "tests/compile_fail.sh" });
@@ -203,8 +208,6 @@ pub fn build(b: *std.Build) void {
     const test_targets = [_][]const u8{
         "tests/http_parser_test.zig",
         "tests/ws_frame_test.zig",
-        "tests/router_test.zig",
-        "tests/middleware_test.zig",
         "tests/db_sqlite_test.zig",
         "tests/d1_mock_test.zig",
         "tests/jwt_test.zig",

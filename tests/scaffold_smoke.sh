@@ -57,6 +57,8 @@ migrate_up() {
 }
 build_app
 build_app -Dbackend=workers -Doptimize=ReleaseSmall
+build_app -Doptimize=ReleaseSafe
+build_app -Dbackend=workers -Doptimize=ReleaseSafe
 migrate_up
 "$cli" migrate generate create_smoke
 migration_file=$(find migrations -type f -name '*_create_smoke.sql' -print | head -n 1)

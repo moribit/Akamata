@@ -1,77 +1,59 @@
-# Akamata Architecture
+# Akamata architecture
 
-3 layer configuration:
+Akamata runs the same Zig application on Native/VPS/Containers and Cloudflare Workers. Its application-facing HTTP path is `App → Context → endpoint/middleware → runtime`.
 
-1. **Transport layer** — `src/http/` (HTTP/1.1 synchronous multithreading) and `src/ws/` (WebSocket upgrade). Directly use `std.net.Server` and write based on `std.Io.Reader/Writer`.
-2. **Application Layer** — Table-driven routing in `src/router.zig`, `fn(ctx, next) !void` chain in `src/middleware.zig`, per-request arena + typed path parameters in `src/context.zig`.
-3. **Persistence layer** — Abstracted with vtables in `src/db/db.zig`. Switch between `src/db/sqlite.zig` (`@cImport("sqlite3.h")`) and `src/db/d1.zig` (extern fn for Workers).
+## Application and adapters
 
-Runtime selection is separated into modules with `src/runtime/native.zig` (TCP listen + SIGINT/SIGTERM) and `src/runtime/workers.zig` (WASM exports `alloc/handle_fetch/dealloc/last_response_length`).
-
-## How to pass app state
-
-`Server(App)` takes `App` as a type parameter and injects `*App` into `Ctx(App)`. The allocator can also use the arena resident in `Ctx`.
+- `src/app.zig` owns route registration, middleware chains, lifecycle hooks, and dispatch. `src/context.zig` provides request data, responses, application state, and portable services. Handlers receive `*am.Context(State)`; middleware receives that Context and `am.Next(State)`.
+- `src/static_router.zig`, `static_middleware.zig`, and `contract.zig` provide compile-time registration/binding into the same App dispatch. They are not a separate HTTP server API.
+- `src/serve.zig` selects transport. Native uses Zig 0.17 `std.Io.Threaded` / `std.Io.net`, libc nonblocking accept/poll, bounded connection handling, parsing deadlines, and graceful SIGINT/SIGTERM shutdown. Experimental reactors remain disabled until they meet the production transport contracts.
+- Workers uses `src/runtime/workers.zig` and the JavaScript WASM bridge under `deploy/worker/`. HTTP requests enter the same App dispatch. JSPI serializes a complete WASM request while asynchronous host operations suspend. Bridge details stay outside application handlers.
+- Database, storage, queue, and realtime abstractions expose portable interfaces with platform adapters. SQLite/Turso and Workers D1 use `am.db.Db`; filesystem and Workers R2 use the storage boundary. Platform-specific capabilities are explicit.
 
 ```zig
-const App = struct { db: am.db.Db, hub: Hub };
-var server = try am.Server(App).init(alloc, &app, .{ ... });
+const State = struct { hits: u32 = 0 };
+fn hello(c: *am.Context(State)) !void {
+    c.state().hits += 1;
+    try c.text("hello");
+}
+// During application initialization:
+// var app = am.App(State).init(allocator, .{});
+// defer app.deinit();
+// _ = try app.get("/hello", hello);
+// try app.serve(.{ .port = 8080 });
 ```
 
-There is only one handler signature:
+Shared mutable state must be synchronized when serving concurrent Native requests.
 
-```zig
-fn handler(ctx: *am.Context(App)) !void
-```
+## Native request flow
 
-## Request processing flow (native)
+1. Accept connections under configured limits and record peer addresses.
+2. Parse headers/body with size limits and header/body/idle/total deadlines; reject ambiguous framing.
+3. Dispatch through App route matching, Context construction, middleware, and endpoint.
+4. Write the response or chunked stream; retain the connection only within keep-alive limits.
+5. A Native WebSocket upgrade transfers the connection to `am.ws.Conn`; that upgraded connection owns its lifetime. Workers realtime uses its platform bridge.
 
-1. Take a connection with `accept()` and run `handleConnection` on the thread pool
-2. Continue `recv` until the headers are complete, then `parser.parseRequest` is called.
-3. Confirm handler with `router.match`
-4. Chain execution with `middleware.run(chain, terminal, ctx)`
-5. Send with `res.writeTo(stream)`, loop if `keep-alive`
+## Build and C bindings
 
-## WebSocket
-
-`am.ws.upgrade(App, ctx, opts)` calculates `Sec-WebSocket-Accept` and returns 101, and after sending the response, the server hands over the connection to `Conn` and returns control to the handler. `Conn.readMessage(arena)` processes fragments and control frames (ping/pong/close) internally and returns text/binary only.
-
-## Build target
-
-| `-Dbackend` | `-Dtarget` | Application |
+| Backend | Target | Use |
 |---|---|---|
-| `native` | `native` (default) | Local development |
-| `native` | `x86_64-linux-musl` | Static binaries for Containers |
-| `workers` | `wasm32-freestanding` (Automatic) | Cloudflare Workers WASM |
+| Native | Host default | Local development/VPS |
+| Native | `x86_64-linux-musl` | Static container binary |
+| Workers | Automatic `wasm32-freestanding` | Workers WASM |
 
-`build.zig` resolves the target from the flag, so there is no need to specify `-Dtarget` for Workers.
+Native compiles the vendored SQLite amalgamation. `build.zig` imports its headers as module `sqlite3` using the official external translate-c package, pinned to its Zig 0.17 branch commit. Optional `-Dopenssl=true` translates `src/crypto/openssl.h` with system `ssl`/`crypto` include/link discovery for RS256 signing. Workers does not instantiate this lazy Native dependency. There is no source-level C import. [Binding tradeoffs](v0.2-phase1.md#c-bindings) describe this choice.
 
-## Production Guidelines
+## CLI architecture
 
-Things to check for production release:
+`tools/akamata/src/main.zig` handles arguments, help, exit behavior, and command dispatch. `command/` orchestrates commands; `project/` owns manifests, scaffolding, managed-file hashes, and update protection. `process.zig` owns subprocess transport and `native.zig` shares POSIX filesystem ABI definitions with the dev watcher.
 
-### Network
-- **TLS termination**: The framework itself is HTTP only. The standard is to leave HTTPS to the front stage (Cloudflare's WAF / nginx / Caddy). `http_client` outbound TLS is SAN/CN validated + `SSL_VERIFY_PEER`
-- **Deadlines**: defaults are 10 seconds for headers, 30 seconds for bodies, 5 seconds for keep-alive idle, and 60 seconds total. `max_requests_per_connection` and `max_connections` are also bounded. These deadlines cover HTTP request parsing; an upgraded WebSocket owns its connection lifecycle.
-- **TCP_NODELAY**: Enabled immediately after accept (latency improvement)
-- **accept backoff**: 100us→5s exponential backoff in case of transient failure such as EMFILE
+Cloudflare operations follow `command → cloudflare/operations.zig → cloudflare/wrangler.zig → process`. The operation layer exposes deploy and D1 create/list/execute/provision, with an injectable runner for offline contract tests. Provider arguments and output parsing stay in `cloudflare/`; configuration rendering is in `cloudflare/config.zig`. Wrangler remains the sole default provider. `--containers` currently builds a Linux binary and Docker image; it does not provision or publish Cloudflare Containers.
 
-### Security
-- **HTTP smuggling**: Reject ambiguous framing, duplicate CL/Host, obs-fold, BWS-before-colon, malformed chunks, and unsupported HTTP versions
-- **JWT**: reject anything other than HS256; middleware requires and validates `exp`, and validates `nbf`
-- **CRLF injection**: `res.header()`, name is HTTP token, value is CR/LF/NUL Reject
-- **JSON mass assignment**: Use `am.json.parseLeakyStrict` in trust boundaries such as authentication payload (unknown field rejected)
+## Operational boundaries
 
-### MQTT (only for Containers)
-- Currently only **plaintext TCP** (`tcp://` / `mqtt://`). non-shipping in TLS-required environments
-- MQTT broker authentication is username/password only
-- Production Cloudflare Containers must switch to `tls://` or WebSocket over TLS (roadmap)
+- Terminate inbound TLS at Cloudflare/nginx/Caddy. Native outbound HTTPS uses `std.crypto.tls.Client` with OS certificate roots; Workers uses host fetch. Optional OpenSSL is used for signing, not outbound transport.
+- HTTP parsing rejects duplicate CL/Host, ambiguous framing, obs-fold, invalid chunking, and unsupported versions. Response headers reject injection. Native parsing deadlines and connection/request limits are configurable with `ServeOptions`.
+- Metrics, tracing, request IDs, and timing use existing middleware and request-scoped observability structures; platform clocks/transport are adapters. Phase 2 will evaluate consistent App configuration rather than create another framework.
+- Workers D1 requires the asynchronous JSPI bridge and fails closed if the bridge is unavailable. Native-only job queues and MQTT remain capability-specific; portable scheduled events are Phase 2 work.
 
-### Observability
-- `am.mw.metrics(State, &counters)` to `useAll` and expose Prometheus format in `GET /metrics`
-- Each worker outputs handler error in `std.log.err` structure
-- graceful shutdown (listener close → drain) with `SIGINT/SIGTERM`
-
-### D1 in Workers environment
-- Implemented with **JSPI** (JavaScript Promise Integration). `new WebAssembly.Suspending(fn)` + `WebAssembly.promising(handle_fetch)` allows Zig handler to call D1 with the same synchronous API as SQLite/Turso
-- Runtimes that do not support JSPI, such as the old Miniflare, will fail-closed (`D1Error.BridgeNotImplemented`), so silent failure will not occur.
-- For details `docs/en/db-backends.md`
+See [v0.2 Phase 1](v0.2-phase1.md) for breaking API removals, validation, and the next design review.

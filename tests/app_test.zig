@@ -400,3 +400,41 @@ test "secureHeaders honors per-field opt-out" {
         try std.testing.expect(!std.ascii.eqlIgnoreCase(h.name, "content-security-policy"));
     }
 }
+
+test "only the current App HTTP API is exported" {
+    inline for (.{ "legacy", "Ctx", "Router", "Route", "Server", "middleware", "runNative" }) |name| {
+        try std.testing.expect(!@hasDecl(am, name));
+    }
+    try std.testing.expect(!@hasDecl(am.http, "Server"));
+    try std.testing.expect(!@hasField(am.ServeOptions, "read_timeout_ms"));
+    try std.testing.expect(@hasDecl(am, "Context"));
+}
+
+const ChainState = struct { log: std.ArrayList(u8) = .empty };
+fn chainOuter(c: *am.Context(ChainState), next: am.Next(ChainState)) !void {
+    try c.state().log.append(c.arena, 'A');
+    try next.run(c);
+    try c.state().log.append(c.arena, 'a');
+}
+fn chainInner(c: *am.Context(ChainState), next: am.Next(ChainState)) !void {
+    try c.state().log.append(c.arena, 'B');
+    try next.run(c);
+    try c.state().log.append(c.arena, 'b');
+}
+fn chainEndpoint(c: *am.Context(ChainState)) !void {
+    try c.state().log.append(c.arena, 'H');
+    try c.text("ok");
+}
+test "App middleware wraps endpoint in registration order" {
+    var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+    defer arena.deinit();
+    var app = am.App(ChainState).init(std.testing.allocator, .{});
+    defer app.deinit();
+    _ = try app.useAll(.{ .call = chainOuter });
+    _ = try app.useAll(.{ .call = chainInner });
+    _ = try app.get("/", chainEndpoint);
+    var req: am.Request = .{ .method = .GET, .raw_method = "GET", .path = "/", .query = "", .version = "HTTP/1.1", .headers = &.{}, .body = "", .keep_alive = false };
+    var res: am.Response = .init(arena.allocator());
+    try app.dispatchWithPeer(arena.allocator(), &req, &res, null, null, null);
+    try std.testing.expectEqualStrings("ABHba", app.state().log.items);
+}

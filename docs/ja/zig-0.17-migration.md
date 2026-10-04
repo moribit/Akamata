@@ -14,7 +14,7 @@ Akamata v0.1.5はZig 0.17.0を必須とします。v0.1.4のZig 0.16向けコー
 | buildの実行引数 | `b.args` | `run.addPassthruArgs()` |
 | ツールチェーン | Zig 0.16.0 | Zig 0.17.0（manifest、CI、Docker） |
 
-SQLiteのヘッダー変換はNativeで実行し、OpenSSLはNativeの`-Dopenssl=true`時だけ取り込みます。Workers向けにはこれらのNative依存を追加しません。0.17で利用可能な`std.Build.addTranslateC`を使用しています。このAPI自体は非推奨のため、今後のZig更新では公式の外部translate-c packageへの移行を検討します。
+SQLiteはNative、OpenSSLは`-Dopenssl=true`時だけヘッダーを変換します。v0.1.5では非推奨の`std.Build.addTranslateC`を使っていましたが、v0.2 Phase 1で公式external translate-cの固定コミットへ移行しました。Workersではこの依存を生成しません。[binding方式の比較](v0.2-phase1.md#c-bindings)を参照してください。
 
 `src/reflection.zig`は0.17の並列配列から共通のfield表現を構成します。これにより、model、JSON、OpenAPI、contract、event/protocol生成がfield名・型・enum値・default値を共有できます。入力projectionの生成にも新しい構造体属性型とsentinel付きfield名を使用します。
 

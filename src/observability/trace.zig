@@ -68,8 +68,8 @@ pub const TraceContext = struct {
     }
     pub fn recordDb(self: *TraceContext, backend: Backend, operation: DbOperation, elapsed_ns: u64, failed: bool) void {
         self.db_ns +|= elapsed_ns;
-        const bi = @intFromEnum(backend);
-        const oi = @intFromEnum(operation);
+        const bi = @backingInt(backend);
+        const oi = @backingInt(operation);
         self.db_backend_operations[bi] +|= 1;
         self.db_backend_operation_counts[bi][oi] +|= 1;
         self.db_backend_operation_ns[bi][oi] +|= elapsed_ns;

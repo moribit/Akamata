@@ -127,7 +127,7 @@ pub const Response = struct {
         // EventSource would sit in "Connecting…" until the first chunk
         // landed (or 4 KB of header lines had piled up in the buffer).
         const wire_status: u16 = if (validStatus(self.status_code)) self.status_code else 500;
-        const code: status.Code = @enumFromInt(wire_status);
+        const code: status.Code = @fromBackingInt(wire_status);
         try sw.print("HTTP/1.1 {d} {s}\r\n", .{ wire_status, code.phrase() });
         for (self.headers.items) |h| try sw.print("{s}: {s}\r\n", .{ h.name, h.value });
         try sw.print("connection: close\r\n", .{});
@@ -211,7 +211,7 @@ pub const Response = struct {
     pub fn writeTo(self: *Response, w: anytype) !void {
         if (self.streaming != null or self.fixed_streaming != null) return;
         const wire_status: u16 = if (validStatus(self.status_code)) self.status_code else 500;
-        const code: status.Code = @enumFromInt(wire_status);
+        const code: status.Code = @fromBackingInt(wire_status);
         try w.print("HTTP/1.1 {d} {s}\r\n", .{ wire_status, code.phrase() });
 
         var saw_content_length = false;

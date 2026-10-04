@@ -139,7 +139,7 @@ pub const Counters = struct {
             else => 4,
         };
         _ = self.by_status_class[cls].fetchAdd(1, .monotonic);
-        _ = self.by_method[@intFromEnum(method)].fetchAdd(1, .monotonic);
+        _ = self.by_method[@backingInt(method)].fetchAdd(1, .monotonic);
         const bounds = if (self.latency_profile == .fast) fast_bounds_us[0..] else web_bounds_us[0..];
         var bucket: usize = bounds.len;
         for (bounds, 0..) |bound, i| if (elapsed_us <= bound) {
@@ -375,7 +375,7 @@ test "Counters.record stamps start_time on the first call only" {
     try testing.expectEqual(t1, t2); // doesn't change on subsequent calls
     try testing.expectEqual(@as(u64, 2), c.requests_total.load(.monotonic));
     try testing.expectEqual(@as(u64, 200), c.latency_us_total.load(.monotonic));
-    try testing.expectEqual(@as(u64, 1), c.by_method[@intFromEnum(Method.GET)].load(.monotonic));
+    try testing.expectEqual(@as(u64, 1), c.by_method[@backingInt(Method.GET)].load(.monotonic));
     try testing.expectEqual(@as(u64, 1), c.by_status_class[1].load(.monotonic)); // 2xx
     try testing.expectEqual(@as(u64, 1), c.by_status_class[3].load(.monotonic)); // 4xx
 }

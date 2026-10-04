@@ -121,10 +121,9 @@ Backend availability and API details are documented in the
 [Handler API](docs/en/handler-api.md), [DB backends](docs/en/db-backends.md),
 and [WebSocket guide](docs/en/websocket.md).
 
-`am.Router` / `am.Ctx` / `am.Server` are compatibility APIs for existing
-applications. New code should use `am.App` / `am.Context` / `app.serve()`;
-the compatibility surface receives no new features and will be progressively
-confined to the legacy namespace before 1.0.
+The HTTP API follows `App → Context → endpoint/middleware → runtime`.
+Use `am.App(State)`, `am.Context(State)`, and `app.serve()`.
+See the [v0.2 Phase 1 changes](docs/en/v0.2-phase1.md) for removed APIs.
 
 ## Examples
 

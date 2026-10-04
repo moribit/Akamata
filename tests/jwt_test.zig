@@ -62,3 +62,16 @@ test "JWT middleware enforces exp and nbf with injected clock" {
     try std.testing.expectEqual(@as(u16, 401), try dispatchJwt(missing, true));
     try std.testing.expectEqual(@as(u16, 200), try dispatchJwt(missing, false));
 }
+
+// This key is a public test fixture, never an application credential.
+test "optional OpenSSL binding signs RSA SHA256 with the expected wire bytes" {
+    const signature = am.crypto.rs256.signPem(std.testing.allocator, @embedFile("fixtures/rs256_test_key.pem"), "Akamata translated OpenSSL binding test") catch |err| {
+        if (err == error.UnsupportedOnTarget) return error.SkipZigTest;
+        return err;
+    };
+    defer std.testing.allocator.free(signature);
+    try std.testing.expectEqual(@as(usize, 256), signature.len);
+    const hex = std.fmt.bytesToHex(signature[0..256].*, .lower);
+    try std.testing.expectEqualStrings("b856aac4f186413e061d620dcccc6839403ff8efbe1fee7b1c2e2f2f81541b6982952d7eaccd6284e343ec40441a60ef45cf6e0137965fd23a66ec5d7b3004b04a9517e582f26c6bf3dfec307b1083995203c68907881fd4fa62b425f4696e5901dbb07d7f10144060053c2986392b26e321759808879c38ea6946adacc61951ffb21dc2f236cb40827d26f06f0d4e18c848b49b9216fe915d9bbbac88a200f6601990dc312ecf16cd87aa8777c42cbf6b478da86c4406ea919fea2c47006a2726f604e24002e3c15aeec612fb1a2efb8bb06e4028225e9bbd549ceee063245be76e7eacc47e3f17fc7d3401bb7ec6909c995a3e6ef47dffb3adb72e8a545d37", &hex);
+    try std.testing.expectError(error.KeyLoadFailed, am.crypto.rs256.signPem(std.testing.allocator, "invalid PEM", "message"));
+}

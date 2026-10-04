@@ -1,77 +1,59 @@
 # Akamata アーキテクチャ
 
-3 層構成:
+Akamataは同じZig applicationをNative／VPS／Container／Cloudflare Workersで動かすportable backendです。HTTPは`App → Context → endpoint/middleware → runtime`の単一系統です。
 
-1. **Transport 層** — `src/http/` (HTTP/1.1 同期マルチスレッド) と `src/ws/` (WebSocket upgrade)。`std.net.Server` を直接使い、`std.Io.Reader/Writer` をベースに書く。
-2. **Application 層** — `src/router.zig` でテーブル駆動ルーティング、`src/middleware.zig` で `fn(ctx, next) !void` チェーン、`src/context.zig` で per-request arena + 型付きパスパラメータ。
-3. **Persistence 層** — `src/db/db.zig` の vtable で抽象。`src/db/sqlite.zig` (`@cImport("sqlite3.h")`) と `src/db/d1.zig` (Workers 用 extern fn) を切替。
+## Applicationとadapter
 
-ランタイム選択は `src/runtime/native.zig` (TCP listen + SIGINT/SIGTERM) と `src/runtime/workers.zig` (WASM exports `alloc/handle_fetch/dealloc/last_response_length`) でモジュール単位に分離。
-
-## アプリ状態の渡し方
-
-`Server(App)` は `App` を型パラメータで取り、`*App` を `Ctx(App)` に注入する。アロケータも `Ctx` に常駐する arena が利用できる。
+- `src/app.zig`がroute登録、middleware chain、lifecycle hook、dispatchを管理します。`src/context.zig`がrequest、response、application state、portable serviceを提供します。handlerは`*am.Context(State)`、middlewareはContextと`am.Next(State)`を受け取ります。
+- `src/static_router.zig`、`static_middleware.zig`、`contract.zig`は同じAppへのcompile-time登録／bindingを提供します。別系統のHTTP Server APIではありません。
+- `src/serve.zig`がtransportを選択します。NativeはZig 0.17の`std.Io.Threaded`／`std.Io.net`、libcのnonblocking accept／pollを使い、connection上限、parsing deadline、SIGINT／SIGTERMでのgraceful shutdownを扱います。experimental reactorはproduction contractを満たすまで無効です。
+- Workersは`src/runtime/workers.zig`と`deploy/worker/`のJavaScript WASM bridgeを使い、同じAppへdispatchします。JSPIによる非同期host操作の中断を含め、request全体を直列化します。bridgeの実装詳細はapplication handlerから隔離します。
+- Database、Storage、Queue、Realtimeはportable interfaceとplatform adapterを持ちます。SQLite／TursoとWorkers D1は`am.db.Db`、filesystemとWorkers R2はStorage境界を利用します。platform限定のcapabilityは明示します。
 
 ```zig
-const App = struct { db: am.db.Db, hub: Hub };
-var server = try am.Server(App).init(alloc, &app, .{ ... });
+const State = struct { hits: u32 = 0 };
+fn hello(c: *am.Context(State)) !void {
+    c.state().hits += 1;
+    try c.text("hello");
+}
+// application初期化時:
+// var app = am.App(State).init(allocator, .{});
+// defer app.deinit();
+// _ = try app.get("/hello", hello);
+// try app.serve(.{ .port = 8080 });
 ```
 
-ハンドラのシグネチャは **1 種類だけ**:
+Nativeで並行requestを処理する場合、共有mutable stateには同期が必要です。
 
-```zig
-fn handler(ctx: *am.Ctx(App)) !void
-```
+## Native requestの流れ
 
-## リクエスト処理フロー (native)
+1. connection上限を守ってacceptし、peer addressを記録します。
+2. header／bodyをsize limitとheader／body／idle／total deadline付きでparseし、曖昧なframingを拒否します。
+3. Appのroute matching、Context生成、middleware、endpointへdispatchします。
+4. responseまたはchunked streamを送信し、keep-alive上限の範囲でconnectionを維持します。
+5. Native WebSocket upgradeではconnectionを`am.ws.Conn`へ渡し、upgrade後のlifecycleはそのconnectionが管理します。Workers realtimeはplatform bridgeを使います。
 
-1. `accept()` でコネクションを取り、スレッドプール上で `handleConnection` が動く
-2. ヘッダが揃うまで `recv` を続け、`parser.parseRequest` が呼ばれる
-3. `router.match` でハンドラ確定
-4. `middleware.run(chain, terminal, ctx)` でチェーン実行
-5. `res.writeTo(stream)` で送信、`keep-alive` ならループ
+## BuildとC binding
 
-## WebSocket
-
-`am.ws.upgrade(App, ctx, opts)` は `Sec-WebSocket-Accept` を計算して 101 を返し、サーバはレスポンス送信後コネクションを `Conn` に引き渡してハンドラに制御を戻す。`Conn.readMessage(arena)` がフラグメントと制御フレーム (ping/pong/close) を内部で処理し、テキスト/バイナリのみを返す。
-
-## ビルドターゲット
-
-| `-Dbackend` | `-Dtarget` | 用途 |
+| Backend | Target | 用途 |
 |---|---|---|
-| `native` | `native` (default) | ローカル開発 |
-| `native` | `x86_64-linux-musl` | Containers 用静的バイナリ |
-| `workers` | `wasm32-freestanding` (自動) | Cloudflare Workers WASM |
+| Native | Host default | ローカル開発／VPS |
+| Native | `x86_64-linux-musl` | Container用static binary |
+| Workers | 自動`wasm32-freestanding` | Workers WASM |
 
-`build.zig` がフラグから target を解決するので、Workers 時は `-Dtarget` を指定する必要はない。
+Nativeはvendored SQLite amalgamationをcompileします。`build.zig`は公式external translate-cのZig 0.17ブランチの固定コミットでheaderを変換し、`sqlite3` moduleとしてimportします。`-Dopenssl=true`時だけ`src/crypto/openssl.h`をsystem `ssl`／`crypto`のinclude／link探索付きで変換し、RS256署名に利用します。Workersではこのlazy Native依存を生成しません。source内のC importは使いません。[binding方式の比較](v0.2-phase1.md#c-bindings)を参照してください。
 
-## Production ガイドライン
+## CLI構造
 
-Production リリースに向けて確認すべき項目:
+`tools/akamata/src/main.zig`は引数、help、exit動作、command dispatchを担当します。`command/`が処理を組み立て、`project/`がmanifest、scaffold、managed-file hash、update保護を管理します。`process.zig`はsubprocess transport、`native.zig`はdev watcherと共有するPOSIX filesystem ABIを担当します。
 
-### ネットワーク
-- **TLS 終端**: フレームワーク自体は HTTP のみ。HTTPS は前段 (Cloudflare の WAF / nginx / Caddy) に任せるのが標準。`http_client` の outbound TLS は SAN/CN 検証 + `SSL_VERIFY_PEER` 済み
-- **deadline**: defaultはheader 10秒、body 30秒、keep-alive idle 5秒、request全体60秒。`max_requests_per_connection`と`max_connections`にも上限があります。これらはHTTP request parsingに適用され、upgrade後のWebSocketはconnection lifecycleを引き継ぎます。
-- **TCP_NODELAY**: accept 直後に有効化済み (latency 改善)
-- **accept backoff**: EMFILE 等の transient failure で 100us→5s 指数バックオフ
+Cloudflare操作は`command → cloudflare/operations.zig → cloudflare/wrangler.zig → process`です。deployとD1 create／list／execute／provisionを操作APIに集約し、offline contract test用にrunnerを注入できます。providerの引数・出力形式は`cloudflare/`内、configuration renderingは`cloudflare/config.zig`に置きます。Wranglerが唯一のdefault providerです。現在の`--containers`はLinux binaryとDocker imageをbuildする機能で、Cloudflare Containersのprovision／publishは行いません。
 
-### セキュリティ
-- **HTTP smuggling**: 曖昧なframing、重複CL／Host、obs-fold、colon前BWS、不正chunk、未対応HTTP versionを拒否
-- **JWT**: HS256以外を拒否し、middlewareは`exp`を必須として検証し、`nbf`も検証
-- **CRLF injection**: `res.header()` で name は HTTP token、value は CR/LF/NUL 拒否
-- **JSON mass assignment**: 認証 payload など信頼境界では `am.json.parseLeakyStrict` を使う (unknown field 拒否)
+## 運用上の境界
 
-### MQTT (Containers 専用)
-- 現状は **平文 TCP のみ** (`tcp://` / `mqtt://`)。TLS 必須環境では non-shipping
-- MQTT broker 認証は username/password のみ
-- 本番の Cloudflare Containers では `tls://` か WebSocket over TLS への切り替えが必要 (roadmap)
+- inbound TLSはCloudflare／nginx／Caddyで終端します。Native outbound HTTPSはOS certificate rootを使う`std.crypto.tls.Client`、Workersはhost fetchです。OpenSSLは署名用で、outbound transportには使いません。
+- HTTP parsingは重複CL／Host、曖昧なframing、obs-fold、不正chunk、未対応versionを拒否します。response headerはinjectionを拒否します。Native parsing deadlineとconnection／request上限は`ServeOptions`で設定します。
+- metrics、tracing、request ID、timingは既存middlewareとrequest-scoped observabilityを使います。clock／transportはplatform adapterに分離されています。App configurationの整理はPhase 2で評価します。
+- Workers D1は非同期JSPI bridgeを必要とし、bridgeが無い場合はfail closedです。Native限定job queueとMQTTはcapability限定です。portable scheduled eventはPhase 2で設計します。
 
-### 観測性
-- `am.mw.metrics(State, &counters)` を `useAll` し、`GET /metrics` で Prometheus 形式 expose
-- 各 worker は handler error を `std.log.err` で構造化出力
-- `SIGINT/SIGTERM` で graceful shutdown (listener close → drain)
-
-### Workers 環境での D1
-- **JSPI** (JavaScript Promise Integration) で実装済み。`new WebAssembly.Suspending(fn)` + `WebAssembly.promising(handle_fetch)` により、Zig ハンドラは SQLite/Turso と同じ同期 API で D1 を呼べる
-- 旧 Miniflare など JSPI 未対応ランタイムでは fail-closed (`D1Error.BridgeNotImplemented`) になるので silent failure はしない
-- 詳細は `docs/ja/db-backends.md`
+削除API、検証内容、次の設計評価は[v0.2 Phase 1](v0.2-phase1.md)を参照してください。

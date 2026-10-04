@@ -16,6 +16,8 @@ jobs:
             cmd: zig build test
           - name: native-release-safe
             cmd: zig build test -Doptimize=ReleaseSafe
+          - name: native-openssl
+            cmd: zig build test -Dopenssl=true -Doptimize=ReleaseSafe
           - name: native-integration
             cmd: zig build integration
           - name: tasks-test
@@ -64,6 +66,7 @@ jobs:
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
       - run: zig build cli
+      - run: zig build cli-operations-test
       - run: zig build scaffold-local-test
       - run: zig build project-update-test
       - run: zig build workers-capability-sync-test

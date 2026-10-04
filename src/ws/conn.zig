@@ -96,7 +96,7 @@ pub const Conn = struct {
         if (self.closed.load(.seq_cst)) return ReadError.ClosedByPeer;
         var h_buf: [14]u8 = undefined;
         var pos: usize = 0;
-        h_buf[0] = 0x80 | @as(u8, @intFromEnum(op));
+        h_buf[0] = 0x80 | @as(u8, @backingInt(op));
         pos = 1;
         if (payload.len < 126) {
             h_buf[1] = @intCast(payload.len);

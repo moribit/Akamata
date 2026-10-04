@@ -192,9 +192,7 @@ pub const ServeOptions = struct {
     /// `std.Thread.getCpuCount()` (default). Has no effect on the
     /// threaded runtime, which uses `accept_thread_count` instead.
     worker_count: ?usize = null,
-    /// Deprecated compatibility alias. Phase-specific deadlines below are
-    /// enforced by the threaded server without SO_RCVTIMEO.
-    read_timeout_ms: u32 = 30_000,
+    /// Reserved; the threaded transport does not enforce write deadlines yet.
     write_timeout_ms: u32 = 30_000,
     header_read_timeout_ms: u32 = 10_000,
     body_read_timeout_ms: u32 = 30_000,

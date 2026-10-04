@@ -1,19 +1,19 @@
 const std = @import("std");
 const am = @import("akamata");
 
-const App = struct { counter: std.atomic.Value(u32) = .init(0) };
+const State = struct { counter: std.atomic.Value(u32) = .init(0) };
 
-fn helloHandler(ctx: *am.Ctx(App)) !void {
-    _ = ctx.app.counter.fetchAdd(1, .seq_cst);
-    try ctx.json(200, .{ .greeting = "hello" });
+fn helloHandler(ctx: *am.Context(State)) !void {
+    _ = ctx.state().counter.fetchAdd(1, .seq_cst);
+    try ctx.json(.{ .greeting = "hello" }, 200);
 }
 
-fn echoHandler(ctx: *am.Ctx(App)) !void {
+fn echoHandler(ctx: *am.Context(State)) !void {
     try ctx.res.header("content-type", "text/plain; charset=utf-8");
-    try ctx.res.writeAll(ctx.req.bodySlice());
+    try ctx.res.writeAll(ctx.req.text());
 }
 
-fn streamHandler(ctx: *am.Ctx(App)) !void {
+fn streamHandler(ctx: *am.Context(State)) !void {
     const w = try ctx.res.startStream(.{ .content_type = "text/plain; charset=utf-8" });
     try w.writeAll("chunk-one");
     try w.flush();
@@ -23,11 +23,14 @@ fn streamHandler(ctx: *am.Ctx(App)) !void {
     try w.flush();
 }
 
-const router = am.Router(App).build(&.{
-    am.Router(App).get("/hello", helloHandler),
-    am.Router(App).post("/echo", echoHandler),
-    am.Router(App).get("/stream", streamHandler),
-});
+fn initApp(alloc: std.mem.Allocator) !am.App(State) {
+    var app = am.App(State).init(alloc, .{});
+    errdefer app.deinit();
+    _ = try app.get("/hello", helloHandler);
+    _ = try app.post("/echo", echoHandler);
+    _ = try app.get("/stream", streamHandler);
+    return app;
+}
 
 test "server roundtrips a GET request" {
     const alloc = std.testing.allocator;
@@ -36,23 +39,22 @@ test "server roundtrips a GET request" {
     defer io_impl.deinit();
     const io = io_impl.io();
 
-    var app: App = .{};
+    var app = try initApp(alloc);
+    defer app.deinit();
 
     // Bind ephemeral port for the test (use a well-known high port to keep this
     // hermetic on a developer box; if it's in use, the test will fail explicitly).
     const port: u16 = 18180;
-    const addr = std.Io.net.IpAddress.parseIp4("127.0.0.1", port) catch unreachable;
 
-    var server = try am.Server(App).init(alloc, io, &app, .{
-        .address = addr,
-        .router = router,
+    const opts: am.ServeOptions = .{
+        .address = "127.0.0.1",
+        .port = port,
         .accept_thread_count = 1,
-    });
-    defer server.deinit();
+    };
 
-    const t = try std.Thread.spawn(.{}, runServer, .{&server});
+    const t = try std.Thread.spawn(.{}, runServer, .{ &app, opts });
     defer {
-        server.requestShutdown();
+        app.requestShutdown();
         t.join();
     }
 
@@ -85,11 +87,11 @@ test "server roundtrips a GET request" {
 
     try std.testing.expect(std.mem.startsWith(u8, resp, "HTTP/1.1 200"));
     try std.testing.expect(std.mem.indexOf(u8, resp, "\"greeting\":\"hello\"") != null);
-    try std.testing.expectEqual(@as(u32, 1), app.counter.load(.seq_cst));
+    try std.testing.expectEqual(@as(u32, 1), app.state().counter.load(.seq_cst));
 }
 
-fn runServer(server: *am.Server(App)) void {
-    server.run() catch {};
+fn runServer(app: *am.App(State), opts: am.ServeOptions) void {
+    app.serve(opts) catch {};
 }
 
 test "server streams chunked response" {
@@ -99,20 +101,19 @@ test "server streams chunked response" {
     defer io_impl.deinit();
     const io = io_impl.io();
 
-    var app: App = .{};
+    var app = try initApp(alloc);
+    defer app.deinit();
     const port: u16 = 18181;
-    const addr = std.Io.net.IpAddress.parseIp4("127.0.0.1", port) catch unreachable;
 
-    var server = try am.Server(App).init(alloc, io, &app, .{
-        .address = addr,
-        .router = router,
+    const opts: am.ServeOptions = .{
+        .address = "127.0.0.1",
+        .port = port,
         .accept_thread_count = 1,
-    });
-    defer server.deinit();
+    };
 
-    const t = try std.Thread.spawn(.{}, runServer, .{&server});
+    const t = try std.Thread.spawn(.{}, runServer, .{ &app, opts });
     defer {
-        server.requestShutdown();
+        app.requestShutdown();
         t.join();
     }
 
@@ -152,20 +153,19 @@ test "slow header times out without starving subsequent connections" {
     var io_impl: std.Io.Threaded = .init(alloc, .{});
     defer io_impl.deinit();
     const io = io_impl.io();
-    var app: App = .{};
+    var app = try initApp(alloc);
+    defer app.deinit();
     const port: u16 = 18182;
-    const addr = std.Io.net.IpAddress.parseIp4("127.0.0.1", port) catch unreachable;
-    var server = try am.Server(App).init(alloc, io, &app, .{
-        .address = addr,
-        .router = router,
+    const opts: am.ServeOptions = .{
+        .address = "127.0.0.1",
+        .port = port,
         .accept_thread_count = 1,
         .header_read_timeout_ms = 100,
         .keep_alive_idle_timeout_ms = 100,
-    });
-    defer server.deinit();
-    const t = try std.Thread.spawn(.{}, runServer, .{&server});
+    };
+    const t = try std.Thread.spawn(.{}, runServer, .{ &app, opts });
     defer {
-        server.requestShutdown();
+        app.requestShutdown();
         t.join();
     }
     std.Io.sleep(io, .fromMilliseconds(80), .awake) catch {};

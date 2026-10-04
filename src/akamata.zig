@@ -145,11 +145,6 @@ pub const observability = struct {
     pub const ActivityBackend = @import("observability/activity.zig").Backend;
 };
 
-// ===== Legacy (Router(App) + Ctx(App)) compatibility =====
-//
-// Existing examples still reference these names. They will eventually be
-// removed; for now they continue to work alongside the new App API.
-
 pub const http = struct {
     pub const Status = @import("http/status.zig").Code;
     pub const Method = @import("http/status.zig").Method;
@@ -162,26 +157,11 @@ pub const http = struct {
     pub const multipart = @import("http/multipart.zig");
     pub const form = @import("http/form.zig");
     pub const cookie = @import("http/cookie.zig");
-    pub const Server = if (backend == .native) @import("http/server.zig").Server else struct {};
 };
 pub const Request = http.Request;
 pub const Response = http.Response;
 pub const Status = http.Status;
 pub const Method = http.Method;
-pub const Server = http.Server;
-
-pub const Router = @import("router.zig").Router;
-pub const Route = @import("router.zig").Route;
-// Re-export legacy RouteKind so existing tests/examples keep compiling. The
-// new app-based RouteKind lives at `am.RouteKind` directly above.
-const legacy_router = @import("router.zig");
-pub const legacy = struct {
-    pub const Ctx = @import("legacy_ctx.zig").Ctx;
-    pub const middleware = @import("middleware.zig");
-    pub const RouteKind = legacy_router.RouteKind;
-};
-pub const Ctx = legacy.Ctx;
-pub const middleware = legacy.middleware;
 
 // Server-Sent Events on top of chunked streaming. Native-only — Workers
 // streaming requires the JS ReadableStream bridge (separate WIP).
@@ -321,16 +301,8 @@ pub const mq = @import("mq.zig");
 pub const model = @import("model/model.zig");
 
 pub const runtime = struct {
-    pub const native = if (backend == .native) @import("runtime/native.zig") else struct {};
     pub const workers = if (backend == .workers) @import("runtime/workers.zig") else struct {};
 };
-
-/// Native entrypoint for legacy Server(App) callers. New code uses
-/// `App(State).serve()` directly.
-pub fn runNative(server: anytype) !void {
-    if (backend != .native) @compileError("runNative is only available on native backend");
-    return runtime.native.run(@TypeOf(server.*), server);
-}
 
 /// Build helper to embed in user-project build.zig files.
 pub const akamata_build = @import("build_helpers/akamata_build.zig");
