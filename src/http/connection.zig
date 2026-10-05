@@ -124,6 +124,10 @@ fn runApplicationSession(transport: anytype, response: *res_mod.Response, defini
     try prepareApplicationSession(&session, response);
     if (definition.mode == .websocket) transport.consumeBufferedInput();
     while (true) {
+        if (definition.mode == .websocket and session.read_deadline_ns != 0 and clock.monotonicNs() >= session.read_deadline_ns) {
+            reason = .timeout;
+            return error.Timeout;
+        }
         if (transport.controlPtr()) |node| {
             const deadline = node.write_deadline_ns.load(.acquire);
             if (deadline != 0 and clock.monotonicNs() >= deadline) {
@@ -132,7 +136,10 @@ fn runApplicationSession(transport: anytype, response: *res_mod.Response, defini
             }
         }
         if (session.wire_len != 0) {
-            if (definition.mode == .websocket) transport.beginResponse(opts.write_timeout_ms);
+            if (definition.mode == .websocket) {
+                const read_remaining = if (session.read_deadline_ns == 0) std.math.maxInt(u32) else @min(std.math.maxInt(u32), (session.read_deadline_ns -| clock.monotonicNs() + std.time.ns_per_ms - 1) / std.time.ns_per_ms);
+                transport.beginResponse(@intCast(@min(opts.write_timeout_ms, read_remaining)));
+            }
             const writer = transport.writer();
             try writer.writeAll(session.wire[0..session.wire_len]);
             try writer.flush();

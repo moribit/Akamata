@@ -17,6 +17,8 @@ pub fn build(b: *std.Build) void {
     const bench_router = b.option(BenchRouter, "bench-router", "router benchmark implementation") orelse .runtime;
     const bench_route_kind = b.option(BenchRouteKind, "bench-route-kind", "router benchmark route kind") orelse .static;
     const bench_middleware_count = b.option(usize, "bench-middlewares", "router benchmark middleware count") orelse 0;
+    // Register before lazy package discovery can return and restart configure.
+    const runtime_tsan = b.option(bool, "runtime-tsan", "instrument only the private runtime Contract fixture with ThreadSanitizer") orelse false;
 
     const native_target = b.standardTargetOptions(.{});
     const target = switch (backend) {
@@ -275,7 +277,7 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/runtime_contract_server.zig"),
             .target = native_target,
             .optimize = optimize,
-            .sanitize_thread = b.option(bool, "runtime-tsan", "instrument only the private runtime Contract fixture with ThreadSanitizer") orelse false,
+            .sanitize_thread = runtime_tsan,
         });
         contract_mod.link_libc = true;
         contract_mod.addOptions("build_options", opts);

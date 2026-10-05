@@ -47,7 +47,7 @@ spec.loader.exec_module(c)
 soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
 ceiling = 16384 if hard == resource.RLIM_INFINITY else min(hard, 16384)
 resource.setrlimit(resource.RLIMIT_NOFILE, (max(soft, ceiling), hard))
-result = {"platform": platform.platform(), "zig_version": subprocess.check_output(["zig", "version"], text=True).strip(), "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(), "command": sys.argv, "rlimit_nofile": resource.getrlimit(resource.RLIMIT_NOFILE), "runs": [], "limitations": ["Python load generator is not a peak throughput benchmark", "allocator counters exclude libc/SQLite and thread stacks", "application callbacks remain cooperatively bounded"]}
+result = {"source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "working_tree_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], text=True).strip()), "close_reason_order": ["completed", "disconnected", "timeout", "shutdown", "application_error"], "platform": platform.platform(), "zig_version": subprocess.check_output(["zig", "version"], text=True).strip(), "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(), "command": sys.argv, "rlimit_nofile": resource.getrlimit(resource.RLIMIT_NOFILE), "runs": [], "limitations": ["Python load generator is not a peak throughput benchmark", "allocator counters exclude libc/SQLite and thread stacks", "application callbacks remain cooperatively bounded"]}
 
 def save():
     out = Path(a.output)

@@ -14,6 +14,7 @@ import struct
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from pathlib import Path
@@ -99,6 +100,46 @@ def receive_bytes(client, expected):
 
 class Contract(unittest.TestCase):
     adapter = "threaded"
+
+    def test_partial_upgrade_budget_survives_external_broadcast(self):
+        with self.server() as (_, connect):
+            target, peer = connect(), connect()
+            for client, path in ((target, "/upgrade-budget"), (peer, "/upgrade-live")):
+                client.send(request(path, extra=UPGRADE))
+                self.assertEqual(client.response()[0], 101)
+                receive_bytes(client, b"\x81\x05ready")
+            target.send(masked_frame(1, b"neverend")[:8])
+            stop = threading.Event()
+            errors = []
+            def produce():
+                try:
+                    while not stop.is_set():
+                        peer.send(masked_frame(1, b"tick"))
+                        receive_bytes(peer, b"\x81\x04tick")
+                        stop.wait(.12)
+                except Exception as exc:
+                    errors.append(exc)
+            worker = threading.Thread(target=produce)
+            started = time.monotonic()
+            worker.start()
+            try:
+                target.sock.settimeout(.65)
+                while True:
+                    remaining = .65 - (time.monotonic()-started)
+                    self.assertGreater(remaining, 0, "external output renewed a partial frame budget")
+                    target.sock.settimeout(remaining)
+                    try:
+                        chunk = target.sock.recv(65536)
+                    except ConnectionResetError:
+                        break
+                    if not chunk:
+                        break
+                self.assertLess(time.monotonic()-started, .65)
+            finally:
+                stop.set()
+                worker.join(timeout=2)
+            self.assertFalse(worker.is_alive())
+            self.assertFalse(errors, errors)
 
     def test_application_execution_capability_is_explicit(self):
         with self.server() as (_, connect):

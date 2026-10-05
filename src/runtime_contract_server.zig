@@ -11,6 +11,11 @@ const State = struct {
     stats: ?*@import("runtime_bench_stats.zig").Stats = null,
     sessions_created: std.atomic.Value(u64) = .init(0),
     sessions_closed: std.atomic.Value(u64) = .init(0),
+    close_reasons: [5]std.atomic.Value(u64) = .{ .init(0), .init(0), .init(0), .init(0), .init(0) },
+    fn recordClosed(self: *State, reason: tasks.CloseReason) void {
+        _ = self.close_reasons[@backingInt(reason)].fetchAdd(1, .monotonic);
+        _ = self.sessions_closed.fetchAdd(1, .monotonic);
+    }
 };
 const Ctx = am.Context(State);
 
@@ -53,7 +58,7 @@ pub fn main(init: std.process.Init) !void {
     defer {
         const created = app.state_value.sessions_created.load(.acquire);
         const closed = app.state_value.sessions_closed.load(.acquire);
-        std.debug.print("SESSION_STATS {{\"created\":{d},\"closed\":{d}}}\n", .{ created, closed });
+        std.debug.print("SESSION_STATS {{\"created\":{d},\"closed\":{d},\"close_reasons\":[{d},{d},{d},{d},{d}]}}\n", .{ created, closed, app.state_value.close_reasons[0].load(.monotonic), app.state_value.close_reasons[1].load(.monotonic), app.state_value.close_reasons[2].load(.monotonic), app.state_value.close_reasons[3].load(.monotonic), app.state_value.close_reasons[4].load(.monotonic) });
         std.debug.assert(created == closed);
     }
     _ = try app.get("/hello", hello);
@@ -76,6 +81,7 @@ pub fn main(init: std.process.Init) !void {
     _ = try app.get("/application-hold", applicationHold);
     _ = try app.get("/db/:id", databaseLookup);
     _ = try app.get("/upgrade-live", upgradeLive);
+    _ = try app.get("/upgrade-budget", upgradeBudget);
     _ = try app.get("/runtime-stats", runtimeStats);
     var opts: am.ServeOptions = .{
         .address = "127.0.0.1",
@@ -309,11 +315,14 @@ fn databaseLookup(c: *Ctx) !void {
 }
 fn runtimeStats(c: *Ctx) !void {
     const stats = c.state().stats.?;
-    try c.json(.{ .live = stats.live.load(.monotonic), .peak = stats.peak.load(.monotonic), .calls = stats.calls.load(.monotonic), .created = c.state().sessions_created.load(.acquire), .closed = c.state().sessions_closed.load(.acquire) }, 200);
+    try c.json(.{ .live = stats.live.load(.monotonic), .peak = stats.peak.load(.monotonic), .calls = stats.calls.load(.monotonic), .created = c.state().sessions_created.load(.acquire), .closed = c.state().sessions_closed.load(.acquire), .close_reasons = [5]u64{ c.state().close_reasons[0].load(.monotonic), c.state().close_reasons[1].load(.monotonic), c.state().close_reasons[2].load(.monotonic), c.state().close_reasons[3].load(.monotonic), c.state().close_reasons[4].load(.monotonic) } }, 200);
 }
 fn upgradeLive(c: *Ctx) !void {
     // Same application callback/session on both transports for certification.
     try newUpgradeWithTimeout(c, .room, 60_000);
+}
+fn upgradeBudget(c: *Ctx) !void {
+    try newUpgradeWithTimeout(c, .room, 400);
 }
 
 const StreamState = struct {
@@ -323,7 +332,7 @@ const StreamState = struct {
     count: usize = 0,
     fn step(self: *StreamState, event: tasks.Event, out: []u8) !tasks.Action {
         if (event == .closed) {
-            _ = self.account.sessions_closed.fetchAdd(1, .monotonic);
+            self.account.recordClosed(event.closed);
             return .{ .next = .done };
         }
         if (event == .opened and (self.kind == .slow or self.kind == .paused))
@@ -412,7 +421,7 @@ const UpgradeState = struct {
         if (event == .closed) {
             if (self.attached) self.group.detach(self);
             self.resumer = null;
-            _ = self.account.sessions_closed.fetchAdd(1, .monotonic);
+            self.account.recordClosed(event.closed);
             return .{ .next = .done };
         }
         if (event == .opened) {

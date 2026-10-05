@@ -58,6 +58,9 @@ fn Context(comptime State: type) type {
             execution: ?*tasks.Session = null,
             response_cursor: ?@import("../http/response_cursor.zig").Cursor = null,
             response_keep_alive: bool = false,
+            // Event-loop-owned snapshot: a producer worker may mutate Session,
+            // but an in-progress input budget remains independently cancellable.
+            application_read_deadline_ns: u64 = 0,
             task_failed: bool = false,
             close_reason: tasks.CloseReason = .disconnected,
             busy: bool = false,
@@ -281,7 +284,9 @@ fn Context(comptime State: type) type {
             self.app.gpa.destroy(c);
         }
         fn fail(self: *Self, c: *Connection) void {
-            self.failReason(c, if (self.stopping) .shutdown else .disconnected);
+            const now = clock.monotonicNs();
+            const deadline = applicationDeadline(c, 0);
+            self.failReason(c, if (self.stopping) .shutdown else if (deadline != 0 and now >= deadline) .timeout else .disconnected);
         }
         fn failReason(self: *Self, c: *Connection, reason: tasks.CloseReason) void {
             if (c.phase != .closing) c.close_reason = reason;
@@ -443,6 +448,7 @@ fn Context(comptime State: type) type {
             self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
         }
         fn scheduleStep(self: *Self, c: *Connection, event: tasks.Event) void {
+            c.application_read_deadline_ns = c.execution.?.read_deadline_ns;
             c.job = .{ .step = event };
             c.task_failed = false;
             c.busy = true;
@@ -456,11 +462,25 @@ fn Context(comptime State: type) type {
                 self.failReason(c, .application_error);
                 return;
             }
-            self.interest(c, .{}) catch self.fail(c);
-            self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
+            self.interest(c, .{}) catch {
+                self.fail(c);
+                return;
+            };
+            self.armApplication(c, 0);
+        }
+        fn applicationDeadline(c: *Connection, other: u64) u64 {
+            var deadline = c.node.write_deadline_ns.load(.acquire);
+            for ([_]u64{ c.application_read_deadline_ns, other }) |candidate| {
+                if (candidate != 0) deadline = if (deadline == 0) candidate else @min(deadline, candidate);
+            }
+            return deadline;
+        }
+        fn armApplication(self: *Self, c: *Connection, other: u64) void {
+            self.timers.set(c.slot, applicationDeadline(c, other));
         }
         fn resumeApplication(self: *Self, c: *Connection) !void {
             const execution = c.execution.?;
+            c.application_read_deadline_ns = execution.read_deadline_ns;
             const ws = execution.definition.mode == .websocket;
             if (self.forced or (self.stopping and (ws or execution.next == .wait))) {
                 self.failReason(c, .shutdown);
@@ -473,7 +493,7 @@ fn Context(comptime State: type) type {
             }
             if (c.output.status().pending) {
                 try self.interest(c, .{ .write = true });
-                self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
+                self.armApplication(c, 0);
                 return;
             }
             if (ws) c.node.clearWriteDeadline();
@@ -498,8 +518,7 @@ fn Context(comptime State: type) type {
                         self.scheduleStep(c, .produce);
                     } else {
                         try self.interest(c, .{});
-                        const write = c.node.write_deadline_ns.load(.acquire);
-                        self.timers.set(c.slot, if (write == 0) execution.wake_ns else @min(write, execution.wake_ns));
+                        self.armApplication(c, execution.wake_ns);
                     }
                 },
                 .input => {
@@ -508,22 +527,26 @@ fn Context(comptime State: type) type {
                         self.failReason(c, .timeout);
                         return;
                     }
-                    if (try execution.consumeInput()) |event| {
-                        self.scheduleStep(c, event);
+                    const event = try execution.consumeInput();
+                    c.application_read_deadline_ns = execution.read_deadline_ns;
+                    if (event) |available| {
+                        self.scheduleStep(c, available);
                     } else if (execution.wire_len != 0) {
                         try self.resumeApplication(c);
                     } else if (execution.protocol_yielded) {
                         self.notify(c.token);
                         try self.interest(c, .{});
+                        self.armApplication(c, 0);
                     } else {
                         if (execution.read_deadline_ns == 0) execution.read_deadline_ns = now +| @as(u64, execution.definition.mode.websocket.read_timeout_ms) * std.time.ns_per_ms;
+                        c.application_read_deadline_ns = execution.read_deadline_ns;
                         try self.interest(c, .{ .read = true });
-                        self.timers.set(c.slot, execution.read_deadline_ns);
+                        self.armApplication(c, 0);
                     }
                 },
                 .wait => {
                     try self.interest(c, .{});
-                    self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
+                    self.armApplication(c, 0);
                 },
                 .done => unreachable,
             }
@@ -630,7 +653,7 @@ fn Context(comptime State: type) type {
                     self.timers.remove(timer.slot);
                     if (self.slots[timer.slot].connection) |c| {
                         const write = c.node.write_deadline_ns.load(.acquire);
-                        if ((write != 0 and write <= now) or (c.need != null and c.need.?.deadline_ns <= now)) self.failReason(c, .timeout) else if (!c.busy and c.execution != null) self.resumeApplication(c) catch self.fail(c) else self.refresh(c);
+                        if ((write != 0 and write <= now) or (c.application_read_deadline_ns != 0 and c.application_read_deadline_ns <= now) or (c.need != null and c.need.?.deadline_ns <= now)) self.failReason(c, .timeout) else if (!c.busy and c.execution != null) self.resumeApplication(c) catch self.fail(c) else self.refresh(c);
                     }
                 }
                 if (self.stopping and self.count == 0) return;
@@ -826,4 +849,39 @@ test "session cancellation retains reserved admission when ordinary work is full
     try std.testing.expect(ctx.lookup(token) == null);
     try std.testing.expectEqual(@as(usize, 1), state.closed);
     try std.testing.expectEqual(@as(usize, 1), ctx.count);
+}
+
+test "partial input deadline remains armed while a producer worker owns the session" {
+    const State = struct {};
+    const SessionState = struct {
+        fn step(_: *@This(), _: tasks.Event, _: []u8) !tasks.Action {
+            return .{ .next = .input };
+        }
+    };
+    var state: SessionState = .{};
+    var app = app_mod.App(State).init(std.testing.allocator, .{});
+    defer app.deinit();
+    const opts: app_mod.ServeOptions = .{ .max_connections = 1 };
+    var ctx = try Context(State).init(&app, std.testing.io, &opts, -1);
+    defer ctx.deinit();
+    var sockets: [2]c_int = undefined;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
+    defer {
+        _ = std.c.close(sockets[1]);
+    }
+    try ctx.admit(.{ .socket = .{ .handle = sockets[0], .address = .{ .ip4 = .{ .bytes = .{ 127, 0, 0, 1 }, .port = 0 } } } });
+    const c = ctx.slots[0].connection.?;
+    c.execution = try c.session.arena.allocator().create(tasks.Session);
+    c.execution.?.* = try tasks.Session.init(std.testing.allocator, tasks.Definition.init(SessionState, &state, SessionState.step, .{ .websocket = .{} }), "");
+    c.execution.?.read_deadline_ns = 10;
+    c.node.write_deadline_ns.store(100, .release);
+    ctx.scheduleStep(c, .produce);
+    try std.testing.expect(c.busy);
+    try std.testing.expectEqual(@as(u64, 10), ctx.timers.top().?.deadline);
+    // Event-loop timeout bookkeeping uses its own immutable admission snapshot
+    // rather than reading worker-mutated session state before publication.
+    c.execution.?.read_deadline_ns = 999;
+    try std.testing.expectEqual(@as(u64, 10), Context(State).applicationDeadline(c, 50));
+    ctx.failReason(c, .timeout);
+    try std.testing.expect(c.phase == .closing and c.busy);
 }

@@ -85,6 +85,19 @@ test "protocol work quantum yields after bounded fragmented input progress" {
     try std.testing.expect(session.protocol_yielded);
     try std.testing.expectEqual(@as(usize, 65 * 6), session.input.items.len);
 }
+
+test "producer resumption cannot renew an incomplete input frame deadline" {
+    var state: TestState = .{};
+    var session = try Session.init(std.testing.allocator, Definition.init(TestState, &state, TestState.step, .{ .websocket = .{} }), "\x81\x84mask\x19");
+    defer session.deinit();
+    defer session.dispose(.timeout);
+    session.read_deadline_ns = 123;
+    try std.testing.expect(try session.consumeInput() == null);
+    try session.step(.produce, 100);
+    try std.testing.expectEqual(@as(u64, 123), session.read_deadline_ns);
+    session.setNext(.{ .after_ms = 10 }, 100);
+    try std.testing.expectEqual(@as(u64, 123), session.read_deadline_ns);
+}
 pub const Event = union(enum) { opened: Resumer, produce, message: messages.Message, closed: CloseReason };
 pub const Next = union(enum) { input, produce, after_ms: u32, wait, done };
 pub const Emission = struct {
@@ -162,7 +175,8 @@ pub const Session = struct {
     pub fn setNext(self: *Session, next: Next, now: u64) void {
         self.next = next;
         self.wake_ns = if (next == .after_ms) now +| @as(u64, next.after_ms) * std.time.ns_per_ms else 0;
-        self.read_deadline_ns = 0;
+        // Output/producer scheduling cannot renew an incomplete input frame.
+        // Only consumeInput() advances the read budget after a complete frame.
     }
     /// Worker-owned: one callback, at most one bounded output quantum.
     pub fn step(self: *Session, event: Event, now: u64) !void {
