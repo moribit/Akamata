@@ -280,9 +280,40 @@ const ShutdownRegistry = struct {
     var trigger: ?*const fn (*anyopaque) void = null;
 };
 fn shutdownTrampoline(_: std.posix.SIG) callconv(.c) void {
+    // requestShutdown() may call clock_gettime/shutdown (including repeated
+    // listener shutdown). Preserve the interrupted syscall's errno even when
+    // those signal-safe calls fail; Zig 0.17 exposes the libc TLS accessor.
+    const errno_ptr = std.c._errno();
+    const saved_errno = errno_ptr.*;
+    defer errno_ptr.* = saved_errno;
     if (ShutdownRegistry.slot) |s| {
         if (ShutdownRegistry.trigger) |t| t(s);
     }
+}
+
+test "shutdown signal preserves the interrupted syscall errno" {
+    const saved_slot = ShutdownRegistry.slot;
+    const saved_trigger = ShutdownRegistry.trigger;
+    const errno_ptr = std.c._errno();
+    const saved_errno = errno_ptr.*;
+    defer {
+        ShutdownRegistry.slot = saved_slot;
+        ShutdownRegistry.trigger = saved_trigger;
+        errno_ptr.* = saved_errno;
+    }
+    var called = false;
+    ShutdownRegistry.slot = &called;
+    ShutdownRegistry.trigger = struct {
+        fn invoke(ptr: *anyopaque) void {
+            const flag: *bool = @ptrCast(@alignCast(ptr));
+            flag.* = true;
+            std.c._errno().* = 99;
+        }
+    }.invoke;
+    errno_ptr.* = 42;
+    shutdownTrampoline(.TERM);
+    try std.testing.expect(called);
+    try std.testing.expectEqual(@as(c_int, 42), errno_ptr.*);
 }
 pub const SignalScope = struct {
     old_int: std.posix.Sigaction,
