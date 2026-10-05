@@ -76,6 +76,8 @@ pub const Response = struct {
     /// Borrowed until dispatch returns; websocket upgrade copies them into its
     /// owned receive buffer. Never serialized or exposed as response content.
     upgrade_input: []const u8 = "",
+    native_control: ?*@import("../runtime/drain.zig").Node = null,
+    native_write_timeout_ms: u32 = 30_000,
     /// HEAD responses carry the same headers (including the GET body length)
     /// but never emit payload bytes on the wire.
     suppress_body: bool = false,

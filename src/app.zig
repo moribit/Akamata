@@ -192,8 +192,12 @@ pub const ServeOptions = struct {
     /// `std.Thread.getCpuCount()` (default). Has no effect on the
     /// threaded runtime, which uses `accept_thread_count` instead.
     worker_count: ?usize = null,
-    /// Reserved; the threaded transport does not enforce write deadlines yet.
+    /// Absolute response write budget from first socket output; progress does
+    /// not renew it. Upgraded connections apply the same budget per frame.
     write_timeout_ms: u32 = 30_000,
+    /// Stop admissions, then allow this grace period before socket shutdown.
+    /// CPU-bound handlers must cooperate; their threads are never preempted.
+    shutdown_drain_timeout_ms: u32 = 30_000,
     header_read_timeout_ms: u32 = 10_000,
     body_read_timeout_ms: u32 = 30_000,
     keep_alive_idle_timeout_ms: u32 = 5_000,
@@ -243,6 +247,7 @@ pub fn App(comptime State: type) type {
         /// Set by `requestShutdown()`. Read by the accept loop on every
         /// iteration; once true, the listener is closed and the loop returns.
         shutdown_flag: std.atomic.Value(bool) = .init(false),
+        shutdown_started_ns: std.atomic.Value(u64) = .init(0),
         /// Listener socket fd, set by serve() while the loop is running.
         /// Used by `requestShutdown()` to close the fd from another thread
         /// (which makes `accept()` return `error.SocketNotListening`).
@@ -410,6 +415,9 @@ pub fn App(comptime State: type) type {
         ///
         /// Safe to call from a signal handler or a separate thread.
         pub fn requestShutdown(self: *Self) void {
+            // Repeated signals must never renew the drain budget. clock_gettime
+            // and lock-free atomic operations are signal-safe on Native POSIX.
+            _ = self.shutdown_started_ns.cmpxchgStrong(0, clock.monotonicNs(), .seq_cst, .seq_cst);
             self.shutdown_flag.store(true, .seq_cst);
             const fd = self.listener_fd.load(.seq_cst);
             if (fd >= 0) {

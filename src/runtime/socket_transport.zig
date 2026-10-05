@@ -14,7 +14,9 @@ pub fn Transport(comptime Readiness: type) type {
         reader_buf: [4096]u8 = undefined,
         writer_buf: [4096]u8 = undefined,
         reader_state: ?net.Stream.Reader = null,
-        writer_state: ?net.Stream.Writer = null,
+        writer_state: ?@import("bounded_writer.zig").Writer = null,
+        write_timeout_ms: u32 = 30_000,
+        control: ?*@import("drain.zig").Node = null,
 
         pub fn init(io: Io, stream: net.Stream, shutdown: *std.atomic.Value(bool)) !Self {
             return .{ .io = io, .stream = stream, .shutdown = shutdown, .readiness = try Readiness.init(stream.socket.handle) };
@@ -49,8 +51,17 @@ pub fn Transport(comptime Readiness: type) type {
             return n;
         }
         pub fn writer(self: *Self) *Io.Writer {
-            if (self.writer_state == null) self.writer_state = self.stream.writer(self.io, &self.writer_buf);
+            if (self.writer_state == null) self.writer_state = @import("bounded_writer.zig").Writer.init(self.stream.socket.handle, self.io, &self.writer_buf, self.write_timeout_ms);
+            self.writer_state.?.control = self.control;
             return &self.writer_state.?.interface;
+        }
+        pub fn beginResponse(self: *Self, timeout_ms: u32) void {
+            self.write_timeout_ms = timeout_ms;
+            self.writer_state = null;
+            if (self.control) |node| node.clearWriteDeadline();
+        }
+        pub fn controlPtr(self: *Self) ?*@import("drain.zig").Node {
+            return self.control;
         }
         pub fn bufferedInput(self: *Self) []const u8 {
             if (self.reader_state) |*reader| return reader.interface.buffered();
@@ -60,7 +71,7 @@ pub fn Transport(comptime Readiness: type) type {
             self.readiness.deinit();
         }
         pub fn close(self: *Self) void {
-            self.stream.close(self.io);
+            if (self.control) |node| node.close() else self.stream.close(self.io);
         }
         pub fn streamPtr(self: *Self) *anyopaque {
             return @ptrCast(&self.stream);

@@ -8,10 +8,10 @@ pub fn serve(comptime State: type, app: *app_mod.App(State), opts: app_mod.Serve
     app.trust_proxy_headers = opts.trust_proxy_headers;
     app.trusted_proxy_fn = opts.trusted_proxy_fn;
     try app.prepare();
-    // One guaranteed-concurrent accept task plus at most max_connections
-    // connection tasks. ConcurrencyUnavailable provides admission backpressure.
+    const accept_count = @max(opts.accept_thread_count, 1);
+    // Match production acceptor count; reserve their task slots explicitly.
     var impl: std.Io.Threaded = .init(app.gpa, .{
-        .concurrent_limit = .limited(opts.max_connections + 1),
+        .concurrent_limit = .limited(opts.max_connections + accept_count),
     });
     defer impl.deinit();
     const io = impl.io();
@@ -25,21 +25,38 @@ pub fn serve(comptime State: type, app: *app_mod.App(State), opts: app_mod.Serve
     var signals = @import("threaded.zig").installSignalHandlers(State, app);
     defer signals.deinit();
     var connections: std.Io.Group = .init;
+    var registry: @import("drain.zig").Registry = .{ .mutex = .init() };
+    defer registry.mutex.deinit();
     defer connections.cancel(io);
     var acceptors: std.Io.Group = .init;
     defer acceptors.cancel(io);
-    try acceptors.concurrent(io, Tasks(State).accept, .{ app, io, &listener, &connections, &opts });
-    while (!app.shutdown_flag.load(.acquire)) try std.Io.sleep(io, .fromMilliseconds(10), .awake);
+    for (0..accept_count) |_| try acceptors.concurrent(io, Tasks(State).accept, .{ app, io, &listener, &connections, &registry, &opts });
+    while (!app.shutdown_flag.load(.acquire)) {
+        registry.expireWrites(@import("../observability/clock.zig").monotonicNs());
+        try std.Io.sleep(io, .fromMilliseconds(10), .awake);
+    }
     // No Thread.spawn/detach, active counter, or spin/join loop. Stop new
     // admissions first, then await already admitted requests. Cancel remains
     // available for a future explicit forced-shutdown deadline.
     acceptors.cancel(io);
+    const clock = @import("../observability/clock.zig");
+    const recorded = app.shutdown_started_ns.load(.acquire);
+    const started = if (recorded == 0) clock.monotonicNs() else recorded;
+    while (connections.token.load(.acquire) != null) {
+        registry.expireWrites(clock.monotonicNs());
+        if (clock.elapsedNs(started) / std.time.ns_per_ms >= opts.shutdown_drain_timeout_ms) {
+            registry.force();
+            connections.cancel(io);
+            break;
+        }
+        try std.Io.sleep(io, .fromMilliseconds(1), .awake);
+    }
     try connections.await(io);
 }
 
 fn Tasks(comptime State: type) type {
     return struct {
-        fn accept(app: *app_mod.App(State), io: std.Io, listener: *std.Io.net.Server, group: *std.Io.Group, opts: *const app_mod.ServeOptions) std.Io.Cancelable!void {
+        fn accept(app: *app_mod.App(State), io: std.Io, listener: *std.Io.net.Server, group: *std.Io.Group, registry: *@import("drain.zig").Registry, opts: *const app_mod.ServeOptions) std.Io.Cancelable!void {
             while (!app.shutdown_flag.load(.acquire)) {
                 const stream = listener.accept(io) catch |err| switch (err) {
                     error.Canceled => return error.Canceled,
@@ -49,17 +66,20 @@ fn Tasks(comptime State: type) type {
                     },
                 };
                 @import("threaded.zig").applyTcpNoDelay(stream) catch {};
-                group.concurrent(io, connection, .{ app, io, stream, opts }) catch {
+                group.concurrent(io, connection, .{ app, io, stream, registry, opts }) catch {
                     stream.close(io);
                 };
             }
         }
 
-        fn connection(app: *app_mod.App(State), io: std.Io, stream: std.Io.net.Stream, opts: *const app_mod.ServeOptions) std.Io.Cancelable!void {
+        fn connection(app: *app_mod.App(State), io: std.Io, stream: std.Io.net.Stream, registry: *@import("drain.zig").Registry, opts: *const app_mod.ServeOptions) std.Io.Cancelable!void {
+            var node: @import("drain.zig").Node = undefined;
+            registry.attach(&node, stream.socket.handle);
+            defer node.detach();
             var transport = Transport.init(io, stream, &app.shutdown_flag) catch {
-                stream.close(io);
                 return;
             };
+            transport.control = &node;
             defer transport.deinit();
             @import("../http/connection.zig").run(State, app, &transport, opts) catch |err| switch (err) {
                 error.Canceled => return error.Canceled,

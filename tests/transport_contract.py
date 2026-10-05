@@ -372,6 +372,89 @@ class Contract(unittest.TestCase):
             self.assertIn(b"completed", raw)
             proc.wait(timeout=1.5)
 
+    def test_absolute_write_deadline_slow_reader(self):
+        with self.server("write") as (_, connect):
+            client = connect()
+            client.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
+            client.send(request("/large"))
+            started = time.monotonic()
+            # Tiny progress must not extend the response budget.
+            for _ in range(7):
+                self.assertTrue(client.sock.recv(1))
+                time.sleep(.06)
+            raw = client.collect()
+            self.assertLess(time.monotonic() - started, 2)
+            self.assertLess(len(raw), 16 * 1024 * 1024)
+            normal = connect()
+            normal.send(request(close=True))
+            self.assertEqual(normal.response()[0], 200)
+
+    def test_stream_write_deadline_while_producer_pauses(self):
+        with self.server("write") as (_, connect):
+            client = connect()
+            client.send(request("/paused-stream"))
+            started = time.monotonic()
+            raw = client.collect()
+            self.assertLess(time.monotonic() - started, .8)
+            self.assertNotIn(b"completed", raw)
+            self.assertTrue(raw.startswith(b"HTTP/1.1 200"))
+
+    def test_forced_drain_slow_writer_and_repeated_signal(self):
+        with self.server("drain") as (proc, connect):
+            client = connect()
+            client.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
+            client.send(request("/large"))
+            self.assertTrue(client.sock.recv(1))
+            started = time.monotonic()
+            proc.send_signal(signal.SIGTERM)
+            proc.send_signal(signal.SIGINT)
+            proc.wait(timeout=1.5)
+            self.assertLess(time.monotonic() - started, 1.5)
+            self.assertLess(len(client.collect()), 16 * 1024 * 1024)
+
+    def test_forced_drain_partial_request(self):
+        with self.server("drain") as (proc, connect):
+            client = connect()
+            client.send(b"POST /echo HTTP/1.1\r\nHost: a\r\nContent-Length: 5\r\n\r\nhe")
+            time.sleep(.04)
+            proc.send_signal(signal.SIGTERM)
+            client.eof()
+            proc.wait(timeout=1.5)
+
+    def test_forced_drain_upgraded_connection(self):
+        with self.server("drain") as (proc, connect):
+            client = connect()
+            client.send(request("/upgrade-wait", extra=b"Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"))
+            self.assertEqual(client.response()[0], 101)
+            proc.send_signal(signal.SIGTERM)
+            client.eof()
+            proc.wait(timeout=1.5)
+
+    def test_upgraded_writer_forced_drain_and_disconnect(self):
+        with self.server("drain") as (proc, connect):
+            client = connect()
+            client.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
+            client.send(request("/upgrade-large", extra=b"Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"))
+            self.assertEqual(client.response()[0], 101)
+            proc.send_signal(signal.SIGTERM)
+            client.sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
+            client.close()
+            proc.wait(timeout=1.5)
+
+    def test_handler_and_stream_outlive_grace_without_preemption(self):
+        with self.server("drain") as (proc, connect):
+            client = connect()
+            client.send(request("/slow", close=True))
+            while b"\r\n\r\n" not in client.pending:
+                client.pending += client.sock.recv(4096)
+            proc.send_signal(signal.SIGTERM)
+            raw = client.collect()
+            # Headers were committed, but expired drain must not send body or
+            # a second HTTP response. Handler ownership still must be joined.
+            self.assertNotIn(b"completed", raw)
+            self.assertEqual(raw.count(b"HTTP/1.1"), 1)
+            proc.wait(timeout=1.5)
+
 
 if __name__ == "__main__":
     gate = subprocess.run([BINARY, "disabled", "0", "normal"], capture_output=True, timeout=5)

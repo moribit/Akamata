@@ -45,7 +45,8 @@ pub fn serveWithReadiness(comptime State: type, comptime Readiness: type, app: *
     try threads.ensureTotalCapacity(app.gpa, n_threads);
 
     const Ctx = LoopCtx(State, Readiness);
-    var ctx: Ctx = .{ .app = app, .io = io, .listener = &listener, .opts = &opts };
+    var ctx: Ctx = .{ .app = app, .io = io, .listener = &listener, .opts = &opts, .connections = .{ .mutex = .init() } };
+    defer ctx.connections.mutex.deinit();
 
     var signals = installSignalHandlers(State, app);
     defer signals.deinit();
@@ -53,7 +54,7 @@ pub fn serveWithReadiness(comptime State: type, comptime Readiness: type, app: *
     errdefer {
         app.requestShutdown();
         for (threads.items) |t| t.join();
-        while (ctx.active_connections.load(.acquire) != 0) Io.sleep(io, .fromMilliseconds(1), .awake) catch {};
+        drain(State, Readiness, &ctx);
     }
     var i: usize = 1;
     while (i < n_threads) : (i += 1) {
@@ -64,7 +65,22 @@ pub fn serveWithReadiness(comptime State: type, comptime Readiness: type, app: *
     for (threads.items) |t| t.join();
     // Detached workers still borrow ctx/app/io. Drain before destroying them;
     // Io.Group replacement is evaluated separately, not mixed into production.
-    while (ctx.active_connections.load(.acquire) != 0) Io.sleep(io, .fromMilliseconds(1), .awake) catch {};
+    drain(State, Readiness, &ctx);
+}
+
+fn drain(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(State, Readiness)) void {
+    const clock = @import("../observability/clock.zig");
+    const recorded = ctx.app.shutdown_started_ns.load(.acquire);
+    const started = if (recorded == 0) clock.monotonicNs() else recorded;
+    var forced = false;
+    while (ctx.active_connections.load(.acquire) != 0) {
+        ctx.connections.expireWrites(clock.monotonicNs());
+        if (!forced and clock.elapsedNs(started) / std.time.ns_per_ms >= ctx.opts.shutdown_drain_timeout_ms) {
+            ctx.connections.force();
+            forced = true;
+        }
+        Io.sleep(ctx.io, .fromMilliseconds(1), .awake) catch {};
+    }
 }
 
 fn LoopCtx(comptime State: type, comptime Readiness: type) type {
@@ -75,6 +91,7 @@ fn LoopCtx(comptime State: type, comptime Readiness: type) type {
         listener: *net.Server,
         opts: *const app_mod.ServeOptions,
         active_connections: std.atomic.Value(usize) = .init(0),
+        connections: @import("drain.zig").Registry,
     };
 }
 
@@ -104,9 +121,10 @@ fn acceptLoop(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(Stat
     // shutdown flag promptly, so requestShutdown() / Ctrl-C always stops them.
     //
     // accept_poll_ms bounds how long a parked thread can ignore shutdown_flag.
-    const accept_poll_ms: c_int = 250;
+    const accept_poll_ms: c_int = 100;
 
     while (!ctx.app.shutdown_flag.load(.seq_cst)) {
+        ctx.connections.expireWrites(@import("../observability/clock.zig").monotonicNs());
         const fd = ctx.app.listener_fd.load(.seq_cst);
         if (fd < 0) return;
         if (!waitAcceptReady(fd, accept_poll_ms)) continue; // timeout/EINTR → re-check flag
@@ -156,10 +174,13 @@ fn acceptLoop(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(Stat
 
 fn connectionThread(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(State, Readiness), stream: net.Stream) void {
     defer _ = ctx.active_connections.fetchSub(1, .acq_rel);
+    var node: @import("drain.zig").Node = undefined;
+    ctx.connections.attach(&node, stream.socket.handle);
+    defer node.detach();
     var transport = @import("socket_transport.zig").Transport(Readiness).init(ctx.io, stream, &ctx.app.shutdown_flag) catch {
-        stream.close(ctx.io);
         return;
     };
+    transport.control = &node;
     defer transport.deinit();
     @import("../http/connection.zig").run(State, ctx.app, &transport, ctx.opts) catch |err| switch (err) {
         error.Timeout, error.EndOfStream => {},
@@ -172,7 +193,8 @@ fn connectionThread(comptime State: type, comptime Readiness: type, ctx: *LoopCt
 // std.Io.Threaded expects blocking connection descriptors; SO_RCVTIMEO and
 // SO_SNDTIMEO can produce EAGAIN that its socket reader treats as a programmer
 // error. Request read deadlines use poll readiness before blocking reads;
-// write_timeout_ms remains reserved until a bounded write path is implemented.
+// Bounded output uses MSG_DONTWAIT and an absolute budget, independently of
+// the blocking std.Io reader. No SO_SNDTIMEO/EAGAIN enters the stdlib writer.
 const builtin = @import("builtin");
 
 extern "c" fn setsockopt(sockfd: c_int, level: c_int, optname: c_int, optval: *const anyopaque, optlen: u32) c_int;

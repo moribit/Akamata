@@ -44,6 +44,12 @@ pub const Conn = struct {
     max_payload: usize = 64 * 1024,
     read_timeout_ms: u32 = 60_000,
     closed: std.atomic.Value(bool) = .init(false),
+    native_control: ?*@import("../runtime/drain.zig").Node = null,
+    write_timeout_ms: u32 = 30_000,
+
+    fn closeSocket(self: *Conn) void {
+        if (self.native_control) |node| node.close() else self.stream.close(self.io);
+    }
 
     pub fn init(gpa: std.mem.Allocator, stream: net.Stream, io: Io, max_payload: usize) Conn {
         return .{
@@ -56,10 +62,12 @@ pub const Conn = struct {
     }
 
     pub fn deinit(self: *Conn) void {
+        self.lockWrite();
         self.recv_buf.deinit(self.gpa);
         if (!self.closed.swap(true, .seq_cst)) {
-            self.stream.close(self.io);
+            self.closeSocket();
         }
+        self.unlockWrite();
         self.write_mutex.deinit();
     }
 
@@ -88,7 +96,9 @@ pub const Conn = struct {
         std.mem.writeInt(u16, buf[0..2], code, .big);
         @memcpy(buf[2 .. 2 + blen], reason[0..blen]);
         self.send(.close, buf[0 .. 2 + blen]) catch {};
-        if (!self.closed.swap(true, .seq_cst)) self.stream.close(self.io);
+        self.lockWrite();
+        defer self.unlockWrite();
+        if (!self.closed.swap(true, .seq_cst)) self.closeSocket();
     }
 
     fn send(self: *Conn, op: frame.Opcode, payload: []const u8) !void {
@@ -112,9 +122,13 @@ pub const Conn = struct {
 
         self.lockWrite();
         defer self.unlockWrite();
+        if (self.closed.load(.seq_cst)) return ReadError.ClosedByPeer;
+        defer if (self.native_control) |node| node.clearWriteDeadline();
+        errdefer if (!self.closed.swap(true, .seq_cst)) self.closeSocket();
 
         var w_buf: [256]u8 = undefined;
-        var sw = self.stream.writer(self.io, &w_buf);
+        var sw = @import("../runtime/bounded_writer.zig").Writer.init(self.stream.socket.handle, self.io, &w_buf, self.write_timeout_ms);
+        sw.control = self.native_control;
         const w: *Io.Writer = &sw.interface;
         w.writeAll(h_buf[0..pos]) catch return ReadError.WriteFailed;
         if (payload.len > 0) w.writeAll(payload) catch return ReadError.WriteFailed;
@@ -134,7 +148,9 @@ pub const Conn = struct {
                     .close => {
                         if (fr.payload.len == 1) return ReadError.InvalidFrame;
                         if (fr.payload.len >= 2 and !validClosePayload(fr.payload)) return ReadError.InvalidFrame;
-                        if (!self.closed.swap(true, .seq_cst)) self.stream.close(self.io);
+                        self.lockWrite();
+                        defer self.unlockWrite();
+                        if (!self.closed.swap(true, .seq_cst)) self.closeSocket();
                         return ReadError.ClosedByPeer;
                     },
                     .ping => {
@@ -263,6 +279,8 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     // leave socket ownership with the HTTP driver.
     try conn.recv_buf.appendSlice(ctx.arena, ctx.res.upgrade_input);
     conn.read_timeout_ms = opts.read_timeout_ms;
+    conn.native_control = ctx.res.native_control;
+    conn.write_timeout_ms = ctx.res.native_write_timeout_ms;
 
     ctx.res.setStatus(101);
     ctx.res.is_upgrade = true;
@@ -277,10 +295,12 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     // otherwise race with the ws.Conn lifecycle and risk writing to an fd
     // already closed by Conn.deinit.
     var sw_buf: [1024]u8 = undefined;
-    var sw = stream_ptr.writer(io_ptr.*, &sw_buf);
+    var sw = @import("../runtime/bounded_writer.zig").Writer.init(stream_ptr.socket.handle, io_ptr.*, &sw_buf, conn.write_timeout_ms);
+    sw.control = conn.native_control;
     const w: *std.Io.Writer = &sw.interface;
     try ctx.res.writeTo(w);
     try w.flush();
+    if (conn.native_control) |node| node.clearWriteDeadline();
     ctx.res.finalized = true;
 
     return conn;

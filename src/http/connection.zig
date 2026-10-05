@@ -25,6 +25,7 @@ pub fn run(comptime State: type, app: *app_mod.App(State), transport: anytype, o
     var request_count: u32 = 0;
     keep_alive: while (true) {
         if (app.shutdown_flag.load(.acquire)) return;
+        transport.beginResponse(opts.write_timeout_ms);
         _ = arena_state.reset(.retain_capacity);
         const arena = arena_state.allocator();
 
@@ -78,6 +79,8 @@ pub fn run(comptime State: type, app: *app_mod.App(State), transport: anytype, o
 
         var req_local = parsed.request;
         var res: res_mod.Response = .init(arena);
+        res.native_control = transport.controlPtr();
+        res.native_write_timeout_ms = opts.write_timeout_ms;
         res.keep_alive = req_local.keep_alive and request_count +| 1 < opts.max_requests_per_connection;
         if (req_local.header("upgrade") != null) {
             const tail = recv_buf.items[parsed.consumed..pending_len];
@@ -127,20 +130,12 @@ pub fn run(comptime State: type, app: *app_mod.App(State), transport: anytype, o
             return;
         }
 
-        // Buffered path: single-shot serialise then write.
-        //
-        // We tried writing res.writeTo directly into a 16 KB-buffered
-        // socket writer in early 2026; results were within ±5% of this
-        // path on a hot loopback. The arena-allocate-then-send pattern
-        // wins on consistency because the kernel sees one contiguous
-        // payload (better for the TLS/proxy cases too).
-        var alloc_w: Io.Writer.Allocating = .init(arena);
+        // Serialize into the fixed transport buffer. Response.body remains
+        // application-owned; do not allocate a second full wire copy.
         // The connection will close after this response; advertise that rather
         // than inviting clients to reuse a socket at the request/shutdown cap.
         if (app.shutdown_flag.load(.acquire) or request_count +| 1 >= opts.max_requests_per_connection) res.keep_alive = false;
-        try res.writeTo(&alloc_w.writer);
-        const out = alloc_w.writer.buffered();
-        w.writeAll(out) catch return;
+        res.writeTo(w) catch return;
         w.flush() catch return;
 
         if (!res.keep_alive) return;
@@ -165,10 +160,8 @@ fn writeProtocolError(arena: std.mem.Allocator, transport: anytype, code: u16, k
     res.setStatus(code);
     res.keep_alive = false;
     try res.json(.{ .error_kind = kind });
-    var out: Io.Writer.Allocating = .init(arena);
-    try res.writeTo(&out.writer);
     const w = transport.writer();
-    try w.writeAll(out.writer.buffered());
+    try res.writeTo(w);
     try w.flush();
 }
 

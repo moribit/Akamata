@@ -30,7 +30,10 @@ pub fn main(init: std.process.Init) !void {
     _ = try app.get("/upgrade", upgrade);
     _ = try app.get("/upgrade-echo", upgradeEcho);
     _ = try app.get("/slow", slow);
+    _ = try app.get("/paused-stream", pausedStream);
     _ = try app.get("/large", large);
+    _ = try app.get("/upgrade-wait", upgradeWait);
+    _ = try app.get("/upgrade-large", upgradeLarge);
     var opts: am.ServeOptions = .{
         .address = "127.0.0.1",
         .port = try std.fmt.parseInt(u16, args[2], 10),
@@ -57,6 +60,14 @@ pub fn main(init: std.process.Init) !void {
         opts.header_read_timeout_ms = 2000;
         opts.total_request_timeout_ms = 3000;
         opts.keep_alive_idle_timeout_ms = 2000;
+    } else if (std.mem.eql(u8, profile, "write")) {
+        opts.write_timeout_ms = 250;
+    } else if (std.mem.eql(u8, profile, "drain")) {
+        opts.write_timeout_ms = 5000;
+        opts.shutdown_drain_timeout_ms = 150;
+        opts.header_read_timeout_ms = 5000;
+        opts.body_read_timeout_ms = 5000;
+        opts.total_request_timeout_ms = 10000;
     } else if (std.mem.eql(u8, profile, "proxy")) {
         opts.trust_proxy_headers = true;
         opts.trusted_proxy_fn = trusted;
@@ -141,10 +152,28 @@ fn upgradeEcho(c: *Ctx) !void {
     const message = try conn.readMessage(c.arena);
     try conn.sendText(message.payload);
 }
+fn upgradeWait(c: *Ctx) !void {
+    var conn = try am.ws.upgrade(Ctx, c, .{ .read_timeout_ms = 5000 });
+    defer conn.deinit();
+    _ = conn.readMessage(c.arena) catch return;
+}
+fn upgradeLarge(c: *Ctx) !void {
+    var conn = try am.ws.upgrade(Ctx, c, .{});
+    defer conn.deinit();
+    const bytes: [16384]u8 = @splat('x');
+    for (0..4096) |_| try conn.sendBinary(&bytes);
+}
 fn slow(c: *Ctx) !void {
     const io: *std.Io = @ptrCast(@alignCast(c.io_ptr.?));
     const w = try c.startStream(.{ .content_length = 9 });
     try std.Io.sleep(io.*, .fromMilliseconds(300), .awake);
+    try w.writeAll("completed");
+    try w.flush();
+}
+fn pausedStream(c: *Ctx) !void {
+    const io: *std.Io = @ptrCast(@alignCast(c.io_ptr.?));
+    const w = try c.startStream(.{ .content_length = 9 });
+    try std.Io.sleep(io.*, .fromMilliseconds(1000), .awake);
     try w.writeAll("completed");
     try w.flush();
 }

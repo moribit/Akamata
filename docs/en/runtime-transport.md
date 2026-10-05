@@ -1,5 +1,8 @@
 # Native HTTP runtime and Transport Contract (Zig 0.17)
 
+This records the 946f021 design. See [Phases 2–5](native-runtime-phases.md)
+for current write and drain semantics.
+
 The baseline is main `3f92014`. App.serve and ServeOptions remain compatible;
 Threaded stays production and `.reactor` stays fail-closed.
 

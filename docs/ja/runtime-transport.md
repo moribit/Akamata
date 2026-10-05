@@ -1,5 +1,8 @@
 # Native HTTP runtimeとTransport Contract（Zig 0.17）
 
+これは946f021時点の設計記録です。現行write／drain仕様は
+[Phase 2–5の記録](native-runtime-phases.md)を参照してください。
+
 基準はmain `3f92014`です。公開`App.serve`／`ServeOptions`とThreadedのproduction選択を維持し、HTTP接続処理をsocket実装から分離しました。性能改善やReactorのproduction有効化は今回の目的に含めません。
 
 ## 構造
