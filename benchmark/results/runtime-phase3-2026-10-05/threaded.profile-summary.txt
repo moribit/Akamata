@@ -1,0 +1,14 @@
+Sort by top of stack, same collapsed (when >= 5):
+        poll  (in libsystem_kernel.dylib)        22427
+        __psynch_mutexwait  (in libsystem_kernel.dylib)        413
+        __sendto  (in libsystem_kernel.dylib)        74
+        __recvmsg  (in libsystem_kernel.dylib)        42
+        __psynch_mutexdrop  (in libsystem_kernel.dylib)        33
+        __ulock_wait2  (in libsystem_kernel.dylib)        19
+        heap.debug_allocator.DebugAllocator(.{ .stack_trace_frames = 0, .enable_memory_limit = false, .safety = false, .thread_safe = true, .never_unmap = false, .retain_metadata = false, .verbose_log = false, .backing_allocator_zeroes = true, .resize_stack_traces = false, .canary = 10534666094765928719, .page_size = 131072 }).alloc  (in bench)        19
+        __munmap  (in libsystem_kernel.dylib)        14
+        __mmap  (in libsystem_kernel.dylib)        8
+        db.sqlite.Backend.prepareBackend  (in bench)        8
+        mach_absolute_time  (in libsystem_kernel.dylib)        7
+        yy_reduce  (in bench)        7
+        mem.eql__func_25  (in bench)        5

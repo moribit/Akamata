@@ -13,7 +13,12 @@ const State = struct {
 pub fn main() !void {
     var gpa: std.heap.DebugAllocator(.{}) = .init;
     defer _ = gpa.deinit();
-    const alloc = gpa.allocator();
+    const base_alloc = gpa.allocator();
+    const tracked = am.env.get(base_alloc, "BENCH_STATS");
+    if (tracked) |value| base_alloc.free(value);
+    var stats: @import("bench_stats").Stats = .{ .backing = base_alloc };
+    defer if (tracked != null) stats.report();
+    const alloc = if (tracked != null) stats.allocator() else base_alloc;
 
     var db = try am.db.openSqlite(alloc, ":memory:");
     defer db.close();

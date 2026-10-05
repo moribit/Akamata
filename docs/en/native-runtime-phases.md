@@ -51,3 +51,23 @@ pass. Linux execution is required in the final CI, not inferred from cross-build
 [Phase 2 raw benchmark](../../benchmark/results/runtime-phase2-2026-10-05/README.md):
 median throughput changes −0.5% / −0.4% / +4.1% for hello/echo/db; no major broad
 regression. The report retains P50/P99/RSS and the hello P99 variation.
+
+## Phase 3 decision: B — defer Group adoption
+
+Both implementations now use eight acceptors. The paired matrix includes
+4/32/128 connections, short-lived traffic, keep-alive, 64/256 idle connections,
+P50/P95/P99, CPU/RSS/fd/thread/allocator observations, and separate task counters.
+Untracked DB repeats show Group throughput −10.3% / −10.4% at 32/128 connections;
+P99 increases 37.6% / 15.4%. Idle thread/RSS cost is essentially unchanged.
+The production runtime remains Threaded; the Group PoC and common contract remain.
+
+Group improves owned await/cancel and task cleanup. It still requires deliberate
+signal, admission, deadline, socket ownership and error propagation policies;
+cancel does not preempt application work. Threaded's registry now provides safe
+forced socket drain and testable cleanup. No new public runtime API is needed.
+
+Sampling identifies shared SQLite mutex contention and Group pool waits, but
+does not isolate one cause for the additional regression. No optimization based
+on that inference was applied. app.gpa counters exclude libc/SQLite/stacks;
+untracked repeats avoid attributing instrumentation overhead to the runtime.
+See [decision record, profiles and raw data](../../benchmark/results/runtime-phase3-2026-10-05/README.md).

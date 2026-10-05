@@ -1,0 +1,21 @@
+Sort by top of stack, same collapsed (when >= 5):
+        poll  (in libsystem_kernel.dylib)        13337
+        __accept  (in libsystem_kernel.dylib)        3703
+        __ulock_wait2  (in libsystem_kernel.dylib)        762
+        __psynch_mutexwait  (in libsystem_kernel.dylib)        721
+        __semwait_signal  (in libsystem_kernel.dylib)        438
+        __sendto  (in libsystem_kernel.dylib)        78
+        __recvmsg  (in libsystem_kernel.dylib)        74
+        __psynch_mutexdrop  (in libsystem_kernel.dylib)        54
+        __munmap  (in libsystem_kernel.dylib)        37
+        heap.debug_allocator.DebugAllocator(.{ .stack_trace_frames = 0, .enable_memory_limit = false, .safety = false, .thread_safe = true, .never_unmap = false, .retain_metadata = false, .verbose_log = false, .backing_allocator_zeroes = true, .resize_stack_traces = false, .canary = 10534666094765928719, .page_size = 131072 }).alloc  (in runtime-group-bench)        21
+        __mmap  (in libsystem_kernel.dylib)        18
+        mach_msg2_trap  (in libsystem_kernel.dylib)        16
+        db.sqlite.Backend.prepareBackend  (in runtime-group-bench)        14
+        http.connection.run__func_712  (in runtime-group-bench)        14
+        mach_absolute_time  (in libsystem_kernel.dylib)        9
+        yy_reduce  (in runtime-group-bench)        9
+        cerror_nocancel  (in libsystem_kernel.dylib)        8
+        resolveExprStep  (in runtime-group-bench)        8
+        sqlite3VdbeExec  (in runtime-group-bench)        7
+        mem.eql__func_28  (in runtime-group-bench)        5

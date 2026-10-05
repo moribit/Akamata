@@ -15,7 +15,14 @@ const State = struct {
 pub fn main() !void {
     var gpa: std.heap.DebugAllocator(.{}) = .init;
     defer _ = gpa.deinit();
-    const alloc = gpa.allocator();
+    const base_alloc = gpa.allocator();
+    const tracked = am.env.get(base_alloc, "BENCH_STATS");
+    if (tracked) |value| base_alloc.free(value);
+    var stats: @import("runtime_bench_stats.zig").Stats = .{ .backing = base_alloc };
+    var task_stats: @import("runtime/io_group_experiment.zig").TaskStats = .{};
+    defer if (tracked != null) task_stats.report();
+    defer if (tracked != null) stats.report();
+    const alloc = if (tracked != null) stats.allocator() else base_alloc;
 
     var db = try am.db.openSqlite(alloc, ":memory:");
     defer db.close();
@@ -33,7 +40,7 @@ pub fn main() !void {
     _ = try app.post("/echo", echo);
     _ = try app.get("/db/:id", lookup);
 
-    try @import("runtime/io_group_experiment.zig").serve(State, &app, .{ .address = "127.0.0.1", .port = 8080, .accept_thread_count = 8 });
+    try @import("runtime/io_group_experiment.zig").serveMeasured(State, &app, .{ .port = 8080, .accept_thread_count = 8 }, if (tracked != null) &task_stats else null);
 }
 
 fn hello(c: *am.Context(State)) !void {

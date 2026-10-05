@@ -111,6 +111,11 @@ pub fn build(b: *std.Build) void {
             .imports = &.{.{ .name = "akamata", .module = am_mod }},
         }),
     });
+    if (example == .bench) exe.root_module.addImport("bench_stats", b.createModule(.{
+        .root_source_file = b.path("src/runtime_bench_stats.zig"),
+        .target = target,
+        .optimize = optimize,
+    }));
 
     if (backend == .workers) {
         exe.entry = .disabled;

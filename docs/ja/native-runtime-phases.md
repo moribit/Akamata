@@ -49,3 +49,22 @@ Linux実行は最終CIで確認し、cross-buildだけで代用しません。
 [Phase 2 raw benchmark](../../benchmark/results/runtime-phase2-2026-10-05/README.md)
 のthroughput中央値はhello/echo/dbで−0.5%／−0.4%／+4.1%でした。
 重大な全体的退行は確認されません。P50/P99/RSSとhelloのP99変動も記録しています。
+
+## Phase 3判断: B — Group採用見送り
+
+両実装のacceptorを8に揃え、4/32/128 connections、keep-alive、短命connection、
+64/256 idleで比較しました。P50/P95/P99、CPU/RSS/fd/thread/allocator、別途task数を記録しています。
+instrumentation無効のDB再測定では32/128 connectionsでthroughput−10.3%／−10.4%、
+P99+37.6%／+15.4%でした。idleのthread/RSSも実質的に改善していません。
+productionはThreadedを維持し、PoC・共通Contract・測定用counterを残します。
+
+Groupはawait/cancelによる所有権とcleanupを単純にしますが、signal、admission、deadline、
+socket所有権、error propagationのpolicyは依然必要です。application処理のpreemptionも保証しません。
+Threaded側はPhase 2 registryでforced socket drainとcleanupを検証できるようになりました。
+新しいpublic runtime APIは増やしません。
+
+profileでは共通SQLite handleのmutex競合とGroup pool待機を確認しました。
+追加の性能差を単一原因には断定できず、推測による最適化は行っていません。
+allocator counterはapp.gpaだけで、libc/SQLite/stackを含みません。
+短命connectionはhost負荷を抑える500 requests/secでlatency/resourceを比較し、最大throughputとは扱いません。
+[判断記録・profile・raw data](../../benchmark/results/runtime-phase3-2026-10-05/README.md)に再現手順を残しています。

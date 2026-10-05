@@ -5,6 +5,28 @@ const app_mod = @import("../app.zig");
 const Transport = @import("socket_transport.zig").Transport(@import("readiness_poll.zig").Readiness);
 
 pub fn serve(comptime State: type, app: *app_mod.App(State), opts: app_mod.ServeOptions) !void {
+    return serveMeasured(State, app, opts, null);
+}
+
+pub const TaskStats = struct {
+    active: std.atomic.Value(u64) = .init(0),
+    peak: std.atomic.Value(u64) = .init(0),
+    completed: std.atomic.Value(u64) = .init(0),
+    fn enter(self: *TaskStats) void {
+        const count = self.active.fetchAdd(1, .monotonic) + 1;
+        _ = self.peak.fetchMax(count, .monotonic);
+    }
+    fn leave(self: *TaskStats) void {
+        _ = self.active.fetchSub(1, .monotonic);
+        _ = self.completed.fetchAdd(1, .monotonic);
+    }
+    pub fn report(self: *TaskStats) void {
+        std.debug.print("BENCH_TASKS {{\"active\":{d},\"peak\":{d},\"completed\":{d}}}\n", .{ self.active.load(.monotonic), self.peak.load(.monotonic), self.completed.load(.monotonic) });
+    }
+};
+
+// Benchmark-only instrumentation; not selected by App.serve.
+pub fn serveMeasured(comptime State: type, app: *app_mod.App(State), opts: app_mod.ServeOptions, task_stats: ?*TaskStats) !void {
     app.trust_proxy_headers = opts.trust_proxy_headers;
     app.trusted_proxy_fn = opts.trusted_proxy_fn;
     try app.prepare();
@@ -30,7 +52,7 @@ pub fn serve(comptime State: type, app: *app_mod.App(State), opts: app_mod.Serve
     defer connections.cancel(io);
     var acceptors: std.Io.Group = .init;
     defer acceptors.cancel(io);
-    for (0..accept_count) |_| try acceptors.concurrent(io, Tasks(State).accept, .{ app, io, &listener, &connections, &registry, &opts });
+    for (0..accept_count) |_| try acceptors.concurrent(io, Tasks(State).accept, .{ app, io, &listener, &connections, &registry, &opts, task_stats });
     while (!app.shutdown_flag.load(.acquire)) {
         registry.expireWrites(@import("../observability/clock.zig").monotonicNs());
         try std.Io.sleep(io, .fromMilliseconds(10), .awake);
@@ -56,7 +78,9 @@ pub fn serve(comptime State: type, app: *app_mod.App(State), opts: app_mod.Serve
 
 fn Tasks(comptime State: type) type {
     return struct {
-        fn accept(app: *app_mod.App(State), io: std.Io, listener: *std.Io.net.Server, group: *std.Io.Group, registry: *@import("drain.zig").Registry, opts: *const app_mod.ServeOptions) std.Io.Cancelable!void {
+        fn accept(app: *app_mod.App(State), io: std.Io, listener: *std.Io.net.Server, group: *std.Io.Group, registry: *@import("drain.zig").Registry, opts: *const app_mod.ServeOptions, stats: ?*TaskStats) std.Io.Cancelable!void {
+            if (stats) |s| s.enter();
+            defer if (stats) |s| s.leave();
             while (!app.shutdown_flag.load(.acquire)) {
                 const stream = listener.accept(io) catch |err| switch (err) {
                     error.Canceled => return error.Canceled,
@@ -66,13 +90,15 @@ fn Tasks(comptime State: type) type {
                     },
                 };
                 @import("threaded.zig").applyTcpNoDelay(stream) catch {};
-                group.concurrent(io, connection, .{ app, io, stream, registry, opts }) catch {
+                group.concurrent(io, connection, .{ app, io, stream, registry, opts, stats }) catch {
                     stream.close(io);
                 };
             }
         }
 
-        fn connection(app: *app_mod.App(State), io: std.Io, stream: std.Io.net.Stream, registry: *@import("drain.zig").Registry, opts: *const app_mod.ServeOptions) std.Io.Cancelable!void {
+        fn connection(app: *app_mod.App(State), io: std.Io, stream: std.Io.net.Stream, registry: *@import("drain.zig").Registry, opts: *const app_mod.ServeOptions, stats: ?*TaskStats) std.Io.Cancelable!void {
+            if (stats) |s| s.enter();
+            defer if (stats) |s| s.leave();
             var node: @import("drain.zig").Node = undefined;
             registry.attach(&node, stream.socket.handle);
             defer node.detach();
