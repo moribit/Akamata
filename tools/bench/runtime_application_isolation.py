@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Phase 6 prerequisite: real HTTP isolation and bounded application admission.
 
-Default execution requires isolation and exits nonzero while the known blocker
-persists. --record-blockers records that evidence without certifying readiness.
+Default execution requires isolation and exits nonzero on regression. --record-blockers records that evidence without certifying readiness.
 No benchmark optimization/certification runs should precede passing this gate.
 """
 import argparse
@@ -166,5 +165,5 @@ finally:
     Path(args.output).write_text(json.dumps(result, indent=2) + "\n")
 
 if not result["isolation_passed"] and not args.record_blockers:
-    raise SystemExit("Phase 6 incomplete: synchronous upgrade/stream still owns workers; retain gate, do not begin Phase 7 optimization.")
+    raise SystemExit("Application isolation regression: retain gate and investigate before performance optimization.")
 print("application isolation evidence saved; isolation_passed=" + str(result["isolation_passed"]).lower())

@@ -1,0 +1,24 @@
+Runtime before fix: d9ac5cc; private regression fixture overlay. Binary SHA256: b2afccb9dd0c5624a347216c4d7df5515c2cc362e8aeb314f1f0aa0b3f2da41b
+test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_threaded.test_partial_upgrade_budget_survives_external_broadcast) ... ERROR
+test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_kqueue.test_partial_upgrade_budget_survives_external_broadcast) ... ERROR
+
+======================================================================
+ERROR: test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_threaded.test_partial_upgrade_budget_survives_external_broadcast)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mimoc/Akamata/tests/transport_contract.py", line 132, in test_partial_upgrade_budget_survives_external_broadcast
+    chunk = target.sock.recv(65536)
+TimeoutError: timed out
+
+======================================================================
+ERROR: test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_kqueue.test_partial_upgrade_budget_survives_external_broadcast)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mimoc/Akamata/tests/transport_contract.py", line 132, in test_partial_upgrade_budget_survives_external_broadcast
+    chunk = target.sock.recv(65536)
+TimeoutError: timed out
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.496s
+
+FAILED (errors=2)

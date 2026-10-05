@@ -1,0 +1,168 @@
+info: fetching lazy dependency translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5
+application isolation evidence saved; isolation_passed=true
+Traceback (most recent call last):
+  File "/home/runner/work/Akamata/Akamata/tools/bench/runtime_certify.py", line 270, in <module>
+    with server(adapter, "shutdown-disconnect-completion-race") as (port, proc, run), concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
+  File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/home/runner/work/Akamata/Akamata/tools/bench/runtime_certify.py", line 125, in server
+    assert run["clean"], run
+           ~~~^^^^^^^^^
+AssertionError: {'adapter': 'threaded', 'scenario': 'shutdown-disconnect-completion-race', 'samples': [], 'baseline': {'rss_kib': 33964, 'cpu_percent': 0.0, 'fds': 4, 'threads': 3}, 'shutdown_requested': True, 'connections': 64, 'shutdown_ms': 715.4708080000205, 'exit_code': 66, 'allocator_final': {'calls': 527, 'requested': 1338945, 'live': 0, 'peak': 1324436}, 'sessions_final': {'created': 64, 'closed': 64, 'close_reasons': [0, 0, 0, 64, 0]}, 'clean': False, 'stderr_tail': 'info: akamata listening on http://127.0.0.1:51053/\nAPPLICATION_WORK_ENTERED\n==================\nWARNING: ThreadSanitizer: signal handler spoils errno (pid=3254)\n  Signal 2 handler invoked at:\n    #0 runtime.threaded.shutdownTrampoline /home/runner/work/Akamata/Akamata/src/runtime/threaded.zig:282 (runtime-contract-server+0x329c00)\n    #1 runtime.threaded.serveWithReadiness__func_885 /home/runner/work/Akamata/Akamata/src/runtime/threaded.zig:68 (runtime-contract-server+0x28b624)\n    #2 runtime.threaded.serve__func_884 /home/runner/work/Akamata/Akamata/src/runtime/threaded.zig:9 (runtime-contract-server+0x28b624)\n    #3 serve.serve__func_37 /home/runner/work/Akamata/Akamata/src/serve.zig:16 (runtime-contract-server+0x28b624)\n    #4 app.App(runtime_contract_server.State).serve /home/runner/work/Akamata/Akamata/src/app.zig:947 (runtime-contract-server+0x28b624)\n    #5 runtime_contract_server.main /home/runner/work/Akamata/Akamata/src/runtime_contract_server.zig:162 (discriminator 2) (runtime-contract-server+0x28dc9e)\n    #6 start.callMain /home/runner/work/_temp/ad2c4b93-6d44-4168-bebb-36a027f2acc2/zig-x86_64-linux-0.17.0/lib/std/start.zig:827 (runtime-contract-server+0x292726)\n    #7 start.callMainWithArgs /home/runner/work/_temp/ad2c4b93-6d44-4168-bebb-36a027f2acc2/zig-x86_64-linux-0.17.0/lib/std/start.zig:729 (runtime-contract-server+0x292726)\n    #8 start.main /home/runner/work/_temp/ad2c4b93-6d44-4168-bebb-36a027f2acc2/zig-x86_64-linux-0.17.0/lib/std/start.zig:754 (runtime-contract-server+0x292726)\n    #9 __libc_init_first ??:? (libc.so.6+0x2a1c9) (BuildId: a4a7992a8e66555c8141ab2a08a8465ff6e0ea65)\n\nSUMMARY: ThreadSanitizer: signal handler spoils errno /home/runner/work/Akamata/Akamata/src/runtime/threaded.zig:282 in runtime.threaded.shutdownTrampoline\n==================\nSESSION_STATS {"created":64,"closed":64,"close_reasons":[0,0,0,64,0]}\nBENCH_STATS {"calls":527,"requested":1338945,"live":0,"peak":1324436}\nThreadSanitizer: reported 1 warnings\n'}
+test_absolute_write_deadline_slow_reader (__main__.Contract_threaded.test_absolute_write_deadline_slow_reader) ... ok
+test_application_execution_capability_is_explicit (__main__.Contract_threaded.test_application_execution_capability_is_explicit) ... ok
+test_application_isolation_with_active_idle_upgrades_and_slow_streams (__main__.Contract_threaded.test_application_isolation_with_active_idle_upgrades_and_slow_streams) ... ok
+test_backpressure_does_not_starve_other_connections (__main__.Contract_threaded.test_backpressure_does_not_starve_other_connections) ... ok
+test_chunked_request (__main__.Contract_threaded.test_chunked_request) ... ok
+test_fixed_length_stream_and_truncation (__main__.Contract_threaded.test_fixed_length_stream_and_truncation) ... ok
+test_forced_drain_partial_request (__main__.Contract_threaded.test_forced_drain_partial_request) ... ok
+test_forced_drain_slow_writer_and_repeated_signal (__main__.Contract_threaded.test_forced_drain_slow_writer_and_repeated_signal) ... ok
+test_forced_drain_upgraded_connection (__main__.Contract_threaded.test_forced_drain_upgraded_connection) ... ok
+test_fragment_control_utf8_and_invalid_upgrade_cleanup (__main__.Contract_threaded.test_fragment_control_utf8_and_invalid_upgrade_cleanup) ... ok
+test_graceful_shutdown_and_idle_connections (__main__.Contract_threaded.test_graceful_shutdown_and_idle_connections) ... ok
+test_handler_and_stream_outlive_grace_without_preemption (__main__.Contract_threaded.test_handler_and_stream_outlive_grace_without_preemption) ... ok
+test_header_and_body_limits (__main__.Contract_threaded.test_header_and_body_limits) ... ok
+test_header_body_and_total_timeout (__main__.Contract_threaded.test_header_body_and_total_timeout) ... ok
+test_idle_timeout (__main__.Contract_threaded.test_idle_timeout) ... ok
+test_keep_alive_multiple_and_request_limit (__main__.Contract_threaded.test_keep_alive_multiple_and_request_limit) ... ok
+test_malformed_and_transfer_encoding (__main__.Contract_threaded.test_malformed_and_transfer_encoding) ... ok
+test_max_connections_overload_and_recovery (__main__.Contract_threaded.test_max_connections_overload_and_recovery) ... ok
+test_normal_request_and_disconnect (__main__.Contract_threaded.test_normal_request_and_disconnect) ... ok
+test_partial_request_and_partial_next_header (__main__.Contract_threaded.test_partial_request_and_partial_next_header) ... ok
+test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_threaded.test_partial_upgrade_budget_survives_external_broadcast) ... ok
+test_peer_and_trusted_proxy (__main__.Contract_threaded.test_peer_and_trusted_proxy) ... ok
+test_pipeline_and_buffer_residue (__main__.Contract_threaded.test_pipeline_and_buffer_residue) ... ok
+test_shutdown_drains_inflight_response (__main__.Contract_threaded.test_shutdown_drains_inflight_response) ... ok
+test_shutdown_with_partial_request (__main__.Contract_threaded.test_shutdown_with_partial_request) ... ok
+test_stream_and_stream_error (__main__.Contract_threaded.test_stream_and_stream_error) ... ok
+test_stream_write_deadline_while_producer_pauses (__main__.Contract_threaded.test_stream_write_deadline_while_producer_pauses) ... ok
+test_trickle_does_not_reset_header_deadline (__main__.Contract_threaded.test_trickle_does_not_reset_header_deadline) ... ok
+test_upgrade_hub_snapshot_disconnect_ownership (__main__.Contract_threaded.test_upgrade_hub_snapshot_disconnect_ownership) ... ok
+test_upgrade_ownership (__main__.Contract_threaded.test_upgrade_ownership) ... ok
+test_upgrade_preserves_coalesced_frame (__main__.Contract_threaded.test_upgrade_preserves_coalesced_frame) ... ok
+test_upgraded_writer_forced_drain_and_disconnect (__main__.Contract_threaded.test_upgraded_writer_forced_drain_and_disconnect) ... ok
+test_zero_write_budget_permits_no_socket_output (__main__.Contract_threaded.test_zero_write_budget_permits_no_socket_output) ... ok
+test_absolute_write_deadline_slow_reader (__main__.Contract_epoll.test_absolute_write_deadline_slow_reader) ... ok
+test_application_execution_capability_is_explicit (__main__.Contract_epoll.test_application_execution_capability_is_explicit) ... ok
+test_application_isolation_with_active_idle_upgrades_and_slow_streams (__main__.Contract_epoll.test_application_isolation_with_active_idle_upgrades_and_slow_streams) ... ok
+test_backpressure_does_not_starve_other_connections (__main__.Contract_epoll.test_backpressure_does_not_starve_other_connections) ... ok
+test_chunked_request (__main__.Contract_epoll.test_chunked_request) ... ok
+test_fixed_length_stream_and_truncation (__main__.Contract_epoll.test_fixed_length_stream_and_truncation) ... ok
+test_forced_drain_partial_request (__main__.Contract_epoll.test_forced_drain_partial_request) ... ok
+test_forced_drain_slow_writer_and_repeated_signal (__main__.Contract_epoll.test_forced_drain_slow_writer_and_repeated_signal) ... FAIL
+test_forced_drain_upgraded_connection (__main__.Contract_epoll.test_forced_drain_upgraded_connection) ... ok
+test_fragment_control_utf8_and_invalid_upgrade_cleanup (__main__.Contract_epoll.test_fragment_control_utf8_and_invalid_upgrade_cleanup) ... ok
+test_graceful_shutdown_and_idle_connections (__main__.Contract_epoll.test_graceful_shutdown_and_idle_connections) ... ok
+test_handler_and_stream_outlive_grace_without_preemption (__main__.Contract_epoll.test_handler_and_stream_outlive_grace_without_preemption) ... ok
+test_header_and_body_limits (__main__.Contract_epoll.test_header_and_body_limits) ... ok
+test_header_body_and_total_timeout (__main__.Contract_epoll.test_header_body_and_total_timeout) ... ok
+test_idle_timeout (__main__.Contract_epoll.test_idle_timeout) ... ok
+test_keep_alive_multiple_and_request_limit (__main__.Contract_epoll.test_keep_alive_multiple_and_request_limit) ... ok
+test_malformed_and_transfer_encoding (__main__.Contract_epoll.test_malformed_and_transfer_encoding) ... ok
+test_max_connections_overload_and_recovery (__main__.Contract_epoll.test_max_connections_overload_and_recovery) ... ok
+test_normal_request_and_disconnect (__main__.Contract_epoll.test_normal_request_and_disconnect) ... ok
+test_partial_request_and_partial_next_header (__main__.Contract_epoll.test_partial_request_and_partial_next_header) ... ok
+test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_epoll.test_partial_upgrade_budget_survives_external_broadcast) ... ok
+test_peer_and_trusted_proxy (__main__.Contract_epoll.test_peer_and_trusted_proxy) ... ok
+test_pipeline_and_buffer_residue (__main__.Contract_epoll.test_pipeline_and_buffer_residue) ... ok
+test_shutdown_drains_inflight_response (__main__.Contract_epoll.test_shutdown_drains_inflight_response) ... ok
+test_shutdown_with_partial_request (__main__.Contract_epoll.test_shutdown_with_partial_request) ... ok
+test_stream_and_stream_error (__main__.Contract_epoll.test_stream_and_stream_error) ... ok
+test_stream_write_deadline_while_producer_pauses (__main__.Contract_epoll.test_stream_write_deadline_while_producer_pauses) ... ok
+test_trickle_does_not_reset_header_deadline (__main__.Contract_epoll.test_trickle_does_not_reset_header_deadline) ... ok
+test_upgrade_hub_snapshot_disconnect_ownership (__main__.Contract_epoll.test_upgrade_hub_snapshot_disconnect_ownership) ... FAIL
+test_upgrade_ownership (__main__.Contract_epoll.test_upgrade_ownership) ... ok
+test_upgrade_preserves_coalesced_frame (__main__.Contract_epoll.test_upgrade_preserves_coalesced_frame) ... ok
+test_upgraded_writer_forced_drain_and_disconnect (__main__.Contract_epoll.test_upgraded_writer_forced_drain_and_disconnect) ... ok
+test_zero_write_budget_permits_no_socket_output (__main__.Contract_epoll.test_zero_write_budget_permits_no_socket_output) ... ok
+test_absolute_write_deadline_slow_reader (__main__.Contract_threaded_incremental.test_absolute_write_deadline_slow_reader) ... ok
+test_application_execution_capability_is_explicit (__main__.Contract_threaded_incremental.test_application_execution_capability_is_explicit) ... ok
+test_application_isolation_with_active_idle_upgrades_and_slow_streams (__main__.Contract_threaded_incremental.test_application_isolation_with_active_idle_upgrades_and_slow_streams) ... ok
+test_backpressure_does_not_starve_other_connections (__main__.Contract_threaded_incremental.test_backpressure_does_not_starve_other_connections) ... ok
+test_chunked_request (__main__.Contract_threaded_incremental.test_chunked_request) ... ok
+test_fixed_length_stream_and_truncation (__main__.Contract_threaded_incremental.test_fixed_length_stream_and_truncation) ... ok
+test_forced_drain_partial_request (__main__.Contract_threaded_incremental.test_forced_drain_partial_request) ... ok
+test_forced_drain_slow_writer_and_repeated_signal (__main__.Contract_threaded_incremental.test_forced_drain_slow_writer_and_repeated_signal) ... ok
+test_forced_drain_upgraded_connection (__main__.Contract_threaded_incremental.test_forced_drain_upgraded_connection) ... ok
+test_fragment_control_utf8_and_invalid_upgrade_cleanup (__main__.Contract_threaded_incremental.test_fragment_control_utf8_and_invalid_upgrade_cleanup) ... ok
+test_graceful_shutdown_and_idle_connections (__main__.Contract_threaded_incremental.test_graceful_shutdown_and_idle_connections) ... ok
+test_handler_and_stream_outlive_grace_without_preemption (__main__.Contract_threaded_incremental.test_handler_and_stream_outlive_grace_without_preemption) ... ok
+test_header_and_body_limits (__main__.Contract_threaded_incremental.test_header_and_body_limits) ... ok
+test_header_body_and_total_timeout (__main__.Contract_threaded_incremental.test_header_body_and_total_timeout) ... ok
+test_idle_timeout (__main__.Contract_threaded_incremental.test_idle_timeout) ... ok
+test_keep_alive_multiple_and_request_limit (__main__.Contract_threaded_incremental.test_keep_alive_multiple_and_request_limit) ... ok
+test_malformed_and_transfer_encoding (__main__.Contract_threaded_incremental.test_malformed_and_transfer_encoding) ... ok
+test_max_connections_overload_and_recovery (__main__.Contract_threaded_incremental.test_max_connections_overload_and_recovery) ... ok
+test_normal_request_and_disconnect (__main__.Contract_threaded_incremental.test_normal_request_and_disconnect) ... ok
+test_partial_request_and_partial_next_header (__main__.Contract_threaded_incremental.test_partial_request_and_partial_next_header) ... ok
+test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_threaded_incremental.test_partial_upgrade_budget_survives_external_broadcast) ... ok
+test_peer_and_trusted_proxy (__main__.Contract_threaded_incremental.test_peer_and_trusted_proxy) ... ok
+test_pipeline_and_buffer_residue (__main__.Contract_threaded_incremental.test_pipeline_and_buffer_residue) ... ok
+test_shutdown_drains_inflight_response (__main__.Contract_threaded_incremental.test_shutdown_drains_inflight_response) ... ok
+test_shutdown_with_partial_request (__main__.Contract_threaded_incremental.test_shutdown_with_partial_request) ... ok
+test_stream_and_stream_error (__main__.Contract_threaded_incremental.test_stream_and_stream_error) ... ok
+test_stream_write_deadline_while_producer_pauses (__main__.Contract_threaded_incremental.test_stream_write_deadline_while_producer_pauses) ... ok
+test_trickle_does_not_reset_header_deadline (__main__.Contract_threaded_incremental.test_trickle_does_not_reset_header_deadline) ... ok
+test_upgrade_hub_snapshot_disconnect_ownership (__main__.Contract_threaded_incremental.test_upgrade_hub_snapshot_disconnect_ownership) ... ok
+test_upgrade_ownership (__main__.Contract_threaded_incremental.test_upgrade_ownership) ... ok
+test_upgrade_preserves_coalesced_frame (__main__.Contract_threaded_incremental.test_upgrade_preserves_coalesced_frame) ... ok
+test_upgraded_writer_forced_drain_and_disconnect (__main__.Contract_threaded_incremental.test_upgraded_writer_forced_drain_and_disconnect) ... ok
+test_zero_write_budget_permits_no_socket_output (__main__.Contract_threaded_incremental.test_zero_write_budget_permits_no_socket_output) ... ok
+
+======================================================================
+FAIL: test_forced_drain_slow_writer_and_repeated_signal (__main__.Contract_epoll.test_forced_drain_slow_writer_and_repeated_signal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/Akamata/Akamata/tests/transport_contract.py", line 575, in test_forced_drain_slow_writer_and_repeated_signal
+    with self.server("drain") as (proc, connect):
+  File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/home/runner/work/Akamata/Akamata/tests/transport_contract.py", line 260, in server
+    self.fail(f"fixture exit {proc.returncode}: {log.read().decode()}")
+AssertionError: fixture exit 66: info: experimental multiplexed reactor listening on port 35061
+==================
+WARNING: ThreadSanitizer: signal handler spoils errno (pid=3642)
+  Signal 2 handler invoked at:
+    #0 runtime.threaded.shutdownTrampoline /home/runner/work/Akamata/Akamata/src/runtime/threaded.zig:282 (runtime-contract-server+0x329c00)
+    #1 sync.Condition.wait /home/runner/work/Akamata/Akamata/src/sync.zig:110 (runtime-contract-server+0x31d5ae)
+    #2 runtime.reactor.Context(runtime_contract_server.State).workerMain /home/runner/work/Akamata/Akamata/src/runtime/reactor.zig:215 (runtime-contract-server+0x31d5ae)
+    #3 Thread.callFn__func_754 /home/runner/work/_temp/ad2c4b93-6d44-4168-bebb-36a027f2acc2/zig-x86_64-linux-0.17.0/lib/std/Thread.zig:422 (runtime-contract-server+0x31d5ae)
+    #4 Thread.PosixThreadImpl.spawn__func_751.Instance.entryFn /home/runner/work/_temp/ad2c4b93-6d44-4168-bebb-36a027f2acc2/zig-x86_64-linux-0.17.0/lib/std/Thread.zig:753 (runtime-contract-server+0x31d5ae)
+
+SUMMARY: ThreadSanitizer: signal handler spoils errno /home/runner/work/Akamata/Akamata/src/runtime/threaded.zig:282 in runtime.threaded.shutdownTrampoline
+==================
+SESSION_STATS {"created":1,"closed":1,"close_reasons":[0,0,0,1,0]}
+BENCH_STATS {"calls":154,"requested":86761,"live":0,"peak":54950}
+ThreadSanitizer: reported 1 warnings
+
+
+======================================================================
+FAIL: test_upgrade_hub_snapshot_disconnect_ownership (__main__.Contract_epoll.test_upgrade_hub_snapshot_disconnect_ownership)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/Akamata/Akamata/tests/transport_contract.py", line 565, in test_upgrade_hub_snapshot_disconnect_ownership
+    receive(peers[0])
+  File "/home/runner/work/Akamata/Akamata/tests/transport_contract.py", line 554, in receive
+    self.assertTrue(data)
+AssertionError: b'' is not true
+
+----------------------------------------------------------------------
+Ran 99 tests in 20.244s
+
+FAILED (failures=2)
+runtime-session-test
++- run python3 failure
+error: process exited with code 1
+failed command: python3 tools/bench/runtime_certify.py ./.zig-cache/o/0ca6488acba66d14b5ea9b249b93092b/runtime-contract-server --idle-levels 100 --mixed-idle 20 --soak-seconds 5 --session-rounds 10 --output .zig-cache/runtime-session-validation.json
+
+transport-contract-test
++- run python3 failure
+error: process exited with code 1
+failed command: python3 tests/transport_contract.py ./.zig-cache/o/0ca6488acba66d14b5ea9b249b93092b/runtime-contract-server
+
+Build Summary: 28/32 steps succeeded (2 failed)
+runtime-session-test transitive failure
++- run python3 failure
+transport-contract-test transitive failure
++- run python3 failure
+

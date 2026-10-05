@@ -1,0 +1,102 @@
+{
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "oha_version": "oha 1.15.0",
+  "command": [
+    "tools/bench/runtime_profile.py",
+    "threaded=zig-out/bin/bench",
+    "reactor=zig-out/bin/runtime-reactor-bench",
+    "--output-dir",
+    "certification/profile",
+    "--endpoint",
+    "hello",
+    "--connections",
+    "32",
+    "128"
+  ],
+  "runs": [
+    {
+      "label": "threaded",
+      "connections": 32,
+      "binary_sha256": "24b8e5cf5706b008e83158393b20e86b52942871ac9b155352b29e134248f370",
+      "profile_command": [
+        "perf",
+        "record",
+        "-F",
+        "199",
+        "-p",
+        "91526",
+        "-g",
+        "-o",
+        "certification/profile/threaded-c32.perf.data",
+        "--",
+        "sleep",
+        "5"
+      ],
+      "profile_available": false,
+      "profiler_stderr": "Missing support for build id in kernel mmap events.\nDisable this warning with --no-buildid-mmap\nError:\nAccess to performance monitoring and observability operations is limited.\nConsider adjusting /proc/sys/kernel/perf_event_paranoid setting to open\naccess to performance monitoring and observability operations for processes\nwithout CAP_PERFMON, CAP_SYS_PTRACE or CAP_SYS_ADMIN Linux capability.\nMore information can be found at 'Perf events and tool security' document:\nhttps://www.kernel.org/doc/html/latest/admin-guide/perf-security.html\nperf_event_paranoid setting is 4:\n  -1: Allow use of (almost) all events by all users\n      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK\n>= 0: Disallow raw and ftrace function tracepoint access\n>= 1: Disallow CPU event access\n>= 2: Disallow kernel profiling\nTo make the adjusted perf_event_paranoid setting permanent preserve it\nin /etc/sysctl.conf (e.g. kernel.perf_event_paranoid = <setting>)\n"
+    },
+    {
+      "label": "reactor",
+      "connections": 32,
+      "binary_sha256": "afa2951985409fabf1f4da3ca2571096cea40da23616d68712e305310564e87e",
+      "profile_command": [
+        "perf",
+        "record",
+        "-F",
+        "199",
+        "-p",
+        "99776",
+        "-g",
+        "-o",
+        "certification/profile/reactor-c32.perf.data",
+        "--",
+        "sleep",
+        "5"
+      ],
+      "profile_available": false,
+      "profiler_stderr": "Missing support for build id in kernel mmap events.\nDisable this warning with --no-buildid-mmap\nError:\nAccess to performance monitoring and observability operations is limited.\nConsider adjusting /proc/sys/kernel/perf_event_paranoid setting to open\naccess to performance monitoring and observability operations for processes\nwithout CAP_PERFMON, CAP_SYS_PTRACE or CAP_SYS_ADMIN Linux capability.\nMore information can be found at 'Perf events and tool security' document:\nhttps://www.kernel.org/doc/html/latest/admin-guide/perf-security.html\nperf_event_paranoid setting is 4:\n  -1: Allow use of (almost) all events by all users\n      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK\n>= 0: Disallow raw and ftrace function tracepoint access\n>= 1: Disallow CPU event access\n>= 2: Disallow kernel profiling\nTo make the adjusted perf_event_paranoid setting permanent preserve it\nin /etc/sysctl.conf (e.g. kernel.perf_event_paranoid = <setting>)\n"
+    },
+    {
+      "label": "threaded",
+      "connections": 128,
+      "binary_sha256": "24b8e5cf5706b008e83158393b20e86b52942871ac9b155352b29e134248f370",
+      "profile_command": [
+        "perf",
+        "record",
+        "-F",
+        "199",
+        "-p",
+        "99794",
+        "-g",
+        "-o",
+        "certification/profile/threaded-c128.perf.data",
+        "--",
+        "sleep",
+        "5"
+      ],
+      "profile_available": false,
+      "profiler_stderr": "Missing support for build id in kernel mmap events.\nDisable this warning with --no-buildid-mmap\nError:\nAccess to performance monitoring and observability operations is limited.\nConsider adjusting /proc/sys/kernel/perf_event_paranoid setting to open\naccess to performance monitoring and observability operations for processes\nwithout CAP_PERFMON, CAP_SYS_PTRACE or CAP_SYS_ADMIN Linux capability.\nMore information can be found at 'Perf events and tool security' document:\nhttps://www.kernel.org/doc/html/latest/admin-guide/perf-security.html\nperf_event_paranoid setting is 4:\n  -1: Allow use of (almost) all events by all users\n      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK\n>= 0: Disallow raw and ftrace function tracepoint access\n>= 1: Disallow CPU event access\n>= 2: Disallow kernel profiling\nTo make the adjusted perf_event_paranoid setting permanent preserve it\nin /etc/sysctl.conf (e.g. kernel.perf_event_paranoid = <setting>)\n"
+    },
+    {
+      "label": "reactor",
+      "connections": 128,
+      "binary_sha256": "afa2951985409fabf1f4da3ca2571096cea40da23616d68712e305310564e87e",
+      "profile_command": [
+        "perf",
+        "record",
+        "-F",
+        "199",
+        "-p",
+        "108135",
+        "-g",
+        "-o",
+        "certification/profile/reactor-c128.perf.data",
+        "--",
+        "sleep",
+        "5"
+      ],
+      "profile_available": false,
+      "profiler_stderr": "Missing support for build id in kernel mmap events.\nDisable this warning with --no-buildid-mmap\nError:\nAccess to performance monitoring and observability operations is limited.\nConsider adjusting /proc/sys/kernel/perf_event_paranoid setting to open\naccess to performance monitoring and observability operations for processes\nwithout CAP_PERFMON, CAP_SYS_PTRACE or CAP_SYS_ADMIN Linux capability.\nMore information can be found at 'Perf events and tool security' document:\nhttps://www.kernel.org/doc/html/latest/admin-guide/perf-security.html\nperf_event_paranoid setting is 4:\n  -1: Allow use of (almost) all events by all users\n      Ignore mlock limit after perf_event_mlock_kb without CAP_IPC_LOCK\n>= 0: Disallow raw and ftrace function tracepoint access\n>= 1: Disallow CPU event access\n>= 2: Disallow kernel profiling\nTo make the adjusted perf_event_paranoid setting permanent preserve it\nin /etc/sysctl.conf (e.g. kernel.perf_event_paranoid = <setting>)\n"
+    }
+  ]
+}

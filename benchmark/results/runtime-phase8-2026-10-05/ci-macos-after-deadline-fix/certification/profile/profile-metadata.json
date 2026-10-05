@@ -1,0 +1,74 @@
+{
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "oha_version": "oha 1.15.0",
+  "command": [
+    "tools/bench/runtime_profile.py",
+    "threaded=zig-out/bin/bench",
+    "reactor=zig-out/bin/runtime-reactor-bench",
+    "--output-dir",
+    "certification/profile",
+    "--endpoint",
+    "hello",
+    "--connections",
+    "32",
+    "128"
+  ],
+  "runs": [
+    {
+      "label": "threaded",
+      "connections": 32,
+      "binary_sha256": "da9b23f774f1cadff3cb8caf076761fdeb0dfd05ea765027b357de203b5c8cb2",
+      "profile_command": [
+        "sample",
+        "20696",
+        "5",
+        "1",
+        "-file",
+        "certification/profile/threaded-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 32,
+      "binary_sha256": "8338b6b688772abc16708e054ec4ad8cfd524414d29025aa6e36d3baccf1ddd6",
+      "profile_command": [
+        "sample",
+        "21010",
+        "5",
+        "1",
+        "-file",
+        "certification/profile/reactor-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "threaded",
+      "connections": 128,
+      "binary_sha256": "da9b23f774f1cadff3cb8caf076761fdeb0dfd05ea765027b357de203b5c8cb2",
+      "profile_command": [
+        "sample",
+        "21312",
+        "5",
+        "1",
+        "-file",
+        "certification/profile/threaded-c128.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 128,
+      "binary_sha256": "8338b6b688772abc16708e054ec4ad8cfd524414d29025aa6e36d3baccf1ddd6",
+      "profile_command": [
+        "sample",
+        "21620",
+        "5",
+        "1",
+        "-file",
+        "certification/profile/reactor-c128.sample.txt"
+      ],
+      "profile_available": true
+    }
+  ]
+}

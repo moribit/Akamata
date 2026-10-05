@@ -1,0 +1,3193 @@
+{
+  "cohorts": {
+    "ci-linux": {
+      "source_sha": "6ec67247cecfa0e84513a2e342468753cdaf7c17",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "binaries": {
+        "threaded": {
+          "path": "zig-out/bin/bench",
+          "sha256": "733b075de0dcf1afd7b336973f6afe89c09004963a2a27a30a191dfd9c84bbbc"
+        },
+        "reactor": {
+          "path": "zig-out/bin/runtime-reactor-bench",
+          "sha256": "56b805a21c5cad4d9971ba52190307fa4750adaf9b59c09e56e809d594d0509d"
+        }
+      },
+      "paired": [
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 54885.79553456418,
+            "latency_ms": {
+              "p50": 0.057537500000000005,
+              "p95": 0.12910149999999998,
+              "p99": 0.24350500000000003
+            },
+            "cpu_percent": 126.50734400513757,
+            "rss_kib": 7080.833333333334,
+            "threads_peak": 13
+          },
+          "reactor": {
+            "rps": 26380.091898664894,
+            "latency_ms": {
+              "p50": 0.142942,
+              "p95": 0.2134235,
+              "p99": 0.2778645
+            },
+            "cpu_percent": 127.27150571937975,
+            "rss_kib": 6029,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -51.93639512421369
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 53282.141262043224,
+            "latency_ms": {
+              "p50": 0.060513,
+              "p95": 0.133825,
+              "p99": 0.25149
+            },
+            "cpu_percent": 126.16443800859398,
+            "rss_kib": 7072.333333333333,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 25508.259215305225,
+            "latency_ms": {
+              "p50": 0.147526,
+              "p95": 0.221944,
+              "p99": 0.286481
+            },
+            "cpu_percent": 127.308113064599,
+            "rss_kib": 6031.0,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -52.1260621080245
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 23066.293984693177,
+            "latency_ms": {
+              "p50": 0.15719349999999999,
+              "p95": 0.291155,
+              "p99": 0.40469700000000003
+            },
+            "cpu_percent": 158.48936164192213,
+            "rss_kib": 7227.833333333334,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 18576.700376078417,
+            "latency_ms": {
+              "p50": 0.203211,
+              "p95": 0.32239799999999996,
+              "p99": 0.40129099999999995
+            },
+            "cpu_percent": 158.9200650200817,
+            "rss_kib": 6189.333333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -19.463870579270605
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 72063.52397163633,
+            "latency_ms": {
+              "p50": 0.3977935,
+              "p95": 0.745163,
+              "p99": 1.3265245
+            },
+            "cpu_percent": 153.0967647109921,
+            "rss_kib": 14101.666666666666,
+            "threads_peak": 40
+          },
+          "reactor": {
+            "rps": 33600.71790271005,
+            "latency_ms": {
+              "p50": 0.9084095,
+              "p95": 1.3278820000000002,
+              "p99": 1.5890345000000001
+            },
+            "cpu_percent": 127.26483834904028,
+            "rss_kib": 6603.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -53.37347377581057
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 70156.0938388065,
+            "latency_ms": {
+              "p50": 0.4120205,
+              "p95": 0.746896,
+              "p99": 1.3063825
+            },
+            "cpu_percent": 152.83662139109776,
+            "rss_kib": 14145.166666666668,
+            "threads_peak": 40
+          },
+          "reactor": {
+            "rps": 32782.06088274675,
+            "latency_ms": {
+              "p50": 0.9239364999999999,
+              "p95": 1.37801,
+              "p99": 1.6352155
+            },
+            "cpu_percent": 127.22138886666406,
+            "rss_kib": 6601.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -53.272682258980744
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 40563.1292517267,
+            "latency_ms": {
+              "p50": 0.6987215,
+              "p95": 1.6940625,
+              "p99": 2.4914734999999997
+            },
+            "cpu_percent": 228.09210812527863,
+            "rss_kib": 14961.818181818182,
+            "threads_peak": 41
+          },
+          "reactor": {
+            "rps": 33758.70625577663,
+            "latency_ms": {
+              "p50": 0.8933249999999999,
+              "p95": 1.4849265000000003,
+              "p99": 1.8947265
+            },
+            "cpu_percent": 220.77098475671687,
+            "rss_kib": 6766.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -16.774896615404533
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 71886.11835139923,
+            "latency_ms": {
+              "p50": 1.6271925,
+              "p95": 2.750003,
+              "p99": 4.170282499999999
+            },
+            "cpu_percent": 151.81024703895008,
+            "rss_kib": 37210.16666666667,
+            "threads_peak": 137
+          },
+          "reactor": {
+            "rps": 37050.666172804195,
+            "latency_ms": {
+              "p50": 3.3641259999999997,
+              "p95": 4.467403,
+              "p99": 5.706644000000001
+            },
+            "cpu_percent": 127.50591691178282,
+            "rss_kib": 8508.0,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -48.45921991268148
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 68573.17195555723,
+            "latency_ms": {
+              "p50": 1.7085285,
+              "p95": 2.8789815,
+              "p99": 4.2880205
+            },
+            "cpu_percent": 153.40491436716098,
+            "rss_kib": 39445.166666666664,
+            "threads_peak": 136
+          },
+          "reactor": {
+            "rps": 36367.36462120836,
+            "latency_ms": {
+              "p50": 3.4322865,
+              "p95": 4.529669,
+              "p99": 5.7676739999999995
+            },
+            "cpu_percent": 127.32856272802032,
+            "rss_kib": 8526.666666666668,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -46.9656082924408
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 41503.94252987432,
+            "latency_ms": {
+              "p50": 2.7685955,
+              "p95": 5.995879499999999,
+              "p99": 9.431947000000001
+            },
+            "cpu_percent": 219.83417845143396,
+            "rss_kib": 41162.545454545456,
+            "threads_peak": 137
+          },
+          "reactor": {
+            "rps": 37068.56934919306,
+            "latency_ms": {
+              "p50": 3.3286160000000002,
+              "p95": 4.5675645000000005,
+              "p99": 6.205659000000001
+            },
+            "cpu_percent": 218.7124206331199,
+            "rss_kib": 8714.833333333332,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -10.68663098087298
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 70149.75899014735,
+            "latency_ms": {
+              "p50": 3.0165355,
+              "p95": 5.1208884999999995,
+              "p99": 7.3795269999999995
+            },
+            "cpu_percent": 154.53046092446522,
+            "rss_kib": 65251.181818181816,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 36921.71728488367,
+            "latency_ms": {
+              "p50": 6.6947525,
+              "p95": 7.862921,
+              "p99": 12.934723000000002
+            },
+            "cpu_percent": 127.54552436721099,
+            "rss_kib": 11075.333333333332,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -47.36729275139864
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 66179.34377697707,
+            "latency_ms": {
+              "p50": 3.2672299999999996,
+              "p95": 5.394756,
+              "p99": 7.714015
+            },
+            "cpu_percent": 152.52374994330756,
+            "rss_kib": 66475.66666666667,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 36013.600870499286,
+            "latency_ms": {
+              "p50": 6.895984,
+              "p95": 8.1103565,
+              "p99": 13.042375
+            },
+            "cpu_percent": 127.50676118381924,
+            "rss_kib": 11095.833333333332,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -45.5818102520564
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 35067.42517424956,
+            "latency_ms": {
+              "p50": 5.0771295,
+              "p95": 18.597549,
+              "p99": 29.1706625
+            },
+            "cpu_percent": 225.0291752411083,
+            "rss_kib": 70580.90909090909,
+            "threads_peak": 265
+          },
+          "reactor": {
+            "rps": 37497.68845725525,
+            "latency_ms": {
+              "p50": 6.5676215,
+              "p95": 8.732771,
+              "p99": 12.7899075
+            },
+            "cpu_percent": 217.67945972735487,
+            "rss_kib": 11251.333333333332,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 6.930258697151981
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 500.1494090414843,
+            "latency_ms": {
+              "p50": 0.22728500000000001,
+              "p95": 0.258448,
+              "p99": 0.27669699999999997
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5993.5,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.1591549563405,
+            "latency_ms": {
+              "p50": 0.2200315,
+              "p95": 0.26458950000000003,
+              "p99": 0.31301
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5902.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.0019486006941127343
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.1001149874627,
+            "latency_ms": {
+              "p50": 0.2301405,
+              "p95": 0.263462,
+              "p99": 0.28593
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5991.833333333334,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.1186900270755,
+            "latency_ms": {
+              "p50": 0.21333400000000002,
+              "p95": 0.26038700000000004,
+              "p99": 0.278606
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5900.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.0037142642155263417
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.1750665043686,
+            "latency_ms": {
+              "p50": 0.24464799999999998,
+              "p95": 0.2791675,
+              "p99": 0.303322
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 6018,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.07480643743355,
+            "latency_ms": {
+              "p50": 0.23252499999999998,
+              "p95": 0.274042,
+              "p99": 0.2934285
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5951.166666666666,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.02004499497261225
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 500.0671060484996,
+            "latency_ms": {
+              "p50": 0.224921,
+              "p95": 0.255658,
+              "p99": 0.276447
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5993.833333333334,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.198938249046,
+            "latency_ms": {
+              "p50": 0.214587,
+              "p95": 0.263323,
+              "p99": 0.2772845
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5896.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.0263629018889322
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.1690879895559,
+            "latency_ms": {
+              "p50": 0.2296045,
+              "p95": 0.2631565,
+              "p99": 0.3031865
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5993.833333333334,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.05985465398453,
+            "latency_ms": {
+              "p50": 0.2195,
+              "p95": 0.2698245,
+              "p99": 0.338303
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5896.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.02183928159383841
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.13397659375414,
+            "latency_ms": {
+              "p50": 0.24554399999999998,
+              "p95": 0.2790865,
+              "p99": 0.297937
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 6012.333333333334,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 500.14722811378226,
+            "latency_ms": {
+              "p50": 0.2332615,
+              "p95": 0.2774835,
+              "p99": 0.2963995
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5951.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.0026495940384618777
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 500.22150240016856,
+            "latency_ms": {
+              "p50": 0.2253365,
+              "p95": 0.25804150000000003,
+              "p99": 0.279643
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5990,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.07037485790335,
+            "latency_ms": {
+              "p50": 0.2127575,
+              "p95": 0.258518,
+              "p99": 0.2738475
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5894.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.030212124336936874
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.09622674144623,
+            "latency_ms": {
+              "p50": 0.2293345,
+              "p95": 0.2642595,
+              "p99": 0.314398
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5993.833333333334,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.04193649462695,
+            "latency_ms": {
+              "p50": 0.223883,
+              "p95": 0.266874,
+              "p99": 0.28455199999999997
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5900.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.01085596009652301
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.04972807510296,
+            "latency_ms": {
+              "p50": 0.24595050000000002,
+              "p95": 0.27885150000000003,
+              "p99": 0.29812700000000003
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 6018.666666666666,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.1235375297175,
+            "latency_ms": {
+              "p50": 0.227881,
+              "p95": 0.2761515,
+              "p99": 0.29611350000000003
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5947.166666666666,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.014760422908066673
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.99846087323795,
+            "latency_ms": {
+              "p50": 0.226779,
+              "p95": 0.258073,
+              "p99": 0.288825
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5997.0,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.13077395537783,
+            "latency_ms": {
+              "p50": 0.237244,
+              "p95": 0.26838700000000004,
+              "p99": 0.2837855
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5897.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.026462697886864284
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.025514031024,
+            "latency_ms": {
+              "p50": 0.230661,
+              "p95": 0.263457,
+              "p99": 0.2959035
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5996,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.11952720045895,
+            "latency_ms": {
+              "p50": 0.221339,
+              "p95": 0.27011050000000003,
+              "p99": 0.2962445
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5897.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.018801674473989394
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.130811597892,
+            "latency_ms": {
+              "p50": 0.24341049999999997,
+              "p95": 0.27613600000000005,
+              "p99": 0.2923015
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 6017.666666666666,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.0172772911649,
+            "latency_ms": {
+              "p50": 0.2366725,
+              "p95": 0.27546,
+              "p99": 0.2998305
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5950.666666666666,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.02270092225759024
+        }
+      ],
+      "soaks": [
+        {
+          "adapter": "threaded",
+          "elapsed_s": 1200.00012691,
+          "http_max_ms": 7.557419000022492,
+          "resources": {
+            "rss_kib": {
+              "first": 58796,
+              "last": 60144,
+              "min": 58796,
+              "max": 60464
+            },
+            "fds": {
+              "first": 123,
+              "last": 123,
+              "min": 122,
+              "max": 124
+            },
+            "threads": {
+              "first": 121,
+              "last": 121,
+              "min": 120,
+              "max": 122
+            },
+            "cpu_percent": {
+              "first": 26.3,
+              "last": 2.7,
+              "min": 2.7,
+              "max": 26.3
+            }
+          },
+          "allocator_live": {
+            "first": 2409230,
+            "last": 2409690,
+            "min": 2407368,
+            "max": 2411624
+          },
+          "shutdown_ms": 63.94014399984371,
+          "allocator_final": {
+            "calls": 62317,
+            "requested": 89736508,
+            "live": 0,
+            "peak": 2430357
+          },
+          "sessions_final": {
+            "created": 4676,
+            "closed": 4676
+          },
+          "clean": true
+        },
+        {
+          "adapter": "epoll",
+          "elapsed_s": 1200.00013445,
+          "http_max_ms": 6.371218999902339,
+          "resources": {
+            "rss_kib": {
+              "first": 15180,
+              "last": 15964,
+              "min": 15180,
+              "max": 15968
+            },
+            "fds": {
+              "first": 123,
+              "last": 127,
+              "min": 123,
+              "max": 127
+            },
+            "threads": {
+              "first": 5,
+              "last": 5,
+              "min": 5,
+              "max": 5
+            },
+            "cpu_percent": {
+              "first": 37.5,
+              "last": 1.3,
+              "min": 1.3,
+              "max": 37.5
+            }
+          },
+          "allocator_live": {
+            "first": 11665252,
+            "last": 11867976,
+            "min": 11665252,
+            "max": 11867976
+          },
+          "shutdown_ms": 163.94857099976434,
+          "allocator_final": {
+            "calls": 93852,
+            "requested": 790120060,
+            "live": 0,
+            "peak": 12202402
+          },
+          "sessions_final": {
+            "created": 4868,
+            "closed": 4868
+          },
+          "clean": true
+        }
+      ],
+      "passed": true,
+      "long_soak_completed": true
+    },
+    "ci-macos": {
+      "source_sha": "6ec67247cecfa0e84513a2e342468753cdaf7c17",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "binaries": {
+        "threaded": {
+          "path": "zig-out/bin/bench",
+          "sha256": "015e8c80f98ee476820f23a2fac3bb636a9ed5274fac1bf4ec21d97f52c41423"
+        },
+        "reactor": {
+          "path": "zig-out/bin/runtime-reactor-bench",
+          "sha256": "0809ef6197f607c0d0e78369de7366a6af58fa4f0a536567ccceea139b81b449"
+        }
+      },
+      "paired": [
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 27788.28116744758,
+            "latency_ms": {
+              "p50": 0.11708350000000001,
+              "p95": 0.27591699999999997,
+              "p99": 0.5455
+            },
+            "cpu_percent": 60.077962912436575,
+            "rss_kib": 3409.4222222222224,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 22482.45589003437,
+            "latency_ms": {
+              "p50": 0.1560835,
+              "p95": 0.2998125,
+              "p99": 0.47262499999999996
+            },
+            "cpu_percent": 79.85388609519242,
+            "rss_kib": 3542.222222222222,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -19.093751230747912
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 32003.727828540028,
+            "latency_ms": {
+              "p50": 0.1079585,
+              "p95": 0.2132915,
+              "p99": 0.38225
+            },
+            "cpu_percent": 67.21685402858682,
+            "rss_kib": 3432.0,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 19576.172015320226,
+            "latency_ms": {
+              "p50": 0.17443799999999998,
+              "p95": 0.38302099999999994,
+              "p99": 0.641458
+            },
+            "cpu_percent": 74.49685650663295,
+            "rss_kib": 3563.3454545454542,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -38.83158824434588
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 28101.19854336445,
+            "latency_ms": {
+              "p50": 0.125604,
+              "p95": 0.259875,
+              "p99": 0.42462450000000007
+            },
+            "cpu_percent": 95.69980251697362,
+            "rss_kib": 3543.490909090909,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 21219.33101463191,
+            "latency_ms": {
+              "p50": 0.17245850000000001,
+              "p95": 0.32918749999999997,
+              "p99": 0.5242085000000001
+            },
+            "cpu_percent": 102.91762461389956,
+            "rss_kib": 3627.7818181818184,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -24.489587225657893
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 77024.21677932801,
+            "latency_ms": {
+              "p50": 0.224271,
+              "p95": 0.893375,
+              "p99": 4.7605005
+            },
+            "cpu_percent": 92.84241343974088,
+            "rss_kib": 6028.888888888889,
+            "threads_peak": 40
+          },
+          "reactor": {
+            "rps": 46753.07501802853,
+            "latency_ms": {
+              "p50": 0.582792,
+              "p95": 1.3865835,
+              "p99": 2.2047915
+            },
+            "cpu_percent": 93.02443253324077,
+            "rss_kib": 5199.111111111111,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -39.30081087098277
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 70809.33837301446,
+            "latency_ms": {
+              "p50": 0.2790625,
+              "p95": 0.9459164999999999,
+              "p99": 3.853625
+            },
+            "cpu_percent": 92.67814063203298,
+            "rss_kib": 6073.777777777777,
+            "threads_peak": 40
+          },
+          "reactor": {
+            "rps": 46585.72119524431,
+            "latency_ms": {
+              "p50": 0.5266664999999999,
+              "p95": 1.553125,
+              "p99": 2.6015625
+            },
+            "cpu_percent": 97.00340898646319,
+            "rss_kib": 5212.355555555556,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -34.209636376156006
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 47174.08975366794,
+            "latency_ms": {
+              "p50": 0.3764165,
+              "p95": 1.4439165,
+              "p99": 6.3547705
+            },
+            "cpu_percent": 120.53733847885648,
+            "rss_kib": 6304.888888888889,
+            "threads_peak": 40
+          },
+          "reactor": {
+            "rps": 40060.73180293059,
+            "latency_ms": {
+              "p50": 0.7430215,
+              "p95": 1.5335205000000003,
+              "p99": 2.355375
+            },
+            "cpu_percent": 125.2465016039412,
+            "rss_kib": 5294.133333333333,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -15.078951152807907
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 57711.50705279336,
+            "latency_ms": {
+              "p50": 1.2378749999999998,
+              "p95": 6.378354,
+              "p99": 20.337521
+            },
+            "cpu_percent": 83.34618764150618,
+            "rss_kib": 15118,
+            "threads_peak": 136
+          },
+          "reactor": {
+            "rps": 50959.90762350875,
+            "latency_ms": {
+              "p50": 1.648958,
+              "p95": 6.381062,
+              "p99": 10.5837915
+            },
+            "cpu_percent": 85.47530208071251,
+            "rss_kib": 10368.888888888889,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -11.698879086814307
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 77912.0938450369,
+            "latency_ms": {
+              "p50": 0.985458,
+              "p95": 4.0848125,
+              "p99": 11.411604
+            },
+            "cpu_percent": 104.88728614277849,
+            "rss_kib": 14760,
+            "threads_peak": 136
+          },
+          "reactor": {
+            "rps": 56541.55754761499,
+            "latency_ms": {
+              "p50": 1.5180415,
+              "p95": 5.3513535,
+              "p99": 10.8582915
+            },
+            "cpu_percent": 93.52062549407344,
+            "rss_kib": 10361.4,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -27.429036036339618
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 54907.45143591463,
+            "latency_ms": {
+              "p50": 1.4174164999999999,
+              "p95": 6.023937,
+              "p99": 18.180917
+            },
+            "cpu_percent": 140.9200460478525,
+            "rss_kib": 15567,
+            "threads_peak": 136
+          },
+          "reactor": {
+            "rps": 48726.86408178204,
+            "latency_ms": {
+              "p50": 2.106104,
+              "p95": 5.8962915,
+              "p99": 9.503125
+            },
+            "cpu_percent": 121.32444866701812,
+            "rss_kib": 10538.755555555555,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -11.256372664366465
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 68951.69757150766,
+            "latency_ms": {
+              "p50": 2.423667,
+              "p95": 9.621646,
+              "p99": 33.246021
+            },
+            "cpu_percent": 102.54010503494567,
+            "rss_kib": 26654,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 45445.401296841366,
+            "latency_ms": {
+              "p50": 4.4626255,
+              "p95": 13.1707705,
+              "p99": 22.9615
+            },
+            "cpu_percent": 73.01311492888459,
+            "rss_kib": 17448.88888888889,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -34.090960922736734
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 54767.609305958555,
+            "latency_ms": {
+              "p50": 2.7388125,
+              "p95": 15.9223125,
+              "p99": 73.760417
+            },
+            "cpu_percent": 89.58141754069999,
+            "rss_kib": 25839.428571428572,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 46575.42410143536,
+            "latency_ms": {
+              "p50": 4.2204165,
+              "p95": 12.237375,
+              "p99": 15.625250000000001
+            },
+            "cpu_percent": 85.54614981564487,
+            "rss_kib": 16634.844444444447,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -14.958084364715752
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 49668.49828086856,
+            "latency_ms": {
+              "p50": 3.2320415,
+              "p95": 13.3479165,
+              "p99": 45.4371875
+            },
+            "cpu_percent": 139.6754004399774,
+            "rss_kib": 27756,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 52454.3529004544,
+            "latency_ms": {
+              "p50": 4.0463545,
+              "p95": 10.1765835,
+              "p99": 13.8397915
+            },
+            "cpu_percent": 125.5654032110962,
+            "rss_kib": 18484.444444444445,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 5.608896415253417
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.9697238189116,
+            "latency_ms": {
+              "p50": 0.4551455,
+              "p95": 0.793958,
+              "p99": 2.578208
+            },
+            "cpu_percent": 10.82700121893278,
+            "rss_kib": 3009.688888888889,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 499.8601451530204,
+            "latency_ms": {
+              "p50": 0.2720205,
+              "p95": 0.5944375,
+              "p99": 1.301792
+            },
+            "cpu_percent": 4.774259601389955,
+            "rss_kib": 3246.981818181818,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.021917060308007663
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.057431647406,
+            "latency_ms": {
+              "p50": 0.273229,
+              "p95": 0.6037085,
+              "p99": 1.6470625
+            },
+            "cpu_percent": 6.249536458683163,
+            "rss_kib": 3026.3999999999996,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.06960630990096,
+            "latency_ms": {
+              "p50": 0.3600415,
+              "p95": 0.643583,
+              "p99": 1.068083
+            },
+            "cpu_percent": 6.11409954207289,
+            "rss_kib": 3264.5656565656564,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.0024346528467500406
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.08812742152884,
+            "latency_ms": {
+              "p50": 0.314354,
+              "p95": 0.734062,
+              "p99": 1.3523125
+            },
+            "cpu_percent": 7.737428393904944,
+            "rss_kib": 3032.8,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.00224219758655,
+            "latency_ms": {
+              "p50": 0.38497950000000003,
+              "p95": 0.811833,
+              "p99": 2.046354
+            },
+            "cpu_percent": 7.10048769474937,
+            "rss_kib": 3276.6222222222223,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.01717401778464911
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.9579061775266,
+            "latency_ms": {
+              "p50": 0.42525,
+              "p95": 0.762292,
+              "p99": 1.394396
+            },
+            "cpu_percent": 9.529100672270593,
+            "rss_kib": 3022.222222222222,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 499.8063825047451,
+            "latency_ms": {
+              "p50": 0.39904200000000006,
+              "p95": 0.7994165,
+              "p99": 2.3300840000000003
+            },
+            "cpu_percent": 6.486470103508789,
+            "rss_kib": 3247.4666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.030307286055331062
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 499.8846696214124,
+            "latency_ms": {
+              "p50": 0.449312,
+              "p95": 0.9719585,
+              "p99": 2.085688
+            },
+            "cpu_percent": 10.912021466892885,
+            "rss_kib": 3043.644444444444,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 499.80370530708035,
+            "latency_ms": {
+              "p50": 0.531604,
+              "p95": 0.8881249999999999,
+              "p99": 3.4781874999999998
+            },
+            "cpu_percent": 8.761788758757742,
+            "rss_kib": 3256.8,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.016196598786144545
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 499.9856936787446,
+            "latency_ms": {
+              "p50": 0.555542,
+              "p95": 0.9866255000000002,
+              "p99": 1.931792
+            },
+            "cpu_percent": 13.161362737027229,
+            "rss_kib": 3060,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 499.8432167250793,
+            "latency_ms": {
+              "p50": 0.552,
+              "p95": 0.9884375000000001,
+              "p99": 1.6607085
+            },
+            "cpu_percent": 10.364445011179257,
+            "rss_kib": 3288.8,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.028496206084827058
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.09293176401326,
+            "latency_ms": {
+              "p50": 0.3332495,
+              "p95": 1.2288750000000002,
+              "p99": 10.9656665
+            },
+            "cpu_percent": 7.349720387830999,
+            "rss_kib": 3023.2,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.0546398670176,
+            "latency_ms": {
+              "p50": 0.2780415,
+              "p95": 0.5352709999999999,
+              "p99": 0.7509375
+            },
+            "cpu_percent": 4.996828846613928,
+            "rss_kib": 3253.6,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.1926911887141447
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 499.9631441302782,
+            "latency_ms": {
+              "p50": 0.3562915,
+              "p95": 0.8269790000000001,
+              "p99": 1.4992085
+            },
+            "cpu_percent": 9.19819793663886,
+            "rss_kib": 3035.2888888888892,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 499.17070110698523,
+            "latency_ms": {
+              "p50": 0.431229,
+              "p95": 0.862375,
+              "p99": 2.758188
+            },
+            "cpu_percent": 8.15667856530245,
+            "rss_kib": 3259.2,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.15850028799051508
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.0138739337533,
+            "latency_ms": {
+              "p50": 0.4489375,
+              "p95": 0.8870625,
+              "p99": 1.618687
+            },
+            "cpu_percent": 10.527764589658211,
+            "rss_kib": 3035.2,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 499.78680439927416,
+            "latency_ms": {
+              "p50": 0.426833,
+              "p95": 2.1663125,
+              "p99": 4.6414375
+            },
+            "cpu_percent": 7.574784898002104,
+            "rss_kib": 3276.9454545454546,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.04541264679172041
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 500.0146749594536,
+            "latency_ms": {
+              "p50": 0.3586045,
+              "p95": 0.7606249999999999,
+              "p99": 2.684354
+            },
+            "cpu_percent": 9.269987027751142,
+            "rss_kib": 3022.666666666667,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 499.97884671494313,
+            "latency_ms": {
+              "p50": 0.36425050000000003,
+              "p95": 0.63825,
+              "p99": 1.2843749999999998
+            },
+            "cpu_percent": 5.930160150721822,
+            "rss_kib": 3252.363636363636,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.007165438597056539
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 499.68927080928233,
+            "latency_ms": {
+              "p50": 0.4699375,
+              "p95": 0.9333335,
+              "p99": 2.4664580000000003
+            },
+            "cpu_percent": 11.126889204125952,
+            "rss_kib": 3052.177777777778,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 498.8457475045444,
+            "latency_ms": {
+              "p50": 0.344042,
+              "p95": 0.8812295,
+              "p99": 1.9881250000000001
+            },
+            "cpu_percent": 6.36094208211076,
+            "rss_kib": 3262.311111111111,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.16880956906915046
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 497.92666330220476,
+            "latency_ms": {
+              "p50": 0.625937,
+              "p95": 1.211729,
+              "p99": 2.9154584999999997
+            },
+            "cpu_percent": 14.599377197442365,
+            "rss_kib": 3094.7555555555555,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 498.409737537031,
+            "latency_ms": {
+              "p50": 0.6617295000000001,
+              "p95": 1.0104164999999998,
+              "p99": 2.261833
+            },
+            "cpu_percent": 10.501416381444491,
+            "rss_kib": 3283.2,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.09701714538090656
+        }
+      ],
+      "soaks": [
+        {
+          "adapter": "threaded",
+          "elapsed_s": 1200.0679765409998,
+          "http_max_ms": 17.324207999990904,
+          "resources": {
+            "rss_kib": {
+              "first": 18176,
+              "last": 29824,
+              "min": 18176,
+              "max": 29824
+            },
+            "fds": {
+              "first": 120,
+              "last": 120,
+              "min": 120,
+              "max": 120
+            },
+            "threads": {
+              "first": 118,
+              "last": 118,
+              "min": 118,
+              "max": 118
+            },
+            "cpu_percent": {
+              "first": 2.7,
+              "last": 0.8,
+              "min": 0.0,
+              "max": 3.1
+            }
+          },
+          "allocator_live": {
+            "first": 2403428,
+            "last": 2403888,
+            "min": 2403428,
+            "max": 2403888
+          },
+          "shutdown_ms": 101.97058299991113,
+          "allocator_final": {
+            "calls": 58764,
+            "requested": 84680886,
+            "live": 0,
+            "peak": 2443224
+          },
+          "sessions_final": {
+            "created": 4412,
+            "closed": 4412
+          },
+          "clean": true
+        },
+        {
+          "adapter": "kqueue",
+          "elapsed_s": 1200.01096125,
+          "http_max_ms": 14.46679100035908,
+          "resources": {
+            "rss_kib": {
+              "first": 16656,
+              "last": 17168,
+              "min": 16656,
+              "max": 17168
+            },
+            "fds": {
+              "first": 123,
+              "last": 123,
+              "min": 123,
+              "max": 123
+            },
+            "threads": {
+              "first": 5,
+              "last": 5,
+              "min": 5,
+              "max": 5
+            },
+            "cpu_percent": {
+              "first": 4.0,
+              "last": 0.0,
+              "min": 0.0,
+              "max": 6.4
+            }
+          },
+          "allocator_live": {
+            "first": 11668060,
+            "last": 11668520,
+            "min": 11668060,
+            "max": 11757571
+          },
+          "shutdown_ms": 317.56945899996936,
+          "allocator_final": {
+            "calls": 89640,
+            "requested": 755287810,
+            "live": 0,
+            "peak": 12420904
+          },
+          "sessions_final": {
+            "created": 4652,
+            "closed": 4652
+          },
+          "clean": true
+        }
+      ],
+      "passed": true,
+      "long_soak_completed": true
+    },
+    "ci-linux-after-deadline-fix": {
+      "source_sha": "26017bd1ca0082811cf9865c60d8cad239b72299",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "binaries": {
+        "threaded": {
+          "path": "zig-out/bin/bench",
+          "sha256": "24b8e5cf5706b008e83158393b20e86b52942871ac9b155352b29e134248f370"
+        },
+        "reactor": {
+          "path": "zig-out/bin/runtime-reactor-bench",
+          "sha256": "afa2951985409fabf1f4da3ca2571096cea40da23616d68712e305310564e87e"
+        }
+      },
+      "paired": [
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 68437.0835864585,
+            "latency_ms": {
+              "p50": 0.044407,
+              "p95": 0.1056645,
+              "p99": 0.218238
+            },
+            "cpu_percent": 126.44944319167334,
+            "rss_kib": 7094.666666666666,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 31036.87697403779,
+            "latency_ms": {
+              "p50": 0.12153749999999999,
+              "p95": 0.177401,
+              "p99": 0.2524195
+            },
+            "cpu_percent": 127.45305500804955,
+            "rss_kib": 6049.333333333333,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -54.64903624242253
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 64068.080531552885,
+            "latency_ms": {
+              "p50": 0.0500255,
+              "p95": 0.115489,
+              "p99": 0.23203400000000002
+            },
+            "cpu_percent": 126.7419125617424,
+            "rss_kib": 7037.833333333334,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 30239.841458052804,
+            "latency_ms": {
+              "p50": 0.124892,
+              "p95": 0.179815,
+              "p99": 0.2592145
+            },
+            "cpu_percent": 127.46736175240247,
+            "rss_kib": 6049.333333333333,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -52.80045662807085
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 27245.431133529688,
+            "latency_ms": {
+              "p50": 0.133295,
+              "p95": 0.2536085,
+              "p99": 0.3599605
+            },
+            "cpu_percent": 158.69356554055227,
+            "rss_kib": 7237.5,
+            "threads_peak": 13
+          },
+          "reactor": {
+            "rps": 21248.061407023633,
+            "latency_ms": {
+              "p50": 0.1769635,
+              "p95": 0.28451800000000005,
+              "p99": 0.37044699999999997
+            },
+            "cpu_percent": 159.23741414428864,
+            "rss_kib": 6198.5,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -22.012386947055397
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 83297.21168083078,
+            "latency_ms": {
+              "p50": 0.34429750000000003,
+              "p95": 0.6320195,
+              "p99": 1.0841735000000001
+            },
+            "cpu_percent": 153.82422378126216,
+            "rss_kib": 14088.666666666668,
+            "threads_peak": 41
+          },
+          "reactor": {
+            "rps": 35109.029657405175,
+            "latency_ms": {
+              "p50": 0.8784975,
+              "p95": 1.210436,
+              "p99": 1.5310255000000002
+            },
+            "cpu_percent": 127.57308591910787,
+            "rss_kib": 6605.833333333333,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -57.85089446699351
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 81464.35595103071,
+            "latency_ms": {
+              "p50": 0.35202849999999997,
+              "p95": 0.645134,
+              "p99": 1.0855709999999998
+            },
+            "cpu_percent": 167.8850634121859,
+            "rss_kib": 13861.833333333334,
+            "threads_peak": 41
+          },
+          "reactor": {
+            "rps": 34607.70134693672,
+            "latency_ms": {
+              "p50": 0.8891655,
+              "p95": 1.2396375000000002,
+              "p99": 1.5632285000000001
+            },
+            "cpu_percent": 127.58600862763251,
+            "rss_kib": 6618.0,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -57.51798324197166
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 49628.200291397414,
+            "latency_ms": {
+              "p50": 0.581874,
+              "p95": 1.3479545000000002,
+              "p99": 2.063145
+            },
+            "cpu_percent": 220.83818739443507,
+            "rss_kib": 14618.257575757576,
+            "threads_peak": 41
+          },
+          "reactor": {
+            "rps": 36153.2418644329,
+            "latency_ms": {
+              "p50": 0.8355155000000001,
+              "p95": 1.3553164999999998,
+              "p99": 1.728513
+            },
+            "cpu_percent": 205.70549678609672,
+            "rss_kib": 6788.5,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -27.15181761144837
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 78476.82044180634,
+            "latency_ms": {
+              "p50": 1.4924325,
+              "p95": 2.5034764999999997,
+              "p99": 3.736359
+            },
+            "cpu_percent": 153.02047055770657,
+            "rss_kib": 39781.0,
+            "threads_peak": 137
+          },
+          "reactor": {
+            "rps": 37496.250004202535,
+            "latency_ms": {
+              "p50": 3.296673,
+              "p95": 4.068082,
+              "p99": 6.0097345
+            },
+            "cpu_percent": 127.52028929788392,
+            "rss_kib": 8532.333333333332,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -52.21996789229313
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 77295.36053396622,
+            "latency_ms": {
+              "p50": 1.5017209999999999,
+              "p95": 2.574909,
+              "p99": 3.865588
+            },
+            "cpu_percent": 167.37262981897032,
+            "rss_kib": 38526.166666666664,
+            "threads_peak": 136
+          },
+          "reactor": {
+            "rps": 36790.23025575839,
+            "latency_ms": {
+              "p50": 3.3551915,
+              "p95": 4.1341895,
+              "p99": 6.2219105
+            },
+            "cpu_percent": 127.64575650384168,
+            "rss_kib": 8477.166666666668,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -52.403054980781796
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 50387.650050324264,
+            "latency_ms": {
+              "p50": 2.363411,
+              "p95": 4.153169999999999,
+              "p99": 5.756444
+            },
+            "cpu_percent": 225.38410766659206,
+            "rss_kib": 40984.0,
+            "threads_peak": 138
+          },
+          "reactor": {
+            "rps": 40977.390023040396,
+            "latency_ms": {
+              "p50": 3.0106485000000003,
+              "p95": 4.139810000000001,
+              "p99": 5.6741225
+            },
+            "cpu_percent": 188.36177218549867,
+            "rss_kib": 8735.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -18.6757271233833
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 76683.36327377494,
+            "latency_ms": {
+              "p50": 2.8350045,
+              "p95": 4.588188499999999,
+              "p99": 6.448554
+            },
+            "cpu_percent": 152.08923288724003,
+            "rss_kib": 65576.83333333334,
+            "threads_peak": 266
+          },
+          "reactor": {
+            "rps": 36242.982505718195,
+            "latency_ms": {
+              "p50": 6.690004,
+              "p95": 7.694931,
+              "p99": 13.918557
+            },
+            "cpu_percent": 127.53524215489702,
+            "rss_kib": 10980.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -52.73683761584178
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 71061.87880915053,
+            "latency_ms": {
+              "p50": 3.0648505,
+              "p95": 5.092200500000001,
+              "p99": 7.0300775
+            },
+            "cpu_percent": 151.87068095797127,
+            "rss_kib": 65918.5,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 35830.98143018669,
+            "latency_ms": {
+              "p50": 6.8938755,
+              "p95": 8.243203,
+              "p99": 12.4506575
+            },
+            "cpu_percent": 127.70611580771529,
+            "rss_kib": 11098.166666666666,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -49.57777358178602
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 49949.939808809184,
+            "latency_ms": {
+              "p50": 4.348017499999999,
+              "p95": 7.4550865,
+              "p99": 11.280869
+            },
+            "cpu_percent": 226.42366881409015,
+            "rss_kib": 69847.09090909091,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 41047.43778691738,
+            "latency_ms": {
+              "p50": 6.058077000000001,
+              "p95": 7.730489499999999,
+              "p99": 11.6588195
+            },
+            "cpu_percent": 188.85921899756767,
+            "rss_kib": 11317.5,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -17.822848347700628
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 500.04464352676007,
+            "latency_ms": {
+              "p50": 0.231708,
+              "p95": 0.2654885,
+              "p99": 0.2874095
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5996.333333333333,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.0718844283724,
+            "latency_ms": {
+              "p50": 0.2154835,
+              "p95": 0.249921,
+              "p99": 0.2700155
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5911.5,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.005447693913929186
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.1282457976332,
+            "latency_ms": {
+              "p50": 0.23726150000000001,
+              "p95": 0.2697855,
+              "p99": 0.311205
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5993.666666666666,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 500.0609183790491,
+            "latency_ms": {
+              "p50": 0.21072649999999998,
+              "p95": 0.2551135,
+              "p99": 0.27491750000000004
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5913,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.013462030819066939
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.0165990587235,
+            "latency_ms": {
+              "p50": 0.251208,
+              "p95": 0.2838735,
+              "p99": 0.30693099999999995
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 6023.333333333334,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.12603547152185,
+            "latency_ms": {
+              "p50": 0.2300805,
+              "p95": 0.2755545,
+              "p99": 0.2942625
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5964,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.021886555967221
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.9931200123097,
+            "latency_ms": {
+              "p50": 0.23356100000000002,
+              "p95": 0.270744,
+              "p99": 0.4221045
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5998,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.0397567075757,
+            "latency_ms": {
+              "p50": 0.217151,
+              "p95": 0.25773749999999995,
+              "p99": 0.27401200000000003
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5908.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.009327467398922984
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.01568724831577,
+            "latency_ms": {
+              "p50": 0.235509,
+              "p95": 0.2666355,
+              "p99": 0.2890475
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5995.0,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.01755601820395,
+            "latency_ms": {
+              "p50": 0.21734150000000002,
+              "p95": 0.26094649999999997,
+              "p99": 0.27799799999999997
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5912.666666666667,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.0003737422516580935
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.02609069348125,
+            "latency_ms": {
+              "p50": 0.2522995,
+              "p95": 0.283751,
+              "p99": 0.307858
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 6017.333333333334,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.08461043891134,
+            "latency_ms": {
+              "p50": 0.23070200000000002,
+              "p95": 0.2722735,
+              "p99": 0.3022285
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5964.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.011703338389579265
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.9834659508905,
+            "latency_ms": {
+              "p50": 0.233055,
+              "p95": 0.263366,
+              "p99": 0.281974
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5999.5,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.03551606765325,
+            "latency_ms": {
+              "p50": 0.2087885,
+              "p95": 0.250667,
+              "p99": 0.270436
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5912.5,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.01041036760360825
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.0586343027269,
+            "latency_ms": {
+              "p50": 0.239255,
+              "p95": 0.273195,
+              "p99": 0.3574125
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5994.0,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.0612964635638,
+            "latency_ms": {
+              "p50": 0.217587,
+              "p95": 0.250186,
+              "p99": 0.272239
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5909.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.0005323697371162339
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 499.9991633515128,
+            "latency_ms": {
+              "p50": 0.254833,
+              "p95": 0.286428,
+              "p99": 0.302635
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 6023.166666666667,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.0518791520286,
+            "latency_ms": {
+              "p50": 0.2275275,
+              "p95": 0.2690795,
+              "p99": 0.2919135
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5960,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.010543177745026
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.92593613713984,
+            "latency_ms": {
+              "p50": 0.2326,
+              "p95": 0.26285749999999997,
+              "p99": 0.281866
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5997.5,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 499.8472272648034,
+            "latency_ms": {
+              "p50": 0.20587450000000002,
+              "p95": 0.24936950000000002,
+              "p99": 0.271418
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5913.833333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.01574410660599712
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 499.97019807399397,
+            "latency_ms": {
+              "p50": 0.236045,
+              "p95": 0.26637500000000003,
+              "p99": 0.2850455
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5994.833333333334,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 499.88698916847864,
+            "latency_ms": {
+              "p50": 0.220206,
+              "p95": 0.260877,
+              "p99": 0.2832355
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5912.333333333334,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.016642773076447348
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.0230133815356,
+            "latency_ms": {
+              "p50": 0.25259450000000006,
+              "p95": 0.2856745,
+              "p99": 0.3032275
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 6017.5,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.0455846297628,
+            "latency_ms": {
+              "p50": 0.23003099999999999,
+              "p95": 0.374172,
+              "p99": 0.5303945
+            },
+            "cpu_percent": 0.0,
+            "rss_kib": 5962,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.004514041878711517
+        }
+      ],
+      "soaks": [
+        {
+          "adapter": "threaded",
+          "elapsed_s": 1200.0000864150002,
+          "http_max_ms": 6.724538999833385,
+          "resources": {
+            "rss_kib": {
+              "first": 58692,
+              "last": 60048,
+              "min": 58524,
+              "max": 60328
+            },
+            "fds": {
+              "first": 122,
+              "last": 123,
+              "min": 120,
+              "max": 124
+            },
+            "threads": {
+              "first": 120,
+              "last": 121,
+              "min": 118,
+              "max": 122
+            },
+            "cpu_percent": {
+              "first": 33.3,
+              "last": 2.5,
+              "min": 2.5,
+              "max": 33.3
+            }
+          },
+          "allocator_live": {
+            "first": 2407354,
+            "last": 2409748,
+            "min": 2403846,
+            "max": 2411682
+          },
+          "shutdown_ms": 113.7036260001878,
+          "allocator_final": {
+            "calls": 62323,
+            "requested": 89736875,
+            "live": 0,
+            "peak": 2430415
+          },
+          "sessions_final": {
+            "created": 4676,
+            "closed": 4676,
+            "close_reasons": [
+              0,
+              4560,
+              0,
+              116,
+              0
+            ]
+          },
+          "clean": true
+        },
+        {
+          "adapter": "epoll",
+          "elapsed_s": 1200.000127202,
+          "http_max_ms": 9.788046000267059,
+          "resources": {
+            "rss_kib": {
+              "first": 15196,
+              "last": 15448,
+              "min": 15196,
+              "max": 15448
+            },
+            "fds": {
+              "first": 123,
+              "last": 123,
+              "min": 123,
+              "max": 123
+            },
+            "threads": {
+              "first": 5,
+              "last": 5,
+              "min": 5,
+              "max": 5
+            },
+            "cpu_percent": {
+              "first": 42.8,
+              "last": 1.0,
+              "min": 0.9,
+              "max": 42.8
+            }
+          },
+          "allocator_live": {
+            "first": 11666246,
+            "last": 11666706,
+            "min": 11666246,
+            "max": 11666706
+          },
+          "shutdown_ms": 163.90798400016138,
+          "allocator_final": {
+            "calls": 93858,
+            "requested": 790313027,
+            "live": 0,
+            "peak": 12475836
+          },
+          "sessions_final": {
+            "created": 4868,
+            "closed": 4868,
+            "close_reasons": [
+              0,
+              4752,
+              0,
+              116,
+              0
+            ]
+          },
+          "clean": true
+        }
+      ],
+      "passed": true,
+      "long_soak_completed": true
+    },
+    "ci-macos-after-deadline-fix": {
+      "source_sha": "26017bd1ca0082811cf9865c60d8cad239b72299",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "binaries": {
+        "threaded": {
+          "path": "zig-out/bin/bench",
+          "sha256": "da9b23f774f1cadff3cb8caf076761fdeb0dfd05ea765027b357de203b5c8cb2"
+        },
+        "reactor": {
+          "path": "zig-out/bin/runtime-reactor-bench",
+          "sha256": "8338b6b688772abc16708e054ec4ad8cfd524414d29025aa6e36d3baccf1ddd6"
+        }
+      },
+      "paired": [
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 29074.28775408424,
+            "latency_ms": {
+              "p50": 0.1125835,
+              "p95": 0.24906299999999998,
+              "p99": 0.4886665
+            },
+            "cpu_percent": 65.23955760559875,
+            "rss_kib": 3441.3737373737376,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 19560.71727846656,
+            "latency_ms": {
+              "p50": 0.171604,
+              "p95": 0.37329199999999996,
+              "p99": 0.702542
+            },
+            "cpu_percent": 77.52985116855248,
+            "rss_kib": 3556.8,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -32.721594269428834
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 26117.54881760513,
+            "latency_ms": {
+              "p50": 0.12116650000000001,
+              "p95": 0.3069375,
+              "p99": 0.6244580000000001
+            },
+            "cpu_percent": 59.243513905091646,
+            "rss_kib": 3469.6,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 18068.315981396267,
+            "latency_ms": {
+              "p50": 0.1867295,
+              "p95": 0.40933300000000006,
+              "p99": 0.6971875000000001
+            },
+            "cpu_percent": 72.69606990913971,
+            "rss_kib": 3596.6060606060605,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -30.819250659476495
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 4,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 22713.859339659237,
+            "latency_ms": {
+              "p50": 0.145292,
+              "p95": 0.39320849999999996,
+              "p99": 0.7615
+            },
+            "cpu_percent": 89.3104730042593,
+            "rss_kib": 3515.5555555555557,
+            "threads_peak": 12
+          },
+          "reactor": {
+            "rps": 15412.779014510823,
+            "latency_ms": {
+              "p50": 0.20087549999999998,
+              "p95": 0.47,
+              "p99": 0.8877920000000001
+            },
+            "cpu_percent": 78.71509396678181,
+            "rss_kib": 3613.2444444444445,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -32.14372430492452
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 56546.959462481725,
+            "latency_ms": {
+              "p50": 0.33989650000000005,
+              "p95": 1.305312,
+              "p99": 4.8266670000000005
+            },
+            "cpu_percent": 87.79345349426892,
+            "rss_kib": 6181.333333333334,
+            "threads_peak": 40
+          },
+          "reactor": {
+            "rps": 40382.28740214555,
+            "latency_ms": {
+              "p50": 0.63425,
+              "p95": 1.72075,
+              "p99": 2.8662915
+            },
+            "cpu_percent": 101.1213568322911,
+            "rss_kib": 5210.311111111111,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -28.58627981768189
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 53666.034811583275,
+            "latency_ms": {
+              "p50": 0.3532505,
+              "p95": 1.4169585,
+              "p99": 5.365229
+            },
+            "cpu_percent": 94.64715958329145,
+            "rss_kib": 6140,
+            "threads_peak": 40
+          },
+          "reactor": {
+            "rps": 32421.440094979236,
+            "latency_ms": {
+              "p50": 0.8045835,
+              "p95": 2.2325415,
+              "p99": 3.7141665
+            },
+            "cpu_percent": 86.06260468185715,
+            "rss_kib": 5219.288888888888,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -39.58666741672259
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 32,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 36340.79438100217,
+            "latency_ms": {
+              "p50": 0.45629149999999996,
+              "p95": 2.269875,
+              "p99": 9.3165625
+            },
+            "cpu_percent": 127.51748437038404,
+            "rss_kib": 6376.222222222223,
+            "threads_peak": 40
+          },
+          "reactor": {
+            "rps": 30418.483548241762,
+            "latency_ms": {
+              "p50": 0.8345415,
+              "p95": 2.224479,
+              "p99": 4.349729
+            },
+            "cpu_percent": 113.42568843700664,
+            "rss_kib": 5305.511111111111,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -16.29659156778478
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 59633.248858908555,
+            "latency_ms": {
+              "p50": 1.4593125,
+              "p95": 5.902604,
+              "p99": 13.68975
+            },
+            "cpu_percent": 99.2835335276687,
+            "rss_kib": 14226.444444444445,
+            "threads_peak": 136
+          },
+          "reactor": {
+            "rps": 39847.9730595145,
+            "latency_ms": {
+              "p50": 2.5488334999999998,
+              "p95": 6.9016045,
+              "p99": 10.3815415
+            },
+            "cpu_percent": 90.79883050370834,
+            "rss_kib": 10870.4,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -33.178262425724526
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 65675.29813446818,
+            "latency_ms": {
+              "p50": 1.0618954999999999,
+              "p95": 5.233542,
+              "p99": 16.045625
+            },
+            "cpu_percent": 101.78429169007433,
+            "rss_kib": 15116,
+            "threads_peak": 136
+          },
+          "reactor": {
+            "rps": 50548.7800952782,
+            "latency_ms": {
+              "p50": 1.8727915,
+              "p95": 5.7046665,
+              "p99": 9.5295625
+            },
+            "cpu_percent": 94.33219825076614,
+            "rss_kib": 10516.0,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -23.03227921130848
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 128,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 42759.668236079044,
+            "latency_ms": {
+              "p50": 1.5965004999999999,
+              "p95": 7.8341245,
+              "p99": 32.980125
+            },
+            "cpu_percent": 134.93660435779196,
+            "rss_kib": 15607,
+            "threads_peak": 136
+          },
+          "reactor": {
+            "rps": 36880.72908629972,
+            "latency_ms": {
+              "p50": 3.1143335,
+              "p95": 7.016874999999999,
+              "p99": 10.153834
+            },
+            "cpu_percent": 112.02098425726027,
+            "rss_kib": 10643.31313131313,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -13.748795049861705
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 49013.71718122356,
+            "latency_ms": {
+              "p50": 3.847354,
+              "p95": 14.1608125,
+              "p99": 31.2863335
+            },
+            "cpu_percent": 98.88587048839965,
+            "rss_kib": 26535,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 41442.40821865379,
+            "latency_ms": {
+              "p50": 5.194541500000001,
+              "p95": 14.049312,
+              "p99": 17.8875205
+            },
+            "cpu_percent": 88.9342224962214,
+            "rss_kib": 18484.0,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -15.447326581200882
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 45651.46599897792,
+            "latency_ms": {
+              "p50": 3.8806665000000002,
+              "p95": 16.5531875,
+              "p99": 39.7705
+            },
+            "cpu_percent": 95.18552265887107,
+            "rss_kib": 25468,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 40701.169665262896,
+            "latency_ms": {
+              "p50": 5.214729,
+              "p95": 13.4333955,
+              "p99": 18.0503955
+            },
+            "cpu_percent": 88.97148742793854,
+            "rss_kib": 17422.61818181818,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -10.843674404291537
+        },
+        {
+          "kind": "keep_alive",
+          "connections": 256,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 37724.85125992077,
+            "latency_ms": {
+              "p50": 4.084021,
+              "p95": 18.964333,
+              "p99": 58.3282915
+            },
+            "cpu_percent": 128.84397689599916,
+            "rss_kib": 27450,
+            "threads_peak": 264
+          },
+          "reactor": {
+            "rps": 32022.533302239208,
+            "latency_ms": {
+              "p50": 6.497604,
+              "p95": 17.925625,
+              "p99": 23.415479
+            },
+            "cpu_percent": 105.25445730944347,
+            "rss_kib": 18140.444444444445,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -15.115547887500236
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 500.0354690482413,
+            "latency_ms": {
+              "p50": 0.39285400000000004,
+              "p95": 0.723625,
+              "p99": 1.1607915
+            },
+            "cpu_percent": 9.086872167131355,
+            "rss_kib": 3008.0,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.0557875974016,
+            "latency_ms": {
+              "p50": 0.4373335,
+              "p95": 0.7804165000000001,
+              "p99": 1.2935835
+            },
+            "cpu_percent": 6.983230646950546,
+            "rss_kib": 3240,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.004063421580680071
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 499.907201269055,
+            "latency_ms": {
+              "p50": 0.5076045,
+              "p95": 0.9534585,
+              "p99": 2.0719585
+            },
+            "cpu_percent": 11.527520869590386,
+            "rss_kib": 3029.777777777778,
+            "threads_peak": 10
+          },
+          "reactor": {
+            "rps": 499.96255598540165,
+            "latency_ms": {
+              "p50": 0.3253955,
+              "p95": 0.7412289999999999,
+              "p99": 1.2507709999999999
+            },
+            "cpu_percent": 6.232818036565812,
+            "rss_kib": 3260.8,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.011072998389716204
+        },
+        {
+          "kind": "short_lived",
+          "connections": 4,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 499.8793369760997,
+            "latency_ms": {
+              "p50": 0.5330835,
+              "p95": 0.9602295000000001,
+              "p99": 1.7734585000000003
+            },
+            "cpu_percent": 11.951278556496739,
+            "rss_kib": 3034.666666666667,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 499.9476248442989,
+            "latency_ms": {
+              "p50": 0.5229585000000001,
+              "p95": 1.0810620000000002,
+              "p99": 2.7476045
+            },
+            "cpu_percent": 9.754603497224554,
+            "rss_kib": 3268.1454545454544,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.013660870363696453
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.79835440698133,
+            "latency_ms": {
+              "p50": 0.4420205,
+              "p95": 1.1070625,
+              "p99": 3.6482499999999995
+            },
+            "cpu_percent": 10.476174826068489,
+            "rss_kib": 3020.8,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 500.119581175975,
+            "latency_ms": {
+              "p50": 0.5136035,
+              "p95": 1.0827915000000001,
+              "p99": 3.0397505
+            },
+            "cpu_percent": 8.787730861595467,
+            "rss_kib": 3249.6969696969695,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.06427127383699105
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.0499272655341,
+            "latency_ms": {
+              "p50": 0.4531664999999999,
+              "p95": 1.2463125000000002,
+              "p99": 2.9942710000000003
+            },
+            "cpu_percent": 10.862934151898882,
+            "rss_kib": 3046.488888888889,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 499.792191300755,
+            "latency_ms": {
+              "p50": 0.496271,
+              "p95": 1.02975,
+              "p99": 3.271979
+            },
+            "cpu_percent": 8.600594430569156,
+            "rss_kib": 3269.6000000000004,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.051542046248964635
+        },
+        {
+          "kind": "short_lived",
+          "connections": 32,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 500.01770440660255,
+            "latency_ms": {
+              "p50": 0.5624585,
+              "p95": 1.119813,
+              "p99": 2.4510625
+            },
+            "cpu_percent": 13.211626583960843,
+            "rss_kib": 3056.0,
+            "threads_peak": 10
+          },
+          "reactor": {
+            "rps": 500.07827584065734,
+            "latency_ms": {
+              "p50": 0.5884164999999999,
+              "p95": 1.0833335000000002,
+              "p99": 2.091875
+            },
+            "cpu_percent": 10.60516143536277,
+            "rss_kib": 3273.6000000000004,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.012113857873630174
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 499.286136319363,
+            "latency_ms": {
+              "p50": 0.4992495,
+              "p95": 0.9272295,
+              "p99": 1.696354
+            },
+            "cpu_percent": 10.726870393401063,
+            "rss_kib": 3021.4222222222224,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 499.79070461655766,
+            "latency_ms": {
+              "p50": 0.48064549999999995,
+              "p95": 0.9899165,
+              "p99": 2.0801875
+            },
+            "cpu_percent": 8.49203552424907,
+            "rss_kib": 3246.5454545454545,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.10105794262869061
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 500.1382101180242,
+            "latency_ms": {
+              "p50": 0.590792,
+              "p95": 1.4658954999999998,
+              "p99": 3.2845204999999997
+            },
+            "cpu_percent": 13.01538527805064,
+            "rss_kib": 3056.8888888888887,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 499.9852269227162,
+            "latency_ms": {
+              "p50": 0.5112705,
+              "p95": 1.070458,
+              "p99": 2.3443125
+            },
+            "cpu_percent": 8.32536172433768,
+            "rss_kib": 3262.254545454545,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.030588183868585084
+        },
+        {
+          "kind": "short_lived",
+          "connections": 128,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 497.7549746520891,
+            "latency_ms": {
+              "p50": 0.7196665,
+              "p95": 24.095979000000003,
+              "p99": 160.8551455
+            },
+            "cpu_percent": 14.22625223911259,
+            "rss_kib": 3126.7555555555555,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 499.7064615021393,
+            "latency_ms": {
+              "p50": 0.6470205,
+              "p95": 4.269229,
+              "p99": 9.948396
+            },
+            "cpu_percent": 10.843286885530022,
+            "rss_kib": 3266.8444444444444,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.39205772908932346
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "hello",
+          "threaded": {
+            "rps": 498.3877382735359,
+            "latency_ms": {
+              "p50": 0.4166875,
+              "p95": 0.8314794999999999,
+              "p99": 1.7780205000000002
+            },
+            "cpu_percent": 8.94330445748764,
+            "rss_kib": 3036.8,
+            "threads_peak": 9
+          },
+          "reactor": {
+            "rps": 498.00895880264983,
+            "latency_ms": {
+              "p50": 0.399771,
+              "p95": 0.766146,
+              "p99": 1.3104375
+            },
+            "cpu_percent": 6.238617107373683,
+            "rss_kib": 3249.163636363636,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.07600096105858656
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "echo",
+          "threaded": {
+            "rps": 497.6477845869872,
+            "latency_ms": {
+              "p50": 0.4509995,
+              "p95": 0.891937,
+              "p99": 2.153687
+            },
+            "cpu_percent": 10.653241233234382,
+            "rss_kib": 3031.7333333333336,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 498.7559996529277,
+            "latency_ms": {
+              "p50": 0.455667,
+              "p95": 0.9412495,
+              "p99": 2.120625
+            },
+            "cpu_percent": 8.319410553566566,
+            "rss_kib": 3268.6222222222223,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": 0.22269064592745913
+        },
+        {
+          "kind": "short_lived",
+          "connections": 256,
+          "endpoint": "db/1",
+          "threaded": {
+            "rps": 499.4614210928621,
+            "latency_ms": {
+              "p50": 0.484375,
+              "p95": 0.8810625000000001,
+              "p99": 1.4284789999999998
+            },
+            "cpu_percent": 11.143142437658515,
+            "rss_kib": 3047.2,
+            "threads_peak": 8
+          },
+          "reactor": {
+            "rps": 497.6307364487571,
+            "latency_ms": {
+              "p50": 0.4669795,
+              "p95": 0.832708,
+              "p99": 1.142229
+            },
+            "cpu_percent": 8.218197523168527,
+            "rss_kib": 3260.6222222222223,
+            "threads_peak": 9
+          },
+          "reactor_rps_delta_percent": -0.36653174135038435
+        }
+      ],
+      "soaks": [
+        {
+          "adapter": "threaded",
+          "elapsed_s": 1200.150558333,
+          "http_max_ms": 22.10854100007964,
+          "resources": {
+            "rss_kib": {
+              "first": 18192,
+              "last": 29696,
+              "min": 18192,
+              "max": 29696
+            },
+            "fds": {
+              "first": 120,
+              "last": 120,
+              "min": 120,
+              "max": 120
+            },
+            "threads": {
+              "first": 118,
+              "last": 118,
+              "min": 118,
+              "max": 118
+            },
+            "cpu_percent": {
+              "first": 4.0,
+              "last": 1.2,
+              "min": 0.0,
+              "max": 4.0
+            }
+          },
+          "allocator_live": {
+            "first": 2403486,
+            "last": 2403946,
+            "min": 2403486,
+            "max": 2403946
+          },
+          "shutdown_ms": 144.97591700001067,
+          "allocator_final": {
+            "calls": 58986,
+            "requested": 84988299,
+            "live": 0,
+            "peak": 2439181
+          },
+          "sessions_final": {
+            "created": 4428,
+            "closed": 4428,
+            "close_reasons": [
+              0,
+              4312,
+              0,
+              116,
+              0
+            ]
+          },
+          "clean": true
+        },
+        {
+          "adapter": "kqueue",
+          "elapsed_s": 1200.0413548329998,
+          "http_max_ms": 25.48449999994773,
+          "resources": {
+            "rss_kib": {
+              "first": 16592,
+              "last": 17104,
+              "min": 16592,
+              "max": 17104
+            },
+            "fds": {
+              "first": 123,
+              "last": 123,
+              "min": 123,
+              "max": 123
+            },
+            "threads": {
+              "first": 5,
+              "last": 5,
+              "min": 5,
+              "max": 5
+            },
+            "cpu_percent": {
+              "first": 2.2,
+              "last": 0.0,
+              "min": 0.0,
+              "max": 8.9
+            }
+          },
+          "allocator_live": {
+            "first": 11669054,
+            "last": 11669514,
+            "min": 11669054,
+            "max": 11758573
+          },
+          "shutdown_ms": 158.89341699994475,
+          "allocator_final": {
+            "calls": 89646,
+            "requested": 755472065,
+            "live": 0,
+            "peak": 12593796
+          },
+          "sessions_final": {
+            "created": 4652,
+            "closed": 4652,
+            "close_reasons": [
+              0,
+              4536,
+              0,
+              116,
+              0
+            ]
+          },
+          "clean": true
+        }
+      ],
+      "passed": true,
+      "long_soak_completed": true
+    }
+  },
+  "note": "Historical macOS session thread counts include the ps header; derived counts subtract one. Matrix counts are already correct."
+}

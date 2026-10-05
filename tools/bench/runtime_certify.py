@@ -47,7 +47,7 @@ spec.loader.exec_module(c)
 soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
 ceiling = 16384 if hard == resource.RLIM_INFINITY else min(hard, 16384)
 resource.setrlimit(resource.RLIMIT_NOFILE, (max(soft, ceiling), hard))
-result = {"source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "working_tree_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], text=True).strip()), "close_reason_order": ["completed", "disconnected", "timeout", "shutdown", "application_error"], "platform": platform.platform(), "zig_version": subprocess.check_output(["zig", "version"], text=True).strip(), "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(), "command": sys.argv, "rlimit_nofile": resource.getrlimit(resource.RLIMIT_NOFILE), "runs": [], "limitations": ["Python load generator is not a peak throughput benchmark", "allocator counters exclude libc/SQLite and thread stacks", "application callbacks remain cooperatively bounded"]}
+result = {"source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "working_tree_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], text=True).strip()), "close_reason_order": ["completed", "disconnected", "timeout", "shutdown", "application_error"], "platform": platform.platform(), "zig_version": subprocess.check_output(["zig", "version"], text=True).strip(), "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(), "command": sys.argv, "thread_count_method": "proc-task" if platform.system() == "Linux" else "ps-M-minus-header", "rlimit_nofile": resource.getrlimit(resource.RLIMIT_NOFILE), "runs": [], "limitations": ["Python load generator is not a peak throughput benchmark", "allocator counters exclude libc/SQLite and thread stacks", "application callbacks remain cooperatively bounded"]}
 
 def save():
     out = Path(a.output)
@@ -62,7 +62,8 @@ def resources(pid):
     else:
         listing = subprocess.run(["lsof", "-nP", "-p", str(pid), "-F", "f"], text=True, capture_output=True)
         fds = sum(x.startswith("f") and x[1:].isdigit() for x in listing.stdout.splitlines())
-        threads = len(subprocess.check_output(["ps", "-M", "-p", str(pid), "-o", "pid="], text=True).splitlines())
+        # Darwin -M still emits its thread-table header despite -o pid=.
+        threads = max(0, len(subprocess.check_output(["ps", "-M", "-p", str(pid)], text=True).splitlines()) - 1)
     return {"rss_kib": int(line[0]), "cpu_percent": float(line[1]), "fds": fds, "threads": threads}
 
 @contextlib.contextmanager
@@ -95,6 +96,10 @@ def server(adapter, scenario):
             yield port, proc, run
         except Exception as exc:
             run["error"] = repr(exc)
+            try:
+                run["failure_snapshot"] = sample(port, proc, 0)
+            except Exception as snapshot_error:
+                run["failure_snapshot_error"] = repr(snapshot_error)
             raise
         finally:
             start = time.monotonic()

@@ -1,0 +1,15 @@
+error: invalid option: "runtime-tsan"
+info: available option: "optimize": Prioritize performance, safety, or binary size
+info: available option: "backend": deployment backend (native | workers)
+info: available option: "example": which example to build (chat | guestbook | bench | tasks | device_messaging)
+info: available option: "openssl": link OpenSSL (only needed for FCM RS256 signing)
+info: available option: "bench-routes": router benchmark route count
+info: available option: "bench-router": router benchmark implementation
+info: available option: "bench-route-kind": router benchmark route kind
+info: available option: "bench-middlewares": router benchmark middleware count
+info: available option: "target": The CPU architecture, OS, and ABI to build for
+info: available option: "cpu": Target CPU features to add or subtract
+info: available option: "ofmt": Target object format
+info: available option: "dynamic-linker": Path to interpreter on the target system
+info: to access the help menu: zig build -h
+error: configure command exited with code 1: .zig-cache/o/7d339ba74e6a5bf663674c9e5bef7e47/configurer --zig /Users/runner/work/_temp/b6be7eba-334d-458d-b388-a18c84887319/zig-aarch64-macos-0.17.0/zig --build-root /Users/runner/work/Akamata/Akamata -Druntime-tsan=true -Doptimize=ReleaseSafe

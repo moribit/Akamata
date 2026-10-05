@@ -1,0 +1,139 @@
+{
+  "normal_ci": {
+    "conclusion": "success",
+    "headSha": "40ed7e4a1429ee4abe408fe35627d0ecddb1ccb1",
+    "jobs": [
+      {
+        "name": "macos native + kqueue contract",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "chat-workers",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "linux threaded + epoll contract",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "native-test",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "chat-native",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "adversarial HTTP smoke",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "tasks-test",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "native-openssl",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "native-integration",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "guestbook-workers",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "native-release-safe",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "cli-build",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "package-archive",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "cli init smoke test",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "docker-build (chat container)",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/moribit/Akamata/actions/runs/37308545796"
+  },
+  "thread_sanitizer": {
+    "conclusion": "success",
+    "headSha": "40ed7e4a1429ee4abe408fe35627d0ecddb1ccb1",
+    "jobs": [
+      {
+        "name": "sanitizer (macos-latest)",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "sanitizer (ubuntu-latest)",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/moribit/Akamata/actions/runs/37308578211"
+  },
+  "first_certification": {
+    "conclusion": "success",
+    "headSha": "6ec67247cecfa0e84513a2e342468753cdaf7c17",
+    "jobs": [
+      {
+        "name": "certify (ubuntu-latest)",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "certify (macos-latest)",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/moribit/Akamata/actions/runs/37292754729"
+  },
+  "deadline_fixed_certification": {
+    "conclusion": "success",
+    "headSha": "26017bd1ca0082811cf9865c60d8cad239b72299",
+    "jobs": [
+      {
+        "name": "certify (ubuntu-latest)",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "certify (macos-latest)",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/moribit/Akamata/actions/runs/37307456569"
+  }
+}

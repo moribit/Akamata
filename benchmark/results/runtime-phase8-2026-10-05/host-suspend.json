@@ -1,0 +1,13 @@
+{
+  "command": "pmset -g log (filtered only relevant sleep/wake transitions)",
+  "failed_soak_file_modified_local": "2026-10-05T18:58:23.549452",
+  "python_monotonic": "mach_absolute_time()",
+  "runtime_clock": "macOS CLOCK_MONOTONIC (6)",
+  "transitions": [
+    "2026-10-05 18:53:26 +0900 Sleep               \tEntering Sleep state due to 'Idle Sleep':TCPKeepAlive=active",
+    "2026-10-05 18:53:46 +0900 Wake                \tWake from Deep Idle [CDNVA] : due to MTP.DOCK.CHANNELS.AP0.IRQ RTP.multi-touch/HID Activity",
+    "2026-10-05 18:57:16 +0900 Sleep               \tEntering Sleep state due to 'Idle Sleep':TCPKeepAlive=active",
+    "2026-10-05 18:58:22 +0900 Wake                \tWake from Deep Idle [CDNVA] : due to MTP.DOCK.CHANNELS.AP0.IRQ RTP.multi-touch/HID Activity",
+    "2026-10-05 19:00:49 +0900 Sleep               \tEntering Sleep state due to 'Idle Sleep':TCPKeepAlive=active"
+  ]
+}

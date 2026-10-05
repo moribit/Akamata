@@ -4,7 +4,9 @@ Phase 6 isolation and cross-platform Contract were passed before these measureme
 
 The all-thread wall sampling shows worker handoff mutex/condition operations, wake pipe write/read, selector calls, socket recv/send and parser/dispatch work. For Reactor c32 before: leaf samples include condition wait 10,471 (sleeping), kevent 725 (includes waiting), mutex wait 432, recv 208, send 145, condition signal 101, wake write 79, wake read 27. These are NOT CPU percentages. Inlining and the five-sample reporting threshold prevent reliable separate parser/dispatch/serialization/allocation percentages. No lock-free queue or implicit event-loop handler fast-path is justified by this evidence.
 
-The only optimization wakes on notification FIFO empty-to-nonempty transition. Duplicate and already-pending notifications need no additional pipe write. A nonempty queue after the 128-token fairness quantum forces a zero-time selector poll; this preserves readiness fairness without losing the batch remainder. No timer-delay batching or extra buffer/task allocation was added. Unit tests cover generation replacement, overflow, deduplication and a 256-token batch across fairness quanta; 96 Contract cases and the isolation gate pass.
+The only optimization wakes on notification FIFO empty-to-nonempty transition. Duplicate and already-pending notifications need no additional pipe write. A nonempty queue after the 128-token fairness quantum forces a zero-time selector poll; this preserves readiness fairness without losing the batch remainder. After batching, c32 wake-write leaf samples fell from 79 to 39; c128 to five (sampling threshold applies). This is corroborating wall-sample evidence, not a syscall-rate or CPU-percentage claim.
+
+No timer-delay batching or extra buffer/task allocation was added. Unit tests cover generation replacement, overflow, deduplication and a 256-token batch across fairness quanta; 96 Contract cases and the isolation gate pass.
 
 | Connections | Endpoint | Reactor change | Threaded req/s | Reactor req/s | Reactor P99 ms |
 |---:|---|---:|---:|---:|---:|

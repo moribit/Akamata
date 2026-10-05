@@ -1,0 +1,208 @@
+{
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "zig_version": "0.17.0",
+  "binary_sha256": "e6ef47276c3ff7cac71c819909cb62ab774940afadffc47337e477e5b5d9da53",
+  "command": [
+    "tools/bench/runtime_application_isolation.py",
+    "./.zig-cache/o/34001fcdeaf0a24dd4afe2ab060b373f/runtime-contract-server",
+    "--output",
+    ".zig-cache/runtime-application-isolation.json"
+  ],
+  "runs": [
+    {
+      "adapter": "threaded",
+      "scenario": "four-idle-upgrades",
+      "http_isolated": true,
+      "probe_ms": 0.1656059999959325,
+      "shutdown_ms": 163.64460500000177,
+      "allocator": {
+        "calls": 151,
+        "requested": 23865,
+        "live": 0,
+        "peak": 13382
+      },
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "four-slow-streams",
+      "http_isolated": true,
+      "probe_ms": 0.19091300001150557,
+      "shutdown_ms": 163.53464900001313,
+      "allocator": {
+        "calls": 155,
+        "requested": 81617,
+        "live": 0,
+        "peak": 71134
+      },
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "mixed-upgrade-stream",
+      "http_isolated": true,
+      "probe_ms": 0.21675700000400866,
+      "shutdown_ms": 163.5547479999957,
+      "allocator": {
+        "calls": 153,
+        "requested": 52741,
+        "live": 0,
+        "peak": 42258
+      },
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "application-queue-overflow-recovery",
+      "threaded_option_ignored": true,
+      "admission_recovered": true,
+      "shutdown_ms": 664.3814480000003,
+      "allocator": {
+        "calls": 149,
+        "requested": 21931,
+        "live": 0,
+        "peak": 7580
+      },
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "four-idle-upgrades",
+      "http_isolated": true,
+      "probe_ms": 0.07518299997855138,
+      "shutdown_ms": 163.63274799999772,
+      "allocator": {
+        "calls": 173,
+        "requested": 439249,
+        "live": 0,
+        "peak": 407438
+      },
+      "sessions": {
+        "created": 4,
+        "closed": 4,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          4,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "four-slow-streams",
+      "http_isolated": true,
+      "probe_ms": 0.11646600000858598,
+      "shutdown_ms": 163.59123499998418,
+      "allocator": {
+        "calls": 169,
+        "requested": 302065,
+        "live": 0,
+        "peak": 270254
+      },
+      "sessions": {
+        "created": 4,
+        "closed": 4,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          4,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "mixed-upgrade-stream",
+      "http_isolated": true,
+      "probe_ms": 0.0955539999836219,
+      "shutdown_ms": 163.5559909999813,
+      "allocator": {
+        "calls": 171,
+        "requested": 370657,
+        "live": 0,
+        "peak": 338846
+      },
+      "sessions": {
+        "created": 4,
+        "closed": 4,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          4,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "application-queue-overflow-recovery",
+      "overflow_closed_without_response": true,
+      "admission_recovered": true,
+      "shutdown_ms": 1.0947229999942465,
+      "allocator": {
+        "calls": 162,
+        "requested": 129139,
+        "live": 0,
+        "peak": 74066
+      },
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "scope": "application isolation/admission gate; not full production certification",
+  "isolation_passed": true,
+  "note": "Incremental isolation gate; full Phase 6 completion additionally requires lifecycle/ownership and fairness Contract parity."
+}

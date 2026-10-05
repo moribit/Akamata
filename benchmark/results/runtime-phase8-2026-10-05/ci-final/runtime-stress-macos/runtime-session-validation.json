@@ -1,0 +1,615 @@
+{
+  "source_sha": "40ed7e4a1429ee4abe408fe35627d0ecddb1ccb1",
+  "working_tree_dirty": false,
+  "close_reason_order": [
+    "completed",
+    "disconnected",
+    "timeout",
+    "shutdown",
+    "application_error"
+  ],
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "zig_version": "0.17.0",
+  "binary_sha256": "6f4f648eadaff62d7bebf6436c52253a3a9ee4d47cd452372a72dc8cb20d750f",
+  "command": [
+    "tools/bench/runtime_certify.py",
+    "./.zig-cache/o/40c2639c024fec82a880be89f78b190d/runtime-contract-server",
+    "--idle-levels",
+    "100",
+    "--mixed-idle",
+    "20",
+    "--soak-seconds",
+    "5",
+    "--session-rounds",
+    "10",
+    "--output",
+    ".zig-cache/runtime-session-validation.json"
+  ],
+  "rlimit_nofile": [
+    16384,
+    9223372036854775807
+  ],
+  "runs": [
+    {
+      "adapter": "threaded",
+      "scenario": "session-performance",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 16336,
+          "cpu_percent": 0.0,
+          "fds": 104,
+          "threads": 103,
+          "allocator": {
+            "live": 2066018,
+            "peak": 2077656,
+            "calls": 1285,
+            "created": 420,
+            "closed": 320,
+            "close_reasons": [
+              320,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 0.7,
+        "fds": 4,
+        "threads": 3
+      },
+      "broadcast": {
+        "p50_ms": 101.86250000000996,
+        "p95_ms": 103.36879099997986,
+        "p99_ms": 103.36879099997986,
+        "recipients": 100,
+        "rounds": 10,
+        "observed_frames_per_second": 982.0232078736378
+      },
+      "stream": {
+        "p50_ms": 1.0696665000011762,
+        "p95_ms": 3.373582999984137,
+        "p99_ms": 5.296916999952828,
+        "requests": 320,
+        "observed_requests_per_second": 7283.5905825463005
+      },
+      "shutdown_ms": 111.96383399999377,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 1285,
+        "requested": 2695381,
+        "live": 0,
+        "peak": 2077656
+      },
+      "sessions_final": {
+        "created": 420,
+        "closed": 420,
+        "close_reasons": [
+          320,
+          0,
+          0,
+          100,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "disconnect-fd-reuse-races",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 3968,
+          "cpu_percent": 0.5,
+          "fds": 4,
+          "threads": 3,
+          "allocator": {
+            "live": 5646,
+            "peak": 233864,
+            "calls": 1487,
+            "created": 192,
+            "closed": 192,
+            "close_reasons": [
+              0,
+              192,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 0.5,
+        "fds": 4,
+        "threads": 3
+      },
+      "iterations": 256,
+      "recovered_http_ms": 0.11704199999940101,
+      "shutdown_ms": 144.3974169999933,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 1489,
+        "requested": 4370191,
+        "live": 0,
+        "peak": 233864
+      },
+      "sessions_final": {
+        "created": 192,
+        "closed": 192,
+        "close_reasons": [
+          0,
+          192,
+          0,
+          0,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "shutdown-disconnect-completion-race",
+      "samples": [],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 0.7,
+        "fds": 4,
+        "threads": 3
+      },
+      "shutdown_requested": true,
+      "connections": 64,
+      "shutdown_ms": 967.5422500000082,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 527,
+        "requested": 1338945,
+        "live": 0,
+        "peak": 1324304
+      },
+      "sessions_final": {
+        "created": 64,
+        "closed": 64,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          64,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "idle",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 15856,
+          "cpu_percent": 0.8,
+          "fds": 104,
+          "threads": 103,
+          "allocator": {
+            "live": 2065946,
+            "peak": 2065946,
+            "calls": 643,
+            "created": 100,
+            "closed": 0,
+            "close_reasons": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 0.8,
+        "fds": 4,
+        "threads": 3
+      },
+      "count": 100,
+      "establishment_ms": 13.377041000012468,
+      "broadcast_ms": 83.14612499998475,
+      "http_probe_ms": 0.12945800000352392,
+      "shutdown_ms": 204.8108749999642,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 647,
+        "requested": 2078435,
+        "live": 0,
+        "peak": 2066018
+      },
+      "sessions_final": {
+        "created": 100,
+        "closed": 100,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          100,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "mixed-soak-races",
+      "samples": [
+        {
+          "elapsed_s": 0.1038451249999639,
+          "rss_kib": 8320,
+          "cpu_percent": 0.8,
+          "fds": 40,
+          "threads": 39,
+          "allocator": {
+            "live": 749806,
+            "peak": 768539,
+            "calls": 467,
+            "created": 44,
+            "closed": 8,
+            "close_reasons": [
+              0,
+              8,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 0.0,
+        "fds": 4,
+        "threads": 3
+      },
+      "requested_soak_s": 5,
+      "mixed_results": [
+        {
+          "http_p50_ms": 0.7948539999915738,
+          "http_max_ms": 1.4859999999998763,
+          "broadcast_ms": 95.20166699996935
+        },
+        {
+          "http_p50_ms": 0.46043749998148087,
+          "http_max_ms": 1.720874999989519,
+          "broadcast_ms": 97.29599999997163
+        },
+        {
+          "http_p50_ms": 2.1022090000144544,
+          "http_max_ms": 2.7646660000186785,
+          "broadcast_ms": 93.60033300004034
+        }
+      ],
+      "elapsed_s": 5.1487019999999575,
+      "iterations": 3,
+      "http_isolated": true,
+      "shutdown_ms": 136.33208400000285,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 683,
+        "requested": 1217965,
+        "live": 0,
+        "peak": 768547
+      },
+      "sessions_final": {
+        "created": 60,
+        "closed": 60,
+        "close_reasons": [
+          0,
+          24,
+          0,
+          36,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "session-performance",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 14896,
+          "cpu_percent": 0.9,
+          "fds": 107,
+          "threads": 6,
+          "allocator": {
+            "live": 9831810,
+            "peak": 11289684,
+            "calls": 2036,
+            "created": 420,
+            "closed": 320,
+            "close_reasons": [
+              320,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 4912,
+        "cpu_percent": 0.9,
+        "fds": 7,
+        "threads": 6
+      },
+      "broadcast": {
+        "p50_ms": 0.8211250000158543,
+        "p95_ms": 1.2649999999894135,
+        "p99_ms": 1.2649999999894135,
+        "recipients": 100,
+        "rounds": 10,
+        "observed_frames_per_second": 114881.9978080678
+      },
+      "stream": {
+        "p50_ms": 1.8540209999855506,
+        "p95_ms": 3.8406659999736803,
+        "p99_ms": 4.534667000029913,
+        "requests": 320,
+        "observed_requests_per_second": 8016.818483491239
+      },
+      "shutdown_ms": 225.0911670000164,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 2036,
+        "requested": 26055005,
+        "live": 0,
+        "peak": 11289684
+      },
+      "sessions_final": {
+        "created": 420,
+        "closed": 420,
+        "close_reasons": [
+          320,
+          0,
+          0,
+          100,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "disconnect-fd-reuse-races",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 5248,
+          "cpu_percent": 0.0,
+          "fds": 7,
+          "threads": 6,
+          "allocator": {
+            "live": 1337742,
+            "peak": 2875452,
+            "calls": 1945,
+            "created": 192,
+            "closed": 192,
+            "close_reasons": [
+              0,
+              192,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 4912,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 6
+      },
+      "iterations": 256,
+      "recovered_http_ms": 0.22412500004520552,
+      "shutdown_ms": 9.074916000031408,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 1948,
+        "requested": 20242783,
+        "live": 0,
+        "peak": 2875452
+      },
+      "sessions_final": {
+        "created": 192,
+        "closed": 192,
+        "close_reasons": [
+          0,
+          192,
+          0,
+          0,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "shutdown-disconnect-completion-race",
+      "samples": [],
+      "baseline": {
+        "rss_kib": 4912,
+        "cpu_percent": 0.8,
+        "fds": 7,
+        "threads": 6
+      },
+      "shutdown_requested": true,
+      "connections": 64,
+      "shutdown_ms": 912.1675000000096,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 601,
+        "requested": 7065257,
+        "live": 0,
+        "peak": 7033422
+      },
+      "sessions_final": {
+        "created": 64,
+        "closed": 64,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          64,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "idle",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 14368,
+          "cpu_percent": 0.8,
+          "fds": 107,
+          "threads": 6,
+          "allocator": {
+            "live": 9827642,
+            "peak": 9827642,
+            "calls": 753,
+            "created": 100,
+            "closed": 0,
+            "close_reasons": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 4912,
+        "cpu_percent": 0.8,
+        "fds": 7,
+        "threads": 6
+      },
+      "count": 100,
+      "establishment_ms": 12.56687500000453,
+      "broadcast_ms": 1.9332499999791253,
+      "http_probe_ms": 0.6640419999826008,
+      "shutdown_ms": 201.3216249999914,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 759,
+        "requested": 9886931,
+        "live": 0,
+        "peak": 9831810
+      },
+      "sessions_final": {
+        "created": 100,
+        "closed": 100,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          100,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "mixed-soak-races",
+      "samples": [
+        {
+          "elapsed_s": 0.007947166999997535,
+          "rss_kib": 8800,
+          "cpu_percent": 0.0,
+          "fds": 43,
+          "threads": 6,
+          "allocator": {
+            "live": 4633073,
+            "peak": 4909404,
+            "calls": 597,
+            "created": 44,
+            "closed": 8,
+            "close_reasons": [
+              0,
+              8,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 4912,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 6
+      },
+      "requested_soak_s": 5,
+      "mixed_results": [
+        {
+          "http_p50_ms": 0.7503750000239506,
+          "http_max_ms": 0.9582499999964966,
+          "broadcast_ms": 1.271750000000793
+        },
+        {
+          "http_p50_ms": 0.7812295000064751,
+          "http_max_ms": 1.8147090000297794,
+          "broadcast_ms": 1.810917000000245
+        },
+        {
+          "http_p50_ms": 0.6071040000108496,
+          "http_max_ms": 1.961209000000963,
+          "broadcast_ms": 2.2413749999827814
+        }
+      ],
+      "elapsed_s": 5.142205166999986,
+      "iterations": 3,
+      "http_isolated": true,
+      "shutdown_ms": 228.43362499997966,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 909,
+        "requested": 8487989,
+        "live": 0,
+        "peak": 5021594
+      },
+      "sessions_final": {
+        "created": 60,
+        "closed": 60,
+        "close_reasons": [
+          0,
+          24,
+          0,
+          36,
+          0
+        ]
+      },
+      "clean": true
+    }
+  ],
+  "limitations": [
+    "Python load generator is not a peak throughput benchmark",
+    "allocator counters exclude libc/SQLite and thread stacks",
+    "application callbacks remain cooperatively bounded"
+  ],
+  "passed": true,
+  "long_soak_completed": false
+}
