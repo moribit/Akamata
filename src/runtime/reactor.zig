@@ -463,10 +463,19 @@ fn Context(comptime State: type) type {
             }
         }
         fn resumeResponse(self: *Self, c: *Connection) !void {
-            if (!c.output.status().pending) {
+            // Profiling: ordinary small responses previously paid writable
+            // ADD/DELETE and a selector round trip even with an empty socket
+            // send buffer. Attempt bounded nonblocking progress immediately;
+            // retain the exact pending offset/readiness/deadline on EAGAIN.
+            for (0..4) |_| {
+                if (c.output.status().pending) break;
                 const n = c.response_cursor.?.fill(&c.writer_buffer);
                 if (n != 0) {
                     try c.output.offer(c.writer_buffer[0..n]);
+                    self.registry.mutex.lock();
+                    const sent = if (c.node.isClosed()) error.ConnectionWriteFailed else c.output.pump(c.stream.socket.handle);
+                    self.registry.mutex.unlock();
+                    try sent;
                 } else {
                     c.response_cursor = null;
                     if (c.response_keep_alive and !self.stopping) {
@@ -477,8 +486,11 @@ fn Context(comptime State: type) type {
                     return;
                 }
             }
-            try self.interest(c, .{ .write = true });
+            const pending = c.output.status().pending;
+            try self.interest(c, .{ .write = pending });
             self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
+            // More cursor data after this turn's 16 KiB fairness quantum.
+            if (!pending) self.notify(c.token);
         }
         fn scheduleStep(self: *Self, c: *Connection, event: tasks.Event) void {
             c.application_read_deadline_ns = c.execution.?.read_deadline_ns;
