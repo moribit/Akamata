@@ -21,7 +21,7 @@ jobs:
           - name: native-integration
             cmd: zig build integration transport-contract-test runtime-poc-test
           - name: linux threaded + epoll contract
-            cmd: zig build transport-contract-test runtime-poc-test -Doptimize=ReleaseSafe
+            cmd: zig build transport-contract-test runtime-poc-test runtime-stress-test -Doptimize=ReleaseSafe
           - name: tasks-test
             cmd: zig build tasks-test
           - name: cli-build
@@ -55,7 +55,7 @@ jobs:
       - run: ./third_party/sqlite/fetch.sh
       - run: zig build test
       - run: zig build -Dexample=bench
-      - run: zig build transport-contract-test runtime-poc-test -Doptimize=ReleaseSafe
+      - run: zig build transport-contract-test runtime-poc-test runtime-stress-test -Doptimize=ReleaseSafe
 
   cli-smoke:
     name: cli init smoke test

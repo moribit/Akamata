@@ -91,3 +91,53 @@ pub fn Output(comptime Owner: type) type {
         }
     };
 }
+
+test "pending output preserves partial send, EAGAIN and disconnect" {
+    const Owner = struct {
+        pub fn notify(_: *@This(), _: u64) void {}
+    };
+    var owner: Owner = .{};
+    var sockets: [2]c_int = undefined;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
+    var peer_open = true;
+    defer if (peer_open) {
+        _ = std.c.close(sockets[1]);
+    };
+    try @import("reactor_selector.zig").nonblocking(sockets[0]);
+    try @import("reactor_selector.zig").nonblocking(sockets[1]);
+    const size: c_int = 1024;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.setsockopt(sockets[0], std.c.SOL.SOCKET, std.c.SO.SNDBUF, &size, @sizeOf(c_int)));
+    var registry: @import("drain.zig").Registry = .{ .mutex = .init() };
+    defer registry.mutex.deinit();
+    var node: @import("drain.zig").Node = undefined;
+    registry.attach(&node, sockets[0]);
+    defer node.detach();
+    var buffer: [4096]u8 = undefined;
+    var output = Output(Owner).init(&owner, 2, &node, &buffer);
+    defer output.deinit();
+    output.timeout_ms = 1000;
+    var bytes: [16 * 1024]u8 = undefined;
+    for (&bytes, 0..) |*byte, i| byte.* = @intCast(i % 251);
+    try output.interface.writeAll(&bytes);
+    try output.interface.flush();
+    try output.pump(sockets[0]);
+    try std.testing.expect(output.offset > 0 and output.offset < bytes.len);
+    const progress = output.offset;
+    try output.pump(sockets[0]);
+    try std.testing.expectEqual(progress, output.offset);
+    var received: [16 * 1024]u8 = undefined;
+    var len: usize = 0;
+    while (len < received.len) {
+        const n = std.c.recv(sockets[1], received[len..].ptr, received.len - len, std.c.MSG.DONTWAIT);
+        if (n > 0) len += @intCast(n) else try std.testing.expect(std.posix.errno(n) == .AGAIN);
+        try output.pump(sockets[0]);
+    }
+    try std.testing.expectEqualSlices(u8, &bytes, &received);
+    try std.testing.expect(!output.status().pending);
+    try output.interface.writeAll(&bytes);
+    _ = std.c.close(sockets[1]);
+    peer_open = false;
+    try std.testing.expectError(error.ConnectionWriteFailed, output.pump(sockets[0]));
+    output.abort();
+    try std.testing.expectError(error.WriteFailed, output.interface.writeAll(&bytes));
+}

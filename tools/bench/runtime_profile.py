@@ -11,6 +11,7 @@ from pathlib import Path
 p = argparse.ArgumentParser()
 p.add_argument("binaries", nargs="+")
 p.add_argument("--output-dir", required=True)
+p.add_argument("--endpoint", default="db/1")
 a = p.parse_args()
 directory = Path(a.output_dir)
 directory.mkdir(parents=True, exist_ok=True)
@@ -34,7 +35,7 @@ for entry in a.binaries:
                 time.sleep(.02)
         else:
             raise RuntimeError("startup deadline")
-        client = subprocess.Popen(["oha", "--no-tui", "--output-format", "quiet", "-c", "32", "-z", "10s", "-w", "http://127.0.0.1:8080/db/1"])
+        client = subprocess.Popen(["oha", "--no-tui", "--output-format", "quiet", "-c", "32", "-z", "10s", "-w", "http://127.0.0.1:8080/" + a.endpoint])
         time.sleep(2)
         subprocess.run(["sample", str(server.pid), "5", "1", "-file", str(directory / (label + ".sample.txt"))], check=True)
         client.wait(timeout=15)

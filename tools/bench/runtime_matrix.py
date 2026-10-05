@@ -33,6 +33,7 @@ p.add_argument("--endpoints", nargs="+", default=["hello", "echo", "db/1"])
 p.add_argument("--modes", nargs="+", choices=["keep_alive", "short_lived"], default=["keep_alive", "short_lived"])
 p.add_argument("--skip-idle", action="store_true")
 a = p.parse_args()
+Path(a.output).parent.mkdir(parents=True, exist_ok=True)
 bins = [s.split("=", 1) for s in a.binaries]
 soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (max(soft, min(2048, hard)), hard))

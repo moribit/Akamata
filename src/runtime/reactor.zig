@@ -353,6 +353,7 @@ fn Context(comptime State: type) type {
                         .AGAIN, .INTR, .CONNABORTED => return,
                         else => {},
                     }
+                    std.log.warn("reactor accept failed: {t}", .{std.posix.errno(accepted.fd)});
                     self.accept_backoff_ms = @min(5000, @max(1, self.accept_backoff_ms *| 2));
                     self.accept_resume = clock.monotonicNs() +| @as(u64, self.accept_backoff_ms) * std.time.ns_per_ms;
                     self.selector.set(self.listener, 0, .{}, &self.listener_interests) catch {};

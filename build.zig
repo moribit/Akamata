@@ -287,6 +287,15 @@ pub fn build(b: *std.Build) void {
         const poc_step = b.step("runtime-poc-test", "evaluate isolated Io.Group lifecycle and socket contract");
         const poc_unit = b.addTest(.{ .root_module = contract_mod });
         poc_step.dependOn(&b.addRunArtifact(poc_unit).step);
+        b.step("runtime-contract-unit", "run lifecycle, allocation and bounded-output fault tests").dependOn(&b.addRunArtifact(poc_unit).step);
+        const stress = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_stress.py" });
+        stress.addArtifactArg(contract_server);
+        stress.addArgs(&.{ "--quick", "--output", ".zig-cache/runtime-stress.json" });
+        b.step("runtime-stress-test", "run bounded CI stress and production-gate evidence").dependOn(&stress.step);
+        const stress_full = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_stress.py" });
+        stress_full.addArtifactArg(contract_server);
+        stress_full.addArgs(&.{ "--output", ".zig-cache/runtime-stress-full.json" });
+        b.step("runtime-stress-full", "run full local runtime stress matrix").dependOn(&stress_full.step);
         const poc_contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
         poc_contract.addArtifactArg(contract_server);
         poc_contract.addArgs(&.{ "--group", "--only-group" });

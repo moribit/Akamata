@@ -9,12 +9,15 @@ test {
     _ = @import("runtime/deadline_heap.zig");
     _ = @import("runtime/reactor_notifications.zig");
     _ = @import("runtime/reactor.zig");
+    _ = @import("runtime/reactor_output.zig");
 }
 
 pub fn main(init: std.process.Init) !void {
     var gpa: std.heap.DebugAllocator(.{}) = .init;
-    defer _ = gpa.deinit();
-    const alloc = gpa.allocator();
+    defer std.debug.assert(gpa.deinit() == .ok);
+    var stats: @import("runtime_bench_stats.zig").Stats = .{ .backing = gpa.allocator() };
+    defer stats.report();
+    const alloc = stats.allocator();
     var arena: std.heap.ArenaAllocator = .init(alloc);
     defer arena.deinit();
     const args = try init.minimal.args.toSlice(arena.allocator());
@@ -49,7 +52,17 @@ pub fn main(init: std.process.Init) !void {
         .max_requests_per_connection = 3,
         .max_connections = 8,
     };
-    if (std.mem.eql(u8, profile, "total")) {
+    if (std.mem.eql(u8, profile, "stress")) {
+        opts.max_connections = 512;
+        opts.worker_count = 4;
+        opts.max_requests_per_connection = 100;
+        opts.parse_limits.max_body_bytes = 1024 * 1024;
+        opts.keep_alive_idle_timeout_ms = 5000;
+        opts.body_read_timeout_ms = 5000;
+        opts.total_request_timeout_ms = 6000;
+        opts.write_timeout_ms = 500;
+        opts.shutdown_drain_timeout_ms = 150;
+    } else if (std.mem.eql(u8, profile, "total")) {
         opts.header_read_timeout_ms = 1500;
         opts.body_read_timeout_ms = 1500;
         opts.total_request_timeout_ms = 300;
@@ -65,6 +78,9 @@ pub fn main(init: std.process.Init) !void {
         opts.keep_alive_idle_timeout_ms = 2000;
     } else if (std.mem.eql(u8, profile, "write")) {
         opts.write_timeout_ms = 250;
+    } else if (std.mem.eql(u8, profile, "write-slot")) {
+        opts.write_timeout_ms = 250;
+        opts.max_connections = 1;
     } else if (std.mem.eql(u8, profile, "drain")) {
         opts.write_timeout_ms = 5000;
         opts.shutdown_drain_timeout_ms = 150;
