@@ -60,6 +60,9 @@ pub fn Transport(comptime Readiness: type) type {
             self.writer_state = null;
             if (self.control) |node| node.clearWriteDeadline();
         }
+        pub fn endResponse(self: *Self) void {
+            if (self.control) |node| node.clearWriteDeadline();
+        }
         pub fn controlPtr(self: *Self) ?*@import("drain.zig").Node {
             return self.control;
         }
@@ -84,7 +87,7 @@ pub fn Transport(comptime Readiness: type) type {
         }
     };
 }
-fn formatPeerIp(arena: std.mem.Allocator, address: net.IpAddress) ![]const u8 {
+pub fn formatPeerIp(arena: std.mem.Allocator, address: net.IpAddress) ![]const u8 {
     var writer: Io.Writer.Allocating = .init(arena);
     switch (address) {
         .ip4 => |ip| try writer.writer.print("{d}.{d}.{d}.{d}", .{ ip.bytes[0], ip.bytes[1], ip.bytes[2], ip.bytes[3] }),

@@ -71,3 +71,40 @@ does not isolate one cause for the additional regression. No optimization based
 on that inference was applied. app.gpa counters exclude libc/SQLite/stacks;
 untracked repeats avoid attributing instrumentation overhead to the runtime.
 See [decision record, profiles and raw data](../../benchmark/results/runtime-phase3-2026-10-05/README.md).
+
+## Phase 4: private true HTTP multiplexing
+
+`http/session.zig` is the incremental input/parser/request lifetime state machine.
+`http/connection.zig` shares dispatch, response framing, stream finalization,
+keep-alive and upgrade semantics. Threaded drives Session synchronously; the
+private Reactor owns Session in one event loop and calls the same dispatch on a
+bounded fixed worker pool. No reactor-specific HTTP parser or serializer exists.
+
+The selector uses standard target kqueue/epoll ABI definitions, level-triggered
+nonblocking sockets, generation-tagged tokens, bounded wakeup notifications and
+an indexed deadline heap (one timer per connection). Read work is capped at
+64KiB per event and admissions at 64 per pass. Hard accept failures suspend
+readiness with bounded backoff. Socket close and selector changes are serialized
+with the ownership registry; queued stale tokens cannot reference freed memory.
+
+Each connection has a 16KiB pending producer slot and existing 4KiB Writer buffer.
+Partial sends preserve offsets; EAGAIN returns to readiness. A producer waits on
+a condition rather than growing output or spinning. The write budget begins when
+first output enters the Transport (before its first send), and never renews on
+progress. Stream/upgrade flush waits for delivery to the kernel. Small normal
+responses can release a worker with pending output; Session is retained until
+that output drains, then pipelined input advances. Request input is not mutated
+while a worker borrows it. Buffered upgrade bytes are copied before handoff.
+
+Upgrade owns its borrowed socket in the handler scope. Its existing synchronous
+read API uses nonblocking recv plus bounded poll and preserves frame fragments.
+The event loop sends its output. This means long-lived upgrade handlers still
+occupy workers; slow stream producers can do the same. This is a specific
+production evaluation gap, not a claim of fully multiplexed application tasks.
+Force drain interrupts sockets and bounded producer waits, but does not preempt
+arbitrary CPU-bound application handlers.
+
+MacOS Threaded and true kqueue pass the same 27 Contract cases. The Linux epoll
+fixture cross-compiles; actual Linux execution is required in CI. The public
+App and direct reactor serve gates remain disabled while Phase 5 evaluates
+resource behavior, handler starvation and platform parity.

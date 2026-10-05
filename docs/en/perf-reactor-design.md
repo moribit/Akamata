@@ -1,58 +1,38 @@
-# Reactor design: shared protocol before multiplexing
+# Reactor design: private multiplexed evaluation
 
-`.runtime = .reactor` returns `error.ExperimentalRuntimeDisabled`. Both direct
-reactor module entrypoints also fail before opening a socket. Threaded remains
-production. Safety parity, rather than throughput, determines when this changes.
+`App.serve(.runtime = .reactor)` and both direct `serve` entrypoints remain
+fail-closed. Threaded is the production default.
 
-## Current structure
-
-`serve.zig` selects backend; `runtime/threaded.zig` manages listener, admission
-and connection workers. `http/connection.zig` owns HTTP parsing, request lifetime,
-App dispatch, serialization, keep-alive, streaming, upgrade and read budgets.
-`runtime/socket_transport.zig` provides a static transport seam with existing
-std.Io Reader/Writer interfaces. Poll, kqueue and epoll provide readiness.
-
-The old per-core prototypes had duplicated HTTP loops, hardcoded receive buffers,
-unbounded EAGAIN send loops and incomplete limits/deadlines/peer-IP/upgrade support.
-Their unsafe HTTP/worker loops were removed. The replacement kernel adapters use
-standard target ABI types, including Linux's packed epoll_event.
-
-Private `evaluate` paths run the same HTTP driver through the established
-thread-per-connection lifecycle with kqueue/epoll readiness. These tests establish
-socket-adapter compatibility; they do **not** establish multiplexed-reactor parity.
-The public worker_count option remains reserved while the reactor is disabled.
-
-## Evaluation
-
-```sh
-zig build transport-contract-test -Doptimize=ReleaseSafe
-zig build runtime-poc-test -Doptimize=ReleaseSafe
+```text
+App.dispatch
+    ↑
+Shared HTTP: Session + connection dispatch/serialization
+    ↑
+Static Transport boundary
+    ├─ Threaded: synchronous driver, bounded socket writer
+    └─ private Reactor: one event loop + bounded handler workers
+           ├─ kqueue (macOS/BSD)
+           └─ epoll (Linux)
 ```
 
-The same 20 black-box socket tests run on Threaded and the host kernel adapter.
-Group experiments are separate. Limits, framing, deadlines, keep-alive/pipelining,
-streaming, upgrade read-ahead/ownership, connection admission, backpressure
-isolation, peer/proxy policy, disconnects and shutdown are covered.
+The private `evaluate` path now multiplexes nonblocking connection sockets;
+it no longer creates a readiness adapter and thread for each connection.
+Input, pending output, deadlines, generation and lifecycle are event-loop owned.
+Standard OS ABI definitions, level-triggered readiness, generation tokens,
+bounded producer output and an indexed deadline heap keep resource ownership
+explicit. Application HTTP semantics live only in shared Session/connection.
 
-## Required before production
+The same 27 socket Contract cases exercise Threaded and the host Reactor.
+Write budgets and forced drain are implemented. Synchronous stream/upgrade
+handlers can still occupy bounded workers; passing these cases does not prove
+production isolation for many long-lived upgraded connections.
 
-- Nonblocking read/write with bounded output queues and partial-write state;
-  never spin on EAGAIN.
-- Multiplexed connection lifecycles using an Io task backend or an incremental
-  shared-protocol driver, without copying HTTP semantics into a reactor.
-- Explicit streaming and upgrade task/buffer/socket ownership and cancellation.
-- Deadline and queue admission parity, kernel wakeup and graceful/forced drain
-  policies, including slow readers and long-running handlers.
-- The full Contract after multiplexing, on Linux and macOS, plus stress,
-  disconnect/fault injection and resource leak checks.
-- Representative idle/burst/stream/upgrade latency and RSS measurements.
+```sh
+zig build transport-contract-test runtime-poc-test -Doptimize=ReleaseSafe
+zig build runtime-reactor-bench -Doptimize=ReleaseFast
+```
 
-Zig 0.17 Io.Group is a promising separate lifecycle experiment, not a replacement
-already selected by App.serve. async may run inline; connections require
-concurrent. Existing production write_timeout_ms remains reserved, so current
-backpressure isolation tests do not claim bounded write or forced drain deadlines.
-
-See [runtime/transport report](runtime-transport.md) for the audited workarounds,
-Contract guarantees, PoC and before/after benchmark. Historical May/August
-measurements remain in [benchmarks](benchmarks.md); they describe older prototypes
-and cannot enable the current gate or justify recommending reactors in production.
+See [current phase report](native-runtime-phases.md) for architecture, budget
+semantics, Group decision, platform results and production gate evidence.
+[Earlier runtime audit](runtime-transport.md) and historical benchmarks describe
+older implementations; they cannot certify the current Reactor production gate.

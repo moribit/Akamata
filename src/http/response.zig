@@ -106,6 +106,7 @@ pub const Response = struct {
         if (self.streaming != null or self.fixed_streaming != null) return StreamError.AlreadyStreaming;
         if (self.body.items.len > 0) return StreamError.AlreadyStreaming;
         const sw = self.socket_writer orelse return StreamError.UnsupportedOnTarget;
+        if (self.native_control) |node| node.synchronous_output.store(true, .release);
 
         self.keep_alive = false;
 

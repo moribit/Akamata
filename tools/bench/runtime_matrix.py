@@ -96,7 +96,7 @@ def server(binary, run):
                 proc.kill()
                 proc.wait()
                 raise RuntimeError("shutdown deadline exceeded")
-            run["shutdown_ms"] = (time.monotonic() - started) * 1000
+            run.setdefault("shutdown_ms", (time.monotonic() - started) * 1000)
             log.seek(0)
             for row in log.read().decode(errors="replace").splitlines():
                 if row.startswith("BENCH_STATS "):
@@ -169,8 +169,10 @@ for connections in ([] if a.skip_idle else a.idle):
                 run.update(cpu_percent=100 * (after["cpu_seconds"] - before["cpu_seconds"]) / (time.monotonic() - started),
                            rss_mean_kib=after["rss_kib"], threads_peak=after["threads"], fd_count=fds(proc.pid))
                 # Leave idle clients connected during shutdown.
+                drain_started = time.monotonic()
                 proc.send_signal(signal.SIGTERM)
                 proc.wait(timeout=3)
+                run["shutdown_ms"] = (time.monotonic() - drain_started) * 1000
             finally:
                 for client in clients:
                     client.close()

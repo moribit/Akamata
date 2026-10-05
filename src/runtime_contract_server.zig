@@ -6,6 +6,9 @@ const Ctx = am.Context(State);
 
 test {
     _ = @import("runtime/io_group_experiment.zig");
+    _ = @import("runtime/deadline_heap.zig");
+    _ = @import("runtime/reactor_notifications.zig");
+    _ = @import("runtime/reactor.zig");
 }
 
 pub fn main(init: std.process.Init) !void {

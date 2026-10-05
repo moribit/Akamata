@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Black-box socket contract, shared by every evaluated Transport adapter.
 
-The kqueue/epoll modes evaluate readiness plus the shared connection driver;
-they are not a claim that a multiplexed Reactor is production-safe.
+The kqueue/epoll modes evaluate true multiplexed sockets and shared HTTP;
+passing this suite alone does not certify Reactor production safety.
 Every read/process wait is bounded; fixtures use OS-selected free ports.
 """
 import contextlib

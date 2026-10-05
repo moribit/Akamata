@@ -46,6 +46,7 @@ pub const Conn = struct {
     closed: std.atomic.Value(bool) = .init(false),
     native_control: ?*@import("../runtime/drain.zig").Node = null,
     write_timeout_ms: u32 = 30_000,
+    native_writer: ?*Io.Writer = null,
 
     fn closeSocket(self: *Conn) void {
         if (self.native_control) |node| node.close() else self.stream.close(self.io);
@@ -129,7 +130,7 @@ pub const Conn = struct {
         var w_buf: [256]u8 = undefined;
         var sw = @import("../runtime/bounded_writer.zig").Writer.init(self.stream.socket.handle, self.io, &w_buf, self.write_timeout_ms);
         sw.control = self.native_control;
-        const w: *Io.Writer = &sw.interface;
+        const w: *Io.Writer = self.native_writer orelse &sw.interface;
         w.writeAll(h_buf[0..pos]) catch return ReadError.WriteFailed;
         if (payload.len > 0) w.writeAll(payload) catch return ReadError.WriteFailed;
         w.flush() catch return ReadError.WriteFailed;
@@ -178,6 +179,8 @@ pub const Conn = struct {
     }
 
     fn readFrame(self: *Conn, arena: std.mem.Allocator) ReadError!?frame.Frame {
+        const clock = @import("../observability/clock.zig");
+        const started = clock.monotonicNs();
         while (true) {
             if (self.recv_buf.items.len > 0) {
                 const r = frame.decodeClient(arena, self.recv_buf.items, self.max_payload) catch |e| switch (e) {
@@ -197,11 +200,16 @@ pub const Conn = struct {
                 }
             }
             var tmp: [4096]u8 = undefined;
-            var sr_buf: [4096]u8 = undefined;
-            var sr = self.stream.reader(self.io, &sr_buf);
-            const reader: *Io.Reader = &sr.interface;
-            if (!waitReadable(self.stream.socket.handle, self.read_timeout_ms)) return ReadError.Timeout;
-            const n = reader.readSliceShort(&tmp) catch return ReadError.ReadFailed;
+            self.io.checkCancel() catch return ReadError.ReadFailed;
+            const elapsed = clock.elapsedNs(started) / std.time.ns_per_ms;
+            if (elapsed >= self.read_timeout_ms) return ReadError.Timeout;
+            if (!waitReadable(self.stream.socket.handle, @intCast(@min(self.read_timeout_ms - elapsed, 100)))) continue;
+            const raw_n = std.c.recv(self.stream.socket.handle, &tmp, tmp.len, std.c.MSG.DONTWAIT);
+            if (raw_n < 0) switch (std.posix.errno(raw_n)) {
+                .AGAIN, .INTR => continue,
+                else => return ReadError.ReadFailed,
+            };
+            const n: usize = @intCast(raw_n);
             if (n == 0) return null;
             self.recv_buf.appendSlice(self.gpa, tmp[0..n]) catch return ReadError.OutOfMemory;
             if (self.recv_buf.items.len > self.max_payload + 14) return ReadError.PayloadTooLarge;
@@ -209,14 +217,10 @@ pub const Conn = struct {
     }
 };
 
-const PollFd = extern struct { fd: c_int, events: i16, revents: i16 = 0 };
-const POLLIN: i16 = 0x0001;
-extern "c" fn poll(fds: [*]PollFd, nfds: c_uint, timeout_ms: c_int) c_int;
-
 fn waitReadable(fd: c_int, timeout_ms: u32) bool {
     if (timeout_ms == 0) return true;
-    var pfd = [_]PollFd{.{ .fd = fd, .events = POLLIN }};
-    return poll(&pfd, 1, @intCast(@min(timeout_ms, std.math.maxInt(c_int)))) > 0 and (pfd[0].revents & POLLIN) != 0;
+    var pfd = [_]std.c.pollfd{.{ .fd = fd, .events = std.c.POLL.IN, .revents = 0 }};
+    return std.c.poll(&pfd, 1, @intCast(@min(timeout_ms, std.math.maxInt(c_int)))) > 0;
 }
 
 fn validClosePayload(payload: []const u8) bool {
@@ -281,8 +285,10 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     conn.read_timeout_ms = opts.read_timeout_ms;
     conn.native_control = ctx.res.native_control;
     conn.write_timeout_ms = ctx.res.native_write_timeout_ms;
+    conn.native_writer = ctx.res.socket_writer;
 
     ctx.res.setStatus(101);
+    if (conn.native_control) |node| node.synchronous_output.store(true, .release);
     ctx.res.is_upgrade = true;
     ctx.res.keep_alive = false;
     try ctx.res.header("upgrade", "websocket");
@@ -297,7 +303,7 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     var sw_buf: [1024]u8 = undefined;
     var sw = @import("../runtime/bounded_writer.zig").Writer.init(stream_ptr.socket.handle, io_ptr.*, &sw_buf, conn.write_timeout_ms);
     sw.control = conn.native_control;
-    const w: *std.Io.Writer = &sw.interface;
+    const w: *std.Io.Writer = conn.native_writer orelse &sw.interface;
     try ctx.res.writeTo(w);
     try w.flush();
     if (conn.native_control) |node| node.clearWriteDeadline();

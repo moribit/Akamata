@@ -39,6 +39,16 @@ pub const Node = struct {
     fd: c_int,
     next: ?*Node,
     write_deadline_ns: std.atomic.Value(u64) = .init(0),
+    closed: std.atomic.Value(bool) = .init(false),
+    synchronous_output: std.atomic.Value(bool) = .init(false),
+    pub fn shutdown(self: *Node) void {
+        self.registry.mutex.lock();
+        defer self.registry.mutex.unlock();
+        if (self.fd >= 0) _ = std.c.shutdown(self.fd, std.c.SHUT.RDWR);
+    }
+    pub fn isClosed(self: *Node) bool {
+        return self.closed.load(.acquire);
+    }
     pub fn clearWriteDeadline(self: *Node) void {
         self.registry.mutex.lock();
         defer self.registry.mutex.unlock();
@@ -50,6 +60,7 @@ pub const Node = struct {
         if (self.fd >= 0) {
             _ = std.c.close(self.fd);
             self.fd = -1;
+            self.closed.store(true, .release);
         }
     }
     pub fn detach(self: *Node) void {

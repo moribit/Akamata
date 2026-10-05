@@ -20,6 +20,8 @@ jobs:
             cmd: zig build test -Dopenssl=true -Doptimize=ReleaseSafe
           - name: native-integration
             cmd: zig build integration transport-contract-test runtime-poc-test
+          - name: linux threaded + epoll contract
+            cmd: zig build transport-contract-test runtime-poc-test -Doptimize=ReleaseSafe
           - name: tasks-test
             cmd: zig build tasks-test
           - name: cli-build

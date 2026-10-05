@@ -260,7 +260,7 @@ fn waitAcceptReady(fd: c_int, timeout_ms: c_int) bool {
 /// negative value on error (inspect errnoVal()).
 const Accepted = struct { fd: c_int, address: net.IpAddress };
 
-fn rawAccept(fd: c_int) Accepted {
+pub fn rawAccept(fd: c_int) Accepted {
     var address: std.posix.sockaddr.in = undefined;
     var len: u32 = @sizeOf(std.posix.sockaddr.in);
     const accepted_fd = accept(fd, &address, &len);

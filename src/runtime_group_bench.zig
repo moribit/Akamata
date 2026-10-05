@@ -20,7 +20,7 @@ pub fn main() !void {
     if (tracked) |value| base_alloc.free(value);
     var stats: @import("runtime_bench_stats.zig").Stats = .{ .backing = base_alloc };
     var task_stats: @import("runtime/io_group_experiment.zig").TaskStats = .{};
-    defer if (tracked != null) task_stats.report();
+    defer if (tracked != null and !@import("bench_kind").reactor) task_stats.report();
     defer if (tracked != null) stats.report();
     const alloc = if (tracked != null) stats.allocator() else base_alloc;
 
@@ -40,7 +40,10 @@ pub fn main() !void {
     _ = try app.post("/echo", echo);
     _ = try app.get("/db/:id", lookup);
 
-    try @import("runtime/io_group_experiment.zig").serveMeasured(State, &app, .{ .port = 8080, .accept_thread_count = 8 }, if (tracked != null) &task_stats else null);
+    if (@import("bench_kind").reactor)
+        try @import("runtime/reactor.zig").evaluate(State, &app, .{ .port = 8080, .worker_count = 8 })
+    else
+        try @import("runtime/io_group_experiment.zig").serveMeasured(State, &app, .{ .port = 8080, .accept_thread_count = 8 }, if (tracked != null) &task_stats else null);
 }
 
 fn hello(c: *am.Context(State)) !void {

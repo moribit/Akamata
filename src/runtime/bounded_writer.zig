@@ -13,7 +13,7 @@ pub const Writer = struct {
     }
     fn send(self: *Writer, bytes: []const u8) std.Io.Writer.Error!void {
         if (bytes.len == 0) return;
-        if (self.started == null) {
+        if (self.started == null or (self.control != null and self.control.?.write_deadline_ns.load(.acquire) == 0)) {
             self.started = clock.monotonicNs();
             if (self.control) |node| node.write_deadline_ns.store(self.started.? +| @as(u64, self.timeout_ms) * std.time.ns_per_ms, .release);
         }

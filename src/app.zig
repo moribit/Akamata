@@ -1053,16 +1053,17 @@ test "endpoint response byte budget is enforced" {
     const TestApp = App(State);
     const handler = struct {
         fn call(c: *ctx_mod.Context(State)) !void {
-            try c.text("too large", 200);
+            try c.text("too large");
         }
     }.call;
     var app = TestApp.init(std.testing.allocator, .{});
     defer app.deinit();
     _ = try app.endpoint(.GET, "/limited", handler, @import("openapi.zig").Spec(.{ .limits = .{ .response_bytes = 2 } }));
-    var request: req_mod.Request = .{ .method = .GET, .raw_method = "GET", .path = "/limited", .version = "HTTP/1.1", .headers = &.{}, .body = "", .keep_alive = false };
-    var response: res_mod.Response = .init(std.testing.allocator);
-    defer response.deinit();
-    try app.dispatch(std.testing.allocator, &request, &response, null, null);
+    var request: req_mod.Request = .{ .method = .GET, .raw_method = "GET", .path = "/limited", .query = "", .version = "HTTP/1.1", .headers = &.{}, .body = "", .keep_alive = false };
+    var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+    defer arena.deinit();
+    var response: res_mod.Response = .init(arena.allocator());
+    try app.dispatch(arena.allocator(), &request, &response, null, null);
     try std.testing.expectEqual(@as(u16, 500), response.status_code);
     try std.testing.expect(std.mem.indexOf(u8, response.body.items, "response_budget_exceeded") != null);
 }

@@ -68,3 +68,29 @@ profileでは共通SQLite handleのmutex競合とGroup pool待機を確認しま
 allocator counterはapp.gpaだけで、libc/SQLite/stackを含みません。
 短命connectionはhost負荷を抑える500 requests/secでlatency/resourceを比較し、最大throughputとは扱いません。
 [判断記録・profile・raw data](../../benchmark/results/runtime-phase3-2026-10-05/README.md)に再現手順を残しています。
+
+## Phase 4: private true HTTP multiplexing
+
+`http/session.zig`へincremental input/parser/request lifecycleを分離しました。
+`http/connection.zig`のdispatch・serialization・keep-alive・stream・upgradeは
+ThreadedとReactorで共通です。Reactorは一つのevent loopがSessionとsocketを所有し、
+固定worker poolで同じdispatchを呼びます。connectionごとのthread生成は行いません。
+
+kqueue/epollの標準ABI定義、level-triggered nonblocking I/O、generation token、
+固定容量notification queue、connectionごとに一件のindexed deadline heapを使います。
+一回のreadは64KiB、acceptは64件までとし、hard accept failureはreadinessを停止して
+backoffします。closeとselector更新をregistry lockで同期し、stale eventは世代で排除します。
+
+pending outputは16KiB、Writer bufferは4KiBです。partial sendのoffsetを保存し、
+EAGAINではevent loopへ戻ります。producerはconditionで待ち、queueを無制限に拡張しません。
+write budgetは最初の出力がTransportへ入る時点から開始し、progressでは更新しません。
+stream/upgradeのflushはkernelへの送信完了を待ちます。通常の小さいresponseではworkerを
+先に解放できますが、Sessionはpending outputが完了するまで保持します。
+
+upgradeはhandler scope内で借用socketを所有します。read-aheadをコピーしてhandoffし、
+同期read APIはnonblocking recvとbounded pollを使います。長寿命upgradeや遅いstreamは
+workerを占有するため、production判断ではworker starvationを独立に検証します。
+forced drainはsocketとproducer待機を中断しますが、CPU-bound handlerはpreemptしません。
+
+macOSではThreaded/kqueue各27 Contractが成功しました。Linux epollはcross-build済みで、
+実行結果はCIで確認します。Phase 5の証拠が揃うまでpublic reactor gateを維持します。
