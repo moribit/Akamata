@@ -235,6 +235,10 @@ fn Context(comptime State: type) type {
             c.phase = .closing;
             c.output.abort();
             c.node.shutdown();
+            // Completion may have been observed while the last output slot
+            // was still pending. A later write failure must reclaim it even
+            // when no further worker notification will arrive.
+            if (c.busy and c.done.load(.acquire)) c.busy = false;
             if (!c.busy) self.destroy(c);
         }
         fn drive(self: *Self, c: *Connection) !void {
@@ -477,4 +481,27 @@ test "stale generation tokens never resolve a recycled slot" {
     try std.testing.expect(ctx.lookup((@as(u64, 1) << 32) | 2) == null);
     try std.testing.expect(ctx.lookup((@as(u64, 2) << 32) | 2) == &connection);
     try std.testing.expect(ctx.lookup((@as(u64, 2) << 32) | 100) == null);
+}
+
+test "failed pending output after worker completion reclaims admission" {
+    const State = struct {};
+    var app = app_mod.App(State).init(std.testing.allocator, .{});
+    defer app.deinit();
+    const opts: app_mod.ServeOptions = .{ .max_connections = 1 };
+    var ctx = try Context(State).init(&app, std.testing.io, &opts, -1);
+    defer ctx.deinit();
+    var sockets: [2]c_int = undefined;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
+    defer {
+        _ = std.c.close(sockets[1]);
+    }
+    try ctx.admit(.{ .socket = .{ .handle = sockets[0], .address = .{ .ip4 = .{ .bytes = .{ 127, 0, 0, 1 }, .port = 0 } } } });
+    const connection = ctx.slots[0].connection.?;
+    connection.busy = true;
+    connection.phase = .working;
+    connection.done.store(true, .release);
+    connection.output.len = 1;
+    ctx.fail(connection);
+    try std.testing.expectEqual(@as(usize, 0), ctx.count);
+    try std.testing.expect(ctx.slots[0].connection == null);
 }

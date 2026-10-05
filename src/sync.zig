@@ -1,7 +1,9 @@
 // Process-local synchronization for APIs that do not own/pass an Io instance
-// (SQLite pool, websocket hub, model cache). Zig 0.17 Io.Mutex/Condition still
-// require Io and cancellation semantics; retrofitting that context would be a
-// separate API/lifecycle change. Use pthreads, with std.c target ABI types.
+// (SQLite pool, websocket hub, model cache). Zig 0.17 Io.Mutex/Condition require
+// Io; retrofitting that context is a separate API/lifecycle change. Conn and
+// runtime queues do have Io, but retain these shared uncancelable primitives
+// for borrow joins and explicit abort/wakeup. This is lifecycle policy, not a
+// claim that 0.17 lacks uncancelable synchronization. Use std.c target ABI types.
 
 const std = @import("std");
 const builtin = @import("builtin");

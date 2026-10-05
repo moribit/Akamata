@@ -120,22 +120,20 @@ fn NativeHub(comptime Key: type) type {
             var n: usize = 0;
             self.mu.lock();
             if (self.rooms.getPtr(key)) |entry| {
-                n = @min(entry.items.len, snapshot_buf.len);
-                @memcpy(snapshot_buf[0..n], entry.items[0..n]);
+                for (entry.items[0..@min(entry.items.len, snapshot_buf.len)]) |conn| {
+                    if (conn.retainForHub()) {
+                        snapshot_buf[n] = conn;
+                        n += 1;
+                    }
+                }
             }
             self.mu.unlock();
-
-            var failed_buf: [256]*conn_mod.Conn = undefined;
-            var failed_n: usize = 0;
+            // Handler detach may race after the snapshot. These borrows pin
+            // Conn and its transport writer until every send/detach finishes.
             for (snapshot_buf[0..n]) |conn| {
-                conn.sendText(payload) catch {
-                    if (failed_n < failed_buf.len) {
-                        failed_buf[failed_n] = conn;
-                        failed_n += 1;
-                    }
-                };
+                conn.sendText(payload) catch self.detach(key, conn);
+                conn.releaseForHub();
             }
-            for (failed_buf[0..failed_n]) |conn| self.detach(key, conn);
         }
 
         /// Send to a single key — convenience for "user_id → 1 conn" hubs.

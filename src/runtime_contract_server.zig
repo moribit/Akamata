@@ -1,7 +1,8 @@
 // Private socket Contract fixture; deliberately not exported by akamata.zig.
 const std = @import("std");
 const am = @import("akamata.zig");
-const State = struct {};
+const Hub = am.ws.Hub(u64);
+const State = struct { hub: *Hub };
 const Ctx = am.Context(State);
 
 test {
@@ -11,6 +12,7 @@ test {
     _ = @import("runtime/reactor.zig");
     _ = @import("runtime/reactor_output.zig");
     _ = @import("http/session.zig");
+    _ = @import("ws/conn.zig");
 }
 
 pub fn main(init: std.process.Init) !void {
@@ -25,7 +27,9 @@ pub fn main(init: std.process.Init) !void {
     if (args.len != 4) return error.InvalidArguments;
     const adapter = args[1];
     const profile = args[3];
-    var app = am.App(State).init(alloc, .{});
+    var hub = Hub.init(alloc);
+    defer hub.deinit();
+    var app = am.App(State).init(alloc, .{ .hub = &hub });
     defer app.deinit();
     _ = try app.get("/hello", hello);
     _ = try app.post("/echo", echo);
@@ -41,10 +45,12 @@ pub fn main(init: std.process.Init) !void {
     _ = try app.get("/large", large);
     _ = try app.get("/upgrade-wait", upgradeWait);
     _ = try app.get("/upgrade-large", upgradeLarge);
+    _ = try app.get("/upgrade-room", upgradeRoom);
     var opts: am.ServeOptions = .{
         .address = "127.0.0.1",
         .port = try std.fmt.parseInt(u16, args[2], 10),
         .accept_thread_count = 2,
+        .worker_count = 4,
         .parse_limits = .{ .max_request_bytes = 256, .max_headers = 8, .max_body_bytes = 64 },
         .header_read_timeout_ms = 250,
         .body_read_timeout_ms = 400,
@@ -82,6 +88,8 @@ pub fn main(init: std.process.Init) !void {
     } else if (std.mem.eql(u8, profile, "write-slot")) {
         opts.write_timeout_ms = 250;
         opts.max_connections = 1;
+    } else if (std.mem.eql(u8, profile, "write-zero")) {
+        opts.write_timeout_ms = 0;
     } else if (std.mem.eql(u8, profile, "drain")) {
         opts.write_timeout_ms = 5000;
         opts.shutdown_drain_timeout_ms = 150;
@@ -176,6 +184,17 @@ fn upgradeWait(c: *Ctx) !void {
     var conn = try am.ws.upgrade(Ctx, c, .{ .read_timeout_ms = 5000 });
     defer conn.deinit();
     _ = conn.readMessage(c.arena) catch return;
+}
+fn upgradeRoom(c: *Ctx) !void {
+    var conn = try am.ws.upgrade(Ctx, c, .{ .read_timeout_ms = 5000 });
+    defer conn.deinit();
+    try c.state().hub.attach(1, &conn);
+    defer c.state().hub.detach(1, &conn);
+    try conn.sendText("ready");
+    while (true) {
+        const message = conn.readMessage(c.arena) catch return;
+        try c.state().hub.broadcast(1, message.payload);
+    }
 }
 fn upgradeLarge(c: *Ctx) !void {
     var conn = try am.ws.upgrade(Ctx, c, .{});

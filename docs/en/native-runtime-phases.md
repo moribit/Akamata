@@ -111,7 +111,19 @@ resource behavior, handler starvation and platform parity.
 
 ## Phase 5 decision: Reactor Not Ready
 
-Threaded, true kqueue and true epoll run the same 27 Contract cases. Linux
+kqueue registers read/write filters separately; epoll combines IN/OUT/RDHUP
+in one packed standard event. Both are level-triggered and use the same
+generation token and shared HTTP/lifecycle state, not different parsers.
+
+The final suite adds zero write budget and concurrent Hub broadcast/disconnect.
+A completed worker with failed pending output is reclaimed immediately even
+when its completion notification was already consumed. Hub snapshots retain
+Conn borrows; deinit joins them before destroying borrowed transport state.
+The handler must detach all Hub memberships before deinit. Nonblocking upgrade
+recv revalidates descriptor identity under the close registry lock; a recycled
+descriptor unit test verifies no data theft or double close.
+
+Threaded, true kqueue and true epoll run the same 29 Contract cases. Linux
 ReleaseSafe Contract and quick stress pass in CI; local macOS full stress also
 passes. Setup/input/parser allocation failures, constrained partial send/EAGAIN,
 EPIPE, stale generations, bounded wakeup overflow and reference-checked timer
@@ -121,8 +133,8 @@ and FD rollback/cleanup are verified for these bounded runs, not every workload.
 Four synchronous long-lived upgrades fill four workers and delay an unrelated
 HTTP request beyond 250ms; Threaded answers it. Slow stream producers can also
 occupy workers. Forced drain succeeds, but production isolation does not.
-Reactor hello/echo throughput at 32 connections is about 45%/47% lower; DB is
-15% lower. Profiles show worker handoff, condition/mutex, pipe and selector costs
+Reactor hello/echo throughput at 32 connections is about 46%/47% lower; DB is
+19% lower. Profiles show worker handoff, condition/mutex, pipe and selector costs
 without proving one causal percentage. No speculative optimization was applied.
 
 At 256 idle clients Reactor uses nine threads versus Threaded's 264, roughly
@@ -144,7 +156,9 @@ as recoverable. Threaded poll/read remains for deadlines without detached-worker
 Io cancellation scopes. Reactor uses nonblocking recv and kernel readiness;
 upgrade's synchronous read needs bounded poll. Bounded send bypasses standard
 blocking writers while retaining std.Io.Writer framing. Pthread synchronization
-uses std.c ABI types because shared Db/Conn APIs do not own/pass Io. Signals use
+uses std.c ABI types because shared Db/cache/Hub APIs do not own/pass Io. Conn
+and runtime queues have Io but retain explicit uncancelable join/abort policy;
+this does not claim that 0.17 lacks uncancelable mutex/condition APIs. Signals use
 standard SIG/Sigaction; obsolete casts and handmade polling structs are removed.
 Detached workers, atomic active count and owned registry drain remain production.
 Group improves ownership but measured DB loss and unchanged idle thread cost

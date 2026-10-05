@@ -32,14 +32,16 @@ pub const ReadError = error{
 };
 
 /// Single WebSocket connection. Holds an owned read buffer and reuses the
-/// underlying TCP stream. Synchronization on the send path is a tiny atomic
-/// spinlock — works because the broadcast path takes a snapshot under the
-/// hub's own lock and writes are short.
+/// underlying TCP stream. A pthread mutex serializes bounded sends. Hub
+/// snapshots retain borrowed connections until their sends finish; deinit
+/// joins those borrows before destroying the writer/control and mutex storage.
 pub const Conn = struct {
     gpa: std.mem.Allocator,
     stream: net.Stream,
     io: Io,
     write_mutex: @import("../sync.zig").Mutex = .{},
+    borrow_finished: @import("../sync.zig").Condition = .{},
+    hub_borrows: usize = 0,
     recv_buf: std.ArrayList(u8) = .empty,
     max_payload: usize = 64 * 1024,
     read_timeout_ms: u32 = 60_000,
@@ -59,17 +61,37 @@ pub const Conn = struct {
             .io = io,
             .max_payload = max_payload,
             .write_mutex = @import("../sync.zig").Mutex.init(),
+            .borrow_finished = @import("../sync.zig").Condition.init(),
         };
     }
 
     pub fn deinit(self: *Conn) void {
         self.lockWrite();
-        self.recv_buf.deinit(self.gpa);
         if (!self.closed.swap(true, .seq_cst)) {
             self.closeSocket();
         }
+        while (self.hub_borrows != 0) self.borrow_finished.wait(&self.write_mutex);
+        self.recv_buf.deinit(self.gpa);
         self.unlockWrite();
+        self.borrow_finished.deinit();
         self.write_mutex.deinit();
+    }
+
+    /// Internal Hub borrow. Caller must hold Hub's membership lock, and the
+    /// owning handler must detach before deinit. No new heap allocation.
+    pub fn retainForHub(self: *Conn) bool {
+        self.lockWrite();
+        defer self.unlockWrite();
+        if (self.closed.load(.acquire)) return false;
+        self.hub_borrows += 1;
+        return true;
+    }
+    pub fn releaseForHub(self: *Conn) void {
+        self.lockWrite();
+        defer self.unlockWrite();
+        std.debug.assert(self.hub_borrows > 0);
+        self.hub_borrows -= 1;
+        if (self.hub_borrows == 0) self.borrow_finished.broadcast();
     }
 
     pub fn isClosed(self: *Conn) bool {
@@ -182,6 +204,7 @@ pub const Conn = struct {
         const clock = @import("../observability/clock.zig");
         const started = clock.monotonicNs();
         while (true) {
+            if (self.closed.load(.acquire) or (self.native_control != null and self.native_control.?.isClosed())) return ReadError.ClosedByPeer;
             if (self.recv_buf.items.len > 0) {
                 const r = frame.decodeClient(arena, self.recv_buf.items, self.max_payload) catch |e| switch (e) {
                     frame.FrameError.Incomplete => null,
@@ -204,8 +227,9 @@ pub const Conn = struct {
             const elapsed = clock.elapsedNs(started) / std.time.ns_per_ms;
             if (elapsed >= self.read_timeout_ms) return ReadError.Timeout;
             if (!waitReadable(self.stream.socket.handle, @intCast(@min(self.read_timeout_ms - elapsed, 100)))) continue;
-            const raw_n = std.c.recv(self.stream.socket.handle, &tmp, tmp.len, std.c.MSG.DONTWAIT);
-            if (raw_n < 0) switch (std.posix.errno(raw_n)) {
+            const received = try self.receiveSocket(&tmp);
+            const raw_n = received.count;
+            if (raw_n < 0) switch (received.errno) {
                 .AGAIN, .INTR => continue,
                 else => return ReadError.ReadFailed,
             };
@@ -214,6 +238,27 @@ pub const Conn = struct {
             self.recv_buf.appendSlice(self.gpa, tmp[0..n]) catch return ReadError.OutOfMemory;
             if (self.recv_buf.items.len > self.max_payload + 14) return ReadError.PayloadTooLarge;
         }
+    }
+
+    const SocketRead = struct { count: isize, errno: std.posix.E };
+    fn receiveSocket(self: *Conn, bytes: []u8) ReadError!SocketRead {
+        // A concurrent broadcast can close the socket. Serialize the identity
+        // check and nonblocking recv with close so recycled descriptors are
+        // never read. Poll itself is read-only and revalidated here afterward.
+        if (self.native_control) |node| {
+            node.registry.mutex.lock();
+            defer node.registry.mutex.unlock();
+            if (node.isClosed() or self.closed.load(.acquire)) return ReadError.ClosedByPeer;
+            return self.receiveUnchecked(bytes);
+        }
+        self.lockWrite();
+        defer self.unlockWrite();
+        if (self.closed.load(.acquire)) return ReadError.ClosedByPeer;
+        return self.receiveUnchecked(bytes);
+    }
+    fn receiveUnchecked(self: *Conn, bytes: []u8) SocketRead {
+        const n = std.c.recv(self.stream.socket.handle, bytes.ptr, bytes.len, std.c.MSG.DONTWAIT);
+        return .{ .count = n, .errno = if (n < 0) std.posix.errno(n) else .SUCCESS };
     }
 };
 
@@ -277,6 +322,7 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     var conn = Conn.init(ctx.arena, stream_ptr.*, io_ptr.*, opts.max_message_bytes);
     errdefer {
         conn.recv_buf.deinit(ctx.arena);
+        conn.borrow_finished.deinit();
         conn.write_mutex.deinit();
     }
     // Copy read-ahead before committing the upgrade: allocation failure must
@@ -310,4 +356,69 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     ctx.res.finalized = true;
 
     return conn;
+}
+
+test "Conn deinit joins retained Hub snapshots before destroying transport" {
+    var sockets: [2]c_int = undefined;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
+    defer {
+        _ = std.c.close(sockets[1]);
+    }
+    var conn = Conn.init(std.testing.allocator, .{ .socket = .{ .handle = sockets[0], .address = .{ .ip4 = .{ .bytes = .{ 127, 0, 0, 1 }, .port = 0 } } } }, std.testing.io, 1024);
+    try std.testing.expect(conn.retainForHub());
+    var retained = true;
+    var done: std.atomic.Value(bool) = .init(false);
+    const worker = try std.Thread.spawn(.{}, struct {
+        fn run(c: *Conn, finished: *std.atomic.Value(bool)) void {
+            c.deinit();
+            finished.store(true, .release);
+        }
+    }.run, .{ &conn, &done });
+    defer {
+        if (retained) conn.releaseForHub();
+        worker.join();
+    }
+    const clock = @import("../observability/clock.zig");
+    const started = clock.monotonicNs();
+    while (!conn.isClosed() and clock.elapsedNs(started) < std.time.ns_per_s)
+        std.Io.sleep(std.testing.io, .fromMilliseconds(1), .awake) catch {};
+    try std.testing.expect(conn.isClosed());
+    try std.testing.expect(!done.load(.acquire));
+    conn.releaseForHub();
+    retained = false;
+}
+
+test "controlled receive cannot read or close a recycled descriptor" {
+    var sockets: [2]c_int = undefined;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
+    defer {
+        _ = std.c.close(sockets[1]);
+    }
+    var registry: @import("../runtime/drain.zig").Registry = .{ .mutex = .init() };
+    defer registry.mutex.deinit();
+    var node: @import("../runtime/drain.zig").Node = undefined;
+    registry.attach(&node, sockets[0]);
+    defer node.detach();
+    var conn = Conn.init(std.testing.allocator, .{ .socket = .{ .handle = sockets[0], .address = .{ .ip4 = .{ .bytes = .{ 127, 0, 0, 1 }, .port = 0 } } } }, std.testing.io, 1024);
+    conn.native_control = &node;
+    var live = true;
+    defer if (live) conn.deinit();
+    node.close();
+    var replacement: [2]c_int = undefined;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &replacement));
+    defer {
+        _ = std.c.close(replacement[0]);
+        _ = std.c.close(replacement[1]);
+    }
+    try std.testing.expectEqual(sockets[0], replacement[0]);
+    const bytes = "replacement";
+    try std.testing.expectEqual(@as(isize, bytes.len), std.c.send(replacement[1], bytes.ptr, bytes.len, std.c.MSG.NOSIGNAL));
+    var buffer: [32]u8 = undefined;
+    try std.testing.expectError(ReadError.ClosedByPeer, conn.receiveSocket(&buffer));
+    conn.deinit();
+    live = false;
+    try std.testing.expect(std.c.fcntl(replacement[0], std.c.F.GETFD) >= 0);
+    const n = std.c.recv(replacement[0], &buffer, buffer.len, std.c.MSG.DONTWAIT);
+    try std.testing.expectEqual(@as(isize, bytes.len), n);
+    try std.testing.expectEqualSlices(u8, bytes, buffer[0..@intCast(n)]);
 }

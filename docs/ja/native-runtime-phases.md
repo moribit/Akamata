@@ -96,7 +96,17 @@ macOSではThreaded/kqueue各27 Contractが成功しました。Linux epollもCI
 
 ## Phase 5 最終判断: Reactor Not Ready
 
-Threaded・true kqueue・true epollへ同じ27項目のContractを適用しました。
+kqueueはread/write filterを別々に登録し、epollはIN/OUT/RDHUPを標準packed eventへ
+まとめます。両者はlevel-triggeredで、generation token・HTTP・lifecycleは共通です。
+
+最終Contractへzero write budgetとHub broadcast/disconnectを追加しました。
+handlerが完了済みでもpending output失敗時にconnectionを即回収し、通知消費後の残留を防ぎます。
+Hub snapshotはConnの借用を保持し、deinitが借用の終了を待ってからtransportを破棄します。
+handlerは全Hub membershipをdetachしてからConnをdeinitしてください。
+upgrade recvはclose registry lock内でdescriptor identityを再確認します。
+fd再利用のunit testで、別socketのdataを読まず、double closeしないことを確認しました。
+
+Threaded・true kqueue・true epollへ同じ29項目のContractを適用しました。
 Linux CIではReleaseSafe Contractとquick stress、macOSローカルではfull stressが成功しました。
 setup/input growth/parserの全allocation failure、partial send/EAGAIN、EPIPE、
 generationによるstale event排除、notification overflow、referenceと比較したtimer churnを
@@ -114,8 +124,8 @@ Reactorの通常HTTP requestは250ms以内に応答できません。Threadedは
 forced drainは回収できますが、同期stream producerも同様にworkerを占有します。
 この期待される不足を試験結果へ明記し、production parity成功とは扱いません。
 
-32 connectionでReactorのhello/echo throughputはThreadedより約45%/47%低く、
-DBも約15%低下しました。profileではworker handoff、condition/mutex、pipe wakeup、
+32 connectionでReactorのhello/echo throughputはThreadedより約46%/47%低く、
+DBも約19%低下しました。profileではworker handoff、condition/mutex、pipe wakeup、
 selector更新のコストが見えますが、一つの原因の寄与率までは分離できていません。
 推測によるlock-free化やdeadline緩和は行っていません。
 
@@ -137,8 +147,9 @@ Linuxでの性能測定、長時間soak、より広いOS/allocator fault、race/
 - Threaded read/pollはabsolute deadlineとdetached workerのcancel scope不足のため維持します。
   Reactorはnonblocking recvとkqueue/epoll、同期upgrade readはbounded pollを使います。
 - bounded sendはstdlib blocking socket writerへEAGAINを渡さず、std.Io.Writer framingを再利用します。
-- pthread Mutex/Conditionはstd.c ABI定義を使います。Db/Conn APIがIoを保持・引数で受けないため、
-  Io同期への移行には別のownership/cancellation設計が必要です。
+- pthread Mutex/Conditionはstd.c ABI定義を使います。Db/cache/Hub APIはIoを受けません。
+  Conn/runtime queueはIoを持ちますが、借用joinと明示abortのuncancelable方針で共通primitiveを
+  維持します。0.17にuncancelable同期APIがないという意味ではありません。
 - signalは標準SIG/Sigactionを使い、古いcastや手書きpoll structを削除しました。
   最初のshutdown timestamp、listener interruption、signalを繰り返しても更新しないbudgetは維持します。
 - detached connection worker、atomic active count、registry drainはproductionに残します。

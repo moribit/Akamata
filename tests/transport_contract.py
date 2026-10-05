@@ -102,7 +102,10 @@ class Contract(unittest.TestCase):
                     try:
                         probe_client = connect()
                         probe_client.send(request(close=True))
-                        self.assertEqual(probe_client.response()[0], 200)
+                        if profile == "write-zero":
+                            probe_client.eof()
+                        else:
+                            self.assertEqual(probe_client.response()[0], 200)
                         probe_client.eof()
                         probe_client.close()
                         break
@@ -402,6 +405,44 @@ class Contract(unittest.TestCase):
             self.assertLess(time.monotonic() - started, .8)
             self.assertNotIn(b"completed", raw)
             self.assertTrue(raw.startswith(b"HTTP/1.1 200"))
+
+    def test_zero_write_budget_permits_no_socket_output(self):
+        with self.server("write-zero") as (_, connect):
+            for path in ("/hello", "/stream", "/upgrade"):
+                client = connect()
+                extra = b"Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n" if path == "/upgrade" else b""
+                client.send(request(path, close=True, extra=extra))
+                client.eof()
+
+    def test_upgrade_hub_snapshot_disconnect_ownership(self):
+        with self.server("shutdown") as (_, connect):
+            extra = b"Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+            payload = b"borrowed-transport"
+            mask = b"mask"
+            frame = bytes([0x81, 0x80 | len(payload)]) + mask + bytes(b ^ mask[i % 4] for i, b in enumerate(payload))
+            expected = bytes([0x81, len(payload)]) + payload
+            def receive(client, expected=expected):
+                while len(client.pending) < len(expected):
+                    data = client.sock.recv(4096)
+                    self.assertTrue(data)
+                    client.pending += data
+                self.assertEqual(client.pending[:len(expected)], expected)
+                client.pending = client.pending[len(expected):]
+            for _ in range(8):
+                peers = [connect() for _ in range(3)]
+                for peer in peers:
+                    peer.send(request("/upgrade-room", extra=extra))
+                    self.assertEqual(peer.response()[0], 101)
+                    receive(peer, b"\x81\x05ready")
+                peers[0].send(frame)
+                receive(peers[0])
+                peers[1].sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
+                peers[1].close()
+                receive(peers[2])
+                peers[0].send(frame)
+                receive(peers[0]); receive(peers[2])
+                peers[0].close(); peers[2].close()
+                time.sleep(.02)
 
     def test_forced_drain_slow_writer_and_repeated_signal(self):
         with self.server("drain") as (proc, connect):

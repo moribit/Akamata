@@ -8,12 +8,12 @@ evaluation, not certification of all production conditions.
 
 Apple M2, macOS 27.0 arm64, installed Zig 0.17.0, oha 1.15.0. ReleaseFast,
 eight Threaded acceptors versus one Reactor event loop/eight bounded workers,
-same three application handlers and shared SQLite DB. matrix.json has 3 paired
+same three application handlers and shared SQLite DB. matrix-final.json has 3 paired
 3-second keep-alive rounds at 4/32/128 connections plus 64/256 idle cases.
 short-lived.json has 2 paired 2-second rounds at the same connection settings,
 paced at 500 requests/s to avoid exhausting local source ports; it measures
 latency/resources at that load, **not short-lived throughput ceiling**.
-Server order alternates. app.gpa counters are enabled in those matrices and
+matrix.json retains the earlier pre-syscall-deadline-check run. matrix-final.json repeats the full matrix after those checks; each records its binary SHA. short-lived.json and the hello profiles precede that extra deadline check. Server order alternates. app.gpa counters are enabled in those matrices and
 exclude libc, SQLite and OS stacks. Every final tracked live count is zero.
 Sampling and compilation were separate from the saturated keep-alive matrix.
 
@@ -23,34 +23,34 @@ binary SHA, CPU/RSS/fd/thread samples and shutdown timings are retained. CPU
 is process CPU time/wall time (100% = one core). ps time has coarse resolution;
 short fixture exchanges and idle CPU are qualitative, not precise CPU profiles.
 P50/P95/P99 below are medians of per-run percentiles, not pooled percentiles.
-FD counts in the saturated matrix are sampled after the client exits and show cleanup; idle FD counts are sampled while connections remain open. Only macOS has local performance data; Linux CI certifies tests, not these rates.
+FD counts in the saturated matrix are sampled after client exit and show cleanup; idle FD counts are sampled while connections remain open. Only macOS has local performance data; Linux CI certifies tests, not these rates.
 
 ## Saturated keep-alive comparison
 
 | Connections | Endpoint | Runtime | req/s | P50 µs | P95 µs | P99 µs | RSS MiB | CPU % | Threads | FDs at end |
 |---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| 4 | hello | threaded | 82840 | 42.5 | 75.9 | 113.8 | 3.63 | 77 | 12 | 4 |
-| 4 | hello | reactor | 56796 | 65.7 | 102.2 | 137.6 | 3.50 | 103 | 9 | 7 |
-| 4 | echo | threaded | 80822 | 43.5 | 77.8 | 114.2 | 3.65 | 80 | 12 | 4 |
-| 4 | echo | reactor | 55568 | 67.0 | 104.2 | 139.8 | 3.52 | 104 | 9 | 7 |
-| 4 | db/1 | threaded | 63968 | 55.8 | 98.5 | 141.2 | 3.71 | 118 | 12 | 4 |
-| 4 | db/1 | reactor | 48991 | 75.8 | 122.4 | 161.0 | 3.60 | 130 | 9 | 7 |
-| 32 | hello | threaded | 164277 | 165.8 | 354.4 | 706.4 | 5.67 | 228 | 40 | 4 |
-| 32 | hello | reactor | 89794 | 333.3 | 509.1 | 694.0 | 5.17 | 185 | 9 | 7 |
-| 32 | echo | threaded | 163586 | 159.5 | 379.0 | 826.6 | 5.70 | 229 | 40 | 4 |
-| 32 | echo | reactor | 86869 | 340.8 | 533.8 | 683.2 | 5.03 | 179 | 9 | 7 |
-| 32 | db/1 | threaded | 85364 | 231.2 | 914.3 | 2543.4 | 6.19 | 431 | 40 | 4 |
-| 32 | db/1 | reactor | 72370 | 427.0 | 663.0 | 872.0 | 5.14 | 285 | 9 | 7 |
-| 128 | hello | threaded | 179718 | 593.0 | 1340.2 | 3870.5 | 11.95 | 256 | 136 | 4 |
-| 128 | hello | reactor | 89787 | 1352.8 | 1839.3 | 2325.3 | 10.88 | 184 | 9 | 7 |
-| 128 | echo | threaded | 179278 | 515.8 | 1414.2 | 4608.6 | 12.03 | 253 | 136 | 4 |
-| 128 | echo | reactor | 88439 | 1372.3 | 1881.2 | 2382.9 | 10.25 | 179 | 9 | 7 |
-| 128 | db/1 | threaded | 73735 | 532.3 | 5132.7 | 23533.8 | 13.47 | 494 | 136 | 4 |
-| 128 | db/1 | reactor | 70155 | 1801.3 | 2433.4 | 3355.7 | 11.01 | 287 | 9 | 7 |
+| 4 | hello | threaded | 83303 | 42.4 | 75.8 | 113.3 | 3.61 | 77 | 12 | 4 |
+| 4 | hello | reactor | 56492 | 66.0 | 102.6 | 138.5 | 3.55 | 103 | 9 | 7 |
+| 4 | echo | threaded | 81005 | 43.5 | 77.1 | 115.4 | 3.63 | 81 | 12 | 4 |
+| 4 | echo | reactor | 55779 | 67.1 | 103.8 | 139.5 | 3.55 | 104 | 9 | 7 |
+| 4 | db/1 | threaded | 64059 | 55.8 | 98.5 | 140.8 | 3.71 | 116 | 12 | 4 |
+| 4 | db/1 | reactor | 48778 | 76.0 | 123.2 | 162.1 | 3.64 | 130 | 9 | 7 |
+| 32 | hello | threaded | 164691 | 167.8 | 351.9 | 724.9 | 5.63 | 228 | 40 | 4 |
+| 32 | hello | reactor | 89662 | 335.0 | 507.8 | 646.7 | 5.04 | 185 | 9 | 7 |
+| 32 | echo | threaded | 164128 | 160.6 | 375.2 | 801.5 | 5.64 | 232 | 40 | 4 |
+| 32 | echo | reactor | 87144 | 342.1 | 525.1 | 758.8 | 5.07 | 181 | 9 | 7 |
+| 32 | db/1 | threaded | 85032 | 233.8 | 919.4 | 2637.2 | 6.19 | 437 | 40 | 4 |
+| 32 | db/1 | reactor | 69081 | 447.7 | 680.5 | 921.5 | 5.19 | 279 | 9 | 7 |
+| 128 | hello | threaded | 179031 | 565.7 | 1386.5 | 4007.4 | 11.94 | 257 | 136 | 4 |
+| 128 | hello | reactor | 88493 | 1364.0 | 1941.4 | 2539.5 | 10.26 | 180 | 9 | 7 |
+| 128 | echo | threaded | 178607 | 518.2 | 1475.0 | 4552.8 | 12.09 | 254 | 136 | 4 |
+| 128 | echo | reactor | 87364 | 1378.9 | 1935.4 | 2405.0 | 10.29 | 178 | 9 | 7 |
+| 128 | db/1 | threaded | 72946 | 517.3 | 5233.4 | 26241.5 | 13.53 | 505 | 136 | 4 |
+| 128 | db/1 | reactor | 70612 | 1751.8 | 2526.3 | 3826.5 | 10.98 | 296 | 9 | 7 |
 
-At 32 connections Reactor hello/echo throughput is approximately 45%/47% lower;
-DB is 15% lower. At 128 connections hello/echo are about 50% lower; DB is only
-5% lower, with lower CPU and bounded worker contention. These differences are
+At 32 connections Reactor hello/echo throughput is approximately 46%/47% lower;
+DB is 19% lower. At 128 connections hello/echo are about 50% lower; DB is only
+3% lower, with lower CPU and bounded worker contention. These differences are
 too large to attribute to measurement noise. Do not enable production on this
 evidence, and do not weaken deadlines to improve the numbers.
 
@@ -58,10 +58,10 @@ evidence, and do not weaken deadlines to improve the numbers.
 
 | Idle clients | Runtime | RSS MiB | Threads | FDs at end | Shutdown ms |
 |---:|---|---:|---:|---:|---:|
-| 64 | threaded | 7.92 | 72 | 68 | 127.5 |
-| 64 | reactor | 7.34 | 9 | 71 | 3.9 |
-| 256 | threaded | 22.00 | 264 | 260 | 130.1 |
-| 256 | reactor | 19.73 | 9 | 263 | 3.8 |
+| 64 | threaded | 7.92 | 72 | 68 | 128.0 |
+| 64 | reactor | 7.38 | 9 | 71 | 3.6 |
+| 256 | threaded | 22.00 | 264 | 260 | 129.9 |
+| 256 | reactor | 19.75 | 9 | 263 | 3.8 |
 
 Reactor's fixed eight workers plus event loop use nine threads. Threaded uses
 one thread per live client plus acceptors. At 256 idle connections Reactor RSS
@@ -83,6 +83,13 @@ as a tail variation, not erased by the throughput result. Echo and DB P99 fall.
 
 ## Stress, faults and ownership
 
+The final common Contract has 29 cases per adapter, including zero output
+budget and concurrent Hub snapshot/disconnect ownership. Snapshot borrows are
+joined by Conn.deinit; controlled upgrade recv cannot consume a recycled fd.
+An explicit unit reproduces failure of pending output after worker completion
+and requires immediate admission reclamation. These are final correctness
+fixes; the matrix's success-path HTTP workload does not exercise these branches.
+
 stress.json is a tracked ReleaseSafe fixture with two acceptors/four Reactor
 workers, separate from the ReleaseFast throughput matrix. Both runtimes pass:
 64/256 idle clients, 1,024 connections in 64-wide burst/churn waves, three-request
@@ -95,8 +102,8 @@ bounded-run evidence, not proof of no leaks under every possible workload.
 
 | Runtime | Stream req/s | Stream P50/P95/P99 ms | Upgrade req/s | Upgrade P50/P95/P99 ms |
 |---|---:|---|---:|---|
-| threaded | 10809 | 0.324 / 0.455 / 1.490 | 11217 | 0.306 / 0.412 / 1.735 |
-| kqueue | 9917 | 0.333 / 0.660 / 1.399 | 10443 | 0.331 / 0.584 / 1.127 |
+| threaded | 9543 | 0.347 / 0.587 / 1.109 | 10090 | 0.335 / 0.513 / 2.118 |
+| kqueue | 10114 | 0.332 / 0.603 / 1.061 | 10522 | 0.317 / 0.583 / 1.216 |
 
 These are 200 complete short-lived exchanges at concurrency four, including
 client connect, stream framing or WebSocket handshake plus a frame and close.

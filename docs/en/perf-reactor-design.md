@@ -22,7 +22,7 @@ Standard OS ABI definitions, level-triggered readiness, generation tokens,
 bounded producer output and an indexed deadline heap keep resource ownership
 explicit. Application HTTP semantics live only in shared Session/connection.
 
-The same 27 socket Contract cases exercise Threaded and the host Reactor.
+The same 29 socket Contract cases exercise Threaded and the host Reactor.
 Write budgets and forced drain are implemented. Synchronous stream/upgrade
 handlers can still occupy bounded workers; passing these cases does not prove
 production isolation for many long-lived upgraded connections.
