@@ -12,15 +12,20 @@ pub fn Output(comptime Owner: type) type {
         mutex: sync.Mutex,
         changed: sync.Condition,
         interface: std.Io.Writer,
-        bytes: [16 * 1024]u8 = undefined,
+        allocator: std.mem.Allocator,
+        // Finite offer borrows stable connection/session storage until drain.
+        // Only the legacy protocol-error Writer requires an owned copy slot.
+        bytes: []const u8 = &.{},
+        owned: ?*[16 * 1024]u8 = null,
         len: usize = 0,
         offset: usize = 0,
         failed: bool = false,
         timeout_ms: u32 = 0,
-        pub fn init(owner: *Owner, token: u64, node: *@import("drain.zig").Node, buffer: []u8) Self {
-            return .{ .owner = owner, .token = token, .node = node, .mutex = .init(), .changed = .init(), .interface = .{ .buffer = buffer, .vtable = &.{ .drain = drain } } };
+        pub fn init(owner: *Owner, token: u64, node: *@import("drain.zig").Node, buffer: []u8, allocator: std.mem.Allocator) Self {
+            return .{ .owner = owner, .token = token, .node = node, .allocator = allocator, .mutex = .init(), .changed = .init(), .interface = .{ .buffer = buffer, .vtable = &.{ .drain = drain } } };
         }
         pub fn deinit(self: *Self) void {
+            if (self.owned) |storage| self.allocator.destroy(storage);
             self.changed.deinit();
             self.mutex.deinit();
         }
@@ -44,12 +49,11 @@ pub fn Output(comptime Owner: type) type {
             defer self.mutex.unlock();
             if (self.failed) return error.ConnectionWriteFailed;
             if (self.len != 0) return error.OutputPending;
-            if (data.len > self.bytes.len) return error.InvalidOutputQuantum;
+            if (data.len > 16 * 1024) return error.InvalidOutputQuantum;
             if (data.len == 0) return;
             if (self.node.write_deadline_ns.load(.acquire) == 0)
                 self.node.write_deadline_ns.store(clock.monotonicNs() +| @as(u64, self.timeout_ms) * std.time.ns_per_ms, .release);
-            cost.add(.copy_bytes, data.len);
-            @memcpy(self.bytes[0..data.len], data);
+            self.bytes = data;
             self.len = data.len;
             self.offset = 0;
         }
@@ -67,8 +71,15 @@ pub fn Output(comptime Owner: type) type {
                 };
                 if (self.node.write_deadline_ns.load(.acquire) == 0)
                     self.node.write_deadline_ns.store(clock.monotonicNs() +| @as(u64, self.timeout_ms) * std.time.ns_per_ms, .release);
-                const n = @min(data.len - offset, self.bytes.len);
-                @memcpy(self.bytes[0..n], data[offset..][0..n]);
+                if (self.owned == null) self.owned = self.allocator.create([16 * 1024]u8) catch {
+                    self.mutex.unlock();
+                    return error.WriteFailed;
+                };
+                const storage = self.owned.?;
+                const n = @min(data.len - offset, storage.len);
+                cost.add(.copy_bytes, n);
+                @memcpy(storage[0..n], data[offset..][0..n]);
+                self.bytes = storage[0..n];
                 self.len = n;
                 self.offset = 0;
                 self.mutex.unlock();
@@ -135,13 +146,13 @@ test "pending output preserves partial send, EAGAIN and disconnect" {
     registry.attach(&node, sockets[0]);
     defer node.detach();
     var buffer: [4096]u8 = undefined;
-    var output = Output(Owner).init(&owner, 2, &node, &buffer);
+    var output = Output(Owner).init(&owner, 2, &node, &buffer, std.testing.allocator);
     defer output.deinit();
     output.timeout_ms = 1000;
     var bytes: [16 * 1024]u8 = undefined;
     for (&bytes, 0..) |*byte, i| byte.* = @intCast(i % 251);
-    try output.interface.writeAll(&bytes);
-    try output.interface.flush();
+    try output.offer(&bytes);
+    try std.testing.expect(output.owned == null);
     try output.pump(sockets[0]);
     try std.testing.expect(output.offset > 0 and output.offset < bytes.len);
     const progress = output.offset;
@@ -166,4 +177,36 @@ test "pending output preserves partial send, EAGAIN and disconnect" {
     try std.testing.expectError(error.ConnectionWriteFailed, output.pump(sockets[0]));
     output.abort();
     try std.testing.expectError(error.WriteFailed, output.interface.writeAll(&bytes));
+}
+
+fn failingOwnedOutput(allocator: std.mem.Allocator) !void {
+    const Owner = struct {
+        pub fn notify(_: *@This(), _: u64) void {}
+    };
+    var owner: Owner = .{};
+    var registry: @import("drain.zig").Registry = .{ .mutex = .init() };
+    defer registry.mutex.deinit();
+    var node: @import("drain.zig").Node = undefined;
+    registry.attach(&node, -1);
+    defer node.detach();
+    var buffer: [4096]u8 = undefined;
+    var output = Output(Owner).init(&owner, 2, &node, &buffer, allocator);
+    defer output.deinit();
+    const borrowed = "finite data";
+    try output.offer(borrowed);
+    try std.testing.expectEqual(borrowed.ptr, output.bytes.ptr);
+    try std.testing.expect(output.owned == null);
+    output.abort();
+    // Reinitialize for the protocol-error copy path. Test every allocation
+    // failure independently of borrowed storage and preserve cleanup ownership.
+    output.failed = false;
+    var bytes: [8192]u8 = undefined;
+    @memset(&bytes, 'a');
+    output.interface.writeAll(&bytes) catch return error.OutOfMemory;
+    try output.interface.flush();
+    try std.testing.expect(output.owned != null);
+    try std.testing.expectEqualSlices(u8, &bytes, output.bytes);
+}
+test "finite output borrows storage and owned fallback handles allocation failure" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, failingOwnedOutput, .{});
 }

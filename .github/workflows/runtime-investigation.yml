@@ -8,9 +8,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
       - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29
         with:
           version: 0.17.0
@@ -35,10 +37,12 @@ jobs:
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
       - name: Build uninstrumented benchmark
         run: |
-          zig build -Dexample=bench -Doptimize=ReleaseFast --prefix baseline
-          zig build runtime-reactor-bench -Doptimize=ReleaseFast --prefix baseline
+          git worktree add --detach before-runtime 97f04ac
+          (cd before-runtime && ./third_party/sqlite/fetch.sh && zig build -Dexample=bench -Doptimize=ReleaseFast --prefix ../baseline && zig build runtime-reactor-bench -Doptimize=ReleaseFast --prefix ../baseline)
+          zig build -Dexample=bench -Doptimize=ReleaseFast --prefix candidate
+          zig build runtime-reactor-bench -Doptimize=ReleaseFast --prefix candidate
       - name: Uninstrumented matrix
-        run: python3 tools/bench/runtime_matrix.py threaded=baseline/bin/bench reactor=baseline/bin/runtime-reactor-bench --output certification/uninstrumented.json --connections 4 32 128 256 --rounds 2 --duration 3s --stats --skip-idle
+        run: python3 tools/bench/runtime_matrix.py threaded-before=baseline/bin/bench threaded=candidate/bin/bench before=baseline/bin/runtime-reactor-bench reactor=candidate/bin/runtime-reactor-bench --output certification/uninstrumented.json --connections 4 32 128 256 --rounds 2 --duration 3s --stats --skip-idle
       - name: Build attribution benchmark
         run: |
           zig build -Dexample=bench -Doptimize=ReleaseFast -Druntime-cost=true --prefix measured
@@ -46,7 +50,7 @@ jobs:
       - name: Instrumented matrix (not throughput evidence)
         run: python3 tools/bench/runtime_matrix.py threaded=measured/bin/bench reactor=measured/bin/runtime-reactor-bench --output certification/cost.json --connections 4 32 128 256 --rounds 1 --duration 2s --stats --skip-idle
       - name: Sampling evidence
-        run: python3 tools/bench/runtime_profile.py threaded=baseline/bin/bench reactor=baseline/bin/runtime-reactor-bench --output-dir certification/profile --endpoint hello --connections 32 128
+        run: python3 tools/bench/runtime_profile.py threaded=candidate/bin/bench reactor=candidate/bin/runtime-reactor-bench --output-dir certification/profile --endpoint hello --connections 32 128
       - name: Linux syscall aggregation
         if: runner.os == 'Linux'
         run: |
@@ -54,9 +58,18 @@ jobs:
           sudo apt-get install -y strace
           for endpoint in hello echo db/1; do
             safe=$(echo "$endpoint" | tr / -)
-            python3 tools/bench/runtime_syscalls.py baseline/bin/bench --endpoint "$endpoint" --output-dir "certification/syscalls-threaded-$safe"
-            python3 tools/bench/runtime_syscalls.py baseline/bin/runtime-reactor-bench --endpoint "$endpoint" --output-dir "certification/syscalls-reactor-$safe"
+            python3 tools/bench/runtime_syscalls.py candidate/bin/bench --endpoint "$endpoint" --output-dir "certification/syscalls-threaded-$safe"
+            python3 tools/bench/runtime_syscalls.py baseline/bin/runtime-reactor-bench --endpoint "$endpoint" --output-dir "certification/syscalls-before-$safe"
+            python3 tools/bench/runtime_syscalls.py candidate/bin/runtime-reactor-bench --endpoint "$endpoint" --output-dir "certification/syscalls-reactor-$safe"
           done
+      - name: Session memory, mixed workload and races
+        run: |
+          zig build runtime-certify-fixture -Doptimize=ReleaseSafe --prefix fixture
+          python3 tools/bench/runtime_certify.py fixture/bin/runtime-contract-server --adapters threaded --output certification/sessions-threaded.json --idle-levels 1000 --mixed-idle 100 --soak-seconds 30
+          if [[ "$RUNNER_OS" == Linux ]]; then adapter=epoll; else adapter=kqueue; fi
+          python3 tools/bench/runtime_certify.py fixture/bin/runtime-contract-server --adapters "$adapter" --output certification/sessions-reactor.json --idle-levels 1000 5000 --mixed-idle 1000 --soak-seconds 240
+      - name: Full regression prerequisites
+        run: zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-session-test runtime-stress-test -Doptimize=ReleaseSafe
       - name: Record source and environment
         if: always()
         run: |

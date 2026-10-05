@@ -50,7 +50,15 @@ else:
             metadata["error"] = repr(exc)
         finally:
             if proc.poll() is None:
-                os.killpg(proc.pid, signal.SIGTERM)
+                children = Path(f"/proc/{proc.pid}/task/{proc.pid}/children").read_text().split()
+                if children:
+                    for child in children:
+                        try:
+                            os.kill(int(child), signal.SIGTERM)
+                        except ProcessLookupError:
+                            pass
+                else:
+                    os.killpg(proc.pid, signal.SIGTERM)
             try:
                 proc.wait(timeout=15)
             except subprocess.TimeoutExpired:

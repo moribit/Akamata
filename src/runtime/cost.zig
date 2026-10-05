@@ -3,6 +3,7 @@
 const std = @import("std");
 pub const enabled = @import("build_options").runtime_cost and @import("build_options").backend == .native;
 pub const Kind = enum {
+    event_loop,
     parse,
     dispatch,
     read,

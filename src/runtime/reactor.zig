@@ -104,7 +104,12 @@ fn Context(comptime State: type) type {
             pub fn deferSession(t: *@This(), response: anytype, definition: tasks.Definition) !void {
                 const c = t.connection;
                 errdefer _ = definition.callback(definition.state, .{ .closed = .application_error }, &.{}) catch {};
-                const execution = try c.session.arena.allocator().create(tasks.Session);
+                // A long-lived ~16 KiB session in the request arena forces a
+                // geometrically grown chunk retained for every idle upgrade.
+                // Separate exact-size ownership preserves application state in
+                // the arena while avoiding that measured unused arena capacity.
+                const execution = try c.owner.app.gpa.create(tasks.Session);
+                errdefer c.owner.app.gpa.destroy(execution);
                 execution.* = try tasks.Session.init(c.owner.app.gpa, definition, response.upgrade_input);
                 errdefer execution.deinit();
                 try http.prepareApplicationSession(execution, response);
@@ -298,6 +303,7 @@ fn Context(comptime State: type) type {
                 // active event loop. Ordinary lifecycle uses a cleanup task.
                 execution.dispose(if (self.stopping) .shutdown else .disconnected);
                 execution.deinit();
+                self.app.gpa.destroy(execution);
             }
             c.session.deinit();
             self.slots[c.slot].connection = null;
@@ -634,7 +640,7 @@ fn Context(comptime State: type) type {
             if (slot.generation == 0) slot.generation = 1;
             const token = (@as(u64, slot.generation) << 32) | @as(u64, slot_index + 2);
             c.* = .{ .owner = self, .token = token, .slot = slot_index, .stream = stream, .node = undefined, .session = try sessions.Session.init(self.app.gpa, self.opts), .output = undefined };
-            c.output = Output.init(self, token, &c.node, &c.writer_buffer);
+            c.output = Output.init(self, token, &c.node, &c.writer_buffer, self.app.gpa);
             self.registry.attach(&c.node, stream.socket.handle);
             self.free_len -= 1;
             slot.connection = c;
@@ -667,6 +673,8 @@ fn Context(comptime State: type) type {
             }
         }
         fn run(self: *Self) !void {
+            const measured = cost.begin();
+            defer measured.end(.event_loop);
             try self.selector.set(self.listener, 0, .{ .read = true }, &self.listener_interests);
             var events: [128]readiness.Event = undefined;
             while (true) {
@@ -754,6 +762,38 @@ fn allocationFailureSetup(gpa: std.mem.Allocator) !void {
     const opts: app_mod.ServeOptions = .{ .max_connections = 8 };
     var ctx = try Context(State).init(&app, std.testing.io, &opts, -1);
     defer ctx.deinit();
+}
+fn allocationFailureSessionHandoff(gpa: std.mem.Allocator) !void {
+    const State = struct {};
+    const Callback = struct {
+        closed: usize = 0,
+        fn step(self: *@This(), event: tasks.Event, _: []u8) !tasks.Action {
+            if (event == .closed) self.closed += 1;
+            return .{ .next = .done };
+        }
+    };
+    var callback: Callback = .{};
+    {
+        var app = app_mod.App(State).init(gpa, .{});
+        defer app.deinit();
+        const opts: app_mod.ServeOptions = .{ .max_connections = 1 };
+        var ctx = try Context(State).init(&app, std.testing.io, &opts, -1);
+        defer ctx.deinit();
+        var sockets: [2]c_int = undefined;
+        if (std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets) != 0) return error.SocketPairFailed;
+        defer _ = std.c.close(sockets[1]);
+        try ctx.admit(.{ .socket = .{ .handle = sockets[0], .address = .{ .ip4 = .{ .bytes = .{ 127, 0, 0, 1 }, .port = 0 } } } });
+        const c = ctx.slots[0].connection.?;
+        var transport: Context(State).Transport = .{ .connection = c };
+        var response = @import("../http/response.zig").Response.init(c.session.arena.allocator());
+        try transport.deferSession(&response, tasks.Definition.init(Callback, &callback, Callback.step, .{ .stream = .{} }));
+    }
+    try std.testing.expectEqual(@as(usize, 1), callback.closed);
+}
+test "separate application session handoff rolls back every allocation failure" {
+    const before = testFdCount();
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, allocationFailureSessionHandoff, .{});
+    try std.testing.expectEqual(before, testFdCount());
 }
 test "reactor setup rolls back every allocation failure" {
     const before = testFdCount();
@@ -885,7 +925,7 @@ test "session cancellation retains reserved admission when ordinary work is full
     try ctx.drive(ordinary);
     const parked = ctx.slots[1].connection.?;
     const token = parked.token;
-    parked.execution = try parked.session.arena.allocator().create(tasks.Session);
+    parked.execution = try std.testing.allocator.create(tasks.Session);
     parked.execution.?.* = try tasks.Session.init(std.testing.allocator, tasks.Definition.init(SessionState, &state, SessionState.step, .{ .stream = .{} }), "");
     parked.phase = .application;
     ctx.failReason(parked, .shutdown);
@@ -921,7 +961,7 @@ test "partial input deadline remains armed while a producer worker owns the sess
     }
     try ctx.admit(.{ .socket = .{ .handle = sockets[0], .address = .{ .ip4 = .{ .bytes = .{ 127, 0, 0, 1 }, .port = 0 } } } });
     const c = ctx.slots[0].connection.?;
-    c.execution = try c.session.arena.allocator().create(tasks.Session);
+    c.execution = try std.testing.allocator.create(tasks.Session);
     c.execution.?.* = try tasks.Session.init(std.testing.allocator, tasks.Definition.init(SessionState, &state, SessionState.step, .{ .websocket = .{} }), "");
     c.execution.?.read_deadline_ns = 10;
     c.node.write_deadline_ns.store(100, .release);

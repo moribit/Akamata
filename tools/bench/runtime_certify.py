@@ -119,7 +119,7 @@ def server(adapter, scenario):
             log.seek(0)
             text = log.read().decode(errors="replace")
             run["exit_code"] = proc.returncode
-            for marker, key in (("BENCH_STATS ", "allocator_final"), ("SESSION_STATS ", "sessions_final")):
+            for marker, key in (("BENCH_STATS ", "allocator_final"), ("SESSION_STATS ", "sessions_final"), ("RUNTIME_MEMORY ", "runtime_memory"), ("APPLICATION_MEMORY ", "application_memory")):
                 lines = [line.split(marker, 1)[1] for line in text.splitlines() if marker in line]
                 if lines:
                     run[key] = json.loads(lines[-1])

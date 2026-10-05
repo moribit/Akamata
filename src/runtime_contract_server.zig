@@ -48,6 +48,7 @@ pub fn main(init: std.process.Init) !void {
     const profile = if (std.mem.startsWith(u8, args[3], "incremental-")) args[3]["incremental-".len..] else args[3];
     var hub = Hub.init(alloc);
     defer hub.deinit();
+    if (comptime @import("runtime/cost.zig").enabled) std.debug.print("APPLICATION_MEMORY {{\"upgrade_state_size\":{d},\"mailbox_bytes\":8192,\"group_size\":{d}}}\n", .{ @sizeOf(UpgradeState), @sizeOf(SessionGroup) });
     var group: SessionGroup = .{ .mutex = .init() };
     defer group.mutex.deinit();
     var db = try am.db.openSqlite(alloc, ":memory:");
