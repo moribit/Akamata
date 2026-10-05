@@ -1,0 +1,72 @@
+name: Native runtime certification
+on:
+  workflow_dispatch:
+    inputs:
+      soak_seconds:
+        description: Mixed workload duration per adapter (1200 seconds minimum for certification)
+        default: '1200'
+        required: true
+
+jobs:
+  certify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29
+        with:
+          version: 0.17.0
+          use-cache: false
+      - run: ./third_party/sqlite/fetch.sh
+      - name: Install pinned benchmark client
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            asset=oha-linux-amd64
+            checksum=86ab7fa2c1df23b3bbc53b73561ffa44a7a38ca08f0e10351df9522a5c4c3c61
+          elif [[ "$(uname -m)" == arm64 ]]; then
+            asset=oha-macos-arm64
+            checksum=70d7cb7c15ed3d5eb4b7d9a7e76f0a8ee32ba1f18f560acef3b28e8670b89bb0
+          else
+            asset=oha-macos-amd64
+            checksum=fc8ccb4126737aae85cc9fbc6f95b161bf8bbb676bf02d4bb6196ec02c709c36
+          fi
+          curl -fLsS "https://github.com/hatoo/oha/releases/download/v1.15.0/$asset" -o "$RUNNER_TEMP/oha"
+          echo "$checksum  $RUNNER_TEMP/oha" | shasum -a 256 -c -
+          chmod +x "$RUNNER_TEMP/oha"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Contract and fault prerequisites
+        run: zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-stress-test -Doptimize=ReleaseSafe
+      - name: Build benchmark and owned certification fixture
+        run: |
+          zig build -Dexample=bench -Doptimize=ReleaseFast
+          zig build runtime-reactor-bench -Doptimize=ReleaseFast
+          zig build runtime-certify-fixture -Doptimize=ReleaseSafe
+      - name: Paired transport performance
+        run: python3 tools/bench/runtime_matrix.py threaded=zig-out/bin/bench reactor=zig-out/bin/runtime-reactor-bench --output certification/matrix.json --connections 4 32 128 256 --rounds 2 --duration 3s --stats --idle 100 1000 --modes keep_alive short_lived
+      - name: Sampling evidence
+        run: python3 tools/bench/runtime_profile.py threaded=zig-out/bin/bench reactor=zig-out/bin/runtime-reactor-bench --output-dir certification/profile --endpoint hello --connections 32 128
+      - name: Incremental session scalability, mixed workload and soak
+        env:
+          SOAK_SECONDS: ${{ inputs.soak_seconds }}
+        run: python3 tools/bench/runtime_certify.py zig-out/bin/runtime-contract-server --output certification/sessions.json --idle-levels 100 1000 --mixed-idle 100 --soak-seconds "$SOAK_SECONDS"
+      - name: Record source and environment
+        if: always()
+        run: |
+          mkdir -p certification
+          git rev-parse HEAD > certification/source-sha.txt
+          uname -a > certification/environment.txt
+          zig version >> certification/environment.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: certification-${{ matrix.os }}
+          path: |
+            certification/
+            .zig-cache/runtime-stress.json
+            .zig-cache/runtime-application-isolation.json
+          if-no-files-found: error

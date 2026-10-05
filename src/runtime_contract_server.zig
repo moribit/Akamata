@@ -8,6 +8,7 @@ const State = struct {
     sessions: *SessionGroup,
     incremental: bool,
     db: am.db.Db,
+    stats: ?*@import("runtime_bench_stats.zig").Stats = null,
     sessions_created: std.atomic.Value(u64) = .init(0),
     sessions_closed: std.atomic.Value(u64) = .init(0),
 };
@@ -47,7 +48,7 @@ pub fn main(init: std.process.Init) !void {
     var db = try am.db.openSqlite(alloc, ":memory:");
     defer db.close();
     try db.execAll("CREATE TABLE items(id INTEGER PRIMARY KEY, name TEXT); INSERT INTO items VALUES(1, 'alpha');");
-    var app = am.App(State).init(alloc, .{ .hub = &hub, .sessions = &group, .incremental = use_incremental, .db = db });
+    var app = am.App(State).init(alloc, .{ .hub = &hub, .sessions = &group, .incremental = use_incremental, .db = db, .stats = &stats });
     defer app.deinit();
     defer {
         const created = app.state_value.sessions_created.load(.acquire);
@@ -75,6 +76,7 @@ pub fn main(init: std.process.Init) !void {
     _ = try app.get("/application-hold", applicationHold);
     _ = try app.get("/db/:id", databaseLookup);
     _ = try app.get("/upgrade-live", upgradeLive);
+    _ = try app.get("/runtime-stats", runtimeStats);
     var opts: am.ServeOptions = .{
         .address = "127.0.0.1",
         .port = try std.fmt.parseInt(u16, args[2], 10),
@@ -90,7 +92,7 @@ pub fn main(init: std.process.Init) !void {
     };
     if (std.mem.eql(u8, profile, "certify")) {
         opts.max_connections = 16384;
-        opts.max_pending_application_tasks = 512;
+        opts.max_pending_application_tasks = 16384;
         opts.worker_count = 4;
         opts.parse_limits.max_body_bytes = 1024 * 1024;
         opts.keep_alive_idle_timeout_ms = 60_000;
@@ -304,6 +306,10 @@ fn databaseLookup(c: *Ctx) !void {
     if (try stmt.step() != .row) return c.json(.{ .error_kind = "not_found" }, 404);
     const row = try stmt.readRow(struct { id: i64, name: []const u8 });
     try c.json(.{ .id = row.id, .name = try c.arena.dupe(u8, row.name) }, 200);
+}
+fn runtimeStats(c: *Ctx) !void {
+    const stats = c.state().stats.?;
+    try c.json(.{ .live = stats.live.load(.monotonic), .peak = stats.peak.load(.monotonic), .calls = stats.calls.load(.monotonic), .created = c.state().sessions_created.load(.acquire), .closed = c.state().sessions_closed.load(.acquire) }, 200);
 }
 fn upgradeLive(c: *Ctx) !void {
     // Same application callback/session on both transports for certification.

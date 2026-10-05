@@ -283,6 +283,7 @@ pub fn build(b: *std.Build) void {
         contract_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
         contract_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
         const contract_server = b.addExecutable(.{ .name = "runtime-contract-server", .root_module = contract_mod });
+        b.step("runtime-certify-fixture", "build private incremental session certification fixture").dependOn(&b.addInstallArtifact(contract_server, .{}).step);
         const contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
         contract.addArtifactArg(contract_server);
         b.step("transport-contract-test", "run shared socket Contract on Threaded and host multiplexed Reactor").dependOn(&contract.step);
