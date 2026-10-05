@@ -71,6 +71,10 @@ pub const Span = struct {
     cpu: u64 = 0,
     pub fn end(self: Span, kind: Kind) void {
         if (comptime enabled) {
+            // Probes run immediately after recv/send, before the transport
+            // inspects errno. Timing must preserve the syscall's error state.
+            const saved_errno = std.c._errno().*;
+            defer std.c._errno().* = saved_errno;
             const wall = now() -| self.wall;
             const cpu = cpuNow() -| self.cpu;
             add(kind, 1);
