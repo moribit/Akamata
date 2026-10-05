@@ -1,3 +1,21 @@
+# Reactor application execution — Phase 6 implementation
+
+The user selected explicit incremental execution for Reactor. Threaded retains synchronous stream/upgrade APIs; Reactor rejects them with `UnsupportedApplicationExecution` (HTTP 501 in the default error handler). The public Reactor gate remains disabled.
+
+`am.http.application_session.Definition.init(State, state, callback, mode)` creates one callback ABI with a compile-time adapter, matching the existing endpoint convention. No transport vtable or per-step allocation is introduced. Native `Response.streamSession()` / `am.ws.upgradeSession()` transfer arena-owned state after initializer return; Context/Conn stack pointers must not escape. Workers currently returns explicit unsupported until its event adapter exists; core events/actions contain no platform API.
+
+Callbacks receive opened/resumer, produce, message or closed/reason and emit one bounded 8 KiB quantum plus input/produce/after/wait/done. Output backpressure parks the session, not a worker. Idle WebSockets and parked producers have no queued/running application work. Shared frame assembly validates fragments/control/UTF-8, reuses bounded scratch state, and yields after 64 frames. Each event-loop turn processes at most 128 notifications.
+
+Buffered HTTP responses also use the shared response cursor: Reactor sends 4 KiB quanta outside workers, including arbitrarily large headers/bodies. Threaded uses the same serializer. Queues are fixed-capacity with one queued/running borrow per connection; a separate cleanup FIFO is bounded by live connection capacity and cannot be rejected by normal admission saturation. Close joins an existing step, delivers closed once on a worker, then destroys state. CPU/foreign blocking calls require cooperative completion. Resumer borrows end with closed; application registries must unregister/join senders. The fixture mailbox joins broadcast/detach under its membership mutex and closes overflow recipients.
+
+Read deadlines are absolute per frame (partial bytes do not renew them). Stream output budgets begin with headers and include producer waits; WebSocket budgets apply per handshake/frame. Shutdown stops admissions, drains finite streams within grace, closes idle/upgraded sessions, force-shuts I/O at deadline, and joins running application work.
+
+Local validation: 32 shared cases each on legacy Threaded, incremental Threaded and kqueue (96 total), isolation/admission gate, stress and allocation/lifecycle faults. The fixture asserts equal created/closed session counts and GPA cleanup. Linux/epoll is verified with the same CI targets before Phase 7 proceeds.
+
+Reproduce: `zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-stress-test -Doptimize=ReleaseSafe`. See [raw evidence](../../benchmark/results/runtime-phase6-2026-10-05/README.md). The following is the pre-implementation investigation/baseline, not the current implementation status.
+
+---
+
 # Reactor application execution — incomplete Phase 6
 
 Baseline: `75fcb26`. **Phase 6 is incomplete.** Do not begin Phase 7 optimization,

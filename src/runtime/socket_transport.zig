@@ -70,6 +70,9 @@ pub fn Transport(comptime Readiness: type) type {
             if (self.reader_state) |*reader| return reader.interface.buffered();
             return "";
         }
+        pub fn consumeBufferedInput(self: *Self) void {
+            if (self.reader_state) |*reader| reader.interface.toss(reader.interface.buffered().len);
+        }
         pub fn deinit(self: *Self) void {
             self.readiness.deinit();
         }

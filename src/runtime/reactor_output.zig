@@ -36,6 +36,21 @@ pub fn Output(comptime Owner: type) type {
             defer self.mutex.unlock();
             return .{ .pending = self.len != 0, .failed = self.failed };
         }
+        /// Event-loop-owned finite quantum. No condition wait or producer task
+        /// is retained behind backpressure; caller retries after output drains.
+        pub fn offer(self: *Self, data: []const u8) !void {
+            self.mutex.lock();
+            defer self.mutex.unlock();
+            if (self.failed) return error.ConnectionWriteFailed;
+            if (self.len != 0) return error.OutputPending;
+            if (data.len > self.bytes.len) return error.InvalidOutputQuantum;
+            if (data.len == 0) return;
+            if (self.node.write_deadline_ns.load(.acquire) == 0)
+                self.node.write_deadline_ns.store(clock.monotonicNs() +| @as(u64, self.timeout_ms) * std.time.ns_per_ms, .release);
+            @memcpy(self.bytes[0..data.len], data);
+            self.len = data.len;
+            self.offset = 0;
+        }
         fn waitEmpty(self: *Self) std.Io.Writer.Error!void {
             while (self.len != 0 and !self.failed) self.changed.wait(&self.mutex);
             if (self.failed) return error.WriteFailed;

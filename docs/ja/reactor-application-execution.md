@@ -1,3 +1,34 @@
+# Reactor application execution — Phase 6実装
+
+同期APIの互換方針はユーザー指定により確定しました。Threadedは既存同期stream/upgradeを維持し、Reactorでは`UnsupportedApplicationExecution`、default error handlerではHTTP 501を返します。incremental APIを必須とします。public Reactor gateは引き続きfail-closedです。
+
+## 実装したsession lifecycle
+
+`am.http.application_session.Definition.init(State, state, callback, mode)`は、comptime callbackを既存endpointと同様の単一callback ABIへ変換します。Transportのvtableやper-step heap allocationは追加しません。`state`はrequest arenaなどsession lifetimeまで有効な場所へallocateし、handlerスタックのContext/Connを保存しません。Nativeでは`Response.streamSession(definition)`と`am.ws.upgradeSession(Ctx, ctx, options, definition)`を利用します。Workers event adapterは未実装のため明示unsupportedです。coreのevent/actionはplatform固有APIを含みません。
+
+```text
+HTTP initializer → owned Session
+readiness/timer/resume → one finite admitted callback → bounded emission
+output drain → next step / await input
+cancel → reserved bounded cleanup task → closed callback once → destroy
+```
+
+callback eventは`opened(resumer) / produce / message / closed(reason)`、resultは最大8 KiBのoutputと`input / produce / after_ms / wait / done`です。Reactorはoutput pendingの間producerをadmitしません。idle WebSocket、timer待ち、external wake待ちはworkerを保持しません。frame/control/fragment/UTF-8は共通message stateで処理し、入力scratch arenaをframeごとにresetします。protocol quantumは64 frames、通知処理は128 tokensでevent-loop turnを区切ります。
+
+通常HTTP responseも共有`response_cursor.zig`でserializationし、Reactorのsocket outputをworkerから分離しました。任意長header/bodyのcursorを4 KiBずつcopyして送信するため、大きなbuffered bodyやslow readerもworkerを保持しません。Threadedの`Response.writeTo()`も同じcursorを利用します。
+
+ordinary pending task上限とは別に、cancelには最大connection数のcleanup FIFOを予約します。各connectionのqueued/running taskは常に一つです。overflowは未admit connectionをcloseします。callbackはworkerで一stepだけ実行し、error/disconnect/deadline/shutdownはjoin後に`closed`を一回deliverします。callback/cleanupでのCPU/第三者blocking callは協調completionが必要で、unsafe preemptionは行いません。Resumerはclosed callbackまでのborrowであり、application registryはclosed内でsenderをunregister/joinします。fixtureのbounded mailboxはmembership mutexでbroadcastとdetachをjoinし、overflow recipientをcloseします。
+
+Read budgetはframe入力のabsolute deadline（partial bytesで更新しない）、complete control/fragment frameで次frameのbudgetへ移行します。stream write budgetはheader outputからのabsolute budgetでproducer待ちも含みます。WebSocketはhandshake/frameごとのbudgetです。pending bytesを送信する前にもdeadlineを確認します。shutdownは受付停止後、有限streamをgrace内でdrainし、idle/upgraded sessionをclose、期限時はI/Oをforce shutdownします。running application stepのcompletionはjoinします。
+
+## Phase 6検証
+
+macOSでは32件の共通ContractをThreaded同期、Threaded incremental、kqueue incrementalへ実行し96件成功。四idle upgrade、四slow stream、upgrade/stream混在のHTTP isolation gateも成功しました。queue overflow/recovery、fragment/control/UTF-8、read-ahead、error termination、zero write budget、shutdown、allocation failureを検証し、fixtureはcreated/closed session数一致とGPA cleanupをassertします。Linux/epollの同じ条件はCIで検証します。cross-platform成功を確認するまでPhase 7へ進みません。
+
+再現: `zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-stress-test -Doptimize=ReleaseSafe`。raw dataは[Phase 6記録](../../benchmark/results/runtime-phase6-2026-10-05/README.md)へ保存します。以下は実装前の調査・baselineであり、現在の未実装項目一覧ではありません。
+
+---
+
 # Reactor application execution — Phase 6設計・検証途中
 
 基準は`75fcb26`。**Phase 6は未完了**です。Phase 7の性能最適化、Phase 8のproduction certification、Phase 9のexperimental公開判断には進みません。Threadedをdefaultとして維持し、Reactorの`ExperimentalRuntimeDisabled`を維持します。

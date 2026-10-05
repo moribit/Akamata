@@ -146,6 +146,9 @@ pub const observability = struct {
 };
 
 pub const http = struct {
+    /// Experimental finite session API; Workers currently returns explicit
+    /// UnsupportedOnTarget until its event adapter is implemented.
+    pub const application_session = @import("http/application_session.zig");
     pub const Status = @import("http/status.zig").Code;
     pub const Method = @import("http/status.zig").Method;
     pub const Request = @import("http/request.zig").Request;
@@ -200,6 +203,7 @@ pub const ws = struct {
     pub const UpgradeOptions = if (backend == .native) @import("ws/conn.zig").UpgradeOptions else struct {};
     pub const Message = if (backend == .native) @import("ws/conn.zig").Message else struct {};
     pub const upgrade = if (backend == .native) @import("ws/conn.zig").upgrade else struct {};
+    pub const upgradeSession = if (backend == .native) @import("ws/conn.zig").upgradeSession else struct {};
     pub const Hub = @import("ws/hub.zig").Hub;
 };
 

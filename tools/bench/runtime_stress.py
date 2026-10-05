@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bounded stress/fault evaluation. Owns only its fixture processes/sockets.
 
-Expected Reactor worker starvation is recorded, not hidden by weakening Contract.
+Application isolation is required after the incremental execution handoff.
 Long runs stay outside normal CI; --quick uses 32 idle clients and smaller waves.
 """
 import argparse
@@ -168,8 +168,8 @@ for adapter in adapters:
         try: run["unrelated_request_isolated"] = probe.response()[0] == 200
         except TimeoutError: run["unrelated_request_isolated"] = False
         run["probe_ms"] = (time.monotonic() - started) * 1000; run["loaded"] = sample(proc.pid)
-        # Record the known architecture gap; public production remains disabled.
-        assert run["unrelated_request_isolated"] == (adapter == "threaded"), run
+        # Phase 6: four idle upgrade sessions must leave HTTP workers available.
+        assert run["unrelated_request_isolated"], run
         started = time.monotonic(); proc.send_signal(signal.SIGTERM); proc.wait(timeout=3)
         run["shutdown_ms"] = (time.monotonic() - started) * 1000
     with server(adapter, "accept-fd-exhaustion-recovery", fd_limit=64) as (proc, connect, run):

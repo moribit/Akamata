@@ -846,6 +846,12 @@ pub fn App(comptime State: type) type {
                 .index = 0,
             };
             chain.run(&ctx) catch |err| {
+                if (response.application_session != null) {
+                    response.application_session_error = true;
+                    response.is_upgrade = false;
+                    response.headers.clearRetainingCapacity();
+                    if (response.status_code == 101) response.setStatus(200);
+                }
                 if (self.err_handler) |eh| {
                     eh(err, &ctx) catch |inner| {
                         std.log.err("error handler itself failed: {t} (original: {t})", .{ inner, err });
@@ -854,7 +860,10 @@ pub fn App(comptime State: type) type {
                     std.log.warn("unhandled handler error on {s} {s}: {t}", .{
                         @tagName(request.method), request.path, err,
                     });
-                    if (response.body.items.len == 0 and response.status_code == 200) {
+                    if (err == error.UnsupportedApplicationExecution) {
+                        response.setStatus(501);
+                        response.json(.{ .error_kind = "unsupported_application_execution", .message = "use an incremental session on this runtime" }) catch {};
+                    } else if (response.body.items.len == 0 and response.status_code == 200) {
                         response.setStatus(500);
                         response.json(.{ .error_kind = "internal", .message = "internal server error" }) catch |jerr| {
                             std.log.err("failed to serialize error response: {t}", .{jerr});
@@ -884,6 +893,11 @@ pub fn App(comptime State: type) type {
                     limit_value = limit;
                 };
                 if (violation) |kind| {
+                    if (response.application_session != null) {
+                        response.application_session_error = true;
+                        response.is_upgrade = false;
+                        response.headers.clearRetainingCapacity();
+                    }
                     response.body.clearRetainingCapacity();
                     response.setStatus(500);
                     try response.json(.{ .error_kind = kind, .limit = limit_value });

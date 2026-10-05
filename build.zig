@@ -279,6 +279,9 @@ pub fn build(b: *std.Build) void {
         contract_mod.link_libc = true;
         contract_mod.addOptions("build_options", opts);
         contract_mod.addImport("sqlite3", am_mod.import_table.get("sqlite3").?);
+        contract_mod.addIncludePath(b.path("third_party/sqlite"));
+        contract_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
+        contract_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
         const contract_server = b.addExecutable(.{ .name = "runtime-contract-server", .root_module = contract_mod });
         const contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
         contract.addArtifactArg(contract_server);

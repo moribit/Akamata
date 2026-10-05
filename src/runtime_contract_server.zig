@@ -2,7 +2,15 @@
 const std = @import("std");
 const am = @import("akamata.zig");
 const Hub = am.ws.Hub(u64);
-const State = struct { hub: *Hub };
+const tasks = @import("http/application_session.zig");
+const State = struct {
+    hub: *Hub,
+    sessions: *SessionGroup,
+    incremental: bool,
+    db: am.db.Db,
+    sessions_created: std.atomic.Value(u64) = .init(0),
+    sessions_closed: std.atomic.Value(u64) = .init(0),
+};
 const Ctx = am.Context(State);
 
 test {
@@ -15,6 +23,8 @@ test {
     _ = @import("http/session.zig");
     _ = @import("ws/conn.zig");
     _ = @import("ws/message_state.zig");
+    _ = @import("http/response_cursor.zig");
+    _ = @import("http/application_session.zig");
 }
 
 pub fn main(init: std.process.Init) !void {
@@ -28,11 +38,23 @@ pub fn main(init: std.process.Init) !void {
     const args = try init.minimal.args.toSlice(arena.allocator());
     if (args.len != 4) return error.InvalidArguments;
     const adapter = args[1];
-    const profile = args[3];
+    const use_incremental = std.mem.eql(u8, adapter, "kqueue") or std.mem.eql(u8, adapter, "epoll") or std.mem.startsWith(u8, args[3], "incremental-");
+    const profile = if (std.mem.startsWith(u8, args[3], "incremental-")) args[3]["incremental-".len..] else args[3];
     var hub = Hub.init(alloc);
     defer hub.deinit();
-    var app = am.App(State).init(alloc, .{ .hub = &hub });
+    var group: SessionGroup = .{ .mutex = .init() };
+    defer group.mutex.deinit();
+    var db = try am.db.openSqlite(alloc, ":memory:");
+    defer db.close();
+    try db.execAll("CREATE TABLE items(id INTEGER PRIMARY KEY, name TEXT); INSERT INTO items VALUES(1, 'alpha');");
+    var app = am.App(State).init(alloc, .{ .hub = &hub, .sessions = &group, .incremental = use_incremental, .db = db });
     defer app.deinit();
+    defer {
+        const created = app.state_value.sessions_created.load(.acquire);
+        const closed = app.state_value.sessions_closed.load(.acquire);
+        std.debug.print("SESSION_STATS {{\"created\":{d},\"closed\":{d}}}\n", .{ created, closed });
+        std.debug.assert(created == closed);
+    }
     _ = try app.get("/hello", hello);
     _ = try app.post("/echo", echo);
     _ = try app.get("/ip", ip);
@@ -48,6 +70,11 @@ pub fn main(init: std.process.Init) !void {
     _ = try app.get("/upgrade-wait", upgradeWait);
     _ = try app.get("/upgrade-large", upgradeLarge);
     _ = try app.get("/upgrade-room", upgradeRoom);
+    _ = try app.get("/sync-stream", syncStream);
+    _ = try app.get("/sync-upgrade", syncUpgrade);
+    _ = try app.get("/application-hold", applicationHold);
+    _ = try app.get("/db/:id", databaseLookup);
+    _ = try app.get("/upgrade-live", upgradeLive);
     var opts: am.ServeOptions = .{
         .address = "127.0.0.1",
         .port = try std.fmt.parseInt(u16, args[2], 10),
@@ -61,7 +88,18 @@ pub fn main(init: std.process.Init) !void {
         .max_requests_per_connection = 3,
         .max_connections = 8,
     };
-    if (std.mem.eql(u8, profile, "stress")) {
+    if (std.mem.eql(u8, profile, "certify")) {
+        opts.max_connections = 16384;
+        opts.max_pending_application_tasks = 512;
+        opts.worker_count = 4;
+        opts.parse_limits.max_body_bytes = 1024 * 1024;
+        opts.keep_alive_idle_timeout_ms = 60_000;
+        opts.body_read_timeout_ms = 5000;
+        opts.total_request_timeout_ms = 6000;
+        opts.write_timeout_ms = 2000;
+        opts.shutdown_drain_timeout_ms = 150;
+        opts.max_requests_per_connection = 100_000;
+    } else if (std.mem.eql(u8, profile, "stress")) {
         opts.max_connections = 512;
         opts.worker_count = 4;
         opts.max_requests_per_connection = 100;
@@ -157,6 +195,7 @@ fn untrusted(_: ?[]const u8) bool {
     return false;
 }
 fn stream(c: *Ctx) !void {
+    if (c.state().incremental) return newStream(c, .stream);
     const w = try c.startStream(.{ .content_type = "text/plain" });
     try w.writeAll("one");
     try w.flush();
@@ -164,38 +203,45 @@ fn stream(c: *Ctx) !void {
     try w.flush();
 }
 fn streamError(c: *Ctx) !void {
+    if (c.state().incremental) return newStream(c, .stream_error);
     const w = try c.startStream(.{});
     try w.writeAll("partial");
     try w.flush();
     return error.ExpectedStreamFailure;
 }
 fn fixed(c: *Ctx) !void {
+    if (c.state().incremental) return newStream(c, .fixed);
     const w = try c.startStream(.{ .content_length = 5 });
     try w.writeAll("hello");
     try w.flush();
 }
 fn fixedShort(c: *Ctx) !void {
+    if (c.state().incremental) return newStream(c, .fixed_short);
     const w = try c.startStream(.{ .content_length = 5 });
     try w.writeAll("he");
     try w.flush();
 }
 fn upgrade(c: *Ctx) !void {
+    if (c.state().incremental) return newUpgrade(c, .one);
     var conn = try am.ws.upgrade(Ctx, c, .{ .read_timeout_ms = 500 });
     defer conn.deinit();
     try conn.sendText("upgraded");
 }
 fn upgradeEcho(c: *Ctx) !void {
+    if (c.state().incremental) return newUpgrade(c, .echo);
     var conn = try am.ws.upgrade(Ctx, c, .{ .read_timeout_ms = 500 });
     defer conn.deinit();
     const message = try conn.readMessage(c.arena);
     try conn.sendText(message.payload);
 }
 fn upgradeWait(c: *Ctx) !void {
+    if (c.state().incremental) return newUpgrade(c, .wait);
     var conn = try am.ws.upgrade(Ctx, c, .{ .read_timeout_ms = 5000 });
     defer conn.deinit();
     _ = conn.readMessage(c.arena) catch return;
 }
 fn upgradeRoom(c: *Ctx) !void {
+    if (c.state().incremental) return newUpgrade(c, .room);
     var conn = try am.ws.upgrade(Ctx, c, .{ .read_timeout_ms = 5000 });
     defer conn.deinit();
     try c.state().hub.attach(1, &conn);
@@ -207,12 +253,14 @@ fn upgradeRoom(c: *Ctx) !void {
     }
 }
 fn upgradeLarge(c: *Ctx) !void {
+    if (c.state().incremental) return newUpgrade(c, .large);
     var conn = try am.ws.upgrade(Ctx, c, .{});
     defer conn.deinit();
     const bytes: [16384]u8 = @splat('x');
     for (0..4096) |_| try conn.sendBinary(&bytes);
 }
 fn slow(c: *Ctx) !void {
+    if (c.state().incremental) return newStream(c, .slow);
     const io: *std.Io = @ptrCast(@alignCast(c.io_ptr.?));
     const w = try c.startStream(.{ .content_length = 9 });
     try std.Io.sleep(io.*, .fromMilliseconds(300), .awake);
@@ -220,6 +268,7 @@ fn slow(c: *Ctx) !void {
     try w.flush();
 }
 fn pausedStream(c: *Ctx) !void {
+    if (c.state().incremental) return newStream(c, .paused);
     const io: *std.Io = @ptrCast(@alignCast(c.io_ptr.?));
     const w = try c.startStream(.{ .content_length = 9 });
     try std.Io.sleep(io.*, .fromMilliseconds(1000), .awake);
@@ -227,8 +276,188 @@ fn pausedStream(c: *Ctx) !void {
     try w.flush();
 }
 fn large(c: *Ctx) !void {
+    if (c.state().incremental) return newStream(c, .large);
     const w = try c.startStream(.{ .content_length = 16 * 1024 * 1024 });
     const bytes: [16384]u8 = @splat('x');
     for (0..1024) |_| try w.writeAll(&bytes);
     try w.flush();
+}
+
+fn syncStream(c: *Ctx) !void {
+    const writer = try c.startStream(.{});
+    try writer.writeAll("synchronous");
+}
+fn syncUpgrade(c: *Ctx) !void {
+    var conn = try am.ws.upgrade(Ctx, c, .{});
+    defer conn.deinit();
+}
+fn applicationHold(c: *Ctx) !void {
+    std.debug.print("APPLICATION_WORK_ENTERED\n", .{});
+    const io: *std.Io = @ptrCast(@alignCast(c.io_ptr.?));
+    try std.Io.sleep(io.*, .fromMilliseconds(700), .awake);
+    try c.text("completed");
+}
+fn databaseLookup(c: *Ctx) !void {
+    var stmt = try c.db().prepare("SELECT id, name FROM items WHERE id = ?");
+    defer stmt.deinit();
+    try stmt.bindAll(.{try c.req.paramAs(i64, "id")});
+    if (try stmt.step() != .row) return c.json(.{ .error_kind = "not_found" }, 404);
+    const row = try stmt.readRow(struct { id: i64, name: []const u8 });
+    try c.json(.{ .id = row.id, .name = try c.arena.dupe(u8, row.name) }, 200);
+}
+fn upgradeLive(c: *Ctx) !void {
+    // Same application callback/session on both transports for certification.
+    try newUpgradeWithTimeout(c, .room, 60_000);
+}
+
+const StreamState = struct {
+    const Kind = enum { stream, stream_error, fixed, fixed_short, slow, paused, large };
+    kind: Kind,
+    account: *State,
+    count: usize = 0,
+    fn step(self: *StreamState, event: tasks.Event, out: []u8) !tasks.Action {
+        if (event == .closed) {
+            _ = self.account.sessions_closed.fetchAdd(1, .monotonic);
+            return .{ .next = .done };
+        }
+        if (event == .opened and (self.kind == .slow or self.kind == .paused))
+            return .{ .next = .{ .after_ms = if (self.kind == .slow) 300 else 1000 } };
+        const bytes: []const u8 = switch (self.kind) {
+            .stream => if (self.count == 0) "one" else if (self.count == 1) "two" else return .{ .next = .done },
+            .stream_error => if (self.count == 0) "partial" else return error.ExpectedStreamFailure,
+            .fixed => if (self.count == 0) "hello" else return .{ .next = .done },
+            .fixed_short => if (self.count == 0) "he" else return .{ .next = .done },
+            .slow, .paused => if (self.count == 0) "completed" else return .{ .next = .done },
+            .large => {
+                if (self.count == 2048) return .{ .next = .done };
+                self.count += 1;
+                @memset(out, 'x');
+                return .{ .output = .{ .len = out.len } };
+            },
+        };
+        self.count += 1;
+        @memcpy(out[0..bytes.len], bytes);
+        return .{ .output = .{ .len = bytes.len } };
+    }
+};
+fn newStream(c: *Ctx, kind: StreamState.Kind) !void {
+    const state = try c.arena.create(StreamState);
+    state.* = .{ .kind = kind, .account = c.state() };
+    const length: ?u64 = switch (kind) {
+        .fixed, .fixed_short => 5,
+        .slow, .paused => 9,
+        .large => 16 * 1024 * 1024,
+        else => null,
+    };
+    try c.res.streamSession(tasks.Definition.init(StreamState, state, StreamState.step, .{ .stream = .{ .content_length = length, .content_type = "text/plain" } }));
+    _ = c.state().sessions_created.fetchAdd(1, .monotonic);
+}
+
+// One bounded mailbox per member. The membership lock joins every sender with
+// closed/detach, so no borrowed state/resumer survives arena destruction.
+const SessionGroup = struct {
+    mutex: @import("sync.zig").Mutex,
+    entries: [16384]?*UpgradeState = @splat(null),
+    fn attach(self: *SessionGroup, state: *UpgradeState) !void {
+        self.mutex.lock();
+        defer self.mutex.unlock();
+        for (&self.entries) |*entry| if (entry.* == null) {
+            entry.* = state;
+            state.attached = true;
+            return;
+        };
+        return error.SessionGroupFull;
+    }
+    fn detach(self: *SessionGroup, state: *UpgradeState) void {
+        self.mutex.lock();
+        defer self.mutex.unlock();
+        for (&self.entries) |*entry| if (entry.* == state) {
+            entry.* = null;
+            state.attached = false;
+            return;
+        };
+    }
+    fn broadcast(self: *SessionGroup, bytes: []const u8) void {
+        self.mutex.lock();
+        defer self.mutex.unlock();
+        for (self.entries) |entry| if (entry) |state| {
+            if (state.mailbox_len != 0 or bytes.len > state.mailbox.len) {
+                state.mailbox_failed = true;
+            } else {
+                @memcpy(state.mailbox[0..bytes.len], bytes);
+                state.mailbox_len = bytes.len;
+            }
+            state.resumer.?.wake();
+        };
+    }
+};
+const UpgradeState = struct {
+    const Kind = enum { one, echo, wait, large, room };
+    kind: Kind,
+    group: *SessionGroup,
+    account: *State,
+    count: usize = 0,
+    attached: bool = false,
+    resumer: ?tasks.Resumer = null,
+    mailbox: [8192]u8 = undefined,
+    mailbox_len: usize = 0,
+    mailbox_failed: bool = false,
+    fn step(self: *UpgradeState, event: tasks.Event, out: []u8) !tasks.Action {
+        if (event == .closed) {
+            if (self.attached) self.group.detach(self);
+            self.resumer = null;
+            _ = self.account.sessions_closed.fetchAdd(1, .monotonic);
+            return .{ .next = .done };
+        }
+        if (event == .opened) {
+            self.resumer = event.opened;
+            if (self.kind == .room) {
+                try self.group.attach(self);
+                @memcpy(out[0..5], "ready");
+                return .{ .output = .{ .len = 5, .opcode = .text, .next = .input } };
+            }
+            if (self.kind == .one) {
+                @memcpy(out[0..8], "upgraded");
+                return .{ .output = .{ .len = 8, .opcode = .text, .next = .done } };
+            }
+            if (self.kind != .large) return .{ .next = .input };
+        }
+        if (event == .message) {
+            if (self.kind == .room) {
+                self.group.broadcast(event.message.payload);
+                return .{ .next = .input };
+            }
+            if (self.kind == .wait) return .{ .next = .done };
+            if (event.message.payload.len > out.len) return error.MessageTooLarge;
+            @memcpy(out[0..event.message.payload.len], event.message.payload);
+            if (event.message.payload.len == 0) return .{ .next = .done };
+            return .{ .output = .{ .len = event.message.payload.len, .opcode = .text, .next = .done } };
+        }
+        if (self.kind == .room) {
+            self.group.mutex.lock();
+            defer self.group.mutex.unlock();
+            if (self.mailbox_failed) return .{ .next = .done };
+            if (self.mailbox_len == 0) return .{ .next = .input };
+            const n = self.mailbox_len;
+            @memcpy(out[0..n], self.mailbox[0..n]);
+            self.mailbox_len = 0;
+            return .{ .output = .{ .len = n, .opcode = .text, .next = .input } };
+        }
+        if (self.kind == .large) {
+            if (self.count == 8192) return .{ .next = .done };
+            self.count += 1;
+            @memset(out, 'x');
+            return .{ .output = .{ .len = out.len, .opcode = .binary } };
+        }
+        return .{ .next = .input };
+    }
+};
+fn newUpgrade(c: *Ctx, kind: UpgradeState.Kind) !void {
+    return newUpgradeWithTimeout(c, kind, if (kind == .wait or kind == .room) 5000 else 500);
+}
+fn newUpgradeWithTimeout(c: *Ctx, kind: UpgradeState.Kind, timeout: u32) !void {
+    const state = try c.arena.create(UpgradeState);
+    state.* = .{ .kind = kind, .group = c.state().sessions, .account = c.state() };
+    try am.ws.upgradeSession(Ctx, c, .{ .read_timeout_ms = timeout }, tasks.Definition.init(UpgradeState, state, UpgradeState.step, .{ .websocket = .{} }));
+    _ = c.state().sessions_created.fetchAdd(1, .monotonic);
 }

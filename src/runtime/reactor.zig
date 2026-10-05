@@ -8,6 +8,7 @@ const sync = @import("../sync.zig");
 const clock = @import("../observability/clock.zig");
 const drain = @import("drain.zig");
 const net = std.Io.net;
+const tasks = @import("../http/application_session.zig");
 
 pub fn evaluate(comptime State: type, app: *app_mod.App(State), opts: app_mod.ServeOptions) !void {
     if (@sizeOf(usize) != 8) return error.UnsupportedPlatform;
@@ -39,7 +40,8 @@ fn Context(comptime State: type) type {
     return struct {
         const Self = @This();
         const Output = @import("reactor_output.zig").Output(Self);
-        const Phase = enum { reading, working, closing };
+        const Phase = enum { reading, working, application, closing };
+        const Job = union(enum) { http: sessions.Event, step: tasks.Event, dispose: tasks.CloseReason };
         const Connection = struct {
             owner: *Self,
             token: u64,
@@ -52,7 +54,12 @@ fn Context(comptime State: type) type {
             interests: readiness.Interests = .{},
             phase: Phase = .reading,
             need: ?sessions.Need = null,
-            job: sessions.Event = undefined,
+            job: Job = undefined,
+            execution: ?*tasks.Session = null,
+            response_cursor: ?@import("../http/response_cursor.zig").Cursor = null,
+            response_keep_alive: bool = false,
+            task_failed: bool = false,
+            close_reason: tasks.CloseReason = .disconnected,
             busy: bool = false,
             done: std.atomic.Value(bool) = .init(false),
             outcome: http.Outcome = .close,
@@ -88,6 +95,25 @@ fn Context(comptime State: type) type {
             pub fn peerIp(t: *@This(), arena: std.mem.Allocator) ![]const u8 {
                 return @import("socket_transport.zig").formatPeerIp(arena, t.connection.stream.socket.address);
             }
+            pub fn deferSession(t: *@This(), response: anytype, definition: tasks.Definition) !void {
+                const c = t.connection;
+                errdefer _ = definition.callback(definition.state, .{ .closed = .application_error }, &.{}) catch {};
+                const execution = try c.session.arena.allocator().create(tasks.Session);
+                execution.* = try tasks.Session.init(c.owner.app.gpa, definition, response.upgrade_input);
+                errdefer execution.deinit();
+                try http.prepareApplicationSession(execution, response);
+                execution.resumer = .{ .pending = &execution.external_wake, .context = c.owner, .token = c.token, .notify = struct {
+                    fn notify(ptr: *anyopaque, token: u64) void {
+                        const owner: *Self = @ptrCast(@alignCast(ptr));
+                        owner.notify(token);
+                    }
+                }.notify };
+                c.execution = execution;
+            }
+            pub fn deferResponse(t: *@This(), response: anytype) !void {
+                t.connection.response_cursor = try @import("../http/response_cursor.zig").Cursor.init(response);
+                t.connection.response_keep_alive = response.keep_alive;
+            }
         };
         app: *app_mod.App(State),
         io: std.Io,
@@ -107,6 +133,9 @@ fn Context(comptime State: type) type {
         jobs_mutex: sync.Mutex,
         jobs_changed: sync.Condition,
         jobs: @import("application_admission.zig").Queue(*Connection),
+        // Cancellation owns at most one entry per live connection and cannot
+        // be rejected by an already-full ordinary application admission queue.
+        cleanup_jobs: @import("application_admission.zig").Queue(*Connection),
         stop_workers: bool = false,
         stopping: bool = false,
         forced: bool = false,
@@ -119,6 +148,8 @@ fn Context(comptime State: type) type {
             if (task_limit == 0 or task_limit > opts.max_connections) return error.InvalidApplicationTaskLimit;
             var jobs = try @import("application_admission.zig").Queue(*Connection).init(gpa, task_limit);
             errdefer jobs.deinit(gpa);
+            var cleanup_jobs = try @import("application_admission.zig").Queue(*Connection).init(gpa, opts.max_connections);
+            errdefer cleanup_jobs.deinit(gpa);
             var selector = try readiness.Selector.init();
             errdefer selector.deinit();
             var wake: [2]c_int = undefined;
@@ -141,7 +172,7 @@ fn Context(comptime State: type) type {
             errdefer timers.deinit(gpa);
             var notifications = try @import("reactor_notifications.zig").Queue.init(gpa, slots.len);
             errdefer notifications.deinit(gpa);
-            return .{ .app = app, .io = io, .opts = opts, .listener = listener, .selector = selector, .wake = wake, .notifications = notifications, .timers = timers, .slots = slots, .free_slots = free, .free_len = free.len, .registry = .{ .mutex = .init() }, .jobs = jobs, .jobs_mutex = .init(), .jobs_changed = .init() };
+            return .{ .app = app, .io = io, .opts = opts, .listener = listener, .selector = selector, .wake = wake, .notifications = notifications, .timers = timers, .slots = slots, .free_slots = free, .free_len = free.len, .registry = .{ .mutex = .init() }, .jobs = jobs, .cleanup_jobs = cleanup_jobs, .jobs_mutex = .init(), .jobs_changed = .init() };
         }
         fn deinit(self: *Self) void {
             self.registry.force();
@@ -154,7 +185,9 @@ fn Context(comptime State: type) type {
             // Setup/unit evaluation may not have started any workers. Abort
             // above revokes their I/O; queued borrows are now unowned.
             while (self.jobs.pop()) |_| {}
+            while (self.cleanup_jobs.pop()) |_| {}
             self.jobs.deinit(self.app.gpa);
+            self.cleanup_jobs.deinit(self.app.gpa);
             for (self.slots) |slot| if (slot.connection) |c| self.destroy(c);
             self.workers.deinit(self.app.gpa);
             self.jobs_changed.deinit();
@@ -176,22 +209,30 @@ fn Context(comptime State: type) type {
         fn workerMain(self: *Self) void {
             while (true) {
                 self.jobs_mutex.lock();
-                while (self.jobs.len == 0 and !self.stop_workers) self.jobs_changed.wait(&self.jobs_mutex);
-                const c = self.jobs.pop() orelse {
+                while (self.jobs.len == 0 and self.cleanup_jobs.len == 0 and !self.stop_workers) self.jobs_changed.wait(&self.jobs_mutex);
+                const c = self.cleanup_jobs.pop() orelse self.jobs.pop() orelse {
                     self.jobs_mutex.unlock();
                     return;
                 };
                 self.jobs_mutex.unlock();
                 var transport: Transport = .{ .connection = c };
-                c.outcome = .close;
-                if (!c.output.status().failed and !c.node.isClosed()) switch (c.job) {
-                    .request => |parsed| c.outcome = http.dispatchOne(State, self.app, &c.session, parsed, &transport, self.opts) catch .close,
-                    .issue => |issue| {
-                        transport.beginResponse(self.opts.write_timeout_ms);
-                        http.writeProtocolError(c.session.arena.allocator(), &transport, issue.code, issue.kind) catch {};
-                    },
-                    .input => unreachable,
-                };
+                if (c.job == .dispose) {
+                    c.execution.?.dispose(c.job.dispose);
+                } else if (c.job == .step) {
+                    if (!c.output.status().failed and !c.node.isClosed()) c.execution.?.step(c.job.step, clock.monotonicNs()) catch {
+                        c.task_failed = true;
+                    };
+                } else {
+                    c.outcome = .close;
+                    if (!c.output.status().failed and !c.node.isClosed()) switch (c.job.http) {
+                        .request => |parsed| c.outcome = http.dispatchOne(State, self.app, &c.session, parsed, &transport, self.opts) catch .close,
+                        .issue => |issue| {
+                            transport.beginResponse(self.opts.write_timeout_ms);
+                            http.writeProtocolError(c.session.arena.allocator(), &transport, issue.code, issue.kind) catch {};
+                        },
+                        .input => unreachable,
+                    };
+                }
                 // Publication relinquishes every borrowed connection pointer.
                 const token = c.token;
                 c.done.store(true, .release);
@@ -226,6 +267,12 @@ fn Context(comptime State: type) type {
             self.interest(c, .{}) catch {};
             c.node.detach();
             c.output.deinit();
+            if (c.execution) |execution| {
+                // Fatal runtime teardown happens after worker join, outside an
+                // active event loop. Ordinary lifecycle uses a cleanup task.
+                execution.dispose(if (self.stopping) .shutdown else .disconnected);
+                execution.deinit();
+            }
             c.session.deinit();
             self.slots[c.slot].connection = null;
             self.free_slots[self.free_len] = c.slot;
@@ -234,6 +281,10 @@ fn Context(comptime State: type) type {
             self.app.gpa.destroy(c);
         }
         fn fail(self: *Self, c: *Connection) void {
+            self.failReason(c, if (self.stopping) .shutdown else .disconnected);
+        }
+        fn failReason(self: *Self, c: *Connection, reason: tasks.CloseReason) void {
+            if (c.phase != .closing) c.close_reason = reason;
             self.interest(c, .{}) catch {};
             self.timers.remove(c.slot);
             c.phase = .closing;
@@ -243,7 +294,19 @@ fn Context(comptime State: type) type {
             // was still pending. A later write failure must reclaim it even
             // when no further worker notification will arrive.
             if (c.busy and c.done.load(.acquire)) c.busy = false;
-            if (!c.busy) self.destroy(c);
+            if (!c.busy) {
+                if (c.execution) |execution| if (!execution.disposed) {
+                    c.job = .{ .dispose = c.close_reason };
+                    c.busy = true;
+                    c.done.store(false, .release);
+                    self.jobs_mutex.lock();
+                    std.debug.assert(self.cleanup_jobs.push(c));
+                    self.jobs_changed.signal();
+                    self.jobs_mutex.unlock();
+                    return;
+                };
+                self.destroy(c);
+            }
         }
         fn drive(self: *Self, c: *Connection) !void {
             if (self.stopping) {
@@ -260,7 +323,7 @@ fn Context(comptime State: type) type {
                 },
                 else => {
                     try self.interest(c, .{});
-                    c.job = event;
+                    c.job = .{ .http = event };
                     c.need = null;
                     c.phase = .working;
                     c.busy = true;
@@ -283,6 +346,26 @@ fn Context(comptime State: type) type {
         }
         fn refresh(self: *Self, c: *Connection) void {
             const status = c.output.status();
+            // A worker may publish a new session pointer. Never read it before
+            // acquire-observing that job's completion (including overflow scan).
+            if (c.busy and c.done.load(.acquire) and (c.execution != null or c.response_cursor != null)) c.busy = false;
+            if (!c.busy and c.response_cursor != null) {
+                if (c.phase == .closing or status.failed or c.node.isClosed()) {
+                    self.fail(c);
+                    return;
+                }
+                self.resumeResponse(c) catch self.fail(c);
+                return;
+            }
+            if (!c.busy and c.execution != null) {
+                if (c.phase == .closing or status.failed or c.node.isClosed() or c.task_failed) {
+                    self.failReason(c, if (c.task_failed) .application_error else if (self.stopping) .shutdown else .disconnected);
+                    return;
+                }
+                c.phase = .application;
+                self.resumeApplication(c) catch self.fail(c);
+                return;
+            }
             if (c.busy and c.done.load(.acquire) and (!status.pending or status.failed)) {
                 c.busy = false;
                 if (c.phase != .closing and !status.failed and !c.node.isClosed() and c.outcome == .keep_alive and !self.stopping) {
@@ -340,6 +423,135 @@ fn Context(comptime State: type) type {
                 };
                 if (self.lookup(token) == null) return;
             }
+        }
+        fn resumeResponse(self: *Self, c: *Connection) !void {
+            if (!c.output.status().pending) {
+                const n = c.response_cursor.?.fill(&c.writer_buffer);
+                if (n != 0) {
+                    try c.output.offer(c.writer_buffer[0..n]);
+                } else {
+                    c.response_cursor = null;
+                    if (c.response_keep_alive and !self.stopping) {
+                        c.node.clearWriteDeadline();
+                        c.session.finish(c.consumed);
+                        try self.drive(c);
+                    } else self.failReason(c, .completed);
+                    return;
+                }
+            }
+            try self.interest(c, .{ .write = true });
+            self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
+        }
+        fn scheduleStep(self: *Self, c: *Connection, event: tasks.Event) void {
+            c.job = .{ .step = event };
+            c.task_failed = false;
+            c.busy = true;
+            c.done.store(false, .release);
+            self.jobs_mutex.lock();
+            const admitted = self.jobs.push(c);
+            if (admitted) self.jobs_changed.signal();
+            self.jobs_mutex.unlock();
+            if (!admitted) {
+                c.busy = false;
+                self.failReason(c, .application_error);
+                return;
+            }
+            self.interest(c, .{}) catch self.fail(c);
+            self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
+        }
+        fn resumeApplication(self: *Self, c: *Connection) !void {
+            const execution = c.execution.?;
+            const ws = execution.definition.mode == .websocket;
+            if (self.forced or (self.stopping and (ws or execution.next == .wait))) {
+                self.failReason(c, .shutdown);
+                return;
+            }
+            if (!c.output.status().pending and execution.wire_len != 0) {
+                if (ws) c.node.clearWriteDeadline();
+                try c.output.offer(execution.wire[0..execution.wire_len]);
+                execution.wire_len = 0;
+            }
+            if (c.output.status().pending) {
+                try self.interest(c, .{ .write = true });
+                self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
+                return;
+            }
+            if (ws) c.node.clearWriteDeadline();
+            if (execution.next == .done) {
+                self.failReason(c, execution.closing_reason);
+                return;
+            }
+            if (!execution.started) {
+                execution.started = true;
+                self.scheduleStep(c, .{ .opened = execution.control() });
+                return;
+            }
+            if (execution.external_wake.swap(false, .acq_rel)) {
+                self.scheduleStep(c, .produce);
+                return;
+            }
+            const now = clock.monotonicNs();
+            switch (execution.next) {
+                .produce => self.scheduleStep(c, .produce),
+                .after_ms => {
+                    if (now >= execution.wake_ns) {
+                        self.scheduleStep(c, .produce);
+                    } else {
+                        try self.interest(c, .{});
+                        const write = c.node.write_deadline_ns.load(.acquire);
+                        self.timers.set(c.slot, if (write == 0) execution.wake_ns else @min(write, execution.wake_ns));
+                    }
+                },
+                .input => {
+                    if (execution.read_deadline_ns == 0) execution.read_deadline_ns = now +| @as(u64, execution.definition.mode.websocket.read_timeout_ms) * std.time.ns_per_ms;
+                    if (now >= execution.read_deadline_ns) {
+                        self.failReason(c, .timeout);
+                        return;
+                    }
+                    if (try execution.consumeInput()) |event| {
+                        self.scheduleStep(c, event);
+                    } else if (execution.wire_len != 0) {
+                        try self.resumeApplication(c);
+                    } else if (execution.protocol_yielded) {
+                        self.notify(c.token);
+                        try self.interest(c, .{});
+                    } else {
+                        if (execution.read_deadline_ns == 0) execution.read_deadline_ns = now +| @as(u64, execution.definition.mode.websocket.read_timeout_ms) * std.time.ns_per_ms;
+                        try self.interest(c, .{ .read = true });
+                        self.timers.set(c.slot, execution.read_deadline_ns);
+                    }
+                },
+                .wait => {
+                    try self.interest(c, .{});
+                    self.timers.set(c.slot, c.node.write_deadline_ns.load(.acquire));
+                },
+                .done => unreachable,
+            }
+        }
+        fn readApplication(self: *Self, c: *Connection) void {
+            const execution = c.execution.?;
+            const buffer = execution.receiveBuffer() catch {
+                self.fail(c);
+                return;
+            };
+            if (clock.monotonicNs() >= execution.read_deadline_ns) {
+                self.failReason(c, .timeout);
+                return;
+            }
+            const n = std.c.recv(c.stream.socket.handle, buffer.ptr, buffer.len, std.c.MSG.DONTWAIT);
+            if (n < 0) switch (std.posix.errno(n)) {
+                .AGAIN, .INTR => return,
+                else => {
+                    self.fail(c);
+                    return;
+                },
+            };
+            if (n == 0) {
+                self.fail(c);
+                return;
+            }
+            execution.received(@intCast(n));
+            self.resumeApplication(c) catch self.fail(c);
         }
         fn admit(self: *Self, stream: net.Stream) !void {
             errdefer stream.close(self.io);
@@ -404,7 +616,12 @@ fn Context(comptime State: type) type {
                     self.registry.force();
                     for (self.slots) |slot| if (slot.connection) |c| self.fail(c);
                 }
-                while (self.notifications.pop()) |token| if (self.lookup(token)) |c| self.refresh(c);
+                // A hot session/producer cannot indefinitely extend this turn
+                // by pushing notifications while the event loop drains them.
+                for (0..128) |_| {
+                    const token = self.notifications.pop() orelse break;
+                    if (self.lookup(token)) |c| self.refresh(c);
+                }
                 if (self.notifications.takeOverflow()) for (self.slots) |slot| {
                     if (slot.connection) |c| self.refresh(c);
                 };
@@ -413,7 +630,7 @@ fn Context(comptime State: type) type {
                     self.timers.remove(timer.slot);
                     if (self.slots[timer.slot].connection) |c| {
                         const write = c.node.write_deadline_ns.load(.acquire);
-                        if ((write != 0 and write <= now) or (c.need != null and c.need.?.deadline_ns <= now)) self.fail(c) else self.refresh(c);
+                        if ((write != 0 and write <= now) or (c.need != null and c.need.?.deadline_ns <= now)) self.failReason(c, .timeout) else if (!c.busy and c.execution != null) self.resumeApplication(c) catch self.fail(c) else self.refresh(c);
                     }
                 }
                 if (self.stopping and self.count == 0) return;
@@ -450,7 +667,7 @@ fn Context(comptime State: type) type {
                     }
                     // refresh may free/reuse a slot; revalidate the generation.
                     const current = self.lookup(event.token) orelse continue;
-                    if (event.read and current.phase == .reading) self.readReady(current) else if (event.failed) self.fail(current);
+                    if (event.read and current.phase == .reading) self.readReady(current) else if (event.read and current.phase == .application and !current.busy) self.readApplication(current) else if (event.failed) self.fail(current);
                 }
             }
         }

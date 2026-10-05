@@ -248,7 +248,8 @@ fn waitReadable(fd: c_int, timeout_ms: u32) bool {
 
 /// Perform a WebSocket upgrade from Context(State). Socket ownership passes
 /// to the returned Conn; the shared HTTP driver must not close it again.
-pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
+pub fn prepareHandshake(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !void {
+    errdefer ctx.res.is_upgrade = false;
     const upg = ctx.req.header("upgrade");
     const conn_h = ctx.req.header("connection");
     const ver = ctx.req.header("sec-websocket-version");
@@ -288,6 +289,35 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     var accept_buf: [64]u8 = undefined;
     const accept_len = try handshake.acceptKey(client_key, &accept_buf);
     const accept_value = try ctx.arena.dupe(u8, accept_buf[0..accept_len]);
+    ctx.res.setStatus(101);
+    ctx.res.is_upgrade = true;
+    ctx.res.keep_alive = false;
+    try ctx.res.header("upgrade", "websocket");
+    try ctx.res.header("connection", "Upgrade");
+    try ctx.res.header("sec-websocket-accept", accept_value);
+}
+
+/// Experimental readiness-driven ownership handoff. No Conn/Context pointer
+/// may escape the initializer; state must be allocated for the session lifetime.
+pub fn upgradeSession(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions, definition: @import("../http/application_session.zig").Definition) !void {
+    if (ctx.res.socket_writer == null) return error.UnsupportedOnTarget;
+    if (definition.mode != .websocket) return error.InvalidSessionMode;
+    if (ctx.res.application_session != null or ctx.res.streaming != null or ctx.res.fixed_streaming != null or ctx.res.body.items.len != 0) return error.AlreadyStreaming;
+    try prepareHandshake(CtxT, ctx, opts);
+    var owned = definition;
+    owned.mode = .{ .websocket = .{ .max_message_bytes = opts.max_message_bytes, .read_timeout_ms = opts.read_timeout_ms } };
+    ctx.res.application_session = owned;
+}
+
+pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
+    if (!ctx.res.synchronous_application_io) return error.UnsupportedApplicationExecution;
+    if (ctx.res.application_session != null) return error.AlreadyStreaming;
+    try prepareHandshake(CtxT, ctx, opts);
+    errdefer {
+        ctx.res.is_upgrade = false;
+        ctx.res.headers.clearRetainingCapacity();
+        ctx.res.setStatus(500);
+    }
 
     const stream_ptr: *net.Stream = @ptrCast(@alignCast(ctx.stream_ptr.?));
     const io_ptr: *Io = @ptrCast(@alignCast(ctx.io_ptr.?));
@@ -305,13 +335,7 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     conn.write_timeout_ms = ctx.res.native_write_timeout_ms;
     conn.native_writer = ctx.res.socket_writer;
 
-    ctx.res.setStatus(101);
     if (conn.native_control) |node| node.synchronous_output.store(true, .release);
-    ctx.res.is_upgrade = true;
-    ctx.res.keep_alive = false;
-    try ctx.res.header("upgrade", "websocket");
-    try ctx.res.header("connection", "Upgrade");
-    try ctx.res.header("sec-websocket-accept", accept_value);
 
     // Send the 101 handshake response immediately so the caller can start
     // reading/writing WebSocket frames on the same socket. The HTTP server

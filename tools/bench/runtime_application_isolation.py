@@ -10,6 +10,7 @@ import contextlib
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import platform
 import signal
@@ -36,7 +37,7 @@ result = {
     "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
     "command": sys.argv,
     "runs": [],
-    "phase_6_complete": False,
+    "scope": "application isolation/admission gate; not full production certification",
 }
 
 @contextlib.contextmanager
@@ -52,6 +53,13 @@ def fixture(adapter, name, profile="stress"):
         return client
     with tempfile.TemporaryFile() as log:
         proc = subprocess.Popen([str(binary), adapter, str(port), profile], stdout=log, stderr=log)
+        def wait_work_started():
+            for _ in range(100):
+                if b"APPLICATION_WORK_ENTERED" in os.pread(log.fileno(), 65536, 0):
+                    return
+                time.sleep(.01)
+            raise AssertionError("finite-work start barrier")
+        connect.wait_work_started = wait_work_started
         try:
             for _ in range(100):
                 if proc.poll() is not None:
@@ -124,13 +132,13 @@ try:
                     assert c.pending.startswith(b"HTTP/1.1 " + (b"101" if "upgrade" in path else b"200"))
                 time.sleep(.03)
                 run["http_isolated"], run["probe_ms"] = http_probe(connect)
-                if adapter == "threaded":
+                if not args.record_blockers:
                     assert run["http_isolated"], run
                 # Keep borrowed clients live through forced drain in finally.
         with fixture(adapter, "application-queue-overflow-recovery", "admission") as (connect, run):
             owner = connect()
-            owner.send(contract.request("/upgrade-wait", extra=upgrade))
-            assert owner.response()[0] == 101
+            owner.send(contract.request("/application-hold"))
+            connect.wait_work_started()
             queued = connect()
             queued.send(contract.request(close=True))
             time.sleep(.05)
@@ -149,11 +157,11 @@ try:
             run["admission_recovered"] = True
     isolation = [r["http_isolated"] for r in result["runs"] if "http_isolated" in r]
     result["isolation_passed"] = all(isolation)
-    result["note"] = "Passing isolation alone does not complete Phase 6: incremental lifecycle/ownership and fairness parity are also required."
+    result["note"] = "Incremental isolation gate; full Phase 6 completion additionally requires lifecycle/ownership and fairness Contract parity."
 finally:
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     Path(args.output).write_text(json.dumps(result, indent=2) + "\n")
 
 if not result["isolation_passed"] and not args.record_blockers:
     raise SystemExit("Phase 6 incomplete: synchronous upgrade/stream still owns workers; retain gate, do not begin Phase 7 optimization.")
-print("application isolation evidence saved; phase_6_complete=false")
+print("application isolation evidence saved; isolation_passed=" + str(result["isolation_passed"]).lower())

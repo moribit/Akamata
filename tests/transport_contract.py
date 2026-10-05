@@ -77,8 +77,88 @@ def request(path="/hello", close=False, extra=b""):
             + (b"Connection: close\r\n" if close else b"") + b"\r\n")
 
 
+UPGRADE = b"Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+
+
+def masked_frame(opcode, payload, fin=True):
+    mask = b"mask"
+    length = bytes([0x80 | len(payload)]) if len(payload) < 126 else b"\xfe" + struct.pack("!H", len(payload))
+    return bytes([(0x80 if fin else 0) | opcode]) + length + mask + bytes(b ^ mask[i % 4] for i, b in enumerate(payload))
+
+
+def receive_bytes(client, expected):
+    while len(client.pending) < len(expected):
+        chunk = client.sock.recv(65536)
+        if not chunk:
+            raise AssertionError("EOF before frame")
+        client.pending += chunk
+    if client.pending[:len(expected)] != expected:
+        raise AssertionError((client.pending[:len(expected)], expected))
+    client.pending = client.pending[len(expected):]
+
+
 class Contract(unittest.TestCase):
     adapter = "threaded"
+
+    def test_application_execution_capability_is_explicit(self):
+        with self.server() as (_, connect):
+            for path in ("/sync-stream", "/sync-upgrade"):
+                c = connect()
+                c.send(request(path, close=True, extra=UPGRADE if "upgrade" in path else b""))
+                raw = c.collect()
+                if self.adapter in ("kqueue", "epoll"):
+                    self.assertTrue(raw.startswith(b"HTTP/1.1 501"), raw)
+                    self.assertIn(b"unsupported_application_execution", raw)
+                    self.assertEqual(raw.count(b"HTTP/1.1"), 1)
+                else:
+                    self.assertTrue(raw.startswith(b"HTTP/1.1 " + (b"101" if "upgrade" in path else b"200")), raw)
+
+    def test_fragment_control_utf8_and_invalid_upgrade_cleanup(self):
+        with self.server("shutdown") as (_, connect):
+            c = connect()
+            frames = masked_frame(1, b"\xe2\x82", False) + masked_frame(9, b"p") + masked_frame(0, b"\xac")
+            c.send(request("/upgrade-echo", extra=UPGRADE) + frames)
+            self.assertEqual(c.response()[0], 101)
+            receive_bytes(c, b"\x8a\x01p\x81\x03\xe2\x82\xac")
+            c.eof()
+            for bad in (masked_frame(1, b"\xff"), b"\x81\x01x", masked_frame(8, b"\x00")):
+                c = connect()
+                c.send(request("/upgrade-echo", extra=UPGRADE))
+                self.assertEqual(c.response()[0], 101)
+                c.send(bad)
+                c.eof()
+                normal = connect()
+                normal.send(request(close=True))
+                self.assertEqual(normal.response()[0], 200)
+
+    def test_application_isolation_with_active_idle_upgrades_and_slow_streams(self):
+        with self.server("stress") as (_, connect):
+            idle = [connect() for _ in range(4)]
+            for c in idle:
+                c.send(request("/upgrade-wait", extra=UPGRADE))
+                self.assertEqual(c.response()[0], 101)
+            streams = [connect() for _ in range(4)]
+            for c in streams:
+                c.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
+                c.send(request("/large"))
+                while b"\r\n\r\n" not in c.pending:
+                    c.pending += c.sock.recv(1024)
+            active = [connect() for _ in range(2)]
+            for c in active:
+                c.send(request("/upgrade-room", extra=UPGRADE))
+                self.assertEqual(c.response()[0], 101)
+                receive_bytes(c, b"\x81\x05ready")
+            for i in range(8):
+                active[0].send(masked_frame(1, b"fair"))
+                for c in active:
+                    receive_bytes(c, b"\x81\x04fair")
+                normal = connect()
+                normal.sock.settimeout(.25)
+                started = time.monotonic()
+                normal.send(request(close=True))
+                self.assertEqual(normal.response()[0], 200)
+                self.assertLess(time.monotonic() - started, .25)
+                time.sleep(.02)
 
     @contextlib.contextmanager
     def server(self, profile="normal"):
@@ -86,7 +166,8 @@ class Contract(unittest.TestCase):
             probe.bind(("127.0.0.1", 0))
             port = probe.getsockname()[1]
         with tempfile.TemporaryFile() as log:
-            proc = subprocess.Popen([BINARY, self.adapter, str(port), profile], stdout=log, stderr=log)
+            server_profile = "incremental-" + profile if getattr(self, "incremental", False) else profile
+            proc = subprocess.Popen([BINARY, self.adapter, str(port), server_profile], stdout=log, stderr=log)
             clients = []
 
             def connect():
@@ -519,6 +600,9 @@ if __name__ == "__main__":
     suite = unittest.TestSuite()
     for adapter in adapters:
         kind = type("Contract_" + adapter, (Contract,), {"adapter": adapter})
+        suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(kind))
+    if "--only-group" not in sys.argv[2:]:
+        kind = type("Contract_threaded_incremental", (Contract,), {"adapter": "threaded", "incremental": True})
         suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(kind))
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     sys.exit(0 if result.wasSuccessful() else 1)

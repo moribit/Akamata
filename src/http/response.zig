@@ -90,6 +90,10 @@ pub const Response = struct {
     /// `writeTo` becomes a no-op (the server only calls `endStream`).
     streaming: ?*ChunkedWriter = null,
     fixed_streaming: ?*FixedLengthWriter = null,
+    /// Experimental finite application execution, owned after handler returns.
+    application_session: ?@import("application_session.zig").Definition = null,
+    application_session_error: bool = false,
+    synchronous_application_io: bool = true,
 
     pub fn init(arena: std.mem.Allocator) Response {
         return .{ .arena = arena };
@@ -103,11 +107,41 @@ pub const Response = struct {
     /// only known to the handler, and pipelining a follow-up request on
     /// the same connection would race with the chunked terminator.
     pub fn startStream(self: *Response, opts: StreamOptions) !*std.Io.Writer {
+        if (!self.synchronous_application_io) return error.UnsupportedApplicationExecution;
+        if (self.application_session != null) return StreamError.AlreadyStreaming;
         if (self.streaming != null or self.fixed_streaming != null) return StreamError.AlreadyStreaming;
         if (self.body.items.len > 0) return StreamError.AlreadyStreaming;
         const sw = self.socket_writer orelse return StreamError.UnsupportedOnTarget;
         if (self.native_control) |node| node.synchronous_output.store(true, .release);
 
+        try self.writeStreamPrelude(sw, opts);
+        try sw.flush();
+
+        if (opts.content_length) |length| {
+            const fixed_buffer = try self.arena.alloc(u8, 8 * 1024);
+            const fixed = try self.arena.create(FixedLengthWriter);
+            fixed.* = FixedLengthWriter.init(sw, fixed_buffer, length);
+            self.fixed_streaming = fixed;
+            return &fixed.writer;
+        }
+        const cw_buf = try self.arena.alloc(u8, 8 * 1024);
+        const cw = try self.arena.create(ChunkedWriter);
+        cw.* = ChunkedWriter.init(sw, cw_buf);
+        self.streaming = cw;
+        return &cw.writer;
+    }
+
+    /// Register a finite producer. state is connection-owned, not handler-stack
+    /// storage. No callback or socket write occurs before the handler returns.
+    pub fn streamSession(self: *Response, definition: @import("application_session.zig").Definition) !void {
+        if (self.socket_writer == null) return error.UnsupportedOnTarget;
+        if (definition.mode != .stream) return error.InvalidSessionMode;
+        if (self.application_session != null or self.streaming != null or self.fixed_streaming != null or self.body.items.len != 0) return error.AlreadyStreaming;
+        self.application_session = definition;
+        self.keep_alive = false;
+    }
+
+    pub fn writeStreamPrelude(self: *Response, sw: *std.Io.Writer, opts: StreamOptions) !void {
         self.keep_alive = false;
 
         // Ensure transfer-encoding: chunked and (optionally) content-type
@@ -139,21 +173,6 @@ pub const Response = struct {
         for (self.headers.items) |h| try sw.print("{s}: {s}\r\n", .{ h.name, h.value });
         try sw.print("connection: close\r\n", .{});
         try sw.writeAll("\r\n");
-        try sw.flush();
-
-        if (opts.content_length) |length| {
-            const fixed_buffer = try self.arena.alloc(u8, 8 * 1024);
-            const fixed = try self.arena.create(FixedLengthWriter);
-            fixed.* = FixedLengthWriter.init(sw, fixed_buffer, length);
-            self.fixed_streaming = fixed;
-            return &fixed.writer;
-        }
-        // Allocate the ChunkedWriter + its buffer in the per-request arena.
-        const cw_buf = try self.arena.alloc(u8, 8 * 1024);
-        const cw = try self.arena.create(ChunkedWriter);
-        cw.* = ChunkedWriter.init(sw, cw_buf);
-        self.streaming = cw;
-        return &cw.writer;
     }
 
     /// Finalize a streaming response. Idempotent. Called by the server
@@ -217,29 +236,11 @@ pub const Response = struct {
     /// been written directly to the socket.
     pub fn writeTo(self: *Response, w: anytype) !void {
         if (self.streaming != null or self.fixed_streaming != null) return;
-        const wire_status: u16 = if (validStatus(self.status_code)) self.status_code else 500;
-        const code: status.Code = @fromBackingInt(wire_status);
-        try w.print("HTTP/1.1 {d} {s}\r\n", .{ wire_status, code.phrase() });
-
-        var saw_content_length = false;
-        var saw_connection = false;
-        for (self.headers.items) |h| {
-            if (eqlIgnoreCase(h.name, "content-length")) saw_content_length = true;
-            if (eqlIgnoreCase(h.name, "connection")) saw_connection = true;
-            try w.print("{s}: {s}\r\n", .{ h.name, h.value });
+        var cursor = try @import("response_cursor.zig").Cursor.init(self);
+        while (cursor.nextSlice()) |bytes| {
+            try w.writeAll(bytes);
+            cursor.consume(bytes.len);
         }
-
-        if (!self.is_upgrade) {
-            if (!saw_content_length) {
-                try w.print("content-length: {d}\r\n", .{self.body.items.len});
-            }
-            if (!saw_connection) {
-                const conn_value: []const u8 = if (self.keep_alive) "keep-alive" else "close";
-                try w.print("connection: {s}\r\n", .{conn_value});
-            }
-        }
-        try w.writeAll("\r\n");
-        if (!self.suppress_body and self.body.items.len > 0) try w.writeAll(self.body.items);
     }
 };
 
