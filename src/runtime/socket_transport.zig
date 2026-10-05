@@ -22,6 +22,8 @@ pub fn Transport(comptime Readiness: type) type {
             return .{ .io = io, .stream = stream, .shutdown = shutdown, .readiness = try Readiness.init(stream.socket.handle) };
         }
         pub fn read(self: *Self, vec: [][]u8, timeout_ms: u32, shutdown_if_idle: bool) !usize {
+            const measured = @import("cost.zig").begin();
+            defer measured.end(.read);
             if (self.reader_state == null) self.reader_state = self.stream.reader(self.io, &self.reader_buf);
             const reader = &self.reader_state.?.interface;
             if (timeout_ms == 0) return error.Timeout;
@@ -43,6 +45,7 @@ pub fn Transport(comptime Readiness: type) type {
                     if (try self.readiness.wait(self.stream.socket.handle, slice)) break;
                 }
             }
+            @import("cost.zig").add(.readvec_call, 1);
             const n = reader.readVec(vec) catch {
                 if (self.reader_state.?.err) |err| if (err == error.Canceled) return error.Canceled;
                 return error.EndOfStream;

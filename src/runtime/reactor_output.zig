@@ -1,6 +1,7 @@
 //! A single bounded producer slot. Only the event loop sends socket bytes.
 const std = @import("std");
 const sync = @import("../sync.zig");
+const cost = @import("cost.zig");
 const clock = @import("../observability/clock.zig");
 pub fn Output(comptime Owner: type) type {
     return struct {
@@ -47,6 +48,7 @@ pub fn Output(comptime Owner: type) type {
             if (data.len == 0) return;
             if (self.node.write_deadline_ns.load(.acquire) == 0)
                 self.node.write_deadline_ns.store(clock.monotonicNs() +| @as(u64, self.timeout_ms) * std.time.ns_per_ms, .release);
+            cost.add(.copy_bytes, data.len);
             @memcpy(self.bytes[0..data.len], data);
             self.len = data.len;
             self.offset = 0;
@@ -94,7 +96,10 @@ pub fn Output(comptime Owner: type) type {
             if (self.len == 0) return;
             const deadline = self.node.write_deadline_ns.load(.acquire);
             if (deadline != 0 and clock.monotonicNs() >= deadline) return error.ConnectionWriteFailed;
+            const send_cost = cost.begin();
+            cost.add(.send_call, 1);
             const n = std.c.send(fd, self.bytes[self.offset..self.len].ptr, self.len - self.offset, std.c.MSG.DONTWAIT | std.c.MSG.NOSIGNAL);
+            send_cost.end(.send);
             if (n < 0) switch (std.posix.errno(n)) {
                 .AGAIN, .INTR => return,
                 else => return error.ConnectionWriteFailed,

@@ -7,6 +7,9 @@ pub const Readiness = struct {
     }
     pub fn deinit(_: *Readiness) void {}
     pub fn wait(_: *Readiness, fd: c_int, timeout_ms: u32) !bool {
+        const measured = @import("cost.zig").begin();
+        defer measured.end(.selector_wait);
+        @import("cost.zig").add(.poll_call, 1);
         var fds = [_]std.posix.pollfd{.{ .fd = fd, .events = std.posix.POLL.IN, .revents = 0 }};
         // posix.poll retries EINTR with the original timeout; use one libc
         // call so the transport recomputes its absolute deadline after EINTR.

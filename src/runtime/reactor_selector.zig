@@ -1,5 +1,6 @@
 //! Level-triggered OS readiness. Tokens are generation-tagged, never pointers.
 const std = @import("std");
+const cost = @import("cost.zig");
 const builtin = @import("builtin");
 pub const Interests = struct { read: bool = false, write: bool = false };
 pub const Event = struct { token: u64, read: bool, write: bool, failed: bool };
@@ -20,11 +21,17 @@ const Epoll = struct {
         _ = std.c.close(self.fd);
     }
     pub fn set(self: *Epoll, fd: c_int, token: u64, next: Interests, previous: *Interests) !void {
+        const measured = cost.begin();
+        defer measured.end(.selector_update);
+        if (previous.read == next.read and previous.write == next.write) cost.add(.selector_same, 1);
+        if (!previous.write and next.write) cost.add(.writable_enable, 1);
+        if (previous.write and !next.write) cost.add(.writable_disable, 1);
         const old_any = previous.read or previous.write;
         const new_any = next.read or next.write;
         if (!old_any and !new_any) return;
         var event: std.c.epoll_event = .{ .events = (if (next.read) @as(u32, std.os.linux.EPOLL.IN | std.os.linux.EPOLL.RDHUP) else 0) | (if (next.write) @as(u32, std.os.linux.EPOLL.OUT) else 0), .data = .{ .u64 = token } };
         const op: u32 = if (!new_any) std.os.linux.EPOLL.CTL_DEL else if (old_any) std.os.linux.EPOLL.CTL_MOD else std.os.linux.EPOLL.CTL_ADD;
+        cost.add(if (!new_any) .selector_delete else if (old_any) .selector_modify else .selector_add, 1);
         const rc = std.c.epoll_ctl(self.fd, @intCast(op), fd, &event);
         if (rc < 0) {
             const e = std.posix.errno(rc);
@@ -33,6 +40,8 @@ const Epoll = struct {
         previous.* = next;
     }
     pub fn wait(self: *Epoll, output: []Event, timeout_ms: u32) !usize {
+        const measured = cost.begin();
+        defer measured.end(.selector_wait);
         var events: [128]std.c.epoll_event = undefined;
         const n = std.c.epoll_wait(self.fd, &events, @intCast(@min(events.len, output.len)), @intCast(timeout_ms));
         if (n < 0) {
@@ -56,6 +65,7 @@ const Kqueue = struct {
         _ = std.c.close(self.fd);
     }
     fn change(self: *Kqueue, fd: c_int, token: u64, filter: i16, enabled: bool) !void {
+        cost.add(if (enabled) .selector_add else .selector_delete, 1);
         var event: std.c.Kevent = .{ .ident = @intCast(fd), .filter = filter, .flags = if (enabled) std.c.EV.ADD | std.c.EV.ENABLE else std.c.EV.DELETE, .fflags = 0, .data = 0, .udata = @intCast(token) };
         var empty: [0]std.c.Kevent = .{};
         const rc = std.c.kevent(self.fd, @ptrCast(&event), 1, &empty, 0, null);
@@ -65,11 +75,18 @@ const Kqueue = struct {
         }
     }
     pub fn set(self: *Kqueue, fd: c_int, token: u64, next: Interests, previous: *Interests) !void {
+        const measured = cost.begin();
+        defer measured.end(.selector_update);
+        if (previous.read == next.read and previous.write == next.write) cost.add(.selector_same, 1);
+        if (!previous.write and next.write) cost.add(.writable_enable, 1);
+        if (previous.write and !next.write) cost.add(.writable_disable, 1);
         if (previous.read != next.read) try self.change(fd, token, std.c.EVFILT.READ, next.read);
         if (previous.write != next.write) try self.change(fd, token, std.c.EVFILT.WRITE, next.write);
         previous.* = next;
     }
     pub fn wait(self: *Kqueue, output: []Event, timeout_ms: u32) !usize {
+        const measured = cost.begin();
+        defer measured.end(.selector_wait);
         var events: [128]std.c.Kevent = undefined;
         const timeout: std.c.timespec = .{ .sec = @intCast(timeout_ms / 1000), .nsec = @intCast((timeout_ms % 1000) * std.time.ns_per_ms) };
         const n = std.c.kevent(self.fd, &.{}, 0, &events, @intCast(@min(events.len, output.len)), &timeout);

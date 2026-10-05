@@ -102,6 +102,8 @@ def server(binary, run):
             for row in log.read().decode(errors="replace").splitlines():
                 if row.startswith("BENCH_STATS "):
                     run["allocator"] = json.loads(row.split(" ", 1)[1])
+                elif row.startswith("RUNTIME_COST "):
+                    run["runtime_cost"] = json.loads(row.split(" ", 1)[1])
                 elif row.startswith("BENCH_TASKS "):
                     run["tasks"] = json.loads(row.split(" ", 1)[1])
             if proc.returncode:

@@ -1,5 +1,6 @@
 //! Fixed-capacity output, absolute response/frame budget, no EAGAIN spin.
 const std = @import("std");
+const cost = @import("cost.zig");
 const clock = @import("../observability/clock.zig");
 pub const Writer = struct {
     interface: std.Io.Writer,
@@ -22,7 +23,10 @@ pub const Writer = struct {
             self.io.checkCancel() catch return error.WriteFailed;
             const elapsed = clock.elapsedNs(self.started.?) / std.time.ns_per_ms;
             if (elapsed >= self.timeout_ms) return error.WriteFailed;
+            const send_cost = cost.begin();
+            cost.add(.send_call, 1);
             const n = std.c.send(self.fd, bytes[offset..].ptr, bytes.len - offset, std.c.MSG.DONTWAIT | std.c.MSG.NOSIGNAL);
+            send_cost.end(.send);
             if (n > 0) {
                 offset += @intCast(n);
                 continue;

@@ -31,6 +31,8 @@ pub const Session = struct {
         self.arena.deinit();
     }
     pub fn next(self: *Session, opts: *const app_mod.ServeOptions) !Event {
+        const measured = @import("../runtime/cost.zig").begin();
+        defer measured.end(.parse);
         if (!self.body_phase) {
             if (parser.headersEnd(self.input.items) == null) {
                 if (self.input.items.len >= self.header_capacity) return .{ .issue = .{ .code = 431, .kind = "headers_too_large" } };
@@ -52,6 +54,7 @@ pub const Session = struct {
                 else => .{ .code = 400, .kind = "bad_request" },
             } },
         };
+        @import("../runtime/cost.zig").add(.request, 1);
         return .{ .request = parsed };
     }
     fn need(self: *Session, opts: *const app_mod.ServeOptions, maximum: usize) Need {

@@ -12,6 +12,7 @@ pub fn serve(comptime State: type, app: *app_mod.App(State), opts: app_mod.Serve
 // Internal evaluation seam; never selected by App.serve(.reactor).
 pub fn serveWithReadiness(comptime State: type, comptime Readiness: type, app: *app_mod.App(State), opts: app_mod.ServeOptions) !void {
     if (!is_native) return;
+    defer @import("cost.zig").report();
     app.trust_proxy_headers = opts.trust_proxy_headers;
     app.trusted_proxy_fn = opts.trusted_proxy_fn;
     try app.prepare();
@@ -261,6 +262,7 @@ fn waitAcceptReady(fd: c_int, timeout_ms: c_int) bool {
 const Accepted = struct { fd: c_int, address: net.IpAddress };
 
 pub fn rawAccept(fd: c_int) Accepted {
+    @import("cost.zig").add(.accept_call, 1);
     var address: std.posix.sockaddr.in = undefined;
     var len: u32 = @sizeOf(std.posix.sockaddr.in);
     const accepted_fd = accept(fd, &address, &len);

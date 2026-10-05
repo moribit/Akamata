@@ -16,6 +16,8 @@ pub const Cursor = struct {
     header_part: u8 = 0,
     current: []const u8 = "",
     pub fn init(res: *const response.Response) !Cursor {
+        const measured = @import("../runtime/cost.zig").begin();
+        defer measured.end(.serialize);
         var self: Cursor = .{ .headers = res.headers.items, .body = if (res.suppress_body) "" else res.body.items, .status_len = 0, .connection = "" };
         const wire_status: u16 = if (res.status_code >= 100 and res.status_code <= 599) res.status_code else 500;
         const code: status.Code = @fromBackingInt(wire_status);
@@ -83,6 +85,8 @@ pub const Cursor = struct {
         self.current = self.current[n..];
     }
     pub fn fill(self: *Cursor, buffer: []u8) usize {
+        const measured = @import("../runtime/cost.zig").begin();
+        defer measured.end(.serialize);
         var count: usize = 0;
         while (count < buffer.len) {
             const bytes = self.nextSlice() orelse break;

@@ -50,11 +50,14 @@ pub const Mutex = struct {
             _ = pthread_mutex_init(&self.raw, null);
             self.initialized = true;
         }
+        const measured = @import("runtime/cost.zig").begin();
+        defer measured.end(.mutex_lock);
         _ = pthread_mutex_lock(&self.raw);
     }
 
     pub fn unlock(self: *Mutex) void {
         if (!is_posix or !self.initialized) return;
+        @import("runtime/cost.zig").add(.mutex_unlock, 1);
         _ = pthread_mutex_unlock(&self.raw);
     }
 };
@@ -107,16 +110,20 @@ pub const Condition = struct {
             _ = pthread_cond_init(&self.raw, null);
             self.initialized = true;
         }
+        const measured = @import("runtime/cost.zig").begin();
+        defer measured.end(.condition_wait);
         _ = pthread_cond_wait(&self.raw, &mu.raw);
     }
 
     pub fn signal(self: *Condition) void {
         if (!is_posix or !self.initialized) return;
+        @import("runtime/cost.zig").add(.condition_signal, 1);
         _ = pthread_cond_signal(&self.raw);
     }
 
     pub fn broadcast(self: *Condition) void {
         if (!is_posix or !self.initialized) return;
+        @import("runtime/cost.zig").add(.condition_broadcast, 1);
         _ = pthread_cond_broadcast(&self.raw);
     }
 };

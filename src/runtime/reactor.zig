@@ -8,9 +8,11 @@ const sync = @import("../sync.zig");
 const clock = @import("../observability/clock.zig");
 const drain = @import("drain.zig");
 const net = std.Io.net;
+const cost = @import("cost.zig");
 const tasks = @import("../http/application_session.zig");
 
 pub fn evaluate(comptime State: type, app: *app_mod.App(State), opts: app_mod.ServeOptions) !void {
+    defer cost.report();
     if (@sizeOf(usize) != 8) return error.UnsupportedPlatform;
     if (opts.max_connections == 0 or opts.max_connections > std.math.maxInt(u32) - 2) return error.InvalidConnectionLimit;
     app.trust_proxy_headers = opts.trust_proxy_headers;
@@ -67,6 +69,7 @@ fn Context(comptime State: type) type {
             done: std.atomic.Value(bool) = .init(false),
             outcome: http.Outcome = .close,
             consumed: usize = 0,
+            measured: if (cost.enabled) struct { queued: u64 = 0, completed: u64 = 0 } else struct {} = .{},
         };
         const Slot = struct { connection: ?*Connection = null, generation: u32 = 0 };
         const Transport = struct {
@@ -112,6 +115,11 @@ fn Context(comptime State: type) type {
                     }
                 }.notify };
                 c.execution = execution;
+                if (comptime cost.enabled) {
+                    if (!c.owner.memory_reported.swap(true, .monotonic)) {
+                        std.debug.print("RUNTIME_MEMORY {{\"connection_size\":{d},\"http_session_size\":{d},\"output_size\":{d},\"writer_buffer\":{d},\"http_input_capacity\":{d},\"arena_capacity\":{d},\"application_session_size\":{d},\"slot_size\":{d},\"fixed_queue_capacity\":{d}}}\n", .{ @sizeOf(Connection), @sizeOf(sessions.Session), @sizeOf(Output), c.writer_buffer.len, c.session.input.capacity, c.session.arena.queryCapacity(), @sizeOf(tasks.Session), @sizeOf(Slot), c.owner.slots.len });
+                    }
+                }
             }
             pub fn deferResponse(t: *@This(), response: anytype) !void {
                 t.connection.response_cursor = try @import("../http/response_cursor.zig").Cursor.init(response);
@@ -145,6 +153,7 @@ fn Context(comptime State: type) type {
         drain_deadline: u64 = 0,
         accept_resume: u64 = 0,
         accept_backoff_ms: u32 = 0,
+        memory_reported: std.atomic.Value(bool) = .init(false),
         fn init(app: *app_mod.App(State), io: std.Io, opts: *const app_mod.ServeOptions, listener: c_int) !Self {
             const gpa = app.gpa;
             const task_limit = opts.max_pending_application_tasks orelse opts.max_connections;
@@ -211,13 +220,21 @@ fn Context(comptime State: type) type {
         }
         fn workerMain(self: *Self) void {
             while (true) {
+                const lock_cost = cost.begin();
                 self.jobs_mutex.lock();
-                while (self.jobs.len == 0 and self.cleanup_jobs.len == 0 and !self.stop_workers) self.jobs_changed.wait(&self.jobs_mutex);
+                lock_cost.end(.worker_lock);
+                while (self.jobs.len == 0 and self.cleanup_jobs.len == 0 and !self.stop_workers) {
+                    const wait_cost = cost.begin();
+                    self.jobs_changed.wait(&self.jobs_mutex);
+                    wait_cost.end(.worker_wait);
+                }
                 const c = self.cleanup_jobs.pop() orelse self.jobs.pop() orelse {
                     self.jobs_mutex.unlock();
                     return;
                 };
                 self.jobs_mutex.unlock();
+                if (comptime cost.enabled) cost.elapsed(.queue_wait, c.measured.queued);
+                const work_cost = cost.begin();
                 var transport: Transport = .{ .connection = c };
                 if (c.job == .dispose) {
                     c.execution.?.dispose(c.job.dispose);
@@ -237,13 +254,19 @@ fn Context(comptime State: type) type {
                     };
                 }
                 // Publication relinquishes every borrowed connection pointer.
+                work_cost.end(.worker_work);
+                const publish_cost = cost.begin();
+                if (comptime cost.enabled) c.measured.completed = cost.now();
                 const token = c.token;
                 c.done.store(true, .release);
                 self.notify(token);
+                publish_cost.end(.completion_publish);
             }
         }
         pub fn notify(self: *Self, token: u64) void {
+            cost.add(.notify, 1);
             if (!self.notifications.push(token)) return;
+            cost.add(.wake_write, 1);
             const byte = [_]u8{1};
             _ = std.c.write(self.wake[1], &byte, 1);
         }
@@ -305,6 +328,7 @@ fn Context(comptime State: type) type {
                     c.busy = true;
                     c.done.store(false, .release);
                     self.jobs_mutex.lock();
+                    if (comptime cost.enabled) c.measured.queued = cost.now();
                     std.debug.assert(self.cleanup_jobs.push(c));
                     self.jobs_changed.signal();
                     self.jobs_mutex.unlock();
@@ -335,6 +359,8 @@ fn Context(comptime State: type) type {
                     c.done.store(false, .release);
                     c.consumed = if (event == .request) event.request.consumed else 0;
                     self.timers.remove(c.slot);
+                    const enqueue_cost = cost.begin();
+                    if (comptime cost.enabled) c.measured.queued = cost.now();
                     self.jobs_mutex.lock();
                     if (!self.jobs.push(c)) {
                         self.jobs_mutex.unlock();
@@ -346,10 +372,14 @@ fn Context(comptime State: type) type {
                     }
                     self.jobs_changed.signal();
                     self.jobs_mutex.unlock();
+                    enqueue_cost.end(.enqueue);
                 },
             }
         }
         fn refresh(self: *Self, c: *Connection) void {
+            if (comptime cost.enabled) {
+                if (c.busy and c.done.load(.acquire)) cost.elapsed(.completion_wait, c.measured.completed);
+            }
             const status = c.output.status();
             // A worker may publish a new session pointer. Never read it before
             // acquire-observing that job's completion (including overflow scan).
@@ -408,7 +438,10 @@ fn Context(comptime State: type) type {
                     self.fail(c);
                     return;
                 };
+                const read_cost = cost.begin();
+                cost.add(.recv_call, 1);
                 const n = std.c.recv(c.stream.socket.handle, buffer.ptr, buffer.len, std.c.MSG.DONTWAIT);
+                read_cost.end(.read);
                 if (n < 0) switch (std.posix.errno(n)) {
                     .AGAIN, .INTR => return,
                     else => {
@@ -453,6 +486,7 @@ fn Context(comptime State: type) type {
             c.task_failed = false;
             c.busy = true;
             c.done.store(false, .release);
+            if (comptime cost.enabled) c.measured.queued = cost.now();
             self.jobs_mutex.lock();
             const admitted = self.jobs.push(c);
             if (admitted) self.jobs_changed.signal();
@@ -624,6 +658,7 @@ fn Context(comptime State: type) type {
             try self.selector.set(self.listener, 0, .{ .read = true }, &self.listener_interests);
             var events: [128]readiness.Event = undefined;
             while (true) {
+                cost.add(.loop, 1);
                 const now = clock.monotonicNs();
                 if (!self.stopping and self.app.shutdown_flag.load(.acquire)) {
                     self.stopping = true;
@@ -674,7 +709,10 @@ fn Context(comptime State: type) type {
                     }
                     if (event.token == 1) {
                         var bytes: [256]u8 = undefined;
-                        while (std.c.read(self.wake[0], &bytes, bytes.len) > 0) {}
+                        while (true) {
+                            cost.add(.wake_read, 1);
+                            if (std.c.read(self.wake[0], &bytes, bytes.len) <= 0) break;
+                        }
                         continue;
                     }
                     const c = self.lookup(event.token) orelse continue;

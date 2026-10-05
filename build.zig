@@ -19,6 +19,7 @@ pub fn build(b: *std.Build) void {
     const bench_middleware_count = b.option(usize, "bench-middlewares", "router benchmark middleware count") orelse 0;
     // Register before lazy package discovery can return and restart configure.
     const runtime_tsan = b.option(bool, "runtime-tsan", "instrument only the private runtime Contract fixture with ThreadSanitizer") orelse false;
+    const runtime_cost = b.option(bool, "runtime-cost", "private Native runtime cost attribution (not performance benchmark)") orelse false;
 
     const native_target = b.standardTargetOptions(.{});
     const target = switch (backend) {
@@ -40,6 +41,7 @@ pub fn build(b: *std.Build) void {
     const opts = b.addOptions();
     opts.addOption(Backend, "backend", backend);
     opts.addOption(bool, "with_openssl", with_openssl);
+    opts.addOption(bool, "runtime_cost", runtime_cost);
     am_mod.addOptions("build_options", opts);
 
     const sqlite_flags = &[_][]const u8{

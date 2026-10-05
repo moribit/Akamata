@@ -52,6 +52,7 @@ pub fn dispatchOne(comptime State: type, app: *app_mod.App(State), session: *ses
     }
     const writer = transport.writer();
     response.socket_writer = writer;
+    const dispatch_cost = @import("../runtime/cost.zig").begin();
     app.dispatchWithPeer(arena, &request, &response, transport.streamPtr(), transport.ioPtr(), try transport.peerIp(arena)) catch |err| {
         if (response.application_session) |definition| {
             _ = definition.callback(definition.state, .{ .closed = .application_error }, &.{}) catch {};
@@ -64,6 +65,7 @@ pub fn dispatchOne(comptime State: type, app: *app_mod.App(State), session: *ses
         }
         return err;
     };
+    dispatch_cost.end(.dispatch);
     if (response.application_session) |definition| {
         if (response.application_session_error) {
             _ = definition.callback(definition.state, .{ .closed = .application_error }, &.{}) catch {};
