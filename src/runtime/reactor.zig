@@ -383,13 +383,17 @@ fn Context(comptime State: type) type {
             }
         }
         fn refresh(self: *Self, c: *Connection) void {
+            // Observe publication once. A worker can complete during refresh;
+            // reloading done in a later branch could route a newly published
+            // incremental session through the ordinary HTTP close path.
+            const completed = c.busy and c.done.load(.acquire);
             if (comptime cost.enabled) {
-                if (c.busy and c.done.load(.acquire)) cost.elapsed(.completion_wait, c.measured.completed);
+                if (completed) cost.elapsed(.completion_wait, c.measured.completed);
             }
             const status = c.output.status();
             // A worker may publish a new session pointer. Never read it before
             // acquire-observing that job's completion (including overflow scan).
-            if (c.busy and c.done.load(.acquire) and (c.execution != null or c.response_cursor != null)) c.busy = false;
+            if (completed and (c.execution != null or c.response_cursor != null)) c.busy = false;
             if (!c.busy and c.response_cursor != null) {
                 if (c.phase == .closing or status.failed or c.node.isClosed()) {
                     self.fail(c);
@@ -407,7 +411,7 @@ fn Context(comptime State: type) type {
                 self.resumeApplication(c) catch self.fail(c);
                 return;
             }
-            if (c.busy and c.done.load(.acquire) and (!status.pending or status.failed)) {
+            if (completed and (!status.pending or status.failed)) {
                 c.busy = false;
                 if (c.phase != .closing and !status.failed and !c.node.isClosed() and c.outcome == .keep_alive and !self.stopping) {
                     c.node.clearWriteDeadline();

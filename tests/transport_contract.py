@@ -259,7 +259,9 @@ class Contract(unittest.TestCase):
                     log.seek(0)
                     self.fail(f"fixture exit {proc.returncode}: {log.read().decode()}")
                 log.seek(0)
-                self.assertNotIn(b"memory address", log.read(), "fixture allocator leak")
+                output = log.read()
+                self.fixture_log = output[-12000:].decode(errors="replace")
+                self.assertNotIn(b"memory address", output, "fixture allocator leak")
 
     def test_normal_request_and_disconnect(self):
         with self.server() as (_, connect):

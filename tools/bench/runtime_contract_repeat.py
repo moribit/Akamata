@@ -36,7 +36,7 @@ def diagnostic_server(self, profile="default"):
             snapshot = {"error": repr(exc)}
             try:
                 client = pair[1]()
-                client.send(c.request("/stats", close=True))
+                client.send(c.request("/runtime-stats", close=True))
                 snapshot["stats"] = client.response()[2].decode()
                 client.close()
             except Exception as error:
@@ -47,8 +47,9 @@ def diagnostic_server(self, profile="default"):
 c.Contract.server = diagnostic_server
 kind = type("RepeatedContract", (c.Contract,), {"adapter": a.adapter})
 for repeat in range(a.repeats):
-    run = unittest.TextTestRunner(verbosity=1).run(unittest.TestSuite([kind(a.test)]))
-    result["runs"].append({"repeat": repeat + 1, "passed": run.wasSuccessful(), "errors": [text for _, text in run.errors], "failures": [text for _, text in run.failures]})
+    case = kind(a.test)
+    run = unittest.TextTestRunner(verbosity=1).run(unittest.TestSuite([case]))
+    result["runs"].append({"repeat": repeat + 1, "passed": run.wasSuccessful(), "fixture_log": getattr(case, "fixture_log", "") if not run.wasSuccessful() else "", "errors": [text for _, text in run.errors], "failures": [text for _, text in run.failures]})
     Path(a.output).parent.mkdir(parents=True, exist_ok=True)
     Path(a.output).write_text(json.dumps(result, indent=2) + "\n")
     if not run.wasSuccessful():

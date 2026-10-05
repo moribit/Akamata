@@ -11,6 +11,7 @@ const State = struct {
     stats: ?*@import("runtime_bench_stats.zig").Stats = null,
     sessions_created: std.atomic.Value(u64) = .init(0),
     sessions_closed: std.atomic.Value(u64) = .init(0),
+    mailbox_overflows: std.atomic.Value(u64) = .init(0),
     close_reasons: [5]std.atomic.Value(u64) = .{ .init(0), .init(0), .init(0), .init(0), .init(0) },
     fn recordClosed(self: *State, reason: tasks.CloseReason) void {
         _ = self.close_reasons[@backingInt(reason)].fetchAdd(1, .monotonic);
@@ -316,7 +317,7 @@ fn databaseLookup(c: *Ctx) !void {
 }
 fn runtimeStats(c: *Ctx) !void {
     const stats = c.state().stats.?;
-    try c.json(.{ .live = stats.live.load(.monotonic), .peak = stats.peak.load(.monotonic), .calls = stats.calls.load(.monotonic), .created = c.state().sessions_created.load(.acquire), .closed = c.state().sessions_closed.load(.acquire), .close_reasons = [5]u64{ c.state().close_reasons[0].load(.monotonic), c.state().close_reasons[1].load(.monotonic), c.state().close_reasons[2].load(.monotonic), c.state().close_reasons[3].load(.monotonic), c.state().close_reasons[4].load(.monotonic) } }, 200);
+    try c.json(.{ .live = stats.live.load(.monotonic), .peak = stats.peak.load(.monotonic), .calls = stats.calls.load(.monotonic), .created = c.state().sessions_created.load(.acquire), .closed = c.state().sessions_closed.load(.acquire), .mailbox_overflows = c.state().mailbox_overflows.load(.monotonic), .close_reasons = [5]u64{ c.state().close_reasons[0].load(.monotonic), c.state().close_reasons[1].load(.monotonic), c.state().close_reasons[2].load(.monotonic), c.state().close_reasons[3].load(.monotonic), c.state().close_reasons[4].load(.monotonic) } }, 200);
 }
 fn upgradeLive(c: *Ctx) !void {
     // Same application callback/session on both transports for certification.
@@ -398,6 +399,7 @@ const SessionGroup = struct {
         defer self.mutex.unlock();
         for (self.entries) |entry| if (entry) |state| {
             if (state.mailbox_len != 0 or bytes.len > state.mailbox.len) {
+                if (!state.mailbox_failed) _ = state.account.mailbox_overflows.fetchAdd(1, .monotonic);
                 state.mailbox_failed = true;
             } else {
                 @memcpy(state.mailbox[0..bytes.len], bytes);

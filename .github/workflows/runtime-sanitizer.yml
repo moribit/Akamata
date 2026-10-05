@@ -25,6 +25,13 @@ jobs:
           zig version >> sanitizer/environment.txt
           set -o pipefail
           zig build transport-contract-test runtime-isolation-test runtime-session-test -Druntime-tsan=true -Doptimize=ReleaseSafe 2>&1 | tee sanitizer/validation.log
+      - name: Repeat upgrade completion and disconnect publication race
+        shell: bash
+        run: |
+          zig build runtime-certify-fixture -Druntime-tsan=true -Doptimize=ReleaseSafe
+          adapter=epoll
+          if [ "$(uname -s)" = Darwin ]; then adapter=kqueue; fi
+          python3 tools/bench/runtime_contract_repeat.py zig-out/bin/runtime-contract-server --adapter "$adapter" --repeats 50 --output sanitizer/upgrade-publication-repeat.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
