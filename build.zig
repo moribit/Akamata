@@ -275,6 +275,7 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/runtime_contract_server.zig"),
             .target = native_target,
             .optimize = optimize,
+            .sanitize_thread = b.option(bool, "runtime-tsan", "instrument only the private runtime Contract fixture with ThreadSanitizer") orelse false,
         });
         contract_mod.link_libc = true;
         contract_mod.addOptions("build_options", opts);
@@ -304,6 +305,10 @@ pub fn build(b: *std.Build) void {
         isolation.addArtifactArg(contract_server);
         isolation.addArgs(&.{ "--output", ".zig-cache/runtime-application-isolation.json" });
         b.step("runtime-isolation-test", "require HTTP isolation from long-lived application execution (Phase 6 gate)").dependOn(&isolation.step);
+        const session_validation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_certify.py" });
+        session_validation.addArtifactArg(contract_server);
+        session_validation.addArgs(&.{ "--idle-levels", "100", "--mixed-idle", "20", "--soak-seconds", "5", "--session-rounds", "10", "--output", ".zig-cache/runtime-session-validation.json" });
+        b.step("runtime-session-test", "run bounded incremental stream/frame performance and lifecycle race validation (not long soak)").dependOn(&session_validation.step);
         const isolation_evaluation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_application_isolation.py" });
         isolation_evaluation.addArtifactArg(contract_server);
         isolation_evaluation.addArgs(&.{ "--record-blockers", "--output", ".zig-cache/runtime-application-isolation.json" });

@@ -1,0 +1,36 @@
+name: Native runtime ThreadSanitizer evaluation
+on:
+  workflow_dispatch:
+jobs:
+  sanitizer:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29
+        with:
+          version: 0.17.0
+          use-cache: false
+      - run: ./third_party/sqlite/fetch.sh
+      - name: Instrumented Contract, isolation and lifecycle races
+        shell: bash
+        run: |
+          mkdir -p sanitizer
+          git rev-parse HEAD > sanitizer/source-sha.txt
+          uname -a > sanitizer/environment.txt
+          zig version >> sanitizer/environment.txt
+          set -o pipefail
+          zig build transport-contract-test runtime-isolation-test runtime-session-test -Druntime-tsan=true -Doptimize=ReleaseSafe 2>&1 | tee sanitizer/validation.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: sanitizer-${{ matrix.os }}
+          path: |
+            sanitizer/
+            .zig-cache/runtime-session-validation.json
+            .zig-cache/runtime-application-isolation.json
+          if-no-files-found: error

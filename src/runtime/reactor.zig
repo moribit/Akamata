@@ -778,3 +778,52 @@ test "invalid application limits are rejected before opening reactor resources" 
     }
     try std.testing.expectEqual(before, testFdCount());
 }
+
+test "session cancellation retains reserved admission when ordinary work is full" {
+    const State = struct {};
+    const SessionState = struct {
+        closed: usize = 0,
+        fn step(self: *@This(), event: tasks.Event, _: []u8) !tasks.Action {
+            if (event == .closed) self.closed += 1;
+            return .{ .next = .wait };
+        }
+    };
+    var state: SessionState = .{};
+    var app = app_mod.App(State).init(std.testing.allocator, .{});
+    defer app.deinit();
+    const opts: app_mod.ServeOptions = .{ .max_connections = 2, .max_pending_application_tasks = 1 };
+    var ctx = try Context(State).init(&app, std.testing.io, &opts, -1);
+    defer ctx.deinit();
+    var peers: [2]c_int = undefined;
+    for (&peers) |*peer| {
+        var sockets: [2]c_int = undefined;
+        try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
+        peer.* = sockets[1];
+        try ctx.admit(.{ .socket = .{ .handle = sockets[0], .address = .{ .ip4 = .{ .bytes = .{ 127, 0, 0, 1 }, .port = 0 } } } });
+    }
+    defer for (peers) |peer| {
+        _ = std.c.close(peer);
+    };
+    const ordinary = ctx.slots[0].connection.?;
+    const request = "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n";
+    const writable = try ordinary.session.writable(request.len);
+    @memcpy(writable[0..request.len], request);
+    ordinary.session.received(request.len);
+    try ctx.drive(ordinary);
+    const parked = ctx.slots[1].connection.?;
+    const token = parked.token;
+    parked.execution = try parked.session.arena.allocator().create(tasks.Session);
+    parked.execution.?.* = try tasks.Session.init(std.testing.allocator, tasks.Definition.init(SessionState, &state, SessionState.step, .{ .stream = .{} }), "");
+    parked.phase = .application;
+    ctx.failReason(parked, .shutdown);
+    try std.testing.expectEqual(@as(usize, 1), ctx.jobs.len);
+    try std.testing.expectEqual(@as(usize, 1), ctx.cleanup_jobs.len);
+    const cleanup = ctx.cleanup_jobs.pop().?;
+    try std.testing.expect(cleanup == parked);
+    cleanup.execution.?.dispose(cleanup.job.dispose);
+    cleanup.done.store(true, .release);
+    ctx.refresh(cleanup);
+    try std.testing.expect(ctx.lookup(token) == null);
+    try std.testing.expectEqual(@as(usize, 1), state.closed);
+    try std.testing.expectEqual(@as(usize, 1), ctx.count);
+}

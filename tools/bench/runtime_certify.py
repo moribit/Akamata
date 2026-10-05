@@ -19,10 +19,12 @@ import selectors
 import signal
 import socket
 import statistics
+import struct
 import subprocess
 import sys
 import tempfile
 import time
+import threading
 
 sys.dont_write_bytecode = True
 p = argparse.ArgumentParser()
@@ -32,8 +34,11 @@ p.add_argument("--idle-levels", nargs="+", type=int, default=[100, 1000])
 p.add_argument("--soak-seconds", type=int, default=1200)
 p.add_argument("--mixed-idle", type=int, default=100)
 p.add_argument("--adapters", nargs="+")
+p.add_argument("--session-rounds", type=int, default=50)
 a = p.parse_args()
 assert 0 <= a.soak_seconds <= 14400
+assert 0 <= a.mixed_idle <= 5000
+assert 1 <= a.session_rounds <= 1000
 assert all(0 < n <= 10000 for n in a.idle_levels)
 binary = Path(a.binary).resolve()
 spec = importlib.util.spec_from_file_location("contract", Path(__file__).parents[2] / "tests/transport_contract.py")
@@ -163,7 +168,6 @@ def sample(port, proc, elapsed):
 
 def mixed(port, clients, pool):
     # Tasks run concurrently with broadcast and slow, bounded-output producers.
-    probes = [pool.submit(query, port, "/db/1" if n % 3 == 0 else "/hello") for n in range(32)]
     slow = []
     try:
         for _ in range(4):
@@ -175,6 +179,7 @@ def mixed(port, clients, pool):
                 chunk = client.sock.recv(1024)
                 assert chunk
                 client.pending += chunk
+        probes = [pool.submit(query, port, "/db/1" if n % 3 == 0 else "/hello") for n in range(32)]
         latency = broadcast(clients)
         values = [future.result(timeout=5)[0] for future in probes]
         return {"http_p50_ms": statistics.median(values), "http_max_ms": max(values), "broadcast_ms": latency}
@@ -182,8 +187,101 @@ def mixed(port, clients, pool):
         for client in slow:
             client.close()
 
+def percentiles(values):
+    values = sorted(values)
+    return {"p50_ms": statistics.median(values), "p95_ms": values[min(len(values)-1, int(len(values)*.95))], "p99_ms": values[min(len(values)-1, int(len(values)*.99))]}
+
+def small_stream(port):
+    client = c.Client(port)
+    try:
+        start = time.monotonic()
+        client.send(c.request("/stream", close=True))
+        wire = client.collect()
+        assert wire.startswith(b"HTTP/1.1 200")
+        assert wire.split(b"\r\n\r\n", 1)[1] == b"3\r\none\r\n3\r\ntwo\r\n0\r\n\r\n"
+        return (time.monotonic()-start)*1000
+    finally:
+        client.close()
+
+def race_session(port, index):
+    if index % 4 == 0:
+        client = c.Client(port)
+        client.send(c.request("/db/1", close=True))
+    else:
+        client = websocket(port)
+        if index % 4 == 1:
+            client.send(c.masked_frame(1, b"race")[:7])  # partial payload
+        elif index % 4 == 2:
+            client.send(c.masked_frame(9, b"race"))
+        else:
+            client.send(c.masked_frame(8, b"\x03\xe8"))
+    try:
+        if index % 2 == 0:
+            client.sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
+    finally:
+        client.close()
+
 try:
     for adapter in a.adapters or ["threaded", "epoll" if platform.system() == "Linux" else "kqueue"]:
+        clients = []
+        try:
+            with server(adapter, "session-performance") as (port, proc, run), concurrent.futures.ThreadPoolExecutor(max_workers=32) as pool:
+                for _ in range(100):
+                    clients.append(websocket(port))
+                broadcast_times = [broadcast(clients) for _ in range(a.session_rounds)]
+                run["broadcast"] = {**percentiles(broadcast_times), "recipients": 100, "rounds": a.session_rounds, "observed_frames_per_second": 100*a.session_rounds/(sum(broadcast_times)/1000)}
+                start = time.monotonic()
+                futures = [pool.submit(small_stream, port) for _ in range(a.session_rounds*32)]
+                stream_times = [future.result(timeout=5) for future in futures]
+                run["stream"] = {**percentiles(stream_times), "requests": len(stream_times), "observed_requests_per_second": len(stream_times)/(time.monotonic()-start)}
+                run["samples"].append(sample(port, proc, 0))
+        except Exception as exc:
+            result["limitations"].append(f"{adapter} session performance: {exc!r}")
+        finally:
+            for client in clients:
+                client.close()
+        with server(adapter, "disconnect-fd-reuse-races") as (port, proc, run), concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
+            for future in [pool.submit(race_session, port, n) for n in range(256)]:
+                future.result(timeout=5)
+            deadline = time.monotonic()+3
+            while True:
+                snapshot = sample(port, proc, 0)
+                stats = snapshot["allocator"]
+                if stats["created"] == stats["closed"]:
+                    break
+                assert time.monotonic() < deadline, "race session cleanup deadline"
+                time.sleep(.01)
+            run["samples"].append(snapshot)
+            run["iterations"] = 256
+            run["recovered_http_ms"] = query(port, "/hello")[0]
+        clients = []
+        try:
+            with server(adapter, "shutdown-disconnect-completion-race") as (port, proc, run), concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
+                for _ in range(64):
+                    clients.append(websocket(port))
+                start = threading.Event()
+                def close_race(client):
+                    start.wait(timeout=2)
+                    try:
+                        client.send(c.masked_frame(9, b"bye"))
+                    except OSError:
+                        pass  # Peer shutdown races with this owned client.
+                    finally:
+                        client.close()
+                futures = [pool.submit(close_race, client) for client in clients]
+                start.set()
+                proc.send_signal(signal.SIGTERM)
+                if proc.poll() is None:
+                    try:
+                        proc.send_signal(signal.SIGINT)
+                    except ProcessLookupError:
+                        pass
+                for future in futures:
+                    future.result(timeout=5)
+                run["connections"] = 64
+        finally:
+            for client in clients:
+                client.close()
         for count in a.idle_levels:
             if count + 128 > ceiling:
                 result["runs"].append({"adapter": adapter, "scenario": "idle", "count": count, "skipped": "safe fd ceiling"})
