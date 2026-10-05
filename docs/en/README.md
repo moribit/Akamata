@@ -42,6 +42,7 @@ is development-oriented; pin a tagged release for reproducible builds.
 - [Long-run benchmarks](benchmarks-long-run.md)
 - [Performance follow-ups](perf-followups.md)
 - [Reactor design](perf-reactor-design.md)
+- [Native runtime and Transport Contract](runtime-transport.md) — shared protocol, Zig 0.17 Io audit, isolated Group experiment and regression measurements
 
 Benchmark numbers are snapshots of the recorded environment, commands, and Akamata revision; they are not performance guarantees for another machine or workload.
 

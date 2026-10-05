@@ -72,6 +72,10 @@ pub const Response = struct {
     finalized: bool = false,
     keep_alive: bool = true,
     is_upgrade: bool = false,
+    /// Internal Native handoff bytes already read past this HTTP request.
+    /// Borrowed until dispatch returns; websocket upgrade copies them into its
+    /// owned receive buffer. Never serialized or exposed as response content.
+    upgrade_input: []const u8 = "",
     /// HEAD responses carry the same headers (including the GET body length)
     /// but never emit payload bytes on the wire.
     suppress_body: bool = false,

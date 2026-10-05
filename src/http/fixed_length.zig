@@ -28,8 +28,11 @@ pub const FixedLengthWriter = struct {
 
     pub fn end(self: *FixedLengthWriter) std.Io.Writer.Error!void {
         try self.writer.flush();
-        if (self.written != self.expected) return error.WriteFailed;
+        // Publish any valid prefix before failing a short stream. The shared
+        // HTTP driver then closes the connection; it must neither pad bytes
+        // nor attempt a second status line after headers are committed.
         try self.out.flush();
+        if (self.written != self.expected) return error.WriteFailed;
     }
 };
 
@@ -44,4 +47,14 @@ test "fixed length writer emits no chunk framing and enforces length" {
 
     var overflow = FixedLengthWriter.init(&sink.writer, &buffer, 1);
     try std.testing.expectError(error.WriteFailed, overflow.writer.writeAll("too long"));
+}
+
+test "short fixed stream flushes its prefix then fails closed" {
+    var sink: std.Io.Writer.Allocating = .init(std.testing.allocator);
+    defer sink.deinit();
+    var buffer: [8]u8 = undefined;
+    var fixed = FixedLengthWriter.init(&sink.writer, &buffer, 5);
+    try fixed.writer.writeAll("he");
+    try std.testing.expectError(error.WriteFailed, fixed.end());
+    try std.testing.expectEqualStrings("he", sink.written());
 }

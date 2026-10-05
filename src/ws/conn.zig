@@ -1,7 +1,6 @@
 const std = @import("std");
 const frame = @import("frame.zig");
 const handshake = @import("handshake.zig");
-// (Legacy Ctx import dropped — upgrade() now uses anytype.)
 const res_mod = @import("../http/response.zig");
 
 const Io = std.Io;
@@ -210,13 +209,9 @@ fn validClosePayload(payload: []const u8) bool {
     return std.unicode.utf8ValidateSlice(payload[2..]);
 }
 
-/// Perform a WebSocket upgrade. Accepts either the legacy `Ctx(App)` or the
-/// new `Context(State)` — both expose the fields we need (`req`, `res`,
-/// `arena`, `stream_ptr`, `io_ptr`) with the same shape.
+/// Perform a WebSocket upgrade from Context(State). Socket ownership passes
+/// to the returned Conn; the shared HTTP driver must not close it again.
 pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
-    // For the new Context(State), `ctx.req` is the Req wrapper struct; we need
-    // header() to work on either. Both expose `.header(name)` so this just
-    // works via duck typing.
     const upg = ctx.req.header("upgrade");
     const conn_h = ctx.req.header("connection");
     const ver = ctx.req.header("sec-websocket-version");
@@ -257,15 +252,24 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     const accept_len = try handshake.acceptKey(client_key, &accept_buf);
     const accept_value = try ctx.arena.dupe(u8, accept_buf[0..accept_len]);
 
+    const stream_ptr: *net.Stream = @ptrCast(@alignCast(ctx.stream_ptr.?));
+    const io_ptr: *Io = @ptrCast(@alignCast(ctx.io_ptr.?));
+    var conn = Conn.init(ctx.arena, stream_ptr.*, io_ptr.*, opts.max_message_bytes);
+    errdefer {
+        conn.recv_buf.deinit(ctx.arena);
+        conn.write_mutex.deinit();
+    }
+    // Copy read-ahead before committing the upgrade: allocation failure must
+    // leave socket ownership with the HTTP driver.
+    try conn.recv_buf.appendSlice(ctx.arena, ctx.res.upgrade_input);
+    conn.read_timeout_ms = opts.read_timeout_ms;
+
     ctx.res.setStatus(101);
     ctx.res.is_upgrade = true;
     ctx.res.keep_alive = false;
     try ctx.res.header("upgrade", "websocket");
     try ctx.res.header("connection", "Upgrade");
     try ctx.res.header("sec-websocket-accept", accept_value);
-
-    const stream_ptr: *net.Stream = @ptrCast(@alignCast(ctx.stream_ptr.?));
-    const io_ptr: *Io = @ptrCast(@alignCast(ctx.io_ptr.?));
 
     // Send the 101 handshake response immediately so the caller can start
     // reading/writing WebSocket frames on the same socket. The HTTP server
@@ -279,7 +283,5 @@ pub fn upgrade(comptime CtxT: type, ctx: *CtxT, opts: UpgradeOptions) !Conn {
     try w.flush();
     ctx.res.finalized = true;
 
-    var conn = Conn.init(ctx.arena, stream_ptr.*, io_ptr.*, opts.max_message_bytes);
-    conn.read_timeout_ms = opts.read_timeout_ms;
     return conn;
 }

@@ -6,7 +6,7 @@ Akamata runs the same Zig application on Native/VPS/Containers and Cloudflare Wo
 
 - `src/app.zig` owns route registration, middleware chains, lifecycle hooks, and dispatch. `src/context.zig` provides request data, responses, application state, and portable services. Handlers receive `*am.Context(State)`; middleware receives that Context and `am.Next(State)`.
 - `src/static_router.zig`, `static_middleware.zig`, and `contract.zig` provide compile-time registration/binding into the same App dispatch. They are not a separate HTTP server API.
-- `src/serve.zig` selects transport. Native uses Zig 0.17 `std.Io.Threaded` / `std.Io.net`, libc nonblocking accept/poll, bounded connection handling, parsing deadlines, and graceful SIGINT/SIGTERM shutdown. Experimental reactors remain disabled until they meet the production transport contracts.
+- `src/serve.zig` selects the backend. Native listener/admission/lifecycle lives in `runtime/threaded.zig`; `http/connection.zig` owns shared HTTP semantics, using a statically dispatched `runtime/socket_transport.zig`. Poll is production; kqueue/epoll readiness adapters are private evaluation paths. Multiplexed reactors remain fail-closed. See [Transport Contract and Zig 0.17 Io policy](runtime-transport.md).
 - Workers uses `src/runtime/workers.zig` and the JavaScript WASM bridge under `deploy/worker/`. HTTP requests enter the same App dispatch. JSPI serializes a complete WASM request while asynchronous host operations suspend. Bridge details stay outside application handlers.
 - Database, storage, queue, and realtime abstractions expose portable interfaces with platform adapters. SQLite/Turso and Workers D1 use `am.db.Db`; filesystem and Workers R2 use the storage boundary. Platform-specific capabilities are explicit.
 

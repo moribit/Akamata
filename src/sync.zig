@@ -1,7 +1,7 @@
-// Process-local synchronization primitives. Zig 0.16 removed
-// `std.Thread.Mutex` in favour of `std.Io.Mutex` (which requires an `Io`
-// instance to lock). For hot-path server code we just want a plain
-// pthread_mutex with no Io plumbing, so we wrap libc directly.
+// Process-local synchronization for APIs that do not own/pass an Io instance
+// (SQLite pool, websocket hub, model cache). Zig 0.17 Io.Mutex/Condition still
+// require Io and cancellation semantics; retrofitting that context would be a
+// separate API/lifecycle change. Use pthreads, with std.c target ABI types.
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -11,14 +11,8 @@ const is_posix = switch (builtin.os.tag) {
     else => false,
 };
 
-/// Opaque storage matching `sizeof(pthread_mutex_t)` on the target platform.
-/// We over-allocate (96 bytes is enough for every glibc/darwin libc) and
-/// rely on `pthread_mutex_init` to set the internal layout.
-const native_storage_bytes: usize = 96;
-
-const PthreadMutex = extern struct {
-    _opaque: [native_storage_bytes]u8 align(@alignOf(usize)),
-};
+const PthreadMutex = if (is_posix) std.c.pthread_mutex_t else extern struct {};
+const PthreadCond = if (is_posix) std.c.pthread_cond_t else extern struct {};
 
 extern "c" fn pthread_mutex_init(m: *PthreadMutex, attr: ?*anyopaque) c_int;
 extern "c" fn pthread_mutex_destroy(m: *PthreadMutex) c_int;
@@ -31,7 +25,7 @@ extern "c" fn pthread_mutex_unlock(m: *PthreadMutex) c_int;
 /// atomic-RW-lock or sharding instead, but for "rare writer / many readers"
 /// this is fine.
 pub const Mutex = struct {
-    raw: PthreadMutex = .{ ._opaque = @as([native_storage_bytes]u8, @splat(0)) },
+    raw: PthreadMutex = .{},
     initialized: bool = false,
 
     pub fn init() Mutex {
@@ -65,13 +59,8 @@ pub const Mutex = struct {
 
 // === Condition variable ===
 //
-// Used by the reactor's worker pool task queue (`src/runtime/reactor_kqueue.zig`).
-// Same modelling as `Mutex` above — wrap libc directly to avoid the
-// `std.Io.Condition` requirement of an Io instance.
-
-const PthreadCond = extern struct {
-    _opaque: [native_storage_bytes]u8 align(@alignOf(usize)),
-};
+// Used by db/pool.zig. No obsolete reactor queue dependency remains.
+// std.Io.Condition cannot replace this without threading Io through Db APIs.
 
 extern "c" fn pthread_cond_init(c: *PthreadCond, attr: ?*anyopaque) c_int;
 extern "c" fn pthread_cond_destroy(c: *PthreadCond) c_int;
@@ -93,7 +82,7 @@ extern "c" fn pthread_cond_broadcast(c: *PthreadCond) c_int;
 ///     mu.unlock();
 ///     cond.signal();
 pub const Condition = struct {
-    raw: PthreadCond = .{ ._opaque = @as([native_storage_bytes]u8, @splat(0)) },
+    raw: PthreadCond = .{},
     initialized: bool = false,
 
     pub fn init() Condition {

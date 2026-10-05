@@ -183,9 +183,9 @@ fn decodeChunked(arena: std.mem.Allocator, buf: []const u8, limits: Limits) Pars
 
         const data_end = std.math.add(usize, i, size) catch return ParseError.BodyTooLarge;
         const framed_end = std.math.add(usize, data_end, 2) catch return ParseError.BodyTooLarge;
-        if (framed_end > buf.len) return ParseError.Incomplete;
         const output_end = std.math.add(usize, out.items.len, size) catch return ParseError.BodyTooLarge;
         if (output_end > limits.max_body_bytes) return ParseError.BodyTooLarge;
+        if (framed_end > buf.len) return ParseError.Incomplete;
 
         try out.appendSlice(arena, buf[i..data_end]);
         i = data_end;
@@ -342,4 +342,10 @@ test "header limit does not include request body" {
     const parsed = try parseRequest(arena, request, .{});
 
     try std.testing.expectEqual(@as(usize, body.len), parsed.request.body.len);
+}
+
+test "oversized declared chunk fails before waiting for its body" {
+    var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+    defer arena.deinit();
+    try std.testing.expectError(error.BodyTooLarge, parseRequest(arena.allocator(), "POST / HTTP/1.1\r\nHost: a\r\nTransfer-Encoding: chunked\r\n\r\n1000000\r\n", .{ .max_body_bytes = 64 }));
 }

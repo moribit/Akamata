@@ -19,7 +19,7 @@ jobs:
           - name: native-openssl
             cmd: zig build test -Dopenssl=true -Doptimize=ReleaseSafe
           - name: native-integration
-            cmd: zig build integration
+            cmd: zig build integration transport-contract-test runtime-poc-test
           - name: tasks-test
             cmd: zig build tasks-test
           - name: cli-build
@@ -42,7 +42,7 @@ jobs:
       - run: ${{ matrix.job.cmd }}
 
   macos-native:
-    name: macos native + kqueue compile
+    name: macos native + kqueue contract
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -53,6 +53,7 @@ jobs:
       - run: ./third_party/sqlite/fetch.sh
       - run: zig build test
       - run: zig build -Dexample=bench
+      - run: zig build transport-contract-test runtime-poc-test -Doptimize=ReleaseSafe
 
   cli-smoke:
     name: cli init smoke test

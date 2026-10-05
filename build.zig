@@ -40,15 +40,15 @@ pub fn build(b: *std.Build) void {
     opts.addOption(bool, "with_openssl", with_openssl);
     am_mod.addOptions("build_options", opts);
 
+    const sqlite_flags = &[_][]const u8{
+        "-DSQLITE_THREADSAFE=1",
+        "-DSQLITE_DQS=0",
+        "-DSQLITE_OMIT_LOAD_EXTENSION",
+        "-DSQLITE_DEFAULT_FOREIGN_KEYS=1",
+        "-DSQLITE_USE_URI=1",
+        "-std=c99",
+    };
     if (backend == .native) {
-        const sqlite_flags = &[_][]const u8{
-            "-DSQLITE_THREADSAFE=1",
-            "-DSQLITE_DQS=0",
-            "-DSQLITE_OMIT_LOAD_EXTENSION",
-            "-DSQLITE_DEFAULT_FOREIGN_KEYS=1",
-            "-DSQLITE_USE_URI=1",
-            "-std=c99",
-        };
         am_mod.addCSourceFile(.{
             .file = b.path("third_party/sqlite/sqlite3.c"),
             .flags = sqlite_flags,
@@ -245,6 +245,41 @@ pub fn build(b: *std.Build) void {
     const tasks_test_step = b.step("tasks-test", "run tests for examples/tasks");
 
     if (backend == .native) {
+        const group_bench_mod = b.createModule(.{
+            .root_source_file = b.path("src/runtime_group_bench.zig"),
+            .target = native_target,
+            .optimize = optimize,
+        });
+        group_bench_mod.addOptions("build_options", opts);
+        group_bench_mod.addImport("sqlite3", am_mod.import_table.get("sqlite3").?);
+        group_bench_mod.link_libc = true;
+        group_bench_mod.addIncludePath(b.path("third_party/sqlite"));
+        group_bench_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
+        group_bench_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
+        const group_bench = b.addExecutable(.{ .name = "runtime-group-bench", .root_module = group_bench_mod });
+        b.step("runtime-group-bench", "build isolated Io.Group HTTP benchmark").dependOn(&b.addInstallArtifact(group_bench, .{}).step);
+        // Private fixture shares source imports without adding a public runtime
+        // selection API. The same black-box suite exercises each host adapter.
+        const contract_mod = b.createModule(.{
+            .root_source_file = b.path("src/runtime_contract_server.zig"),
+            .target = native_target,
+            .optimize = optimize,
+        });
+        contract_mod.link_libc = true;
+        contract_mod.addOptions("build_options", opts);
+        contract_mod.addImport("sqlite3", am_mod.import_table.get("sqlite3").?);
+        const contract_server = b.addExecutable(.{ .name = "runtime-contract-server", .root_module = contract_mod });
+        const contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
+        contract.addArtifactArg(contract_server);
+        b.step("transport-contract-test", "run socket Transport Contract on Threaded and host readiness adapter").dependOn(&contract.step);
+        b.step("transport-contract-build", "compile private Transport Contract fixture").dependOn(&contract_server.step);
+        const poc_step = b.step("runtime-poc-test", "evaluate isolated Io.Group lifecycle and socket contract");
+        const poc_unit = b.addTest(.{ .root_module = contract_mod });
+        poc_step.dependOn(&b.addRunArtifact(poc_unit).step);
+        const poc_contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
+        poc_contract.addArtifactArg(contract_server);
+        poc_contract.addArgs(&.{ "--group", "--only-group" });
+        poc_step.dependOn(&poc_contract.step);
         inline for (test_targets) |tf| {
             const t_mod = b.createModule(.{
                 .root_source_file = b.path(tf),

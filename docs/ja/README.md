@@ -42,6 +42,7 @@
 - [Long-run benchmarks](benchmarks-long-run.md)
 - [Performance follow-ups](perf-followups.md)
 - [Reactor design](perf-reactor-design.md)
+- [Native runtime／Transport Contract](runtime-transport.md) — 共通protocol、Zig 0.17 Io調査、分離したGroup PoCと性能比較
 
 benchmark値は、記載された環境、command、Akamata revisionでの測定結果です。別のmachineやworkloadで同じ性能を保証するものではありません。
 

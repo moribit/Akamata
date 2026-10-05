@@ -1,10 +1,12 @@
+// Isolated Io.Group benchmark. Same three handlers, SQLite data, allocator,
+// and ServeOptions as examples/bench; not part of the installed public API.
 // Minimal Akamata benchmark server. Three scenarios:
 //   GET  /hello       — static text response (framework overhead only)
 //   POST /echo        — JSON parse + JSON serialize
 //   GET  /db/:id      — SQLite query
 
 const std = @import("std");
-const am = @import("akamata");
+const am = @import("akamata.zig");
 
 const State = struct {
     db: am.db.Db,
@@ -27,38 +29,11 @@ pub fn main() !void {
     var app = am.App(State).init(alloc, .{ .db = db });
     defer app.deinit();
 
-    // BENCH_OBSERVABILITY=metrics|request|full provides repeatable A/B modes.
-    // Unset is the zero-observability baseline.
-    var metrics_counters: am.mw.MetricsCounters = .{};
-    if (am.env.get(alloc, "BENCH_OBSERVABILITY")) |mode| {
-        defer alloc.free(mode);
-        if (std.mem.eql(u8, mode, "metrics")) {
-            _ = try app.useAll(am.mw.metrics(State, &metrics_counters));
-        } else if (std.mem.eql(u8, mode, "request")) {
-            _ = try app.useAll(am.mw.requestId(State));
-            _ = try app.useAll(am.mw.accessLog(State, .json));
-        } else if (std.mem.eql(u8, mode, "full")) {
-            _ = try app.useAll(am.mw.requestId(State));
-            _ = try app.useAll(am.mw.metrics(State, &metrics_counters));
-            _ = try app.useAll(am.mw.serverTiming(State, .{ .enabled = true }));
-        }
-    }
-
     _ = try app.get("/hello", hello);
     _ = try app.post("/echo", echo);
     _ = try app.get("/db/:id", lookup);
 
-    // BENCH_RUNTIME=reactor verifies the fail-closed gate; it does not enable
-    // the experimental adapter or a production reactor.
-    const rt: am.Runtime = blk: {
-        if (am.env.get(alloc, "BENCH_RUNTIME")) |v| {
-            defer alloc.free(v);
-            if (std.mem.eql(u8, v, "reactor")) break :blk .reactor;
-        }
-        break :blk .threaded;
-    };
-    std.log.info("bench runtime: {s}", .{@tagName(rt)});
-    try app.serve(.{ .port = 8080, .accept_thread_count = 8, .runtime = rt });
+    try @import("runtime/io_group_experiment.zig").serve(State, &app, .{ .address = "127.0.0.1", .port = 8080, .accept_thread_count = 8 });
 }
 
 fn hello(c: *am.Context(State)) !void {

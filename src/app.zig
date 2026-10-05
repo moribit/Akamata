@@ -167,8 +167,8 @@ fn matchSegments(
 // ===== App =====
 
 pub const Runtime = enum {
-    /// Default — std.Io.Threaded + one accept loop per worker. Solid,
-    /// portable, but bounded by `accept_thread_count` for concurrency.
+    /// Production std.Io.Threaded I/O with detached connection workers.
+    /// accept_thread_count controls acceptors; max_connections bounds clients.
     threaded,
     /// Reserved experimental reactor. `serve()` currently fails closed with
     /// `error.ExperimentalRuntimeDisabled` because it has not reached the
@@ -180,13 +180,13 @@ pub const ServeOptions = struct {
     address: ?[]const u8 = null,
     port: u16 = 8080,
     accept_thread_count: usize = 4,
-    /// HTTP parsing limits used by the Workers/WASM bridge. Increase
+    /// HTTP parsing limits used by both Native and the Workers/WASM bridge. Increase
     /// `max_body_bytes` for endpoints that intentionally accept larger
     /// request bodies, such as image uploads.
     parse_limits: parser.Limits = .{},
     /// HTTP runtime selection. `.threaded` is the current production
-    /// model; `.reactor` is the new kqueue-based prototype (BSD-family
-    /// kernels only). See `docs/en/perf-reactor-design.md`.
+    /// model; `.reactor` fails closed while multiplexed lifecycle parity is
+    /// unproven. Private kqueue/epoll evaluation is separate from this option.
     runtime: Runtime = .threaded,
     /// Number of worker threads when `runtime == .reactor`. `null` =
     /// `std.Thread.getCpuCount()` (default). Has no effect on the
@@ -404,8 +404,9 @@ pub fn App(comptime State: type) type {
         }
 
         /// Signal a running `serve()` to stop accepting new connections.
-        /// Existing in-flight requests are allowed to complete; the listener
-        /// socket is closed so `accept()` returns and the loop exits.
+        /// Existing in-flight requests are allowed to complete; Native stops
+        /// admission and closes idle connections. The serving scope owns and
+        /// closes the listener after its acceptors and connection workers drain.
         ///
         /// Safe to call from a signal handler or a separate thread.
         pub fn requestShutdown(self: *Self) void {
