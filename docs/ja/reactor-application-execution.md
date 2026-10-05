@@ -23,7 +23,7 @@ Read budgetはframe入力のabsolute deadline（partial bytesで更新しない�
 
 ## Phase 6検証
 
-macOSでは32件の共通ContractをThreaded同期、Threaded incremental、kqueue incrementalへ実行し96件成功。四idle upgrade、四slow stream、upgrade/stream混在のHTTP isolation gateも成功しました。queue overflow/recovery、fragment/control/UTF-8、read-ahead、error termination、zero write budget、shutdown、allocation failureを検証し、fixtureはcreated/closed session数一致とGPA cleanupをassertします。Linux/epollの同じ条件はCIで検証します。cross-platform成功を確認するまでPhase 7へ進みません。
+macOSでは32件の共通ContractをThreaded同期、Threaded incremental、kqueue incrementalへ実行し96件成功。四idle upgrade、四slow stream、upgrade/stream混在のHTTP isolation gateも成功しました。queue overflow/recovery、fragment/control/UTF-8、read-ahead、error termination、zero write budget、shutdown、allocation failureを検証し、fixtureはcreated/closed session数一致とGPA cleanupをassertします。Linux/epollもCI 37286692679で同じ条件に成功しました。15 jobすべて成功し、Phase 7の測定へ進みます。
 
 再現: `zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-stress-test -Doptimize=ReleaseSafe`。raw dataは[Phase 6記録](../../benchmark/results/runtime-phase6-2026-10-05/README.md)へ保存します。以下は実装前の調査・baselineであり、現在の未実装項目一覧ではありません。
 

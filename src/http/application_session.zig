@@ -139,7 +139,7 @@ pub const Session = struct {
 
     pub fn init(gpa: std.mem.Allocator, definition: Definition, read_ahead: []const u8) !Session {
         const maximum = if (definition.mode == .websocket) definition.mode.websocket.max_message_bytes else 0;
-        if (maximum > std.math.maxInt(usize) - 14 or read_ahead.len > maximum + 14) return error.PayloadTooLarge;
+        if (definition.mode == .websocket and (maximum > std.math.maxInt(usize) - 14 or read_ahead.len > maximum + 14)) return error.PayloadTooLarge;
         var self: Session = .{ .definition = definition, .gpa = gpa, .scratch = .init(gpa), .message = .{ .max_payload = maximum }, .outgoing_message = .{ .max_payload = maximum } };
         errdefer self.deinit();
         if (definition.mode == .websocket) try self.input.appendSlice(gpa, read_ahead);

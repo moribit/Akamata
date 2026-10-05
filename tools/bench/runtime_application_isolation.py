@@ -96,6 +96,9 @@ def fixture(adapter, name, profile="stress"):
             stats = json.loads(stats_line.split("BENCH_STATS ", 1)[1])
             assert stats["live"] == 0, stats
             run["allocator"] = stats
+            session_line = next(line for line in text.splitlines() if "SESSION_STATS " in line)
+            run["sessions"] = json.loads(session_line.split("SESSION_STATS ", 1)[1])
+            assert run["sessions"]["created"] == run["sessions"]["closed"]
             result["runs"].append(run)
 
 def http_probe(connect):

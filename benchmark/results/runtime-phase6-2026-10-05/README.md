@@ -1,3 +1,13 @@
+# Phase 6: application isolation completed
+
+Current implementation: `cf2b6c0` plus deadline/empty-frame cleanup followup. Strict isolation succeeds on macOS/kqueue and Linux/epoll. CI [37286692679](https://github.com/moribit/Akamata/actions/runs/37286692679) passed all 15 jobs. Cross-platform CI JSON is stored in `ci-linux/` and `ci-macos/`; local after measurements are `macos-isolation-after.json` and `macos-stress-after.json`. The shared 32-case Contract passes for Threaded synchronous, Threaded incremental and the host Reactor. Session creation/closure and framework allocator cleanup are checked.
+
+Reactor requires incremental stream/upgrade APIs; synchronous APIs explicitly return 501. Threaded preserves synchronous APIs. Public Reactor remains fail-closed pending Phases 7–9 certification. No performance optimization preceded the isolation pass.
+
+Reproduce: `zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-stress-test -Doptimize=ReleaseSafe`.
+
+## Historical before implementation
+
 # Phase 6 application execution baseline (incomplete)
 
 Baseline main: `75fcb26`. This records foundations and an unmet gate, not completion of Phases 6–9.

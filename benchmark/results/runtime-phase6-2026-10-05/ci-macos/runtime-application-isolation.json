@@ -1,0 +1,120 @@
+{
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "zig_version": "0.17.0",
+  "binary_sha256": "208502edbf78eb6e432616851e3ba15ac194ec61f38f69665fc21230a02aa39f",
+  "command": [
+    "tools/bench/runtime_application_isolation.py",
+    "./.zig-cache/o/cabad4754516f653adb731b96e9e8f3b/runtime-contract-server",
+    "--output",
+    ".zig-cache/runtime-application-isolation.json"
+  ],
+  "runs": [
+    {
+      "adapter": "threaded",
+      "scenario": "four-idle-upgrades",
+      "http_isolated": true,
+      "probe_ms": 0.16904199998180047,
+      "shutdown_ms": 247.5758339999743,
+      "allocator": {
+        "calls": 139,
+        "requested": 23135,
+        "live": 0,
+        "peak": 13268
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "four-slow-streams",
+      "http_isolated": true,
+      "probe_ms": 0.18795799996951246,
+      "shutdown_ms": 209.88591600001882,
+      "allocator": {
+        "calls": 143,
+        "requested": 80887,
+        "live": 0,
+        "peak": 71020
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "mixed-upgrade-stream",
+      "http_isolated": true,
+      "probe_ms": 0.2619580000100541,
+      "shutdown_ms": 200.08674999996856,
+      "allocator": {
+        "calls": 141,
+        "requested": 52011,
+        "live": 0,
+        "peak": 42144
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "application-queue-overflow-recovery",
+      "threaded_option_ignored": true,
+      "admission_recovered": true,
+      "shutdown_ms": 693.9627499999688,
+      "allocator": {
+        "calls": 137,
+        "requested": 21201,
+        "live": 0,
+        "peak": 7466
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "four-idle-upgrades",
+      "http_isolated": true,
+      "probe_ms": 0.15141699998366676,
+      "shutdown_ms": 271.3072499999498,
+      "allocator": {
+        "calls": 161,
+        "requested": 438615,
+        "live": 0,
+        "peak": 407404
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "four-slow-streams",
+      "http_isolated": true,
+      "probe_ms": 0.14916600002834457,
+      "shutdown_ms": 203.80687499999794,
+      "allocator": {
+        "calls": 157,
+        "requested": 301431,
+        "live": 0,
+        "peak": 270220
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "mixed-upgrade-stream",
+      "http_isolated": true,
+      "probe_ms": 0.11562499997808118,
+      "shutdown_ms": 198.88216700002204,
+      "allocator": {
+        "calls": 159,
+        "requested": 370023,
+        "live": 0,
+        "peak": 338812
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "application-queue-overflow-recovery",
+      "overflow_closed_without_response": true,
+      "admission_recovered": true,
+      "shutdown_ms": 4.808041999979196,
+      "allocator": {
+        "calls": 150,
+        "requested": 128489,
+        "live": 0,
+        "peak": 74000
+      }
+    }
+  ],
+  "scope": "application isolation/admission gate; not full production certification",
+  "isolation_passed": true,
+  "note": "Incremental isolation gate; full Phase 6 completion additionally requires lifecycle/ownership and fairness Contract parity."
+}

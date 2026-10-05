@@ -430,7 +430,6 @@ const UpgradeState = struct {
             if (self.kind == .wait) return .{ .next = .done };
             if (event.message.payload.len > out.len) return error.MessageTooLarge;
             @memcpy(out[0..event.message.payload.len], event.message.payload);
-            if (event.message.payload.len == 0) return .{ .next = .done };
             return .{ .output = .{ .len = event.message.payload.len, .opcode = .text, .next = .done } };
         }
         if (self.kind == .room) {

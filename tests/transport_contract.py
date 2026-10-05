@@ -121,6 +121,11 @@ class Contract(unittest.TestCase):
             self.assertEqual(c.response()[0], 101)
             receive_bytes(c, b"\x8a\x01p\x81\x03\xe2\x82\xac")
             c.eof()
+            c = connect()
+            c.send(request("/upgrade-echo", extra=UPGRADE) + masked_frame(1, b""))
+            self.assertEqual(c.response()[0], 101)
+            receive_bytes(c, b"\x81\x00")
+            c.eof()
             for bad in (masked_frame(1, b"\xff"), b"\x81\x01x", masked_frame(8, b"\x00")):
                 c = connect()
                 c.send(request("/upgrade-echo", extra=UPGRADE))

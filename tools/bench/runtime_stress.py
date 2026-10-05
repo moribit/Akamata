@@ -88,6 +88,9 @@ def server(adapter, name, fd_limit=None):
                 if line.startswith("BENCH_STATS "): run["allocator"] = json.loads(line.split(" ", 1)[1])
             assert run.get("allocator", {}).get("live") == 0, run
             run["success"] = True
+            session_line = next(line for line in text.splitlines() if "SESSION_STATS " in line)
+            run["sessions"] = json.loads(session_line.split("SESSION_STATS ", 1)[1])
+            assert run["sessions"]["created"] == run["sessions"]["closed"]
             result["runs"].append(run)
             Path(a.output).write_text(json.dumps(result, indent=2) + "\n")
             print(adapter, name, "ok", flush=True)

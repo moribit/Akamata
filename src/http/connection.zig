@@ -114,10 +114,23 @@ fn runApplicationSession(transport: anytype, response: *res_mod.Response, defini
     defer session.deinit();
     var reason: tasks.CloseReason = .completed;
     defer session.dispose(if (reason == .completed) session.closing_reason else reason);
-    errdefer reason = if (shutdown.load(.acquire)) .shutdown else .disconnected;
+    errdefer {
+        if (shutdown.load(.acquire)) reason = .shutdown else if (session.closing_reason == .application_error) reason = .application_error else if (reason == .completed) reason = .disconnected;
+        if (transport.controlPtr()) |node| {
+            const deadline = node.write_deadline_ns.load(.acquire);
+            if (!shutdown.load(.acquire) and deadline != 0 and clock.monotonicNs() >= deadline) reason = .timeout;
+        }
+    }
     try prepareApplicationSession(&session, response);
     if (definition.mode == .websocket) transport.consumeBufferedInput();
     while (true) {
+        if (transport.controlPtr()) |node| {
+            const deadline = node.write_deadline_ns.load(.acquire);
+            if (deadline != 0 and clock.monotonicNs() >= deadline) {
+                reason = .timeout;
+                return error.Timeout;
+            }
+        }
         if (session.wire_len != 0) {
             if (definition.mode == .websocket) transport.beginResponse(opts.write_timeout_ms);
             const writer = transport.writer();
@@ -165,7 +178,10 @@ fn runApplicationSession(transport: anytype, response: *res_mod.Response, defini
             if (session.protocol_yielded) continue;
             const now = clock.monotonicNs();
             if (session.read_deadline_ns == 0) session.read_deadline_ns = now +| @as(u64, definition.mode.websocket.read_timeout_ms) * std.time.ns_per_ms;
-            if (now >= session.read_deadline_ns) return error.Timeout;
+            if (now >= session.read_deadline_ns) {
+                reason = .timeout;
+                return error.Timeout;
+            }
             const remaining_ms: u32 = @intCast(@min(std.math.maxInt(u32), (session.read_deadline_ns - now + std.time.ns_per_ms - 1) / std.time.ns_per_ms));
             var vec = [_][]u8{try session.receiveBuffer()};
             const n = transport.read(&vec, @min(remaining_ms, 100), true) catch |err| {

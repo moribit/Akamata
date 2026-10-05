@@ -1,0 +1,120 @@
+{
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "zig_version": "0.17.0",
+  "binary_sha256": "22457a89e88089a974f43557561e1e0785fb88f63f0c64fff3e8ffc5a9f78b52",
+  "command": [
+    "tools/bench/runtime_application_isolation.py",
+    "./.zig-cache/o/777afa56a90eeffe2816229091496c67/runtime-contract-server",
+    "--output",
+    ".zig-cache/runtime-application-isolation.json"
+  ],
+  "runs": [
+    {
+      "adapter": "threaded",
+      "scenario": "four-idle-upgrades",
+      "http_isolated": true,
+      "probe_ms": 0.22439399998575027,
+      "shutdown_ms": 163.61478900000748,
+      "allocator": {
+        "calls": 139,
+        "requested": 23135,
+        "live": 0,
+        "peak": 13268
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "four-slow-streams",
+      "http_isolated": true,
+      "probe_ms": 0.19103899998640372,
+      "shutdown_ms": 163.5725099999945,
+      "allocator": {
+        "calls": 143,
+        "requested": 80887,
+        "live": 0,
+        "peak": 71020
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "mixed-upgrade-stream",
+      "http_isolated": true,
+      "probe_ms": 0.28117499999780193,
+      "shutdown_ms": 163.5608019999779,
+      "allocator": {
+        "calls": 141,
+        "requested": 52011,
+        "live": 0,
+        "peak": 42144
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "application-queue-overflow-recovery",
+      "threaded_option_ignored": true,
+      "admission_recovered": true,
+      "shutdown_ms": 664.3293469999776,
+      "allocator": {
+        "calls": 137,
+        "requested": 21201,
+        "live": 0,
+        "peak": 7466
+      }
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "four-idle-upgrades",
+      "http_isolated": true,
+      "probe_ms": 0.090346999996882,
+      "shutdown_ms": 163.64038400001846,
+      "allocator": {
+        "calls": 161,
+        "requested": 438471,
+        "live": 0,
+        "peak": 407284
+      }
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "four-slow-streams",
+      "http_isolated": true,
+      "probe_ms": 0.12377699999888137,
+      "shutdown_ms": 163.6192699999981,
+      "allocator": {
+        "calls": 157,
+        "requested": 301287,
+        "live": 0,
+        "peak": 270100
+      }
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "mixed-upgrade-stream",
+      "http_isolated": true,
+      "probe_ms": 0.09023699999488599,
+      "shutdown_ms": 163.62701100001686,
+      "allocator": {
+        "calls": 159,
+        "requested": 369879,
+        "live": 0,
+        "peak": 338692
+      }
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "application-queue-overflow-recovery",
+      "overflow_closed_without_response": true,
+      "admission_recovered": true,
+      "shutdown_ms": 1.1042780000138919,
+      "allocator": {
+        "calls": 150,
+        "requested": 128369,
+        "live": 0,
+        "peak": 73928
+      }
+    }
+  ],
+  "scope": "application isolation/admission gate; not full production certification",
+  "isolation_passed": true,
+  "note": "Incremental isolation gate; full Phase 6 completion additionally requires lifecycle/ownership and fairness Contract parity."
+}
