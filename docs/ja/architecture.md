@@ -6,7 +6,7 @@ Akamataは同じZig applicationをNative／VPS／Container／Cloudflare Workers�
 
 - `src/app.zig`がroute登録、middleware chain、lifecycle hook、dispatchを管理します。`src/context.zig`がrequest、response、application state、portable serviceを提供します。handlerは`*am.Context(State)`、middlewareはContextと`am.Next(State)`を受け取ります。
 - `src/static_router.zig`、`static_middleware.zig`、`contract.zig`は同じAppへのcompile-time登録／bindingを提供します。別系統のHTTP Server APIではありません。
-- `src/serve.zig`がbackendを選択します。Nativeのlistener／admission／lifecycleは`runtime/threaded.zig`、HTTP処理は共通の`http/connection.zig`に置き、`runtime/socket_transport.zig`をstatic dispatchします。Threadedは共通incremental Sessionを同期駆動し、private kqueue／epollは一つのevent loopと固定worker poolでsocketを多重化します。production Reactor gateは維持します。[現行lifecycleとTransport Contract](native-runtime-phases.md)を参照してください。
+- `src/serve.zig`がbackendを選択します。Nativeのlistener／admission／lifecycleは`runtime/threaded.zig`、HTTP処理は共通の`http/connection.zig`に置き、`runtime/socket_transport.zig`をstatic dispatchします。Threadedは共通incremental Sessionを同期駆動し、private kqueue／epollは一つのevent loopと固定worker poolでsocketを多重化します。production Reactor gateは維持します。[現行lifecycleとTransport Contract](runtime-transport.md)を参照してください。
 - Workersは`src/runtime/workers.zig`と`deploy/worker/`のJavaScript WASM bridgeを使い、同じAppへdispatchします。JSPIによる非同期host操作の中断を含め、request全体を直列化します。bridgeの実装詳細はapplication handlerから隔離します。
 - Database、Storage、Queue、Realtimeはportable interfaceとplatform adapterを持ちます。SQLite／TursoとWorkers D1は`am.db.Db`、filesystemとWorkers R2はStorage境界を利用します。platform限定のcapabilityは明示します。
 
@@ -57,3 +57,5 @@ Cloudflare操作は`command → cloudflare/operations.zig → cloudflare/wrangle
 - Workers D1は非同期JSPI bridgeを必要とし、bridgeが無い場合はfail closedです。Native限定job queueとMQTTはcapability限定です。portable scheduled eventはPhase 2で設計します。
 
 削除API、検証内容、次の設計評価は[v0.2 Phase 1](v0.2-phase1.md)を参照してください。
+
+Native Reactorは有限application stepとconnection ownershipを分離します。同期stream/upgradeはThreadedで維持し、Reactorではincremental sessionを必須とします。共通HTTP・bounded queue/output・static Transportの構造と公開gate判断は [Phase 6–9](native-reactor-phases6-9.md) を参照してください。

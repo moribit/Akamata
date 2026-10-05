@@ -10,7 +10,7 @@ Buffered HTTP responses also use the shared response cursor: Reactor sends 4 KiB
 
 Read deadlines are absolute per frame (partial bytes do not renew them). Stream output budgets begin with headers and include producer waits; WebSocket budgets apply per handshake/frame. Shutdown stops admissions, drains finite streams within grace, closes idle/upgraded sessions, force-shuts I/O at deadline, and joins running application work.
 
-Local validation: 32 shared cases each on legacy Threaded, incremental Threaded and kqueue (96 total), isolation/admission gate, stress and allocation/lifecycle faults. The fixture asserts equal created/closed session counts and GPA cleanup. Linux/epoll is verified with the same CI targets before Phase 7 proceeds.
+Local validation: 33 shared cases each on legacy Threaded, incremental Threaded and kqueue (99 total), isolation/admission gate, stress and allocation/lifecycle faults. The fixture asserts equal created/closed session counts and GPA cleanup. Linux/epoll passed the same targets in CI 37286692679 (all 15 jobs passed).
 
 Reproduce: `zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-stress-test -Doptimize=ReleaseSafe`. See [raw evidence](../../benchmark/results/runtime-phase6-2026-10-05/README.md). The following is the pre-implementation investigation/baseline, not the current implementation status.
 
@@ -127,3 +127,5 @@ zig build -Dbackend=workers -Dexample=chat -Doptimize=ReleaseSafe
 ```
 
 Phase 7–9 have not been completed. Reactor remains **Not Ready**.
+
+Current certification and release decision: [Phases 6–9 report](native-reactor-phases6-9.md).

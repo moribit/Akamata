@@ -22,17 +22,20 @@ Standard OS ABI definitions, level-triggered readiness, generation tokens,
 bounded producer output and an indexed deadline heap keep resource ownership
 explicit. Application HTTP semantics live only in shared Session/connection.
 
-The same 29 socket Contract cases exercise Threaded and the host Reactor.
-Write budgets and forced drain are implemented. Synchronous stream/upgrade
-handlers can still occupy bounded workers; passing these cases does not prove
-production isolation for many long-lived upgraded connections.
+The same 33 socket Contract cases exercise Threaded and the host Reactor.
+Write budgets and forced drain are implemented. Reactor requires owned incremental
+stream/frame sessions; synchronous stream/upgrade is explicitly unsupported.
+Idle and slow sessions do not occupy workers. Contract and isolation success
+still do not certify production readiness; long cross-platform evidence is required.
 
 ```sh
 zig build transport-contract-test runtime-poc-test -Doptimize=ReleaseSafe
 zig build runtime-reactor-bench -Doptimize=ReleaseFast
 ```
 
-See [current phase report](native-runtime-phases.md) for architecture, budget
+See [current phase report](native-reactor-phases6-9.md) for architecture, budget
 semantics, Group decision, platform results and production gate evidence.
-[Earlier runtime audit](runtime-transport.md) and historical benchmarks describe
-older implementations; they cannot certify the current Reactor production gate.
+[Transport Contract](runtime-transport.md) and historical benchmarks should be distinguished from
+current measurements; historical data cannot certify the current Reactor production gate.
+
+Current certification and release decision: [Phases 6–9 report](native-reactor-phases6-9.md).

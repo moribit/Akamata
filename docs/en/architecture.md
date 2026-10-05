@@ -6,7 +6,7 @@ Akamata runs the same Zig application on Native/VPS/Containers and Cloudflare Wo
 
 - `src/app.zig` owns route registration, middleware chains, lifecycle hooks, and dispatch. `src/context.zig` provides request data, responses, application state, and portable services. Handlers receive `*am.Context(State)`; middleware receives that Context and `am.Next(State)`.
 - `src/static_router.zig`, `static_middleware.zig`, and `contract.zig` provide compile-time registration/binding into the same App dispatch. They are not a separate HTTP server API.
-- `src/serve.zig` selects the backend. Native listener/admission/lifecycle lives in `runtime/threaded.zig`; `http/connection.zig` owns shared HTTP semantics, using a statically dispatched `runtime/socket_transport.zig`. Threaded drives the shared incremental Session synchronously; private kqueue/epoll evaluation multiplexes sockets with a bounded handler pool. Public Reactor selection stays fail-closed. See [current lifecycle and Transport Contract](native-runtime-phases.md).
+- `src/serve.zig` selects the backend. Native listener/admission/lifecycle lives in `runtime/threaded.zig`; `http/connection.zig` owns shared HTTP semantics, using a statically dispatched `runtime/socket_transport.zig`. Threaded drives the shared incremental Session synchronously; private kqueue/epoll evaluation multiplexes sockets with a bounded handler pool. Public Reactor selection stays fail-closed. See [current lifecycle and Transport Contract](runtime-transport.md).
 - Workers uses `src/runtime/workers.zig` and the JavaScript WASM bridge under `deploy/worker/`. HTTP requests enter the same App dispatch. JSPI serializes a complete WASM request while asynchronous host operations suspend. Bridge details stay outside application handlers.
 - Database, storage, queue, and realtime abstractions expose portable interfaces with platform adapters. SQLite/Turso and Workers D1 use `am.db.Db`; filesystem and Workers R2 use the storage boundary. Platform-specific capabilities are explicit.
 
@@ -57,3 +57,5 @@ Cloudflare operations follow `command → cloudflare/operations.zig → cloudfla
 - Workers D1 requires the asynchronous JSPI bridge and fails closed if the bridge is unavailable. Native-only job queues and MQTT remain capability-specific; portable scheduled events are Phase 2 work.
 
 See [v0.2 Phase 1](v0.2-phase1.md) for breaking API removals, validation, and the next design review.
+
+Native Reactor separates finite application steps from connection ownership. Threaded preserves synchronous stream/upgrade; Reactor requires incremental sessions. Shared HTTP, bounded queues/output, static Transport and the unchanged release gate are documented in [Phases 6–9](native-reactor-phases6-9.md).

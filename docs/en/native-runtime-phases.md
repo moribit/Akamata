@@ -1,3 +1,5 @@
+Historical record: this document describes Phases 2–5. See the [current Phases 6–9 report](native-reactor-phases6-9.md).
+
 # Native runtime Phases 2–5
 
 Baseline: main 946f021, installed Zig 0.17.0 stdlib. Threaded stays default;
@@ -182,6 +184,5 @@ and writes .zig-cache/runtime-stress-full.json.
 ## Final CI validation
 
 Implementation `ce5ef1f` passed all 15 jobs in [CI](https://github.com/moribit/Akamata/actions/runs/37270065077). Linux Threaded/epoll and macOS Threaded/kqueue each passed the same 29-case Contract, alongside ReleaseSafe fault/unit tests, Group Contract and quick stress. Raw CI stress data and implementation provenance are saved in the [Phase 5 evidence](../../benchmark/results/runtime-phase5-2026-10-05/README.md). Stress success includes reproducing the expected worker-isolation failure; it does not establish production suitability. The decision remains **Reactor Not Ready**.
-> See [reactor-application-execution.md](reactor-application-execution.md)
-> for Phase 6 foundations and the unmet application-isolation gate.
-> Phase 6 is incomplete; this does not certify Phase 7–9.
+> Subsequent Phase 6 isolation passed. See the [Phases 6–9 report](native-reactor-phases6-9.md)
+> for current certification and the performance-based Not Ready decision.
