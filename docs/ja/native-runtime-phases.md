@@ -170,3 +170,7 @@ zig build runtime-stress-full -Doptimize=ReleaseSafe
 CIではLinux Threaded/epoll、macOS Threaded/kqueueに同じContractとquick stress、
 Group PoCを実行し、platformごとのstress JSONをartifactへ保存します。
 full stressは通常CIから分離し、`.zig-cache/runtime-stress-full.json`へ出力します。
+
+## 最終CI検証
+
+実装コミット `ce5ef1f` の[CI](https://github.com/moribit/Akamata/actions/runs/37270065077)は15ジョブすべて成功。Linux Threaded/epoll、macOS Threaded/kqueueは、それぞれ同一の29件のContractに成功しました。ReleaseSafeのfault/unit test、Group Contract、quick stressも成功しています。CIのstress生データと検証対象SHAは [Phase 5測定記録](../../benchmark/results/runtime-phase5-2026-10-05/README.md) に保存しました。stress成功にはworker占有による隔離失敗の再現確認を含み、production適合を意味しません。判定は **Reactor Not Ready** のままです。

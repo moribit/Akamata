@@ -175,3 +175,7 @@ All runners own only their children. localhost port 8080 must be free for the
 benchmark matrix; the stress/Contract fixtures use OS-selected free ports.
 Baseline binaries must be rebuilt from 946f021 to reproduce before results.
 The recorded SHA identifies the preserved original baseline binary.
+
+## Final cross-platform CI
+
+Implementation `ce5ef1f40732c8c8de132b71a847b2aa28e262fa` passed all 15 jobs in [CI run 37270065077](https://github.com/moribit/Akamata/actions/runs/37270065077). Each of Linux Threaded/epoll and macOS Threaded/kqueue passed the same 29-case Contract. The CI jobs also ran ReleaseSafe fault/unit tests, Group Contract and quick stress. Raw stress artifacts are in `ci-linux/` and `ci-macos/`; run provenance is in `ci-validation.json`. The expected worker-isolation failure is recorded as evidence for **Not Ready**, not converted into a weaker production Contract. These final evidence additions change only documentation/data.
