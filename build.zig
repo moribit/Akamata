@@ -329,6 +329,9 @@ pub fn build(b: *std.Build) void {
                 .imports = &.{.{ .name = "akamata", .module = am_mod }},
             });
             const t = b.addTest(.{ .root_module = t_mod });
+            // Standalone src tests can import synchronization/cost directly,
+            // outside the akamata module's dependency namespace.
+            t_mod.addOptions("build_options", opts);
             test_step.dependOn(&b.addRunArtifact(t).step);
         }
         // CLI tests (parsing wrangler.toml, UUID extraction)
