@@ -74,6 +74,13 @@ def server(adapter, scenario):
     result["runs"].append(run)
     with tempfile.TemporaryFile() as log:
         proc = subprocess.Popen([str(binary), adapter, str(port), "incremental-certify"], stdout=log, stderr=log)
+        def wait_work_started():
+            for _ in range(100):
+                if b"APPLICATION_WORK_ENTERED" in os.pread(log.fileno(), 65536, 0):
+                    return
+                time.sleep(.01)
+            raise AssertionError("finite application work start barrier")
+        proc.wait_work_started = wait_work_started
         try:
             for _ in range(100):
                 try:
@@ -92,7 +99,11 @@ def server(adapter, scenario):
         finally:
             start = time.monotonic()
             if proc.poll() is None:
-                proc.send_signal(signal.SIGTERM)
+                # A prior signal may already have returned from serve() and
+                # restored the application's original disposition. Never send
+                # a third cleanup signal into that post-runtime teardown.
+                if not run.get("shutdown_requested"):
+                    proc.send_signal(signal.SIGTERM)
                 try:
                     proc.wait(timeout=5)
                 except subprocess.TimeoutExpired:
@@ -269,7 +280,12 @@ try:
                     finally:
                         client.close()
                 futures = [pool.submit(close_race, client) for client in clients]
+                work = c.Client(port)
+                clients.append(work)
+                work.send(c.request("/application-hold"))
+                proc.wait_work_started()
                 start.set()
+                run["shutdown_requested"] = True
                 proc.send_signal(signal.SIGTERM)
                 if proc.poll() is None:
                     try:
