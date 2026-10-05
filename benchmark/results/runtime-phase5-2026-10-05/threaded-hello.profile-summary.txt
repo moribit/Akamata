@@ -1,0 +1,7 @@
+Sort by top of stack, same collapsed (when >= 5):
+        poll  (in libsystem_kernel.dylib)        17340
+        __sendto  (in libsystem_kernel.dylib)        81
+        __recvmsg  (in libsystem_kernel.dylib)        55
+        http.connection.run__func_731  (in bench)        8
+        mach_absolute_time  (in libsystem_kernel.dylib)        8
+        mem.eql__func_25  (in bench)        8

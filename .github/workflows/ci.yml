@@ -42,6 +42,12 @@ jobs:
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
       - run: ${{ matrix.job.cmd }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always() && matrix.job.name == 'linux threaded + epoll contract'
+        with:
+          name: runtime-stress-linux
+          path: .zig-cache/runtime-stress.json
+          if-no-files-found: ignore
 
   macos-native:
     name: macos native + kqueue contract
@@ -56,6 +62,12 @@ jobs:
       - run: zig build test
       - run: zig build -Dexample=bench
       - run: zig build transport-contract-test runtime-poc-test runtime-stress-test -Doptimize=ReleaseSafe
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: runtime-stress-macos
+          path: .zig-cache/runtime-stress.json
+          if-no-files-found: ignore
 
   cli-smoke:
     name: cli init smoke test

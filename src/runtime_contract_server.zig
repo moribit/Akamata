@@ -10,6 +10,7 @@ test {
     _ = @import("runtime/reactor_notifications.zig");
     _ = @import("runtime/reactor.zig");
     _ = @import("runtime/reactor_output.zig");
+    _ = @import("http/session.zig");
 }
 
 pub fn main(init: std.process.Init) !void {

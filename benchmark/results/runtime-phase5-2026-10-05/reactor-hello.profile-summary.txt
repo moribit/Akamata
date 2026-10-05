@@ -1,0 +1,20 @@
+Sort by top of stack, same collapsed (when >= 5):
+        __psynch_cvwait  (in libsystem_kernel.dylib)        10230
+        kevent  (in libsystem_kernel.dylib)        702
+        __psynch_mutexwait  (in libsystem_kernel.dylib)        476
+        __recvfrom  (in libsystem_kernel.dylib)        183
+        __sendto  (in libsystem_kernel.dylib)        162
+        write  (in libsystem_kernel.dylib)        118
+        __psynch_cvsignal  (in libsystem_kernel.dylib)        106
+        __psynch_mutexdrop  (in libsystem_kernel.dylib)        59
+        read  (in libsystem_kernel.dylib)        36
+        runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench)        26
+        mem.eql__func_28  (in runtime-reactor-bench)        14
+        Thread.PosixThreadImpl.spawn__func_769.Instance.entryFn  (in runtime-reactor-bench)        10
+        runtime.reactor.evaluate__func_29  (in runtime-reactor-bench)        8
+        mach_absolute_time  (in libsystem_kernel.dylib)        7
+        __munmap  (in libsystem_kernel.dylib)        6
+        mem.findPos__func_727  (in runtime-reactor-bench)        6
+        pthread_mutex_lock  (in libsystem_pthread.dylib)        6
+        pthread_mutex_unlock  (in libsystem_pthread.dylib)        6
+        heap.ArenaAllocator.alloc  (in runtime-reactor-bench)        5

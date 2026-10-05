@@ -299,6 +299,10 @@ fn Context(comptime State: type) type {
             var total: usize = 0;
             while (c.phase == .reading and total < 64 * 1024) {
                 const need = c.need orelse return;
+                if (clock.monotonicNs() >= need.deadline_ns) {
+                    self.fail(c);
+                    return;
+                }
                 const buffer = c.session.writable(need.maximum) catch {
                     self.fail(c);
                     return;
@@ -449,5 +453,28 @@ fn allocationFailureSetup(gpa: std.mem.Allocator) !void {
     defer ctx.deinit();
 }
 test "reactor setup rolls back every allocation failure" {
+    const before = testFdCount();
     try std.testing.checkAllAllocationFailures(std.testing.allocator, allocationFailureSetup, .{});
+    try std.testing.expectEqual(before, testFdCount());
+}
+fn testFdCount() usize {
+    var count: usize = 0;
+    for (0..256) |fd| if (std.c.fcntl(@intCast(fd), std.c.F.GETFD) >= 0) {
+        count += 1;
+    };
+    return count;
+}
+test "stale generation tokens never resolve a recycled slot" {
+    const State = struct {};
+    var app = app_mod.App(State).init(std.testing.allocator, .{});
+    defer app.deinit();
+    const opts: app_mod.ServeOptions = .{ .max_connections = 2 };
+    var ctx = try Context(State).init(&app, std.testing.io, &opts, -1);
+    defer ctx.deinit();
+    var connection: Context(State).Connection = undefined;
+    ctx.slots[0] = .{ .generation = 2, .connection = &connection };
+    defer ctx.slots[0].connection = null;
+    try std.testing.expect(ctx.lookup((@as(u64, 1) << 32) | 2) == null);
+    try std.testing.expect(ctx.lookup((@as(u64, 2) << 32) | 2) == &connection);
+    try std.testing.expect(ctx.lookup((@as(u64, 2) << 32) | 100) == null);
 }

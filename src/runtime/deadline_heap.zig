@@ -92,3 +92,27 @@ test "indexed deadlines replace/remove without stale entries" {
     heap.set(1, 0);
     try std.testing.expect(heap.top() == null);
 }
+
+test "indexed timer updates match a reference under replacement churn" {
+    var heap = try Heap.init(std.testing.allocator, 64);
+    defer heap.deinit(std.testing.allocator);
+    var model: [64]u64 = @splat(0);
+    var random: u64 = 42;
+    for (0..10000) |_| {
+        random = random *% 6364136223846793005 +% 1;
+        const slot: usize = @intCast(random % model.len);
+        random = random *% 6364136223846793005 +% 1;
+        const deadline = if (random % 5 == 0) 0 else random % 1000 + 1;
+        model[slot] = deadline;
+        heap.set(slot, deadline);
+        var count: usize = 0;
+        var minimum: u64 = std.math.maxInt(u64);
+        for (model, 0..) |value, i| if (value != 0) {
+            count += 1;
+            minimum = @min(minimum, value);
+            try std.testing.expectEqual(i, heap.entries[heap.positions[i]].slot);
+        };
+        try std.testing.expectEqual(count, heap.len);
+        if (count == 0) try std.testing.expect(heap.top() == null) else try std.testing.expectEqual(minimum, heap.top().?.deadline);
+    }
+}

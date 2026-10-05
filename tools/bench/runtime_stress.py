@@ -22,6 +22,7 @@ import sys
 import tempfile
 import time
 
+sys.dont_write_bytecode = True
 p = argparse.ArgumentParser()
 p.add_argument("binary")
 p.add_argument("--output", required=True)

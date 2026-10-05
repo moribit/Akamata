@@ -92,5 +92,70 @@ upgradeはhandler scope内で借用socketを所有します。read-aheadをコ�
 workerを占有するため、production判断ではworker starvationを独立に検証します。
 forced drainはsocketとproducer待機を中断しますが、CPU-bound handlerはpreemptしません。
 
-macOSではThreaded/kqueue各27 Contractが成功しました。Linux epollはcross-build済みで、
-実行結果はCIで確認します。Phase 5の証拠が揃うまでpublic reactor gateを維持します。
+macOSではThreaded/kqueue各27 Contractが成功しました。Linux epollもCIで同じContractとquick stressが成功しました。Phase 5の証拠が揃うまでpublic reactor gateを維持します。
+
+## Phase 5 最終判断: Reactor Not Ready
+
+Threaded・true kqueue・true epollへ同じ27項目のContractを適用しました。
+Linux CIではReleaseSafe Contractとquick stress、macOSローカルではfull stressが成功しました。
+setup/input growth/parserの全allocation failure、partial send/EAGAIN、EPIPE、
+generationによるstale event排除、notification overflow、referenceと比較したtimer churnを
+unit testへ追加しました。socket側ではreset/disconnect、handler/stream error、
+read/write/total timeout、idle/partial input/write/stream/upgrade中のshutdownを検証します。
+
+64/256 idle、64並列・1024 connectionのburst/churn、pipeline、32 slowloris、
+fragmented 512KiB body、stream/upgrade、4 slow-readerの16MiB streamで検証しました。
+childだけのfd上限64でEMFILEを再現し、backoff・復帰・fd回収も確認しました。
+試験後のfdはbaselineへ戻り、管理対象allocationは0、DebugAllocator deinitも成功します。
+これは今回の有限試験での証拠であり、全workloadでのleak不存在を保証しません。
+
+重要な未達条件はworker isolationです。4件の長寿命upgradeが4 workerを占有すると、
+Reactorの通常HTTP requestは250ms以内に応答できません。Threadedは応答できます。
+forced drainは回収できますが、同期stream producerも同様にworkerを占有します。
+この期待される不足を試験結果へ明記し、production parity成功とは扱いません。
+
+32 connectionでReactorのhello/echo throughputはThreadedより約45%/47%低く、
+DBも約15%低下しました。profileではworker handoff、condition/mutex、pipe wakeup、
+selector更新のコストが見えますが、一つの原因の寄与率までは分離できていません。
+推測によるlock-free化やdeadline緩和は行っていません。
+
+256 idleではReactorは9 thread、Threadedは264 thread、RSSは約10%低く、
+idle shutdownは約4ms対130msです。ただし、この利点で隔離不足と速度低下を相殺しません。
+defaultはThreaded、`.runtime = .reactor`は`ExperimentalRuntimeDisabled`を維持します。
+
+Threadedの最終uninstrumented比較は946f021に対してhello −0.5%、echo −0.4%、
+DB +5.1%で重大な全般的regressionはありません。hello P99の約9%増加も隠さず記録します。
+[全比較表・raw data・profile・再現手順](../../benchmark/results/runtime-phase5-2026-10-05/README.md)
+にP50/P95/P99、CPU、RSS、fd/thread、allocation、shutdownを残しました。
+short-livedは500req/sのpaced評価、stream/upgradeは短いfixture exchangeです。
+Linuxでの性能測定、長時間soak、より広いOS/allocator fault、race/sanitizer評価は残課題です。
+
+### Zig 0.17 workaroundと次の設計
+
+- raw acceptは維持します。インストール済み0.17 netAcceptPosixはnonblockingのEAGAINを
+  回復可能な結果として返さず、readiness後のraceに使えません。
+- Threaded read/pollはabsolute deadlineとdetached workerのcancel scope不足のため維持します。
+  Reactorはnonblocking recvとkqueue/epoll、同期upgrade readはbounded pollを使います。
+- bounded sendはstdlib blocking socket writerへEAGAINを渡さず、std.Io.Writer framingを再利用します。
+- pthread Mutex/Conditionはstd.c ABI定義を使います。Db/Conn APIがIoを保持・引数で受けないため、
+  Io同期への移行には別のownership/cancellation設計が必要です。
+- signalは標準SIG/Sigactionを使い、古いcastや手書きpoll structを削除しました。
+  最初のshutdown timestamp、listener interruption、signalを繰り返しても更新しないbudgetは維持します。
+- detached connection worker、atomic active count、registry drainはproductionに残します。
+  Groupはownership改善だけでなくDB性能低下とidle thread削減なしを評価し、採用を見送りました。
+  Reactor workerは固定数でjoinし、HTTP semanticsとは分離します。
+
+次は長寿命stream/upgradeのbounded admission・ownership・通常HTTP隔離を設計するか、
+portable incremental frame/producer task APIを検討します。Groupだけでは既存同期handlerの
+占有問題は解決しません。wakeup/selector batchingをprofileに基づいて評価した後、
+Linux/macOS全Contract・stress/fault/resourceを再実施してください。
+CPU-boundや第三者のblocking処理は引き続き協調cancelが必要です。
+
+```sh
+zig build runtime-contract-unit runtime-stress-test -Doptimize=ReleaseSafe
+zig build runtime-stress-full -Doptimize=ReleaseSafe
+```
+
+CIではLinux Threaded/epoll、macOS Threaded/kqueueに同じContractとquick stress、
+Group PoCを実行し、platformごとのstress JSONをartifactへ保存します。
+full stressは通常CIから分離し、`.zig-cache/runtime-stress-full.json`へ出力します。

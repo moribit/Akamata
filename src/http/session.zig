@@ -84,3 +84,32 @@ pub const Session = struct {
         self.body_phase = false;
     }
 };
+
+fn failingIncrementalRequest(gpa: std.mem.Allocator) !void {
+    const opts: app_mod.ServeOptions = .{ .parse_limits = .{ .max_request_bytes = 256, .max_headers = 8, .max_body_bytes = 32768 } };
+    var session = try Session.init(gpa, &opts);
+    defer session.deinit();
+    const header = "POST /echo HTTP/1.1\r\nHost: a\r\nContent-Length: 20000\r\n\r\n";
+    var raw: [header.len + 20000]u8 = undefined;
+    @memcpy(raw[0..header.len], header);
+    @memset(raw[header.len..], 'x');
+    var consumed: usize = 0;
+    while (true) switch (try session.next(&opts)) {
+        .input => |need| {
+            const writable_bytes = try session.writable(need.maximum);
+            const n = @min(raw.len - consumed, @min(writable_bytes.len, 701));
+            @memcpy(writable_bytes[0..n], raw[consumed..][0..n]);
+            consumed += n;
+            session.received(n);
+        },
+        .request => |parsed| {
+            try std.testing.expectEqual(raw.len, parsed.consumed);
+            try std.testing.expectEqualSlices(u8, raw[header.len..], parsed.request.body);
+            return;
+        },
+        .issue => return error.UnexpectedProtocolIssue,
+    };
+}
+test "incremental input growth and parser allocation failures clean up" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, failingIncrementalRequest, .{});
+}

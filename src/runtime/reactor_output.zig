@@ -77,6 +77,8 @@ pub fn Output(comptime Owner: type) type {
             defer self.mutex.unlock();
             if (self.failed) return error.ConnectionWriteFailed;
             if (self.len == 0) return;
+            const deadline = self.node.write_deadline_ns.load(.acquire);
+            if (deadline != 0 and clock.monotonicNs() >= deadline) return error.ConnectionWriteFailed;
             const n = std.c.send(fd, self.bytes[self.offset..self.len].ptr, self.len - self.offset, std.c.MSG.DONTWAIT | std.c.MSG.NOSIGNAL);
             if (n < 0) switch (std.posix.errno(n)) {
                 .AGAIN, .INTR => return,
@@ -135,6 +137,10 @@ test "pending output preserves partial send, EAGAIN and disconnect" {
     try std.testing.expectEqualSlices(u8, &bytes, &received);
     try std.testing.expect(!output.status().pending);
     try output.interface.writeAll(&bytes);
+    node.write_deadline_ns.store(1, .release);
+    try std.testing.expectError(error.ConnectionWriteFailed, output.pump(sockets[0]));
+    try std.testing.expectEqual(@as(usize, 0), output.offset);
+    node.write_deadline_ns.store(clock.monotonicNs() + std.time.ns_per_s, .release);
     _ = std.c.close(sockets[1]);
     peer_open = false;
     try std.testing.expectError(error.ConnectionWriteFailed, output.pump(sockets[0]));

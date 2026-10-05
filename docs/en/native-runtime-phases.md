@@ -105,6 +105,62 @@ Force drain interrupts sockets and bounded producer waits, but does not preempt
 arbitrary CPU-bound application handlers.
 
 MacOS Threaded and true kqueue pass the same 27 Contract cases. The Linux epoll
-fixture cross-compiles; actual Linux execution is required in CI. The public
+fixture cross-compiles and the same Contract now passes on Linux CI. The public
 App and direct reactor serve gates remain disabled while Phase 5 evaluates
 resource behavior, handler starvation and platform parity.
+
+## Phase 5 decision: Reactor Not Ready
+
+Threaded, true kqueue and true epoll run the same 27 Contract cases. Linux
+ReleaseSafe Contract and quick stress pass in CI; local macOS full stress also
+passes. Setup/input/parser allocation failures, constrained partial send/EAGAIN,
+EPIPE, stale generations, bounded wakeup overflow and reference-checked timer
+churn accompany socket reset/error/timeout/drain coverage. Managed allocation
+and FD rollback/cleanup are verified for these bounded runs, not every workload.
+
+Four synchronous long-lived upgrades fill four workers and delay an unrelated
+HTTP request beyond 250ms; Threaded answers it. Slow stream producers can also
+occupy workers. Forced drain succeeds, but production isolation does not.
+Reactor hello/echo throughput at 32 connections is about 45%/47% lower; DB is
+15% lower. Profiles show worker handoff, condition/mutex, pipe and selector costs
+without proving one causal percentage. No speculative optimization was applied.
+
+At 256 idle clients Reactor uses nine threads versus Threaded's 264, roughly
+10% less RSS and about 4ms versus 130ms idle shutdown. Those gains do not remove
+the blockers. Threaded remains default; Reactor still fails closed. The final
+untracked Threaded check against 946f021 is −0.5% / −0.4% / +5.1% hello/echo/db
+throughput with no major broad regression; hello P99 variation is retained.
+
+[Full tables, raw data, profiles and reproduction](../../benchmark/results/runtime-phase5-2026-10-05/README.md)
+include latency, CPU, RSS, FD/thread, allocation and shutdown observations.
+Short-lived traffic is paced; stream/upgrade fixture timings are smoke results.
+Linux performance measurements, longer soak, broader OS/allocator faults and
+race/sanitizer analysis remain future certification requirements.
+
+### Zig 0.17 choices and next work
+
+Raw nonblocking accept remains: installed netAcceptPosix does not expose EAGAIN
+as recoverable. Threaded poll/read remains for deadlines without detached-worker
+Io cancellation scopes. Reactor uses nonblocking recv and kernel readiness;
+upgrade's synchronous read needs bounded poll. Bounded send bypasses standard
+blocking writers while retaining std.Io.Writer framing. Pthread synchronization
+uses std.c ABI types because shared Db/Conn APIs do not own/pass Io. Signals use
+standard SIG/Sigaction; obsolete casts and handmade polling structs are removed.
+Detached workers, atomic active count and owned registry drain remain production.
+Group improves ownership but measured DB loss and unchanged idle thread cost
+do not justify adoption. Reactor workers are fixed and joined.
+
+Next design work: explicit bounded long-lived stream/upgrade admission and
+ownership, or portable incremental frame/producer tasks. Group alone does not
+make synchronous handlers suspend efficiently. Profile batching/wakeup/selector
+costs before optimization, then repeat full Linux/macOS correctness/resource
+evaluation. CPU-bound and arbitrary blocking handlers still must cooperate.
+
+```sh
+zig build runtime-contract-unit runtime-stress-test -Doptimize=ReleaseSafe
+zig build runtime-stress-full -Doptimize=ReleaseSafe
+```
+
+CI runs Threaded+epoll on Linux and Threaded+kqueue on macOS, quick stress and
+Group PoC. Platform stress JSON is uploaded. Full local stress remains separate
+and writes .zig-cache/runtime-stress-full.json.
