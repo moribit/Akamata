@@ -53,7 +53,6 @@ fn Context(comptime State: type) type {
             phase: Phase = .reading,
             need: ?sessions.Need = null,
             job: sessions.Event = undefined,
-            next_job: ?*Connection = null,
             busy: bool = false,
             done: std.atomic.Value(bool) = .init(false),
             outcome: http.Outcome = .close,
@@ -107,8 +106,7 @@ fn Context(comptime State: type) type {
         workers: std.ArrayList(std.Thread) = .empty,
         jobs_mutex: sync.Mutex,
         jobs_changed: sync.Condition,
-        jobs_head: ?*Connection = null,
-        jobs_tail: ?*Connection = null,
+        jobs: @import("application_admission.zig").Queue(*Connection),
         stop_workers: bool = false,
         stopping: bool = false,
         forced: bool = false,
@@ -117,6 +115,10 @@ fn Context(comptime State: type) type {
         accept_backoff_ms: u32 = 0,
         fn init(app: *app_mod.App(State), io: std.Io, opts: *const app_mod.ServeOptions, listener: c_int) !Self {
             const gpa = app.gpa;
+            const task_limit = opts.max_pending_application_tasks orelse opts.max_connections;
+            if (task_limit == 0 or task_limit > opts.max_connections) return error.InvalidApplicationTaskLimit;
+            var jobs = try @import("application_admission.zig").Queue(*Connection).init(gpa, task_limit);
+            errdefer jobs.deinit(gpa);
             var selector = try readiness.Selector.init();
             errdefer selector.deinit();
             var wake: [2]c_int = undefined;
@@ -139,7 +141,7 @@ fn Context(comptime State: type) type {
             errdefer timers.deinit(gpa);
             var notifications = try @import("reactor_notifications.zig").Queue.init(gpa, slots.len);
             errdefer notifications.deinit(gpa);
-            return .{ .app = app, .io = io, .opts = opts, .listener = listener, .selector = selector, .wake = wake, .notifications = notifications, .timers = timers, .slots = slots, .free_slots = free, .free_len = free.len, .registry = .{ .mutex = .init() }, .jobs_mutex = .init(), .jobs_changed = .init() };
+            return .{ .app = app, .io = io, .opts = opts, .listener = listener, .selector = selector, .wake = wake, .notifications = notifications, .timers = timers, .slots = slots, .free_slots = free, .free_len = free.len, .registry = .{ .mutex = .init() }, .jobs = jobs, .jobs_mutex = .init(), .jobs_changed = .init() };
         }
         fn deinit(self: *Self) void {
             self.registry.force();
@@ -149,6 +151,10 @@ fn Context(comptime State: type) type {
             self.jobs_changed.broadcast();
             self.jobs_mutex.unlock();
             for (self.workers.items) |worker| worker.join();
+            // Setup/unit evaluation may not have started any workers. Abort
+            // above revokes their I/O; queued borrows are now unowned.
+            while (self.jobs.pop()) |_| {}
+            self.jobs.deinit(self.app.gpa);
             for (self.slots) |slot| if (slot.connection) |c| self.destroy(c);
             self.workers.deinit(self.app.gpa);
             self.jobs_changed.deinit();
@@ -170,13 +176,11 @@ fn Context(comptime State: type) type {
         fn workerMain(self: *Self) void {
             while (true) {
                 self.jobs_mutex.lock();
-                while (self.jobs_head == null and !self.stop_workers) self.jobs_changed.wait(&self.jobs_mutex);
-                const c = self.jobs_head orelse {
+                while (self.jobs.len == 0 and !self.stop_workers) self.jobs_changed.wait(&self.jobs_mutex);
+                const c = self.jobs.pop() orelse {
                     self.jobs_mutex.unlock();
                     return;
                 };
-                self.jobs_head = c.next_job;
-                if (self.jobs_head == null) self.jobs_tail = null;
                 self.jobs_mutex.unlock();
                 var transport: Transport = .{ .connection = c };
                 c.outcome = .close;
@@ -264,9 +268,14 @@ fn Context(comptime State: type) type {
                     c.consumed = if (event == .request) event.request.consumed else 0;
                     self.timers.remove(c.slot);
                     self.jobs_mutex.lock();
-                    c.next_job = null;
-                    if (self.jobs_tail) |tail| tail.next_job = c else self.jobs_head = c;
-                    self.jobs_tail = c;
+                    if (!self.jobs.push(c)) {
+                        self.jobs_mutex.unlock();
+                        // No worker owns the rejected borrow. fail() must not
+                        // wait for a completion which can never be published.
+                        c.busy = false;
+                        self.fail(c);
+                        return;
+                    }
                     self.jobs_changed.signal();
                     self.jobs_mutex.unlock();
                 },
@@ -504,4 +513,51 @@ test "failed pending output after worker completion reclaims admission" {
     ctx.fail(connection);
     try std.testing.expectEqual(@as(usize, 0), ctx.count);
     try std.testing.expect(ctx.slots[0].connection == null);
+}
+
+test "application queue overflow closes only the unowned connection" {
+    const State = struct {};
+    var app = app_mod.App(State).init(std.testing.allocator, .{});
+    defer app.deinit();
+    const opts: app_mod.ServeOptions = .{ .max_connections = 2, .max_pending_application_tasks = 1 };
+    var ctx = try Context(State).init(&app, std.testing.io, &opts, -1);
+    defer ctx.deinit();
+    var peers: [2]c_int = undefined;
+    for (&peers) |*peer| {
+        var sockets: [2]c_int = undefined;
+        try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
+        peer.* = sockets[1];
+        try ctx.admit(.{ .socket = .{ .handle = sockets[0], .address = .{ .ip4 = .{ .bytes = .{ 127, 0, 0, 1 }, .port = 0 } } } });
+    }
+    defer for (peers) |peer| {
+        _ = std.c.close(peer);
+    };
+    const first = ctx.slots[0].connection.?;
+    const second = ctx.slots[1].connection.?;
+    const second_token = second.token;
+    const request = "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n";
+    for ([_]*Context(State).Connection{ first, second }) |connection| {
+        const writable = try connection.session.writable(request.len);
+        @memcpy(writable[0..request.len], request);
+        connection.session.received(request.len);
+        try ctx.drive(connection);
+    }
+    try std.testing.expectEqual(@as(usize, 1), ctx.count);
+    try std.testing.expectEqual(@as(usize, 1), ctx.jobs.len);
+    try std.testing.expect(first.busy);
+    try std.testing.expect(ctx.lookup(second_token) == null);
+    try std.testing.expect(ctx.slots[0].connection == first);
+    // deinit exercises aborted queued ownership without starting any workers.
+}
+
+test "invalid application limits are rejected before opening reactor resources" {
+    const State = struct {};
+    var app = app_mod.App(State).init(std.testing.allocator, .{});
+    defer app.deinit();
+    const before = testFdCount();
+    for ([_]usize{ 0, 3 }) |limit| {
+        const opts: app_mod.ServeOptions = .{ .max_connections = 2, .max_pending_application_tasks = limit };
+        try std.testing.expectError(error.InvalidApplicationTaskLimit, Context(State).init(&app, std.testing.io, &opts, -1));
+    }
+    try std.testing.expectEqual(before, testFdCount());
 }

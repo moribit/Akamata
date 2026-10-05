@@ -21,7 +21,7 @@ jobs:
           - name: native-integration
             cmd: zig build integration transport-contract-test runtime-poc-test
           - name: linux threaded + epoll contract
-            cmd: zig build transport-contract-test runtime-poc-test runtime-stress-test -Doptimize=ReleaseSafe
+            cmd: zig build transport-contract-test runtime-poc-test runtime-stress-test runtime-isolation-evaluate -Doptimize=ReleaseSafe
           - name: tasks-test
             cmd: zig build tasks-test
           - name: cli-build
@@ -46,7 +46,9 @@ jobs:
         if: always() && matrix.job.name == 'linux threaded + epoll contract'
         with:
           name: runtime-stress-linux
-          path: .zig-cache/runtime-stress.json
+          path: |
+            .zig-cache/runtime-stress.json
+            .zig-cache/runtime-application-isolation.json
           if-no-files-found: ignore
 
   macos-native:
@@ -61,12 +63,14 @@ jobs:
       - run: ./third_party/sqlite/fetch.sh
       - run: zig build test
       - run: zig build -Dexample=bench
-      - run: zig build transport-contract-test runtime-poc-test runtime-stress-test -Doptimize=ReleaseSafe
+      - run: zig build transport-contract-test runtime-poc-test runtime-stress-test runtime-isolation-evaluate -Doptimize=ReleaseSafe
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: runtime-stress-macos
-          path: .zig-cache/runtime-stress.json
+          path: |
+            .zig-cache/runtime-stress.json
+            .zig-cache/runtime-application-isolation.json
           if-no-files-found: ignore
 
   cli-smoke:

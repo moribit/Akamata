@@ -296,6 +296,14 @@ pub fn build(b: *std.Build) void {
         stress_full.addArtifactArg(contract_server);
         stress_full.addArgs(&.{ "--output", ".zig-cache/runtime-stress-full.json" });
         b.step("runtime-stress-full", "run full local runtime stress matrix").dependOn(&stress_full.step);
+        const isolation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_application_isolation.py" });
+        isolation.addArtifactArg(contract_server);
+        isolation.addArgs(&.{ "--output", ".zig-cache/runtime-application-isolation.json" });
+        b.step("runtime-isolation-test", "require HTTP isolation from long-lived application execution (Phase 6 gate)").dependOn(&isolation.step);
+        const isolation_evaluation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_application_isolation.py" });
+        isolation_evaluation.addArtifactArg(contract_server);
+        isolation_evaluation.addArgs(&.{ "--record-blockers", "--output", ".zig-cache/runtime-application-isolation.json" });
+        b.step("runtime-isolation-evaluate", "record incomplete Phase 6 isolation and bounded admission without certification").dependOn(&isolation_evaluation.step);
         const poc_contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
         poc_contract.addArtifactArg(contract_server);
         poc_contract.addArgs(&.{ "--group", "--only-group" });

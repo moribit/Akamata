@@ -1,0 +1,121 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "zig_version": "0.17.0",
+  "binary_sha256": "cb0c72026c827ea9c41649e79284d2a906ee18d4bc7f038fbc4d5b8a168b93cc",
+  "command": [
+    "tools/bench/runtime_application_isolation.py",
+    "./.zig-cache/o/7c5c37a00bb6981b17d976b9483ea025/runtime-contract-server",
+    "--record-blockers",
+    "--output",
+    ".zig-cache/runtime-application-isolation.json"
+  ],
+  "runs": [
+    {
+      "adapter": "threaded",
+      "scenario": "four-idle-upgrades",
+      "http_isolated": true,
+      "probe_ms": 0.2594580000732094,
+      "shutdown_ms": 180.16812500718515,
+      "allocator": {
+        "calls": 108,
+        "requested": 19904,
+        "live": 0,
+        "peak": 12351
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "four-slow-streams",
+      "http_isolated": true,
+      "probe_ms": 0.13712499639950693,
+      "shutdown_ms": 179.58195800019894,
+      "allocator": {
+        "calls": 112,
+        "requested": 77656,
+        "live": 0,
+        "peak": 70103
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "mixed-upgrade-stream",
+      "http_isolated": true,
+      "probe_ms": 0.22262500715442002,
+      "shutdown_ms": 183.87833300221246,
+      "allocator": {
+        "calls": 110,
+        "requested": 48780,
+        "live": 0,
+        "peak": 41227
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "application-queue-overflow-recovery",
+      "threaded_option_ignored": true,
+      "admission_recovered": true,
+      "shutdown_ms": 126.2417079997249,
+      "allocator": {
+        "calls": 106,
+        "requested": 17970,
+        "live": 0,
+        "peak": 6549
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "four-idle-upgrades",
+      "http_isolated": false,
+      "probe_ms": 250.78783399658278,
+      "shutdown_ms": 177.03250001068227,
+      "allocator": {
+        "calls": 121,
+        "requested": 183176,
+        "live": 0,
+        "peak": 154559
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "four-slow-streams",
+      "http_isolated": false,
+      "probe_ms": 251.10249999852385,
+      "shutdown_ms": 176.50087500805967,
+      "allocator": {
+        "calls": 125,
+        "requested": 240928,
+        "live": 0,
+        "peak": 212311
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "mixed-upgrade-stream",
+      "http_isolated": false,
+      "probe_ms": 251.1105419980595,
+      "shutdown_ms": 182.447624989436,
+      "allocator": {
+        "calls": 123,
+        "requested": 212052,
+        "live": 0,
+        "peak": 183435
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "application-queue-overflow-recovery",
+      "overflow_closed_without_response": true,
+      "admission_recovered": true,
+      "shutdown_ms": 1.3117499911459163,
+      "allocator": {
+        "calls": 118,
+        "requested": 123794,
+        "live": 0,
+        "peak": 72179
+      }
+    }
+  ],
+  "phase_6_complete": false,
+  "isolation_passed": false,
+  "note": "Passing isolation alone does not complete Phase 6: incremental lifecycle/ownership and fairness parity are also required."
+}

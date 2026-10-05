@@ -14,10 +14,7 @@ pub const UpgradeOptions = struct {
     allowed_origins: []const []const u8 = &.{},
 };
 
-pub const Message = struct {
-    opcode: frame.Opcode,
-    payload: []u8,
-};
+pub const Message = @import("message_state.zig").Message;
 
 pub const ReadError = error{
     ClosedByPeer,
@@ -159,43 +156,24 @@ pub const Conn = struct {
     }
 
     pub fn readMessage(self: *Conn, arena: std.mem.Allocator) ReadError!Message {
-        var assembled: std.ArrayList(u8) = .empty;
-        defer assembled.deinit(self.gpa);
-        var first_opcode: ?frame.Opcode = null;
+        var state: @import("message_state.zig").State = .{ .max_payload = self.max_payload };
+        defer state.deinit(self.gpa);
 
-        outer: while (true) {
+        while (true) {
             const fr = (try self.readFrame(arena)) orelse return ReadError.ClosedByPeer;
-
-            if (fr.opcode.isControl()) {
-                switch (fr.opcode) {
-                    .close => {
-                        if (fr.payload.len == 1) return ReadError.InvalidFrame;
-                        if (fr.payload.len >= 2 and !validClosePayload(fr.payload)) return ReadError.InvalidFrame;
-                        self.lockWrite();
-                        defer self.unlockWrite();
-                        if (!self.closed.swap(true, .seq_cst)) self.closeSocket();
-                        return ReadError.ClosedByPeer;
-                    },
-                    .ping => {
-                        self.send(.pong, fr.payload) catch {};
-                        continue :outer;
-                    },
-                    .pong => continue :outer,
-                    else => return ReadError.InvalidFrame,
-                }
-            }
-
-            if (first_opcode == null) {
-                if (fr.opcode == .cont) return ReadError.InvalidFrame;
-                first_opcode = fr.opcode;
-            } else if (fr.opcode != .cont) return ReadError.InvalidFrame;
-            try assembled.appendSlice(self.gpa, fr.payload);
-            if (assembled.items.len > self.max_payload) return ReadError.PayloadTooLarge;
-            if (fr.fin) {
-                if (first_opcode.? == .text and !std.unicode.utf8ValidateSlice(assembled.items)) return ReadError.InvalidFrame;
-                const out = try arena.alloc(u8, assembled.items.len);
-                @memcpy(out, assembled.items);
-                return .{ .opcode = first_opcode.?, .payload = out };
+            switch (try state.accept(self.gpa, fr)) {
+                .closed => {
+                    self.lockWrite();
+                    defer self.unlockWrite();
+                    if (!self.closed.swap(true, .seq_cst)) self.closeSocket();
+                    return ReadError.ClosedByPeer;
+                },
+                .pong => |payload| self.send(.pong, payload) catch {},
+                .more => {},
+                .message => |message| {
+                    const out = try arena.dupe(u8, message.payload);
+                    return .{ .opcode = message.opcode, .payload = out };
+                },
             }
         }
     }
@@ -266,12 +244,6 @@ fn waitReadable(fd: c_int, timeout_ms: u32) bool {
     if (timeout_ms == 0) return true;
     var pfd = [_]std.c.pollfd{.{ .fd = fd, .events = std.c.POLL.IN, .revents = 0 }};
     return std.c.poll(&pfd, 1, @intCast(@min(timeout_ms, std.math.maxInt(c_int)))) > 0;
-}
-
-fn validClosePayload(payload: []const u8) bool {
-    const code = std.mem.readInt(u16, payload[0..2], .big);
-    if (code < 1000 or code >= 5000 or code == 1004 or code == 1005 or code == 1006 or code == 1015) return false;
-    return std.unicode.utf8ValidateSlice(payload[2..]);
 }
 
 /// Perform a WebSocket upgrade from Context(State). Socket ownership passes

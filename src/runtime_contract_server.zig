@@ -10,9 +10,11 @@ test {
     _ = @import("runtime/deadline_heap.zig");
     _ = @import("runtime/reactor_notifications.zig");
     _ = @import("runtime/reactor.zig");
+    _ = @import("runtime/application_admission.zig");
     _ = @import("runtime/reactor_output.zig");
     _ = @import("http/session.zig");
     _ = @import("ws/conn.zig");
+    _ = @import("ws/message_state.zig");
 }
 
 pub fn main(init: std.process.Init) !void {
@@ -68,6 +70,14 @@ pub fn main(init: std.process.Init) !void {
         opts.body_read_timeout_ms = 5000;
         opts.total_request_timeout_ms = 6000;
         opts.write_timeout_ms = 500;
+        opts.shutdown_drain_timeout_ms = 150;
+    } else if (std.mem.eql(u8, profile, "admission")) {
+        opts.worker_count = 1;
+        opts.max_pending_application_tasks = 1;
+        opts.max_connections = 8;
+        opts.header_read_timeout_ms = 5000;
+        opts.total_request_timeout_ms = 10000;
+        opts.keep_alive_idle_timeout_ms = 5000;
         opts.shutdown_drain_timeout_ms = 150;
     } else if (std.mem.eql(u8, profile, "total")) {
         opts.header_read_timeout_ms = 1500;

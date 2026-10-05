@@ -192,6 +192,11 @@ pub const ServeOptions = struct {
     /// `std.Thread.getCpuCount()` (default). Has no effect on the
     /// threaded runtime, which uses `accept_thread_count` instead.
     worker_count: ?usize = null,
+    /// Private Reactor evaluation: waiting application tasks, excluding work
+    /// already running. null uses max_connections; one task per connection.
+    /// Overflow closes the rejected connection without committing a response.
+    /// Threaded ignores this option. Does not enable the Reactor runtime gate.
+    max_pending_application_tasks: ?usize = null,
     /// Absolute response write budget from first socket output; progress does
     /// not renew it. Upgraded connections apply the same budget per frame.
     write_timeout_ms: u32 = 30_000,
