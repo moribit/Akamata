@@ -1,0 +1,132 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "oha_version": "oha 1.15.0",
+  "command": [
+    "tools/bench/runtime_profile.py",
+    "threaded=zig-out/bin/bench",
+    "reactor=zig-out/bin/runtime-reactor-bench",
+    "--output-dir",
+    "benchmark/results/runtime-phase7-2026-10-05/profile-hello",
+    "--endpoint",
+    "hello",
+    "--connections",
+    "4",
+    "32",
+    "128",
+    "256"
+  ],
+  "runs": [
+    {
+      "label": "threaded",
+      "connections": 4,
+      "binary_sha256": "2b7497c35e3b0861cb98e60c3e5d08ff21fa72a887cb9f2ecffeb9686a6035bb",
+      "profile_command": [
+        "sample",
+        "26652",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-hello/threaded-c4.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 4,
+      "binary_sha256": "975abda760a1422a1bf867731804ac5b2fa26a99d1b9a1481d9913f604b5fadd",
+      "profile_command": [
+        "sample",
+        "27313",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-hello/reactor-c4.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "threaded",
+      "connections": 32,
+      "binary_sha256": "2b7497c35e3b0861cb98e60c3e5d08ff21fa72a887cb9f2ecffeb9686a6035bb",
+      "profile_command": [
+        "sample",
+        "28035",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-hello/threaded-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 32,
+      "binary_sha256": "975abda760a1422a1bf867731804ac5b2fa26a99d1b9a1481d9913f604b5fadd",
+      "profile_command": [
+        "sample",
+        "28693",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-hello/reactor-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "threaded",
+      "connections": 128,
+      "binary_sha256": "2b7497c35e3b0861cb98e60c3e5d08ff21fa72a887cb9f2ecffeb9686a6035bb",
+      "profile_command": [
+        "sample",
+        "29348",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-hello/threaded-c128.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 128,
+      "binary_sha256": "975abda760a1422a1bf867731804ac5b2fa26a99d1b9a1481d9913f604b5fadd",
+      "profile_command": [
+        "sample",
+        "30062",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-hello/reactor-c128.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "threaded",
+      "connections": 256,
+      "binary_sha256": "2b7497c35e3b0861cb98e60c3e5d08ff21fa72a887cb9f2ecffeb9686a6035bb",
+      "profile_command": [
+        "sample",
+        "30715",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-hello/threaded-c256.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 256,
+      "binary_sha256": "975abda760a1422a1bf867731804ac5b2fa26a99d1b9a1481d9913f604b5fadd",
+      "profile_command": [
+        "sample",
+        "31488",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-hello/reactor-c256.sample.txt"
+      ],
+      "profile_available": true
+    }
+  ]
+}

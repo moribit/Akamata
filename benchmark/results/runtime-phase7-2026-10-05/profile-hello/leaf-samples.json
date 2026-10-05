@@ -1,0 +1,111 @@
+{
+  "note": "All-thread wall-clock samples, includes sleeping; NOT CPU percentages. Functions with fewer than five samples are omitted by sample.",
+  "profiles": {
+    "threaded-c32.sample.txt": {
+      "poll": 17415,
+      "__sendto": 107,
+      "__recvmsg": 64,
+      "Thread.PosixThreadImpl.spawn__func_726.Instance.entryFn": 14,
+      "mach_absolute_time": 12,
+      "mem.eql__func_25": 6
+    },
+    "reactor-c4.sample.txt": {
+      "__psynch_cvwait": 10740,
+      "kevent": 1029,
+      "__recvfrom": 129,
+      "__psynch_mutexwait": 94,
+      "__sendto": 61,
+      "__psynch_cvsignal": 57,
+      "write": 50,
+      "__psynch_mutexdrop": 23,
+      "mach_absolute_time": 11,
+      "read": 11,
+      "runtime.reactor.Context(runtime_group_bench.State).drive": 11,
+      "Thread.PosixThreadImpl.spawn__func_780.Instance.entryFn": 10,
+      "mem.eql__func_28": 8,
+      "__accept": 5,
+      "pthread_mutex_lock": 5,
+      "runtime.reactor.evaluate__func_29": 5
+    },
+    "threaded-c4.sample.txt": {
+      "poll": 22521,
+      "__recvmsg": 199,
+      "__sendto": 124,
+      "Thread.PosixThreadImpl.spawn__func_726.Instance.entryFn": 19,
+      "mach_absolute_time": 19,
+      "mem.eql__func_25": 14,
+      "mem.findPos__func_872": 5
+    },
+    "reactor-c32.sample.txt": {
+      "__psynch_cvwait": 10471,
+      "kevent": 725,
+      "__psynch_mutexwait": 432,
+      "__recvfrom": 208,
+      "__sendto": 145,
+      "__psynch_cvsignal": 101,
+      "write": 79,
+      "__psynch_mutexdrop": 57,
+      "read": 27,
+      "runtime.reactor.Context(runtime_group_bench.State).drive": 21,
+      "mem.eql__func_28": 19,
+      "mach_absolute_time": 18,
+      "Thread.PosixThreadImpl.spawn__func_780.Instance.entryFn": 17,
+      "__commpage_gettimeofday_internal": 5,
+      "_mach_boottime_usec": 5
+    },
+    "threaded-c128.sample.txt": {
+      "poll": 17330,
+      "__recvmsg": 58,
+      "__sendto": 46,
+      "mach_absolute_time": 12,
+      "__psynch_mutexwait": 8,
+      "Thread.PosixThreadImpl.spawn__func_726.Instance.entryFn": 5
+    },
+    "reactor-c256.sample.txt": {
+      "__psynch_cvwait": 9594,
+      "__psynch_mutexwait": 1031,
+      "__sendto": 342,
+      "kevent": 315,
+      "__recvfrom": 205,
+      "__psynch_cvsignal": 181,
+      "write": 141,
+      "__psynch_mutexdrop": 129,
+      "mach_absolute_time": 40,
+      "Thread.PosixThreadImpl.spawn__func_780.Instance.entryFn": 27,
+      "runtime.reactor.Context(runtime_group_bench.State).drive": 27,
+      "mem.eql__func_28": 16,
+      "runtime.deadline_heap.Heap.down": 11,
+      "pthread_mutex_lock": 9,
+      "runtime.reactor.Context(runtime_group_bench.State).refresh": 8,
+      "mem.findPos__func_735": 7,
+      "runtime.reactor.evaluate__func_29": 6,
+      "pthread_mutex_unlock": 5
+    },
+    "threaded-c256.sample.txt": {
+      "poll": 17736,
+      "__psynch_mutexwait": 131,
+      "thread_start": 11,
+      "__sendto": 9,
+      "__recvmsg": 8,
+      "__bsdthread_create": 6
+    },
+    "reactor-c128.sample.txt": {
+      "__psynch_cvwait": 9677,
+      "__psynch_mutexwait": 1056,
+      "__sendto": 494,
+      "kevent": 367,
+      "__recvfrom": 127,
+      "__psynch_mutexdrop": 112,
+      "__psynch_cvsignal": 105,
+      "write": 60,
+      "mach_absolute_time": 28,
+      "runtime.reactor.Context(runtime_group_bench.State).drive": 18,
+      "Thread.PosixThreadImpl.spawn__func_780.Instance.entryFn": 14,
+      "mem.eql__func_28": 9,
+      "pthread_mutex_lock": 8,
+      "__munmap": 7,
+      "runtime.reactor.Context(runtime_group_bench.State).refresh": 5,
+      "runtime.reactor.evaluate__func_29": 5
+    }
+  }
+}

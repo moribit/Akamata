@@ -1,0 +1,45 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "oha_version": "oha 1.15.0",
+  "command": [
+    "tools/bench/runtime_profile.py",
+    "reactor=zig-out/bin/runtime-reactor-bench",
+    "--output-dir",
+    "benchmark/results/runtime-phase7-2026-10-05/profile-wakeup-batched",
+    "--endpoint",
+    "hello",
+    "--connections",
+    "32",
+    "128"
+  ],
+  "runs": [
+    {
+      "label": "reactor",
+      "connections": 32,
+      "binary_sha256": "ed6f964a5a8a39ae1d6c1299a5dec5f8848027e5c8688fe796a874a6b02cebe4",
+      "profile_command": [
+        "sample",
+        "76249",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-wakeup-batched/reactor-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 128,
+      "binary_sha256": "ed6f964a5a8a39ae1d6c1299a5dec5f8848027e5c8688fe796a874a6b02cebe4",
+      "profile_command": [
+        "sample",
+        "76963",
+        "5",
+        "1",
+        "-file",
+        "benchmark/results/runtime-phase7-2026-10-05/profile-wakeup-batched/reactor-c128.sample.txt"
+      ],
+      "profile_available": true
+    }
+  ]
+}

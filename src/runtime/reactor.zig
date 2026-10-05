@@ -240,7 +240,7 @@ fn Context(comptime State: type) type {
             }
         }
         pub fn notify(self: *Self, token: u64) void {
-            self.notifications.push(token);
+            if (!self.notifications.push(token)) return;
             const byte = [_]u8{1};
             _ = std.c.write(self.wake[1], &byte, 1);
         }
@@ -642,7 +642,7 @@ fn Context(comptime State: type) type {
                 if (self.timers.top()) |timer| deadline = @min(deadline, timer.deadline);
                 if (self.stopping and !self.forced) deadline = @min(deadline, self.drain_deadline);
                 if (self.accept_resume != 0) deadline = @min(deadline, self.accept_resume);
-                const wait_ms: u32 = @intCast((deadline -| now + std.time.ns_per_ms - 1) / std.time.ns_per_ms);
+                const wait_ms: u32 = if (self.notifications.pending()) 0 else @intCast((deadline -| now + std.time.ns_per_ms - 1) / std.time.ns_per_ms);
                 const count = try self.selector.wait(&events, wait_ms);
                 for (events[0..count]) |event| {
                     if (event.token == 0) {

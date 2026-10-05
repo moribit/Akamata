@@ -1,0 +1,43 @@
+{
+  "reactor-c32.sample.txt": {
+    "__psynch_cvwait": 10357,
+    "kevent": 686,
+    "__psynch_mutexwait": 385,
+    "__recvfrom": 200,
+    "__sendto": 144,
+    "__psynch_cvsignal": 106,
+    "__psynch_mutexdrop": 56,
+    "write": 39,
+    "runtime.reactor.Context(runtime_group_bench.State).drive": 28,
+    "mach_absolute_time": 24,
+    "read": 23,
+    "mem.eql__func_28": 14,
+    "Thread.PosixThreadImpl.spawn__func_780.Instance.entryFn": 11,
+    "http.parser.validFieldName": 11,
+    "runtime.reactor.evaluate__func_29": 11,
+    "mem.findPos__func_735": 10,
+    "runtime.reactor.Context(runtime_group_bench.State).refresh": 8,
+    "__munmap": 5,
+    "pthread_mutex_lock": 5
+  },
+  "reactor-c128.sample.txt": {
+    "__psynch_cvwait": 9953,
+    "__psynch_mutexwait": 796,
+    "__sendto": 527,
+    "kevent": 356,
+    "__recvfrom": 119,
+    "__psynch_mutexdrop": 115,
+    "__psynch_cvsignal": 61,
+    "mach_absolute_time": 32,
+    "runtime.reactor.Context(runtime_group_bench.State).drive": 22,
+    "Thread.PosixThreadImpl.spawn__func_780.Instance.entryFn": 15,
+    "mem.eql__func_28": 15,
+    "pthread_mutex_unlock": 9,
+    "runtime.reactor.Context(runtime_group_bench.State).refresh": 9,
+    "runtime.deadline_heap.Heap.down": 8,
+    "__munmap": 6,
+    "runtime.reactor.evaluate__func_29": 6,
+    "runtime.reactor.Context(runtime_group_bench.State).destroy": 5,
+    "write": 5
+  }
+}
