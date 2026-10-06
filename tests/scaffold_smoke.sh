@@ -70,6 +70,7 @@ migrate_up
 if [ -n "$local_checkout" ]; then
   # Exercise the public helper as well as the independently generated build.
   cp "$local_checkout/src/build_helpers/akamata_build.zig" build_helper.zig
+  cp build.zig build.zig.generated
   cat > build.zig <<'HELPER_BUILD'
 const std = @import("std");
 const helper = @import("build_helper.zig");
@@ -78,6 +79,31 @@ pub fn build(b: *std.Build) void {
 }
 HELPER_BUILD
   build_app run -- migrate-up
+  # Restore the generated build's dedicated worker.zig entry for Workers tests.
+  cp build.zig.generated build.zig
+  # The same metadata must survive a named binding and an explicit Turso
+  # provider. Tooling runs before DB initialization, so no services are opened.
+  cp src/main.zig src/main.zig.default
+  python3 - <<'PY'
+from pathlib import Path
+p = Path("src/main.zig")
+source = p.read_text()
+assert 'const DatabaseBinding = am.binding.D1("DB")' in source
+p.write_text(source.replace('const DatabaseBinding = am.binding.D1("DB")', 'const DatabaseBinding = am.binding.D1("REPORTS")'))
+PY
+  build_app run -- akamata-capabilities workers > named-contract.json
+  python3 -c 'import json; d=json.load(open("named-contract.json")); assert d["providers"][0]["binding"] == "REPORTS"'
+  build_app -Dbackend=workers -Doptimize=ReleaseSafe
+  python3 - <<'PY'
+from pathlib import Path
+p = Path("src/main.zig")
+source = p.read_text()
+assert '.provider = am.capability.defaultProvider(.database, target)' in source
+p.write_text(source.replace('.provider = am.capability.defaultProvider(.database, target)', '.provider = .turso').replace('.binding = if (target == .workers) DatabaseBinding.binding_name else null', '.binding = null'))
+PY
+  build_app run -- akamata-capabilities workers > turso-contract.json
+  python3 -c 'import json; d=json.load(open("turso-contract.json")); assert d["providers"][0]["provider"] == "turso" and d["providers"][0]["binding"] is None'
+  build_app -Dbackend=workers -Doptimize=ReleaseSafe
 fi
 
 echo "scaffold smoke test: OK"

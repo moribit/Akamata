@@ -91,7 +91,7 @@ fn inputError(err: anyerror, c: *am.Context(State)) !void {
     // default unhandled-error behavior remains unchanged.
     switch (err) {
         error.SyntaxError, error.UnexpectedToken, error.MissingField => try c.json(.{ .error_kind = "invalid_input" }, 400),
-        else => return err,
+        else => try c.json(.{ .error_kind = "internal" }, 500),
     }
 }
 

@@ -140,8 +140,16 @@ pub fn registerRoutes(app: *am.App(State)) !void {
 
 pub fn buildState(alloc: std.mem.Allocator) !State {
     if (am.backend == .native) am.env.loadDotEnv(alloc, ".env") catch {};
-    const url = am.env.get(alloc, "DATABASE_URL") orelse
-        try alloc.dupe(u8, if (am.backend == .native) "file:{{NAME}}.db" else "d1:DB");
+    const url = am.env.get(alloc, "DATABASE_URL") orelse blk: {
+        if (comptime @hasDecl(Portable, "For")) {
+            const target: am.capability.Target = if (am.backend == .native) .native else .workers;
+            const provision = comptime Portable.For(target).resolve(.database);
+            if (comptime provision.provider == .turso) return error.MissingDatabaseUrl;
+            break :blk try alloc.dupe(u8, if (am.backend == .native) "file:{{NAME}}.db" else "d1:" ++ provision.binding.?);
+        } else {
+            break :blk try alloc.dupe(u8, if (am.backend == .native) "file:{{NAME}}.db" else "d1:DB");
+        }
+    };
     defer alloc.free(url);
     const database = try am.db.open(alloc, url);
     if (am.backend == .native) {

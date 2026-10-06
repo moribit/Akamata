@@ -8,7 +8,7 @@ const App = @import("app.zig").App;
 const models = @import("models.zig");
 
 pub const default_native_url = "file:guestbook.db";
-pub const default_workers_url = "d1:" ++ @import("contract.zig").For(.workers).resolve(.database).binding.?;
+pub const default_workers_url = if (@import("contract.zig").For(.workers).resolve(.database).binding) |name| "d1:" ++ name else "";
 
 /// Process-wide one-shot guard used by the deferred-migrate middleware on
 /// Workers. Native builds run migrate from `buildState` so this stays at
@@ -37,6 +37,8 @@ pub fn buildState(alloc: std.mem.Allocator) !App {
     if (am.backend == .native) am.env.loadDotEnv(alloc, ".env") catch {};
 
     const url = am.env.get(alloc, "DATABASE_URL") orelse blk: {
+        const target: am.capability.Target = if (am.backend == .native) .native else .workers;
+        if (comptime @import("contract.zig").For(target).resolve(.database).provider == .turso) return error.MissingDatabaseUrl;
         const def = if (am.backend == .native) default_native_url else default_workers_url;
         break :blk try alloc.dupe(u8, def);
     };

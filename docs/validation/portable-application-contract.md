@@ -52,6 +52,12 @@ Provider declarations reject sharing one resource binding name across distinct
 providers. Compile-time and CLI validation both reject duplicate requirements;
 this keeps generated manifests consistent with the tooling validator.
 
+Generated-project variants also compile with a named D1 binding and an explicit
+Turso provider (without D1 binding). Default Workers DB URLs derive from the
+selected binding. A declared Turso provider requires DATABASE_URL instead of
+silently opening the default SQLite/D1 database. Legacy URL overrides continue
+to work; declared metadata must still match the selected runtime URL.
+
 CI remains in `.github/workflows/ci.yml`: Native/ReleaseSafe/OpenSSL, Linux/macOS
 runtime contracts, examples, package/container/fuzz, existing CLI protections,
 plus the new Workers application contract and CLI capability/compile-fail

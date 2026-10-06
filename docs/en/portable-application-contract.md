@@ -92,6 +92,9 @@ the existing Cloudflare operation layer; inspection never rewrites user files.
 Guestbook's shared `src/contract.zig` demonstrates route requirements and
 SQLite/D1 resolution. Its metadata command executes before buildState,
 preventing tooling from opening a DB or running migrations.
+Generated projects derive the default D1 URL from the same binding declaration.
+An explicitly declared Turso provider requires DATABASE_URL; there is no
+automatic SQLite/D1 fallback when that provider has no configured URL.
 
 ## Minimal explicit wiring
 
