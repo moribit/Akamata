@@ -29,3 +29,7 @@ middlewareはstatic graphのfreeze前に `.middleware = .{.{ .call = authenticat
 The shared [application fixture](../../../tests/dx_application_fixture.zig) runs with `zig build dx-test -Doptimize=ReleaseSafe` and `zig build portable-application-test -Dbackend=workers -Doptimize=ReleaseSafe`. Workers executes the same contract ten times inside WASM with simulated host imports; this is offline application evidence, not live Cloudflare certification.
 
 TypeScript生成も同じmetadataを利用します。Pathのscalar型、Queryのoptional/required、scalar responseのtype alias、text responseのtext decodeを維持します。JavaScript numberは全u64を正確には表現できません。大きなIDの正確性が必要なら文字列IDを明示してください。同じmappingからoperation別error型とruntime判定関数を生成します。[Error handling](errors.md)を参照してください。
+
+Endpointは既存の`description`、`tags`、`deprecated`、`limits` metadataも共有します。limitsの意味は既存APIと同じで、metadataの宣言だけで新しいtimeout機構を追加するものではありません。未知のoptionはcompile errorです。typed success statusは最終2xx/3xxのみ、204/205はbody禁止で、status helperと`success_status`の不一致も検出します。特殊responseには明示Contextを使用してください。
+
+`.configure`は一時的なApp/Stateのaddressを保持したり、それをborrowするtaskを開始してはいけません。初期化はAppを値で返します。provider ownerは別途取得し、application lifetime中は安定したaddressを維持してください。

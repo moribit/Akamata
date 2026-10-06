@@ -117,6 +117,13 @@ fn errorResponses(comptime mapping: anytype, comptime fallback: ?Code, comptime 
 }
 
 pub fn Endpoint(comptime State: type, comptime options: anytype) type {
+    inline for (reflection.fields(@typeInfo(@TypeOf(options)).@"struct")) |field| {
+        comptime var known = false;
+        inline for (.{ "handler", "method", "path", "errors", "fallback", "success_status", "operation_id", "summary", "description", "tags", "deprecated", "security", "limits", "capabilities", "platform_capabilities" }) |name| {
+            if (std.mem.eql(u8, field.name, name)) known = true;
+        }
+        if (!known) @compileError("unknown Akamata endpoint option " ++ field.name ++ "; use documented metadata or the explicit Endpoint API");
+    }
     const handler = options.handler;
     const path = options.path;
     const fn_info = @typeInfo(@TypeOf(handler));
@@ -187,6 +194,9 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         contract.validateErrorMap(handler, mapping);
     }
     const success: u16 = if (isResult(Value)) Value.status_code else if (@hasField(@TypeOf(options), "success_status")) options.success_status else 200;
+    if (success < 200 or success >= 400) @compileError("Akamata typed success status must be a final 2xx or 3xx HTTP status");
+    if ((success == 204 or success == 205) and Payload != void) @compileError("Akamata 204/205 responses cannot return a body; use noContent or a manual Context response");
+    if (isResult(Value) and @hasField(@TypeOf(options), "success_status") and success != options.success_status) @compileError("Akamata status helper and endpoint success_status disagree");
     const principal_required = blk: {
         for (params) |maybe| if (maybe) |T| {
             if (isPrincipal(T)) break :blk true;
@@ -202,6 +212,19 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         .security = if (@hasField(@TypeOf(options), "security")) options.security else &.{},
         .additional_responses = errorResponses(mapping, fallback, principal_required),
         .summary = if (@hasField(@TypeOf(options), "summary")) options.summary else "",
+        .description = if (@hasField(@TypeOf(options), "description")) options.description else "",
+        .tags = if (@hasField(@TypeOf(options), "tags")) options.tags else &.{},
+        .deprecated = if (@hasField(@TypeOf(options), "deprecated")) options.deprecated else false,
+        .limits = blk: {
+            var limits: openapi.Limits = .{};
+            if (@hasField(@TypeOf(options), "limits")) {
+                inline for (reflection.fields(@typeInfo(@TypeOf(options.limits)).@"struct")) |field| {
+                    if (!@hasField(openapi.Limits, field.name)) @compileError("unknown Akamata endpoint limit " ++ field.name);
+                    @field(limits, field.name) = @field(options.limits, field.name);
+                }
+            }
+            break :blk limits;
+        },
     });
     const has_query = blk: {
         for (params) |maybe| if (maybe) |T| {

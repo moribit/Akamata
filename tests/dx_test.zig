@@ -33,6 +33,21 @@ test "request failure releases staged test-client allocations" {
 fn hello() []const u8 {
     return "Hello, Akamata!";
 }
+test "typed route retains existing endpoint documentation and limits" {
+    const Route = ak.endpoint(.{
+        .method = .GET,
+        .path = "/",
+        .handler = hello,
+        .description = "A documented greeting",
+        .tags = &.{"greeting"},
+        .deprecated = true,
+        .limits = .{ .request_bytes = 256 },
+    }).For(struct {});
+    try std.testing.expectEqualStrings("A documented greeting", Route.meta.description);
+    try std.testing.expectEqualStrings("greeting", Route.meta.tags[0]);
+    try std.testing.expect(Route.meta.deprecated);
+    try std.testing.expectEqual(@as(?usize, 256), Route.meta.limits.request_bytes);
+}
 const User = struct { id: u64, name: []const u8 };
 fn show(id: ak.Path(u64, "id"), q: ak.Query(?[]const u8, "name")) error{NotFound}!User {
     if (id.value == 0) return error.NotFound;
