@@ -207,11 +207,20 @@ pub fn build(b: *std.Build) void {
     // the default scaffold resolves its commit-pinned dependency over HTTPS.
     const scaffold_smoke = b.addSystemCommand(&.{ "sh", "tests/scaffold_smoke.sh" });
     scaffold_smoke.addArtifactArg(cli_exe);
-    b.step("scaffold-test", "generate and build a portable scaffold").dependOn(&scaffold_smoke.step);
+    const scaffold_step = b.step("scaffold-test", "generate and build portable scaffolds against the pinned release");
+    scaffold_step.dependOn(&scaffold_smoke.step);
+    const minimal_release = b.addSystemCommand(&.{ "python3", "tests/minimal_scaffold.py" });
+    minimal_release.addArtifactArg(cli_exe);
+    scaffold_step.dependOn(&minimal_release.step);
     const scaffold_local = b.addSystemCommand(&.{ "sh", "tests/scaffold_smoke.sh" });
     scaffold_local.addArtifactArg(cli_exe);
     scaffold_local.addDirectoryArg2(b.path("."), .{});
-    b.step("scaffold-local-test", "generate and build a scaffold against this checkout").dependOn(&scaffold_local.step);
+    const scaffold_local_step = b.step("scaffold-local-test", "generate and build a scaffold against this checkout");
+    scaffold_local_step.dependOn(&scaffold_local.step);
+    const minimal_scaffold = b.addSystemCommand(&.{ "python3", "tests/minimal_scaffold.py" });
+    minimal_scaffold.addArtifactArg(cli_exe);
+    minimal_scaffold.addDirectoryArg2(b.path("."), .{});
+    scaffold_local_step.dependOn(&minimal_scaffold.step);
     const project_update_sync = b.addSystemCommand(&.{ "sh", "tests/project_update_sync.sh" });
     project_update_sync.addArtifactArg(cli_exe);
     b.step("project-update-test", "upgrade and sync a legacy Native/Workers project safely").dependOn(&project_update_sync.step);

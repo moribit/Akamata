@@ -100,7 +100,7 @@ jobs:
       - run: zig build workers-capability-sync-test
       - run: |
           mkdir -p /tmp/cli-smoke && cd /tmp/cli-smoke
-          ${GITHUB_WORKSPACE}/zig-out/bin/akamata init testapp --target=both
+          ${GITHUB_WORKSPACE}/zig-out/bin/akamata init testapp --target=both --template=notes
           test -f testapp/src/main.zig
           test -f testapp/deploy/wrangler.toml
           test -f testapp/deploy/Dockerfile

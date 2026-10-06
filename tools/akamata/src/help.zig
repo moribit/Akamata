@@ -55,7 +55,7 @@ pub fn usage() !void {
         \\Version: akamata 0.1.5 (use `akamata --version` for the version)
         \\
         \\Commands:
-        \\  init <name> [--target=native|workers|containers|both] [--d1] [--r2] [--queue] [--realtime]
+        \\  init <name> [--template=minimal|notes] [--target=native|workers|containers|both] [--d1] [--r2] [--queue] [--realtime]
         \\      Scaffold a new Akamata app.
         \\  build [--workers|--containers] [--optimize=MODE]
         \\      Build the current app (native by default).
@@ -129,6 +129,7 @@ pub fn commandUsage(command: []const u8) !void {
         \\Options:
         \\  --target=native|workers|containers|both  Generated deployment targets (default: native)
         \\  --d1 --r2 --queue --realtime             Select Workers capabilities and generated glue
+        \\  --template=minimal|notes                 Minimal Hello (default) or DB/migration tutorial
         \\  -h, --help                               Show this help
         \\
     else if (std.mem.eql(u8, command, "build"))

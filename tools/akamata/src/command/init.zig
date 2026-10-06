@@ -27,6 +27,9 @@ pub fn cmdInit(parent_alloc: std.mem.Allocator, args: []const [:0]const u8) !voi
                 std.debug.print("unknown --target value: {s}\n", .{v});
                 return error.UsageError;
             }
+        } else if (std.mem.startsWith(u8, a, "--template=")) {
+            const value = a[11..];
+            if (std.mem.eql(u8, value, "minimal")) opts.template = .minimal else if (std.mem.eql(u8, value, "notes")) opts.template = .notes else return error.UsageError;
         } else if (std.mem.eql(u8, a, "--d1")) opts.capabilities.d1 = true else if (std.mem.eql(u8, a, "--r2")) opts.capabilities.r2 = true else if (std.mem.eql(u8, a, "--queue")) opts.capabilities.queue = true else if (std.mem.eql(u8, a, "--realtime")) opts.capabilities.realtime = true;
     }
 

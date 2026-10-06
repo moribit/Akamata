@@ -1,144 +1,104 @@
-# Quick Start
+# Getting Started
 
-Create and run Akamata's generated Note API in about five minutes.
+Start with Hello, then add typed JSON, validation, a database, tests and deployment.
 
-## Requirements
+## 1. Installation
 
-- Zig 0.17.x
-- Git and a POSIX shell
-- Node.js and Wrangler only for Cloudflare Workers
-- Docker only for Cloudflare Containers
-
-The native build includes the SQLite amalgamation and links libc. OpenSSL is optional and is only required when enabling FCM RS256 support with `-Dopenssl=true`.
-
-## 1. Install the CLI
-
-Clone Akamata and run the installer:
-
-```bash
-git clone https://github.com/appleuser634/Akamata.git
+```sh
+git clone https://github.com/moribit/Akamata.git
 cd Akamata
 ./scripts/install.sh
-akamata help
 ```
 
-The installer builds the CLI and installs it to `$HOME/.local/bin` by default. Ensure that directory is on `PATH`. To work directly from a source checkout instead:
+Use Zig 0.17.x and put `$HOME/.local/bin` on PATH. Node.js/Wrangler are needed only for Workers; Docker only for Containers.
 
-```bash
-zig build cli
-./zig-out/bin/akamata help
-```
+## 2. Hello World
 
-## 2. Generate a project
-
-The generated `build.zig.zon` uses a release-compatible, revision-pinned GitHub archive with a Zig content hash, so the project can be created independently of the Akamata checkout. The first v0.0.1 scaffold uses an immutable release-preparation revision; subsequent releases update this pin to the previous stable release to avoid a self-referential archive:
-
-```bash
-cd ~/projects
-akamata init myapp --target=both
+```sh
+akamata init myapp
 cd myapp
+zig build run
+# another terminal
+curl http://127.0.0.1:8080/
 ```
 
-`--target` accepts `native`, `workers`, `containers`, or `both`; its default is `native`. `both` generates:
+The default project returns `Hello, myapp!` without opening a database or initializing providers. It contains build files, `src/main.zig`, README and `.gitignore`. `PORT` changes the Native port.
 
-```text
-myapp/
-├── .gitignore
-├── README.md
-├── build.zig
-├── build.zig.zon
-├── migrations/
-│   └── .gitkeep
-├── src/
-│   ├── main.zig
-│   └── worker.zig
-└── deploy/
-    ├── Dockerfile
-    ├── wrangler.toml
-    └── worker/
-        └── index.mjs
+Dependencies remain pinned to v0.1.5. The new typed APIs in this guide require latest main; use a local checkout override:
+
+```sh
+zig build --fork=/absolute/path/to/Akamata run
 ```
 
-The scaffold is a working SQLite-backed Note API, not a Hello World placeholder. It defines a validated `Note` model and these routes:
+The generated bootstrap selects the ordinary-function API when available and preserves the same Hello response on v0.1.5. Update/sync do not rewrite existing application source.
 
-| Method | Route | Purpose |
-|---|---|---|
-| `GET` | `/` | Describe the generated API |
-| `GET` | `/health` | Health check |
-| `GET` | `/notes` | List notes |
-| `POST` | `/notes` | Create a note from `{ "title", "body" }` |
-| `GET` | `/notes/:id` | Fetch one note |
-| `DELETE` | `/notes/:id` | Delete one note |
+## 3. Routing
 
-The native entry point computes and applies the model schema diff at startup. The Workers entry point uses `migrate.Once` so initialization runs once per isolate.
-
-The first build downloads the pinned Akamata source. To test a local Akamata checkout without editing `build.zig.zon`, use Zig 0.17's package override:
-
-```bash
-zig build --fork=/path/to/Akamata
+```zig
+fn hello() []const u8 { return "Hello, Akamata!"; }
+pub const Application = ak.App(.{
+    .routes = .{ ak.get("/", hello) },
+});
 ```
 
-## 3. Run the native server
+Initialize this type with an explicit allocator, defer `deinit`, then call `serve`. The complete [minimal source](../../tests/docs/minimal.zig) is compiled in CI. Dynamic registration remains available through the original `ak.App(State)`.
 
-```bash
+## 4. JSON API
+
+Use ordinary structs with explicit parameter sources: `ak.Json(CreateUser)`, `ak.Path(u64, "id")`, `ak.Query(?u32, "page")`. Read `.value`. Return a struct for JSON, a string for text, or `ak.created(value)` for 201.
+
+[Typed handlers](guides/typed-handlers.md) · [Native/Workers fixture](../../tests/dx_application_fixture.zig)
+
+## 5. Validation / Errors
+
+DTO `validation` metadata reuses existing model rules. Validation preserves the machine-readable 422 response. Finite handler error sets require HTTP mappings; `anyerror` requires a fallback. Endpoint metadata feeds OpenAPI and client generation.
+
+[Validation](guides/validation.md) · [Error handling](guides/errors.md)
+
+## 6. Database
+
+Add an explicitly owned `am.db.Db` to State when needed. Open it with `am.db.open(allocator, url)` and borrow through Context. SQLite/Turso and D1/Turso share the facade; deployment configuration differs.
+
+[Database backends](db-backends.md) · [Provider lifecycle](provider-lifecycle.md)
+
+```sh
+akamata init notesapp --template=notes --target=both
+cd notesapp
 zig build run
 ```
 
-The server reports that it is listening on port 8080. From another terminal:
+This opt-in tutorial retains `/notes` CRUD, validated input, SQLite model migration and an empty versioned migration directory. Configure `DATABASE_URL` as needed. `akamata migrate generate NAME` and `akamata migrate up` record applied versions. D1 bridge operations are not transactional; review migrations and environment explicitly.
 
-```bash
-akamata client /
-akamata client /health
-akamata client /notes
-akamata client POST /notes --json='{"title":"hello","body":"first note"}'
+## 7. Testing
+
+Use `app.client(allocator)`, `client.post("/users").json(value).send()`, `response.expectStatus(.created)` and `response.json(User)`. No port or socket is needed. Principal injection and provider effect assertions are documented in the guide.
+
+[Testing](guides/testing.md)
+
+## 8. Native deployment
+
+```sh
+zig build -Doptimize=ReleaseSafe
+./zig-out/bin/myapp
 ```
 
-The local database is `myapp.db` unless `DATABASE_URL` overrides it.
+Threaded remains the production default; Reactor remains parked and fail-closed. Generate with `--target=containers` or `both` for Container deployment files.
 
-Versioned migrations are also available. A fresh scaffold contains an empty `migrations/` directory, and applying it is a successful no-op:
+[Deployment](portable-backend.md)
 
-```bash
-akamata migrate generate add_widgets
-# Edit the generated SQL file.
-akamata migrate up
-```
+## 9. Workers deployment
 
-Applied versions are recorded in `schema_migrations`; running `migrate up` again skips them. Use `--dir=PATH` for another directory or `--target=VERSION` to stop at a version.
-
-Each file is atomic on SQLite and Turso. D1 is non-transactional through the
-bridge, so keep D1 migrations idempotent and use the reviewed deployment path.
-
-## 4. Build other targets
-
-Workers:
-
-```bash
-zig build -Dbackend=workers -Doptimize=ReleaseSmall
+```sh
+# create with --target=workers or --target=both
+zig build -Dbackend=workers -Doptimize=ReleaseSafe
 cd deploy
 npx wrangler dev --local
 ```
 
-Before using the generated app with D1, create a D1 database and enable/update the commented `[[d1_databases]]` binding in `deploy/wrangler.toml`. The binding name must remain `DB` unless you also change the application.
+The Workers entry imports the same application. Hello needs no D1/R2 resource. Configure account/resources and authenticate before `akamata deploy --workers` from the project root. Stateful applications must declare and configure bindings. Validation neither creates resources nor proves live readiness.
 
-Containers:
-
-```bash
-akamata deploy --containers
-docker run --rm -p 8080:8080 akamata-app
-```
-
-For a Workers deployment after configuring Wrangler:
-
-```bash
-npx wrangler login
-akamata deploy --workers
-```
+[Workers](cloudflare.md) · [Portable Production Contract](portable-production-contract.md)
 
 ## Next steps
 
-- [Tutorial](tutorial.md): build a complete application step by step
-- [Handbook](handbook.md): a compact tour of models, repositories, migrations, and deployment
-- [Handler API reference](handler-api.md): current public APIs and lifetimes
-- [Database backends](db-backends.md): SQLite, D1, and Turso
-- [WebSocket guide](websocket.md)
-- [Documentation home](README.md)
+[Documentation home](README.md) · [Tutorial](tutorial.md) · [Handbook](handbook.md)

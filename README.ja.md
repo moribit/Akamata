@@ -60,12 +60,13 @@ zig build run
 
 ```bash
 curl -sS http://127.0.0.1:8080/
-curl -sS http://127.0.0.1:8080/notes
 ```
 
-生成projectには、validation付き`Note` model、SQLite自動migration、`/notes` CRUD、
-health route、空のversion付きmigration directory、Workers entry point、Wrangler設定、Workers JS glue、Container用Dockerfileが
-含まれます。正確なtreeとresponseは[クイックスタート](docs/ja/quickstart.md)を参照してください。
+default projectはDBやproviderを初期化せず、Hello responseを返します。
+`--target=both`はWorkersとContainerのdeploy fileを追加します。
+従来のSQLite CRUD・validation・migration tutorialは`--template=notes`で生成できます。
+依存はv0.1.5に固定されます。新しいtyped APIにはlocal checkout overrideを使用します。
+両方の手順は[Getting Started](docs/ja/quickstart.md)を参照してください。
 
 CLI自体を開発する場合は、installせず直接buildできます。
 

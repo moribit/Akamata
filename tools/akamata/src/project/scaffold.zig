@@ -20,6 +20,7 @@ pub const InitOpts = struct {
     name: []const u8,
     target: enum { native, workers, containers, both } = .native,
     capabilities: WorkerCapabilities = .{},
+    template: enum { minimal, notes } = .minimal,
 };
 
 pub fn validAppName(name: []const u8) bool {
@@ -111,16 +112,16 @@ pub fn generate(alloc: std.mem.Allocator, opts: InitOpts) !void {
         .{ .key = "{{NAME_ENUM}}", .val = package_name },
         .{ .key = "{{FINGERPRINT}}", .val = fingerprint_str },
     });
-    try renderFile(alloc, opts.name, "src/main.zig", tmpl_main, &.{
+    try renderFile(alloc, opts.name, "src/main.zig", if (opts.template == .minimal) @import("templates.zig").tmpl_minimal_main else tmpl_main, &.{
         .{ .key = "{{NAME}}", .val = opts.name },
     });
     try renderFile(alloc, opts.name, ".gitignore", tmpl_gitignore, &.{});
-    try renderFile(alloc, opts.name, "README.md", tmpl_readme, &.{
+    try renderFile(alloc, opts.name, "README.md", if (opts.template == .minimal) @import("templates.zig").tmpl_minimal_readme else tmpl_readme, &.{
         .{ .key = "{{NAME}}", .val = opts.name },
     });
 
     if (opts.target == .workers or opts.target == .both) {
-        try renderFile(alloc, opts.name, "src/worker.zig", tmpl_worker, &.{
+        try renderFile(alloc, opts.name, "src/worker.zig", if (opts.template == .minimal) @import("templates.zig").tmpl_minimal_worker else tmpl_worker, &.{
             .{ .key = "{{NAME}}", .val = opts.name },
         });
         try makeDirRecursive(try std.fmt.allocPrint(alloc, "{s}/deploy/worker", .{opts.name}));
@@ -141,8 +142,10 @@ pub fn generate(alloc: std.mem.Allocator, opts: InitOpts) !void {
             .{ .key = "{{NAME}}", .val = opts.name },
         });
     }
-    try makeDirRecursive(try std.fmt.allocPrint(alloc, "{s}/migrations", .{opts.name}));
-    try renderFile(alloc, opts.name, "migrations/.gitkeep", "", &.{});
+    if (opts.template == .notes) {
+        try makeDirRecursive(try std.fmt.allocPrint(alloc, "{s}/migrations", .{opts.name}));
+        try renderFile(alloc, opts.name, "migrations/.gitkeep", "", &.{});
+    }
 
     std.debug.print(
         \\

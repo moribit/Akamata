@@ -19,7 +19,7 @@ tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/akamata-scaffold-test.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT HUP INT TERM
 
 cd "$tmp_dir"
-"$cli" init smokeapp --target=both
+"$cli" init smokeapp --target=both --template=notes
 cd smokeapp
 
 test ! -e ../Akamata

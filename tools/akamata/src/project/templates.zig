@@ -6,6 +6,9 @@ pub const tmpl_build_zig = @embedFile("../templates/build.zig.tpl");
 pub const tmpl_build_zon = @embedFile("../templates/build.zig.zon.tpl");
 
 pub const tmpl_main = @embedFile("../templates/main.zig.tpl");
+pub const tmpl_minimal_main = @embedFile("../templates/minimal_main.zig.tpl");
+pub const tmpl_minimal_worker = @embedFile("../templates/minimal_worker.zig.tpl");
+pub const tmpl_minimal_readme = @embedFile("../templates/minimal_README.md.tpl");
 
 pub const tmpl_worker = @embedFile("../templates/worker.zig.tpl");
 

@@ -60,13 +60,13 @@ In another terminal:
 
 ```bash
 curl -sS http://127.0.0.1:8080/
-curl -sS http://127.0.0.1:8080/notes
 ```
 
-The generated project includes a validated `Note` model, SQLite auto-migration,
-CRUD routes under `/notes`, a health route, a Workers entry point, Wrangler
-configuration, an empty versioned-migration directory, Workers JS glue, and a Container Dockerfile. See the
-[Quick Start](docs/en/quickstart.md) for the exact tree and responses.
+The default project serves one Hello response without opening a database or
+configuring providers. `--target=both` adds Workers and Container deployment files.
+Choose `--template=notes` for the existing SQLite CRUD/validation/migration tutorial.
+The dependency remains pinned to v0.1.5; use a local checkout override for the new
+typed API. See [Getting Started](docs/en/quickstart.md) for both paths.
 
 Developing the CLI itself? Build without installing:
 

@@ -1,144 +1,104 @@
-# クイックスタート
+# Getting Started
 
-約5分で、Akamataが生成するNote APIを起動します。
+Helloからtyped JSON、validation、DB、test、deployへ段階的に進みます。
 
-## 必要な環境
+## 1. Installation
 
-- Zig 0.17.x
-- GitとPOSIX互換shell
-- Cloudflare Workersを利用する場合のみNode.jsとWrangler
-- Cloudflare Containersを利用する場合のみDocker
-
-nativeビルドにはSQLite amalgamationが含まれ、libcへリンクします。OpenSSLは任意で、FCMのRS256対応を`-Dopenssl=true`で有効にする場合に限り必要です。
-
-## 1. CLIをインストールする
-
-Akamataをcloneし、インストールスクリプトを実行します。
-
-```bash
-git clone https://github.com/appleuser634/Akamata.git
+```sh
+git clone https://github.com/moribit/Akamata.git
 cd Akamata
 ./scripts/install.sh
-akamata help
 ```
 
-スクリプトはCLIをビルドし、デフォルトでは`$HOME/.local/bin`へインストールします。このディレクトリを`PATH`へ追加してください。source checkout内のCLIを直接使う場合は、次のようにビルドできます。
+Zig 0.17.xを使用し、`$HOME/.local/bin`へPATHを通します。Node.js/WranglerはWorkers、DockerはContainerを使う場合のみ必要です。
 
-```bash
-zig build cli
-./zig-out/bin/akamata help
-```
+## 2. Hello World
 
-## 2. プロジェクトを生成する
-
-生成される`build.zig.zon`は、release互換のrevisionを固定したGitHub archiveとZig content hashを使用します。Akamata checkoutの場所に依存せず、任意のdirectoryへprojectを作成できます。v0.0.1の初回scaffoldでは、自己参照archiveを避けるためimmutableなrelease準備revisionを参照します。次回以降は直前のstable releaseへpinを更新します。
-
-```bash
-cd ~/projects
-akamata init myapp --target=both
+```sh
+akamata init myapp
 cd myapp
+zig build run
+# another terminal
+curl http://127.0.0.1:8080/
 ```
 
-`--target`には`native`、`workers`、`containers`、`both`を指定でき、デフォルトは`native`です。`both`では次のファイルが生成されます。
+default projectはDB/providerを初期化せず`Hello, myapp!`を返します。build file、`src/main.zig`、README、`.gitignore`のみです。Native portは`PORT`で変更します。
 
-```text
-myapp/
-├── .gitignore
-├── README.md
-├── build.zig
-├── build.zig.zon
-├── migrations/
-│   └── .gitkeep
-├── src/
-│   ├── main.zig
-│   └── worker.zig
-└── deploy/
-    ├── Dockerfile
-    ├── wrangler.toml
-    └── worker/
-        └── index.mjs
+依存はv0.1.5へ固定されます。このguideの新typed APIには最新mainが必要です。local checkoutでoverrideします。
+
+```sh
+zig build --fork=/absolute/path/to/Akamata run
 ```
 
-scaffoldはHello Worldではなく、SQLiteで動作するNote APIです。validation付きの`Note` modelと、次のrouteを含みます。
+生成bootstrapは利用可能ならordinary-function APIを選び、v0.1.5でも同じHello responseを返します。update/syncは既存application sourceを書き換えません。
 
-| Method | Route | 用途 |
-|---|---|---|
-| `GET` | `/` | 生成されたAPIの説明 |
-| `GET` | `/health` | health check |
-| `GET` | `/notes` | Note一覧 |
-| `POST` | `/notes` | `{ "title", "body" }`からNoteを作成 |
-| `GET` | `/notes/:id` | 1件取得 |
-| `DELETE` | `/notes/:id` | 1件削除 |
+## 3. Routing
 
-native entrypointは起動時にmodel schemaとの差分を計算して適用します。Workers entrypointは`migrate.Once`を使用し、isolateごとに初期化を1回実行します。
-
-初回buildでは固定済みAkamata sourceをdownloadします。`build.zig.zon`を編集せずlocal checkoutを試すには、Zig 0.17のpackage overrideを使用します。
-
-```bash
-zig build --fork=/path/to/Akamata
+```zig
+fn hello() []const u8 { return "Hello, Akamata!"; }
+pub const Application = ak.App(.{
+    .routes = .{ ak.get("/", hello) },
+});
 ```
 
-## 3. native serverを起動する
+明示allocatorで型を初期化し、`defer deinit`、`serve`を呼びます。完全な[minimal source](../../tests/docs/minimal.zig)をCIでcompileします。動的登録には従来の`ak.App(State)`を使用できます。
 
-```bash
+## 4. JSON API
+
+普通のstructと明示sourceの`ak.Json(CreateUser)`、`ak.Path(u64, "id")`、`ak.Query(?u32, "page")`を使用し、`.value`を読みます。structはJSON、stringはtext、`ak.created(value)`は201になります。
+
+[Typed handlers](guides/typed-handlers.md) · [Native/Workers fixture](../../tests/dx_application_fixture.zig)
+
+## 5. Validation / Errors
+
+DTOの`validation` metadataは既存model ruleを再利用し、machine-readable 422形式を維持します。有限error setはHTTP mapping、`anyerror`にはfallbackが必要です。同じendpoint metadataをOpenAPIとclient生成で使用します。
+
+[Validation](guides/validation.md) · [Error handling](guides/errors.md)
+
+## 6. Database
+
+必要なら明示ownerの`am.db.Db`をStateへ追加し、`am.db.open(allocator, url)`でopen、Contextからborrowします。SQLite/TursoとD1/Tursoは共通facadeで、deploy設定は異なります。
+
+[Database backends](db-backends.md) · [Provider lifecycle](provider-lifecycle.md)
+
+```sh
+akamata init notesapp --template=notes --target=both
+cd notesapp
 zig build run
 ```
 
-port 8080でlistenしていることが表示されます。別のterminalから確認します。
+明示templateは`/notes` CRUD、validated input、SQLite model migration、空のversion付きmigration directoryを維持します。必要なら`DATABASE_URL`を設定します。`akamata migrate generate NAME`と`akamata migrate up`で履歴を管理します。D1 bridgeは非transactionalなのでmigrationとenvironmentを明示確認してください。
 
-```bash
-akamata client /
-akamata client /health
-akamata client /notes
-akamata client POST /notes --json='{"title":"hello","body":"first note"}'
+## 7. Testing
+
+`app.client(allocator)`、`client.post("/users").json(value).send()`、`response.expectStatus(.created)`、`response.json(User)`を利用でき、port/socketは不要です。Principal injectionとprovider effect assertionもguideで説明しています。
+
+[Testing](guides/testing.md)
+
+## 8. Native deployment
+
+```sh
+zig build -Doptimize=ReleaseSafe
+./zig-out/bin/myapp
 ```
 
-`DATABASE_URL`を指定しない場合、local databaseは`myapp.db`です。
+production defaultはThreadedです。ReactorはPark/fail-closedを維持します。Container deploy fileは`--target=containers`または`both`で生成します。
 
-version付きmigrationも利用できます。fresh scaffoldには空の`migrations/` directoryがあり、そのまま適用した場合は成功するno-opです。
+[Deployment](portable-backend.md)
 
-```bash
-akamata migrate generate add_widgets
-# 生成されたSQL fileを編集します。
-akamata migrate up
-```
+## 9. Workers deployment
 
-適用済みversionは`schema_migrations`へ記録され、同じ`migrate up`を再実行してもskipされます。別directoryには`--dir=PATH`、特定versionまでの適用には`--target=VERSION`を指定します。
-
-SQLiteとTursoではfile単位でatomicです。D1 bridgeは非transactionalなので、D1 migrationは
-idempotentにし、レビュー済みdeploy経路を使用してください。
-
-## 4. その他のtargetをビルドする
-
-Workers:
-
-```bash
-zig build -Dbackend=workers -Doptimize=ReleaseSmall
+```sh
+# create with --target=workers or --target=both
+zig build -Dbackend=workers -Doptimize=ReleaseSafe
 cd deploy
 npx wrangler dev --local
 ```
 
-生成されたアプリをD1で動かす前にD1 databaseを作成し、`deploy/wrangler.toml`内でcomment outされている`[[d1_databases]]` bindingを有効にして値を更新してください。アプリ側も変更する場合を除き、binding名は`DB`のままにします。
+Workers entryは同じapplicationをimportします。HelloはD1/R2不要です。account/resource設定と認証後、project rootから`akamata deploy --workers`を実行します。stateful applicationはbindingの宣言と設定が必要です。validationはresource作成やlive readinessの証明ではありません。
 
-Containers:
+[Workers](cloudflare.md) · [Portable Production Contract](portable-production-contract.md)
 
-```bash
-akamata deploy --containers
-docker run --rm -p 8080:8080 akamata-app
-```
+## Next steps
 
-Wranglerを設定した後、Workersへdeployするには次を実行します。
-
-```bash
-npx wrangler login
-akamata deploy --workers
-```
-
-## 次に読む文書
-
-- [Tutorial](tutorial.md): 完成したアプリを段階的に構築します
-- [Handbook](handbook.md): model、repository、migration、deployを短時間で確認します
-- [Handler API reference](handler-api.md): 現在のpublic APIとlifetimeを確認します
-- [Database backends](db-backends.md): SQLite、D1、Tursoを設定します
-- [WebSocket guide](websocket.md)
-- [Documentation home](README.md)
+[Documentation home](README.md) · [Tutorial](tutorial.md) · [Handbook](handbook.md)
