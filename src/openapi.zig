@@ -632,7 +632,18 @@ fn writeTypeSchema(comptime T: type, ctx: *SpecBuilder, w: *std.Io.Writer) anyer
                 first = false;
                 try writeJsonString(w, f.name);
                 try w.writeAll(":");
+                const bounds = comptime integerValidationBounds(T, f.name, f.type);
+                if (bounds.minimum != null or bounds.maximum != null) try w.writeAll("{\"allOf\":[");
                 try writeTypeSchema(f.type, ctx, w);
+                if (bounds.minimum != null or bounds.maximum != null) {
+                    try w.writeAll(",{");
+                    // Optional values must still accept null. Numeric keywords
+                    // alone constrain numbers and do not reject null.
+                    var first_bound = true;
+                    if (bounds.minimum) |value| try writeNumberField(w, &first_bound, "minimum", value);
+                    if (bounds.maximum) |value| try writeNumberField(w, &first_bound, "maximum", value);
+                    try w.writeAll("}]}");
+                }
             }
             try w.writeAll("},\"required\":[");
             var first_req = true;
@@ -655,6 +666,25 @@ fn writeTypeSchema(comptime T: type, ctx: *SpecBuilder, w: *std.Io.Writer) anyer
         },
         else => try w.writeAll("{}"),
     }
+}
+
+const ValidationBounds = struct { minimum: ?i64 = null, maximum: ?i64 = null };
+fn integerValidationBounds(comptime Parent: type, comptime name: []const u8, comptime Field: type) ValidationBounds {
+    const Scalar = if (@typeInfo(Field) == .optional) @typeInfo(Field).optional.child else Field;
+    if (@typeInfo(Scalar) != .int) return .{};
+    const integer = @typeInfo(Scalar).int;
+    if (integer.bits > 63 and !(integer.bits == 64 and integer.signedness == .signed)) return .{};
+    const rules = if (@hasDecl(Parent, "validation")) Parent.validation else if (@hasDecl(Parent, "__schema") and @hasField(@TypeOf(Parent.__schema), "validates")) Parent.__schema.validates else return .{};
+    if (!@hasField(@TypeOf(rules), name)) return .{};
+    var result: ValidationBounds = .{};
+    inline for (@field(rules, name)) |rule| {
+        if (rule.kind == .min or rule.kind == .range) result.minimum = if (result.minimum) |prior| @max(prior, rule.int_a) else rule.int_a;
+        if (rule.kind == .max or rule.kind == .range) {
+            const maximum = if (rule.kind == .range) rule.int_b else rule.int_a;
+            result.maximum = if (result.maximum) |prior| @min(prior, maximum) else maximum;
+        }
+    }
+    return result;
 }
 
 fn unwrapOptional(comptime T: type) type {

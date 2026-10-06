@@ -6,6 +6,8 @@ JSONの形は普通のstruct、optional型、Zigのdefaultで定義します。�
 
 複雑なcheckは普通のZig関数と既存 `model.rule.custom` / `customInt` を使います。関数はrequest allocatorと値を受け取り、任意error messageを返します。messageを確保する場合は渡されたallocatorを利用してください。business errorはhandlerのerror mappingで扱います。
 
-length ruleはUnicode文字数ではなくbyte数です。OpenAPI minLength/maxLengthと同じ意味だとはみなしません。format ruleも完全な標準validatorではありません。constraint annotationとDTO単位validation hookは後続作業であり、現時点のJSON schemaはfield型・optional・defaultを表します。
+length ruleはUnicode文字数ではなくbyte数です。OpenAPI minLength/maxLengthと同じ意味だとはみなしません。format ruleも完全な標準validatorではありません。DTO単位validation hookは後続作業です。schemaはfield型・optional・defaultに加え、下記の安全なinteger制約を表します。
 
 [共通fixture](../../../tests/dx_application_fixture.zig)でNative/Workers WASM双方を検証します。[英語Guide](../../en/guides/validation.md)も参照してください。旧model projectionの挙動は維持し、strict metadata診断は新typed handlerに適用します。
+
+field全体がi64へ安全に収まるintegerのmin/max/rangeは、OpenAPI minimum/maximumへ投影します。optional fieldのnullを維持します。floatの切り捨て、広いinteger、byte length、heuristic formatを、より強いschema保証として推論しません。DTO全体のvalidate hookは未追加ですが、既存custom ruleで普通のZig functionを使用できます。

@@ -4,7 +4,11 @@ const ak = @import("akamata");
 const User = struct { id: u64, name: []const u8 };
 const Body = struct {
     name: []const u8,
-    pub const validation = .{ .name = .{ak.model.rule.min_len(1)} };
+    count: ?i32 = null,
+    pub const validation = .{
+        .name = .{ak.model.rule.min_len(1)},
+        .count = .{ak.model.rule.range(0, 10)},
+    };
 };
 fn hello() []const u8 {
     return "Hello, Akamata!";
@@ -39,6 +43,12 @@ pub fn run(allocator: std.mem.Allocator) !void {
     const document = try ak.openapi.generate(Application.Metadata, &metadata, allocator, .{ .title = "DX fixture", .version = "1" });
     defer allocator.free(document);
     if (std.mem.indexOf(u8, document, "text/plain") == null) return error.MissingEndpointMetadata;
+    const parsed_document = try std.json.parseFromSlice(std.json.Value, allocator, document, .{});
+    defer parsed_document.deinit();
+    const count_schema = parsed_document.value.object.get("components").?.object.get("schemas").?.object.get("Body").?.object.get("properties").?.object.get("count").?;
+    const constraints = count_schema.object.get("allOf").?.array.items[1].object;
+    try expect(constraints.get("minimum").?.integer == 0 and constraints.get("maximum").?.integer == 10);
+    try expect(constraints.get("type") == null); // numeric keywords preserve nullable input
     try @import("docs/minimal.zig").contract(allocator);
     var app = try Application.init(allocator);
     defer app.deinit();
@@ -63,6 +73,12 @@ pub fn run(allocator: std.mem.Allocator) !void {
     var validation = try client.post("/users").json(.{ .name = "" }).send();
     defer validation.deinit();
     try expect(validation.status == 422);
+    var out_of_range = try client.post("/users").json(.{ .name = "Alice", .count = 11 }).send();
+    defer out_of_range.deinit();
+    try out_of_range.expectStatus(.unprocessable_entity);
+    var nullable = try client.post("/users").json(.{ .name = "Alice", .count = @as(?i32, null) }).send();
+    defer nullable.deinit();
+    try nullable.expectStatus(.created);
     var absent = try client.get("/profile").send();
     defer absent.deinit();
     try expect(absent.status == 401);

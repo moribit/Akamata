@@ -42,6 +42,16 @@ test "request failure releases staged test-client allocations" {
 fn hello() []const u8 {
     return "Hello, Akamata!";
 }
+test "principal and mapped errors share a unique discriminator schema" {
+    const Handler = struct {
+        fn reject(_: ak.Principal(struct { id: u64 })) error{unauthorized}!void {
+            return error.unauthorized;
+        }
+    };
+    const Route = ak.endpoint(.{ .method = .GET, .path = "/", .handler = Handler.reject, .errors = .{ .unauthorized = .unauthorized } }).For(struct {});
+    try std.testing.expectEqual(@as(usize, 1), Route.meta.additional_responses.len);
+    try std.testing.expectEqual(@as(usize, 1), Route.meta.additional_responses[0].error_kinds.len);
+}
 test "typed route retains existing endpoint documentation and limits" {
     const Route = ak.endpoint(.{
         .method = .GET,

@@ -104,7 +104,11 @@ fn errorResponses(comptime mapping: anytype, comptime fallback: ?Code, comptime 
         if (extra.status < 400 or extra.status > 599) @compileError("Akamata fallback must use a 4xx or 5xx HTTP status");
         var found = false;
         for (docs[0..count]) |*doc| if (doc.status == extra.status) {
-            doc.error_kinds = doc.error_kinds ++ .{extra.kind};
+            var duplicate = false;
+            for (doc.error_kinds) |kind| if (std.mem.eql(u8, kind, extra.kind)) {
+                duplicate = true;
+            };
+            if (!duplicate) doc.error_kinds = doc.error_kinds ++ .{extra.kind};
             found = true;
         };
         if (!found) {
