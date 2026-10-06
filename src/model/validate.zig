@@ -108,10 +108,12 @@ pub fn validate(comptime T: type, value: T, arena: std.mem.Allocator) ![]Validat
 /// applicable rule.
 pub fn validateAny(comptime T: type, value: anytype, arena: std.mem.Allocator) ![]ValidationError {
     var errs: std.ArrayList(ValidationError) = .empty;
-    if (!@hasDecl(T, "__schema")) return errs.toOwnedSlice(arena);
-    const s = T.__schema;
-    if (!@hasField(@TypeOf(s), "validates")) return errs.toOwnedSlice(arena);
-    const v = s.validates;
+    const v = blk: {
+        if (@hasDecl(T, "validation")) break :blk T.validation;
+        if (!@hasDecl(T, "__schema")) return errs.toOwnedSlice(arena);
+        if (!@hasField(@TypeOf(T.__schema), "validates")) return errs.toOwnedSlice(arena);
+        break :blk T.__schema.validates;
+    };
 
     inline for (reflection.fields(@typeInfo(@TypeOf(v)).@"struct")) |field_decl| {
         const field_name = field_decl.name;

@@ -55,6 +55,29 @@ fn validateValue(comptime T: type) void {
     }
 }
 
+fn validateDto(comptime T: type) void {
+    const rules = blk: {
+        if (@hasDecl(T, "validation")) {
+            if (@hasDecl(T, "__schema") and @hasField(@TypeOf(T.__schema), "validates")) @compileError("Akamata DTO must declare either validation or __schema.validates, not both");
+            break :blk T.validation;
+        }
+        if (!@hasDecl(T, "__schema")) return;
+        if (!@hasField(@TypeOf(T.__schema), "validates")) return;
+        break :blk T.__schema.validates;
+    };
+    if (@typeInfo(@TypeOf(rules)) != .@"struct") @compileError("Akamata DTO validation must be a field-to-rule-tuple declaration");
+    inline for (reflection.fields(@typeInfo(@TypeOf(rules)).@"struct")) |field| {
+        if (!@hasField(T, field.name)) @compileError("Akamata DTO validation references unknown field " ++ field.name);
+        const tuple = @field(rules, field.name);
+        if (@typeInfo(@TypeOf(tuple)) != .@"struct" or !@typeInfo(@TypeOf(tuple)).@"struct".is_tuple) @compileError("Akamata DTO validation field " ++ field.name ++ " must contain a tuple of model.rule values");
+        inline for (tuple) |rule| {
+            if (@TypeOf(rule) != @import("../model/validate.zig").Rule) @compileError("Akamata DTO validation requires model.rule values for " ++ field.name);
+            if ((rule.kind == .min_len or rule.kind == .max_len) and rule.int_a < 0) @compileError("Akamata DTO length validation cannot be negative");
+            if (rule.kind == .range and rule.int_a > rule.int_b) @compileError("Akamata DTO validation range minimum exceeds maximum");
+        }
+    }
+}
+
 pub fn Endpoint(comptime State: type, comptime options: anytype) type {
     const handler = options.handler;
     const path = options.path;
@@ -75,6 +98,7 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         if (T.input_source == .json) {
             if (body != null) @compileError("Akamata handler may bind only one JSON body");
             if (@typeInfo(T.Value) != .@"struct") @compileError("Akamata Json request DTO must be a struct");
+            validateDto(T.Value);
             body = T.Value;
         }
         inline for (params[0..i]) |prior| if (prior) |P| {

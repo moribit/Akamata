@@ -409,7 +409,7 @@ pub fn Context(comptime State: type) type {
                 return null;
             }
 
-            if (@hasDecl(T, "__schema")) {
+            if (@hasDecl(T, "__schema") or @hasDecl(T, "validation")) {
                 const errs = try @import("model/validate.zig").validateAny(T, proj, self.arena);
                 if (errs.len > 0) {
                     try self.unprocessable(errs);

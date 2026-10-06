@@ -15,7 +15,7 @@ jobs:
           - name: native-test
             cmd: zig build test
           - name: native-release-safe
-            cmd: zig build test -Doptimize=ReleaseSafe
+            cmd: zig build test documentation-test -Doptimize=ReleaseSafe
           - name: native-openssl
             cmd: zig build test -Dopenssl=true -Doptimize=ReleaseSafe
           - name: native-integration
@@ -39,7 +39,7 @@ jobs:
           - name: guestbook-workers
             cmd: zig build -Dexample=guestbook -Dbackend=workers -Doptimize=ReleaseSmall
           - name: portable-application-workers
-            cmd: zig build portable-application-test -Dbackend=workers -Doptimize=ReleaseSafe
+            cmd: zig build portable-application-test documentation-test -Dbackend=workers -Doptimize=ReleaseSafe
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2.2.1

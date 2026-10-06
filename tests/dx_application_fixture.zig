@@ -4,7 +4,7 @@ const ak = @import("akamata");
 const User = struct { id: u64, name: []const u8 };
 const Body = struct {
     name: []const u8,
-    pub const __schema = .{ .validates = .{ .name = .{ak.model.rule.min_len(1)} } };
+    pub const validation = .{ .name = .{ak.model.rule.min_len(1)} };
 };
 fn hello() []const u8 {
     return "Hello, Akamata!";
@@ -35,6 +35,7 @@ fn expect(ok: bool) !void {
     if (!ok) return error.DeveloperContractFailed;
 }
 pub fn run(allocator: std.mem.Allocator) !void {
+    try @import("docs/minimal.zig").contract(allocator);
     var app = try Application.init(allocator);
     defer app.deinit();
     var client = app.client(allocator);

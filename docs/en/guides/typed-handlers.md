@@ -25,7 +25,7 @@ ak.endpoint(.{ .method = .GET, .path = "/users/:id", .handler = show,
 
 An `anyerror` handler requires an explicit `.fallback = .internal_server_error`; fallback responses do not reveal internal error names. Allocation/serialization failures remain framework errors, not application error-set mappings. All declarations adapt to the existing static route graph; no new router, transport or service locator is added.
 
-The executable contract is [tests/dx_test.zig](../../../../tests/dx_test.zig). Existing contract.TypedEndpoint/Bound/manual Context handlers remain supported. Migration is optional: move each aggregate wrapper field to an explicit function parameter and return its value instead of calling c.json. Advanced stateful handlers can stay on the original API.
+The executable contract is [tests/dx_test.zig](../../../tests/dx_test.zig). Existing contract.TypedEndpoint/Bound/manual Context handlers remain supported. Migration is optional: move each aggregate wrapper field to an explicit function parameter and return its value instead of calling c.json. Advanced stateful handlers can stay on the original API.
 
 Current first-stage metadata includes body/response schemas and typed path/query/header/cookie OpenAPI parameters. Client query/error generation and auth integration are subsequent work; do not treat their coverage as complete. Static declarations freeze route registration: use the original App(State) for dynamically registered routes.
 
@@ -33,6 +33,6 @@ Authentication middleware attaches an identity with `c.setPrincipal(identity)`. 
 
 Register middleware before the static graph freezes registration: declare `.middleware = .{.{ .call = authenticate }}`. Advanced startup configuration can use `.configure = configure`, where `fn configure(app: *ak.App(State)) !void` configures the existing core before mounting. `.core` is the runtime escape hatch, but registration methods remain frozen after initialization.
 
-The shared [application fixture](../../../../tests/dx_application_fixture.zig) runs with `zig build dx-test -Doptimize=ReleaseSafe` and `zig build portable-application-test -Dbackend=workers -Doptimize=ReleaseSafe`. Workers executes the same contract ten times inside WASM with simulated host imports; this is offline application evidence, not live Cloudflare certification.
+The shared [application fixture](../../../tests/dx_application_fixture.zig) runs with `zig build dx-test -Doptimize=ReleaseSafe` and `zig build portable-application-test -Dbackend=workers -Doptimize=ReleaseSafe`. Workers executes the same contract ten times inside WASM with simulated host imports; this is offline application evidence, not live Cloudflare certification.
 
 TypeScript generation uses the same endpoint metadata: path scalars retain their type, query keys preserve optional/required binding, ordinary scalar responses become type aliases, and text responses use `Response.text()`. JavaScript numbers cannot exactly represent every Zig u64; use explicit string IDs if exact large identifiers are required. Known application-error body typing is still pending.

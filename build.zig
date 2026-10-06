@@ -38,6 +38,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const documentation_step = b.step("documentation-test", "compile README source and run documentation application contracts");
     const opts = b.addOptions();
     opts.addOption(Backend, "backend", backend);
     opts.addOption(bool, "with_openssl", with_openssl);
@@ -152,6 +153,7 @@ pub fn build(b: *std.Build) void {
         contract_runner.step.dependOn(&binding_bridge.step);
         const provider_bridge = b.addSystemCommand(&.{ "node", "tests/workers_provider_bridge_test.mjs" });
         contract_runner.step.dependOn(&provider_bridge.step);
+        documentation_step.dependOn(&contract_runner.step);
         b.step("portable-application-test", "run shared application semantics inside Workers WASM with test providers").dependOn(&contract_runner.step);
     }
 
@@ -351,6 +353,13 @@ pub fn build(b: *std.Build) void {
         poc_contract.addArtifactArg(contract_server);
         poc_contract.addArgs(&.{ "--group", "--only-group" });
         poc_step.dependOn(&poc_contract.step);
+        const minimal = b.addExecutable(.{ .name = "documentation-minimal", .root_module = b.createModule(.{
+            .root_source_file = b.path("tests/docs/minimal.zig"),
+            .target = native_target,
+            .optimize = optimize,
+            .imports = &.{.{ .name = "akamata", .module = am_mod }},
+        }) });
+        documentation_step.dependOn(&minimal.step);
         inline for (test_targets) |tf| {
             const t_mod = b.createModule(.{
                 .root_source_file = b.path(tf),
@@ -364,7 +373,10 @@ pub fn build(b: *std.Build) void {
             t_mod.addOptions("build_options", opts);
             const run_test = b.addRunArtifact(t);
             test_step.dependOn(&run_test.step);
-            if (comptime std.mem.eql(u8, tf, "tests/dx_test.zig")) b.step("dx-test", "run developer API and documentation source contracts").dependOn(&run_test.step);
+            if (comptime std.mem.eql(u8, tf, "tests/dx_test.zig")) {
+                b.step("dx-test", "run developer API and documentation source contracts").dependOn(&run_test.step);
+                documentation_step.dependOn(&run_test.step);
+            }
         }
         // CLI tests (parsing wrangler.toml, UUID extraction)
         const cli_test_mod = b.createModule(.{

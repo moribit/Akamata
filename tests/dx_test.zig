@@ -1,5 +1,8 @@
 const std = @import("std");
 const ak = @import("akamata");
+test "README source executes through the in-process client" {
+    try @import("docs/minimal.zig").contract(std.testing.allocator);
+}
 fn hello() []const u8 {
     return "Hello, Akamata!";
 }
