@@ -25,6 +25,8 @@ pub const SecurityScheme = struct {
 /// Per-route metadata stamped at registration time. Stored once in static
 /// memory (the value lives in `.rodata`) and referenced from `Route.meta`.
 pub const EndpointMeta = struct {
+    required_services: []const @import("capability.zig").Application = &.{},
+    required_capabilities: []const @import("capability.zig").Kind = &.{},
     summary: []const u8 = "",
     description: []const u8 = "",
     tags: []const []const u8 = &.{},
@@ -328,6 +330,18 @@ fn writeOperation(w: *std.Io.Writer, op: OperationEntry) !void {
             try writeJsonString(w, t);
         }
         try w.writeAll("]");
+    }
+    if (op.meta.required_services.len > 0) {
+        if (!first) try w.writeAll(",");
+        first = false;
+        try w.writeAll("\"x-akamata-capabilities\":");
+        try std.json.Stringify.value(op.meta.required_services, .{}, w);
+    }
+    if (op.meta.required_capabilities.len > 0) {
+        if (!first) try w.writeAll(",");
+        first = false;
+        try w.writeAll("\"x-akamata-platform-capabilities\":");
+        try std.json.Stringify.value(op.meta.required_capabilities, .{}, w);
     }
     if (op.middleware_names.len > 0) {
         if (!first) try w.writeAll(",");

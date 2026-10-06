@@ -326,6 +326,10 @@ pub fn App(comptime State: type) type {
         }
 
         pub fn init(gpa: std.mem.Allocator, initial_state: State) Self {
+            if (comptime @hasDecl(State, "application_contract")) {
+                comptime State.application_contract.validate(if (build_options.backend == .workers) .workers else .native);
+                comptime State.application_contract.validateState(State);
+            }
             return .{
                 .gpa = gpa,
                 .state_value = initial_state,
@@ -564,6 +568,17 @@ pub fn App(comptime State: type) type {
             meta: *const @import("openapi.zig").EndpointMeta,
         ) !*Self {
             return self.addWithMeta(method, .http, path, h, meta);
+        }
+
+        /// Typed decorations validate before registration without changing
+        /// the existing runtime endpoint registration API.
+        pub fn validateEndpoint(_: *Self, comptime method: Method, comptime path: []const u8, comptime meta: *const @import("openapi.zig").EndpointMeta) void {
+            const target: @import("capability.zig").Target = if (build_options.backend == .workers) .workers else .native;
+            comptime @import("capability.zig").requireKinds("route " ++ @tagName(method) ++ " " ++ path, meta.required_capabilities, target);
+            if (comptime meta.required_services.len > 0) {
+                if (!@hasDecl(State, "application_contract")) @compileError("route " ++ path ++ " declares portable capabilities; State must declare application_contract");
+                comptime State.application_contract.validateRequirement("route " ++ @tagName(method) ++ " " ++ path, meta.required_services, target);
+            }
         }
 
         /// Mount a validated compile-time route graph. Route views still use

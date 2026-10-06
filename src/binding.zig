@@ -68,9 +68,47 @@ pub fn validate(comptime Env: type, comptime target: capability.Target) void {
     }
 }
 
+/// Checks provider-to-binding edges. This is wiring validation, not remote
+/// resource provisioning or deployment readiness.
+pub fn validateContract(comptime Env: type, comptime Contract: type, comptime target: capability.Target) void {
+    validate(Env, target);
+    Contract.validate(target);
+    inline for (Contract.providers) |provision| {
+        const expected: ?Kind = switch (provision.provider) {
+            .d1 => .d1,
+            .r2 => .r2,
+            .workers_queue => .queue,
+            .durable_objects => .durable_object,
+            else => null,
+        };
+        if (expected) |kind| {
+            const name = provision.binding orelse @compileError(Contract.name ++ " capability " ++ @tagName(provision.capability) ++ " provider " ++ @tagName(provision.provider) ++ ": missing Workers binding name");
+            comptime var found = false;
+            inline for (reflection.fields(@typeInfo(Env).@"struct")) |field| {
+                if (std.mem.eql(u8, field.type.binding_name, name)) {
+                    if (field.type.binding_kind != kind) @compileError(Contract.name ++ " binding " ++ name ++ ": wrong binding kind for " ++ @tagName(provision.provider));
+                    found = true;
+                }
+            }
+            if (!found) @compileError(Contract.name ++ " capability " ++ @tagName(provision.capability) ++ ": binding " ++ name ++ " absent from environment for target " ++ @tagName(target));
+        } else if (provision.binding != null) @compileError(Contract.name ++ ": provider " ++ @tagName(provision.provider) ++ " does not use a resource binding");
+    }
+}
+
 test "worker binding declarations validate" {
     const Env = struct { db: D1("DB"), files: R2("FILES"), events: Queue("EVENTS"), rooms: DurableObject("ROOMS"), token: Secret("TOKEN") };
     comptime validate(Env, .workers);
+}
+
+test "portable requirements resolve to declared Workers bindings" {
+    const Env = struct { database: D1("DB"), storage: R2("FILES"), rooms: DurableObject("ROOMS"), jobs: Queue("JOBS") };
+    const C = capability.Contract("portable fixture", &.{ .database, .object_storage, .realtime, .queue }, &.{
+        .{ .capability = .database, .provider = .d1, .binding = "DB" },
+        .{ .capability = .object_storage, .provider = .r2, .binding = "FILES" },
+        .{ .capability = .realtime, .provider = .durable_objects, .binding = "ROOMS" },
+        .{ .capability = .queue, .provider = .workers_queue, .binding = "JOBS" },
+    });
+    comptime validateContract(Env, C, .workers);
 }
 
 test "secret formatting is always redacted" {

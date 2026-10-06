@@ -32,6 +32,14 @@ pub fn validateKey(key: []const u8) Error!void {
 pub const Store = struct {
     ptr: *anyopaque,
     vtable: *const VTable,
+    /// Borrowed request trace. Never retain an observed facade past dispatch.
+    trace: ?*@import("observability/trace.zig").TraceContext = null,
+
+    pub fn observed(self: Store, trace: *@import("observability/trace.zig").TraceContext) Store {
+        var copy = self;
+        copy.trace = trace;
+        return copy;
+    }
     pub const VTable = struct {
         put: *const fn (*anyopaque, []const u8, stream.Reader, PutOptions) Error!Metadata,
         get: *const fn (*anyopaque, []const u8, GetOptions) Error!Object,
@@ -40,18 +48,28 @@ pub const Store = struct {
         list: *const fn (*anyopaque, std.mem.Allocator, []const u8, ?[]const u8, usize) Error![]ListEntry,
     };
     pub fn put(self: Store, key: []const u8, body: stream.Reader, options: PutOptions) Error!Metadata {
+        var span = if (self.trace) |trace| trace.startSpan("storage.put") else null;
+        defer if (span) |*s| s.end();
         return self.vtable.put(self.ptr, key, body, options);
     }
     pub fn get(self: Store, key: []const u8, options: GetOptions) Error!Object {
+        var span = if (self.trace) |trace| trace.startSpan("storage.get") else null;
+        defer if (span) |*s| s.end();
         return self.vtable.get(self.ptr, key, options);
     }
     pub fn delete(self: Store, key: []const u8) Error!void {
+        var span = if (self.trace) |trace| trace.startSpan("storage.delete") else null;
+        defer if (span) |*s| s.end();
         return self.vtable.delete(self.ptr, key);
     }
     pub fn head(self: Store, key: []const u8) Error!Metadata {
+        var span = if (self.trace) |trace| trace.startSpan("storage.head") else null;
+        defer if (span) |*s| s.end();
         return self.vtable.head(self.ptr, key);
     }
     pub fn list(self: Store, allocator: std.mem.Allocator, prefix: []const u8, cursor: ?[]const u8, limit: usize) Error![]ListEntry {
+        var span = if (self.trace) |trace| trace.startSpan("storage.list") else null;
+        defer if (span) |*s| s.end();
         return self.vtable.list(self.ptr, allocator, prefix, cursor, limit);
     }
 };

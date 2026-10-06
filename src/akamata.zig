@@ -1,7 +1,7 @@
 // Akamata — Zig 製ミニマル Web フレームワーク。
 //
 // 公開 API はこのファイル経由でアクセスする。Hono 風の `App(State)` ベース
-// + 既存 `Router(App)` 互換 API の両方を提供する。
+// の App / Context API を提供する。
 
 const std = @import("std");
 const builtin = @import("builtin");

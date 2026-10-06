@@ -53,6 +53,15 @@ pub fn validateCapabilities(comptime endpoints: anytype, comptime target: @impor
     }
 }
 
+pub fn validateApplication(comptime endpoints: anytype, comptime ApplicationContract: type, comptime target: @import("capability.zig").Target) void {
+    validateGraph(endpoints);
+    validateCapabilities(endpoints, target);
+    ApplicationContract.validate(target);
+    inline for (endpoints) |endpoint| if (@hasDecl(endpoint, "required_services")) {
+        ApplicationContract.validateRequirement("route " ++ @tagName(endpoint.http_method) ++ " " ++ endpoint.route_path, endpoint.required_services, target);
+    };
+}
+
 fn validatePath(comptime path: []const u8) void {
     if (path.len == 0 or path[0] != '/') @compileError("endpoint path must start with '/': " ++ path);
     if (std.mem.indexOf(u8, path, "//") != null) @compileError("endpoint path contains an empty segment: " ++ path);

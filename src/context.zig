@@ -308,6 +308,20 @@ pub fn Context(comptime State: type) type {
             return self.app_state.db;
         }
 
+        /// Borrowed portable facades. State/provider owns their resources;
+        /// Context never destroys them. Explicit State wiring stays visible.
+        pub fn storage(self: *Self) @import("storage.zig").Store {
+            return self.app_state.store.observed(&self.trace);
+        }
+
+        pub fn queue(self: *Self) @import("queue.zig").Producer {
+            return self.app_state.queue;
+        }
+
+        pub fn realtime(self: *Self) @import("realtime.zig").Service {
+            return self.app_state.realtime;
+        }
+
         /// Stable request ID installed by `am.mw.requestId`, independent of
         /// `user_data` used by sessions/JWT middleware.
         pub fn requestId(self: *const Self) ?[]const u8 {

@@ -1,7 +1,9 @@
 const std = @import("std");
 const am = @import("akamata");
 
-const State = struct {};
+const State = struct {
+    pub const application_contract = am.capability.Contract("typed API", &.{.outbound_http}, &.{.{ .capability = .outbound_http, .provider = .native_http }});
+};
 
 fn runtimeHandler(c: *am.Context(State)) !void {
     try c.text(try c.req.param("id"));
@@ -70,6 +72,23 @@ test "capability matrix distinguishes native and Workers" {
     try std.testing.expect(am.capability.available(.native, .filesystem));
     try std.testing.expect(!am.capability.available(.workers, .filesystem));
     try std.testing.expect(am.capability.available(.workers, .d1));
+}
+
+test "portable route metadata preserves typed endpoint schema and handler" {
+    const Portable = am.capability.Uses(Typed, &.{.outbound_http});
+    const Native = am.capability.Contract("typed API", &.{.outbound_http}, &.{.{ .capability = .outbound_http, .provider = .native_http }});
+    const Workers = am.capability.Contract("typed API", &.{.outbound_http}, &.{.{ .capability = .outbound_http, .provider = .workers_fetch }});
+    comptime am.contract.validateApplication(.{Portable}, Native, .native);
+    comptime am.contract.validateApplication(.{Portable}, Workers, .workers);
+    try std.testing.expect(Portable.meta.schema_fn == Typed.meta.schema_fn);
+    try std.testing.expectEqualStrings(Typed.meta.operation_id, Portable.meta.operation_id);
+    var app = am.App(State).init(std.testing.allocator, .{});
+    defer app.deinit();
+    try Portable.register(&app);
+    var client = am.testing.Client(@TypeOf(app)).init(std.testing.allocator, &app);
+    var response = try client.get("/typed/7").send();
+    defer response.deinit();
+    try response.expectStatus(200);
 }
 
 test "DI graph emits dependency-first order" {
