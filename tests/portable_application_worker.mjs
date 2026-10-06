@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 
 const module = new WebAssembly.Module(readFileSync(process.argv[2]));
 let memory;
@@ -125,6 +128,33 @@ assert.equal(exports.memory.buffer.byteLength, warmedMemory, "test providers/app
 assert.equal(exports.prepare_developer_client(), 0, decode(exports.error_ptr(), exports.error_len()));
 const developerSource = decode(exports.developer_client_ptr(), exports.developer_client_len());
 exports.release_developer_client();
+if (process.env.AKAMATA_DX_TSC) {
+  const directory = mkdtempSync(join(tmpdir(), "akamata-dx-client-"));
+  try {
+    writeFileSync(join(directory, "client.ts"), developerSource);
+    writeFileSync(join(directory, "usage.ts"), `
+import { createClient, is_getUsersByIdError } from "./client";
+const api = createClient({ baseUrl: "https://fixture.test" });
+const user: Promise<{ id: number; name: string }> = api.getUsersById(42, { name: "Bob" });
+const hello: Promise<string> = api.get();
+api.postUsers({ name: "Alice" });
+// @ts-expect-error: path id is numeric
+api.getUsersById("bad", {});
+// @ts-expect-error: request body requires name
+api.postUsers({});
+const unknownError: unknown = null;
+if (is_getUsersByIdError(unknownError)) {
+  const status: 404 = unknownError.status;
+  const discriminator: "NotFound" = unknownError.body.error_kind;
+}
+`);
+    const checked = spawnSync(process.execPath, [process.env.AKAMATA_DX_TSC, "--noEmit", "--strict", "--target", "ES2022", "--module", "ESNext", "--moduleResolution", "bundler", "--lib", "ES2022,DOM", join(directory, "usage.ts")], { encoding: "utf8", timeout: 30000 });
+    assert.equal(checked.status, 0, checked.stdout + checked.stderr + (checked.error?.message ?? ""));
+    console.log("generated DX client: TypeScript strict static checks and expected type errors passed");
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+}
 // Syntax transformation is additional evidence when supported by the host
 // Node version, not a substitute for TypeScript's static type checker.
 const { stripTypeScriptTypes } = await import("node:module");

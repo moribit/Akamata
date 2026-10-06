@@ -48,3 +48,15 @@ explicitly on the pinned v0.1.5 bootstrap. With a local override, use
 The latter emits a manifest accepted by `akamata inspect capabilities --manifest=PATH`.
 For a stateful application replace the empty Hello Contract with its existing
 explicit Contract/provider declarations; do not hand-edit generated manifests.
+
+Generated-client CI runs TypeScript 5.9.3 with `--strict --noEmit`, including
+expected errors for wrong path IDs/missing bodies and narrowing known HTTP errors.
+The optional local command is:
+
+```sh
+npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund
+AKAMATA_DX_TSC=/tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js zig build documentation-test -Dbackend=workers -Doptimize=ReleaseSafe
+```
+
+This is test tooling, not a framework runtime dependency. Syntax transformation
+and mocked-fetch checks remain separate from static type checking.

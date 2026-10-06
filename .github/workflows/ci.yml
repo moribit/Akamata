@@ -58,6 +58,23 @@ jobs:
             .zig-cache/runtime-session-validation.json
           if-no-files-found: ignore
 
+  dx-typescript:
+    name: generated DX client strict typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2.2.1
+        with:
+          version: 0.17.0
+          use-cache: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+      - run: npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund
+      - run: zig build documentation-test -Dbackend=workers -Doptimize=ReleaseSafe
+        env:
+          AKAMATA_DX_TSC: /tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js
+
   macos-native:
     name: macos native + kqueue contract
     runs-on: macos-latest
