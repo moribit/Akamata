@@ -103,8 +103,12 @@ pub fn Contract(comptime subject: []const u8, comptime requirements: []const App
                     @compileError(subject ++ ": provider " ++ @tagName(provision.provider) ++ " cannot provide " ++ @tagName(provision.capability));
                 if (!providerSupports(provision.provider, target))
                     @compileError(subject ++ " capability " ++ @tagName(provision.capability) ++ ": provider " ++ @tagName(provision.provider) ++ " unavailable on target " ++ @tagName(target) ++ "; select defaultProvider for this target or a supported explicit provider");
-                inline for (provisions[0..i]) |previous| if (previous.capability == provision.capability)
-                    @compileError(subject ++ ": duplicate provider for " ++ @tagName(provision.capability));
+                inline for (provisions[0..i]) |previous| {
+                    if (previous.capability == provision.capability)
+                        @compileError(subject ++ ": duplicate provider for " ++ @tagName(provision.capability));
+                    if (provision.binding) |resource_name| if (previous.binding) |prior| if (@import("std").mem.eql(u8, resource_name, prior))
+                        @compileError(subject ++ ": duplicate resource binding " ++ resource_name ++ " for " ++ @tagName(previous.provider) ++ " and " ++ @tagName(provision.provider) ++ " on target " ++ @tagName(target));
+                }
                 requireKinds(subject ++ " capability " ++ @tagName(provision.capability) ++ " provider " ++ @tagName(provision.provider), &.{provision.provider.facility()}, target);
                 if (provision.binding) |binding_name| if (binding_name.len == 0)
                     @compileError(subject ++ ": empty binding for " ++ @tagName(provision.capability));
@@ -113,7 +117,11 @@ pub fn Contract(comptime subject: []const u8, comptime requirements: []const App
                 if (!provision.provider.usesBinding() and provision.binding != null)
                     @compileError(subject ++ ": provider " ++ @tagName(provision.provider) ++ " does not use a resource binding");
             }
-            inline for (requirements) |needed| _ = resolve(needed);
+            inline for (requirements, 0..) |needed, index| {
+                inline for (requirements[0..index]) |previous| if (previous == needed)
+                    @compileError(subject ++ ": duplicate requirement " ++ @tagName(needed));
+                _ = resolve(needed);
+            }
         }
 
         pub fn validateRequirement(comptime component: []const u8, comptime needed: []const Application, comptime target: Target) void {

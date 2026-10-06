@@ -34,6 +34,10 @@ with tempfile.TemporaryDirectory(prefix="akamata-capability-") as directory:
     output = json.loads(result.stderr.strip())
     assert all(p["status"] == "binding_configured" for p in output["providers"])
     assert "ready" not in result.stderr
+    invalid = dict(declaration, requirements=["database", "database", "object_storage"])
+    assert "InvalidCapabilityManifest" in run(invalid, 1).stderr
+    invalid = dict(declaration, providers=[declaration["providers"][0], {"capability": "object_storage", "provider": "r2", "binding": "DB"}])
+    assert "InvalidCapabilityManifest" in run(invalid, 1).stderr
     invalid = dict(declaration, routes=[{"method": "POST", "path": "/files", "capabilities": ["realtime"]}])
     assert "InvalidCapabilityManifest" in run(invalid, 1).stderr
     config.write_text('# [[r2_buckets]]\n# binding = "FILES"\n[[d1_databases]]\nbinding = "DB"\n')

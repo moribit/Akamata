@@ -59,6 +59,8 @@ providerの宣言はopaque facadeの実装や接続先の稼働を証明しま�
 
 ## Contextとownership
 
+異なるproviderへの同一resource binding名の割り当てとrequirementの重複も、compile-time／CLIの両方で拒否します。
+
 Opt-in Stateの既存field型をApp.initで検証します。
 
 | Requirement | State field | Request-local view |

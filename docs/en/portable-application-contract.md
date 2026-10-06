@@ -47,7 +47,7 @@ the declared adapter and configuration. Containers have Native capabilities,
 not Workers binding access. Disk durability depends on deployment volumes.
 
 `Contract.validate(target)` rejects missing/duplicate providers, incompatible
-provider semantics and unsupported targets. `binding.validateContract(Env,
+provider semantics, duplicate requirements/resource names and unsupported targets. `binding.validateContract(Env,
 Contract, target)` validates resource names/kinds using D1/R2/Queue/DO markers.
 It does not create remote resources or contain credentials/resource IDs.
 

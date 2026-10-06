@@ -13,7 +13,7 @@ are tested separately from live Cloudflare behavior.
 | `zig build portable-application-test -Dbackend=workers -Doptimize=ReleaseSafe -j4` | pass | Ten shared WASM fixture iterations, stable pages after warmup; actual Zig D1/R2/Queue adapters with injected host bindings |
 | `node tests/d1_binding_bridge.mjs` | pass | Actual managed/template bridge source, named/default D1, async statements, metadata, missing binding, handle cleanup |
 | `node tests/workers_provider_bridge_test.mjs` | pass | Actual managed/template R2/Queue bridge source, bounded write abort, conditional failure, delivery metadata |
-| `bash tests/compile_fail.sh` | 20 cases pass | Existing diagnostics plus missing provider/unsupported provider/binding mismatch/undeclared route/missing State facade |
+| `bash tests/compile_fail.sh` | 22 cases pass | Existing diagnostics plus missing provider/unsupported provider/binding mismatch/undeclared route/missing State facade/duplicate resource name and requirement |
 | `zig build cli-capabilities-test -j4` | pass | Resolution, binding drift/comments, invalid manifests/routes, check integration, old-project fail-fast, no config mutation |
 | `zig build cli-operations-test -j4` | pass | Existing deploy/D1 failure safety, build, dev restart/shutdown, containers |
 | `zig build scaffold-local-test -j4` | pass | Generated app against checkout, Native/Workers, ReleaseSmall/ReleaseSafe, migration double-apply protection |
@@ -47,6 +47,10 @@ opening D1, then fail Stmt allocation after the host prepare succeeds. The host
 statement is finalized and the original statement remains valid until its own
 deinit. Workers reference/scaffold initialization now uses errdefer to destroy
 App before closing DB on a failed setup; successful owners retain isolate lifetime.
+
+Provider declarations reject sharing one resource binding name across distinct
+providers. Compile-time and CLI validation both reject duplicate requirements;
+this keeps generated manifests consistent with the tooling validator.
 
 CI remains in `.github/workflows/ci.yml`: Native/ReleaseSafe/OpenSSL, Linux/macOS
 runtime contracts, examples, package/container/fuzz, existing CLI protections,

@@ -102,7 +102,7 @@ fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     defer if (config_bytes) |owned| alloc.free(owned);
     if (!json) std.debug.print("Target: {s}\nApplication capabilities (remote resource readiness is not checked)\n", .{target});
     var missing = false;
-    for (providers.array.items) |*item| {
+    for (providers.array.items, 0..) |*item, provider_index| {
         if (item.* != .object) return error.InvalidCapabilityManifest;
         const kind = item.object.get("capability") orelse return error.InvalidCapabilityManifest;
         const provider = item.object.get("provider") orelse return error.InvalidCapabilityManifest;
@@ -117,6 +117,9 @@ fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
         var status: []const u8 = "declared";
         if (item.object.get("binding")) |binding_name| if (binding_name == .string) {
             if (!needs_binding or binding_name.string.len == 0) return error.InvalidCapabilityManifest;
+            for (providers.array.items[0..provider_index]) |previous| {
+                if (previous.object.get("binding")) |prior| if (prior == .string and std.mem.eql(u8, prior.string, binding_name.string)) return error.InvalidCapabilityManifest;
+            }
             const present = if (config_bytes) |content| @import("../cloudflare/config.zig").hasResourceBinding(content, provider.string, binding_name.string) else false;
             status = if (present) "binding_configured" else "missing_binding";
             if (!present) missing = true;
