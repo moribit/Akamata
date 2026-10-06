@@ -60,11 +60,11 @@ pub fn cmdDeploy(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
                 std.debug.print("--migrate given but {s} has no [[d1_databases]] entry — nothing to migrate against.\n", .{cfg});
                 return error.UsageError;
             };
+            defer alloc.free(db_name.name);
+            defer alloc.free(db_name.id);
+            defer alloc.free(db_name.binding);
             std.debug.print("==> akamata: applying {s} to remote D1 \"{s}\"\n", .{ sql, db_name.name });
             try cloudflare.executeD1(alloc, .{ .database = db_name.name, .location = .remote, .config = cfg, .file = sql });
-            alloc.free(db_name.name);
-            alloc.free(db_name.id);
-            alloc.free(db_name.binding);
         }
         // 3. Build wasm + deploy.
         const opt = optimizeFlag(args, workers_default_optimize);

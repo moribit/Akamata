@@ -10,7 +10,7 @@ akamata deploy --workers --environment=production --preflight
 
 Contract-aware projects with the existing akamata-capabilities metadata hook preflight automatically before migrations, build or deploy. Legacy projects can opt in with --preflight or --manifest=PATH. A supplied manifest must be generated from the application being deployed; it is not cryptographically tied to the binary. Inspection/check only read local files. No remote probe happens implicitly.
 
-Named Wrangler environments resolve only their own non-inheritable bindings and vars. Root D1/R2/Queue/DO bindings never satisfy a named environment. Environment names supported by the local TOML reader are alphanumeric/underscore/hyphen identifiers; quoted/dotted names are explicitly unsupported. This is a limitation of local config parsing, not a forced development/staging/production naming policy. JSONC and complex TOML forms remain unsupported; do not mistake missing parsed bindings for remote absence.
+Named Wrangler environments resolve only their own non-inheritable bindings and vars. Root D1/R2/Queue/DO bindings never satisfy a named environment. Environment names supported by the local TOML reader are alphanumeric/underscore/hyphen identifiers; quoted/dotted names are explicitly unsupported. This is a limitation of local config parsing, not a forced development/staging/production naming policy. JSON/JSONC metadata is now projected through std.json into the same binding reader. Comments and trailing commas are supported; malformed structures, duplicate JSON keys and unrepresentable escaped strings fail explicitly. The projection is read-only and does not rewrite Wrangler config. Complex TOML forms remain unsupported; missing parsed bindings do not imply remote absence.
 
 ## Readiness evidence
 
@@ -37,3 +37,30 @@ Deploy now rejects placeholder D1 IDs instead of automatically creating/updating
 --environment is passed to Wrangler deployment, not just displayed by inspection. Combining named-environment deployment with --migrate currently fails closed with EnvironmentMigrationUnsupported rather than applying SQL to the root environment database. Run explicit environment-aware platform migrations separately. Threaded remains Native default; Reactor remains parked/fail-closed.
 
 Named Workers environments always request strict preflight, including legacy projects (which must supply the Contract metadata hook or a generated manifest). Containers honor explicit `--preflight` / `--manifest` with target `containers`; Workers environment overrides are rejected for Containers. Custom Realtime namespace bindings additionally require matching AKAMATA_REALTIME_BINDING in the selected environment.
+
+## Configuration parser boundary (DX phase)
+
+`inspect`, deployment checks and resource-name readers accept `.json`, `.jsonc`
+and the existing generated TOML subset. The JSONC lexer only removes comments
+and trailing commas outside strings; Zig 0.17 `std.json` validates the tree.
+Relevant resource fields and provider variables are projected into a caller-owned
+metadata view and freed after inspection. Arbitrary vars unrelated to provider
+validation remain Wrangler's responsibility. Backslash/quote/control characters
+in projected values are explicitly unsupported because the existing borrowing
+TOML reader does not decode escapes; they are never silently reinterpreted.
+
+Root and named environments retain distinct resources. Named-environment
+migration stays fail-closed: the current migration operation resolves the first
+root D1 declaration, not an environment-specific binding/resource pair. Supporting
+JSONC inspection does not make that migration path safe.
+
+The same-format and non-inheritable binding semantics were checked against the
+[official Wrangler configuration documentation](https://developers.cloudflare.com/workers/wrangler/configuration/)
+on 2026-10-06. This is local validation evidence, not live provider certification.
+
+Custom glue artifact proof remains a separate boundary. Symbol presence alone
+cannot prove that arbitrary JS dispatches the declared consumer/gateway or
+implements the R2 listPage ABI correctly. Existing managed-glue simulation tests
+cover the shipped bridge; user glue needs a dedicated host/adapter smoke before
+remote readiness can be asserted. Offline inspection deliberately never reports
+reachable/ready for either path. No resource is automatically created.

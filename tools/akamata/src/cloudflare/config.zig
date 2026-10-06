@@ -8,6 +8,17 @@ const writeFileBytes = @import("../project/files.zig").writeFileBytes;
 // ---- deploy ----
 pub const PLACEHOLDER_UUID = "00000000-0000-0000-0000-000000000000";
 
+/// Caller-owned read-only metadata view. JSONC is parsed with std.json after
+/// removing comments/trailing commas; user files and Wrangler format stay intact.
+pub fn readConfigAlloc(alloc: std.mem.Allocator, path: []const u8, limit: usize) ![]u8 {
+    const raw = try readFileAlloc(alloc, path, limit);
+    if (std.mem.endsWith(u8, path, ".json") or std.mem.endsWith(u8, path, ".jsonc")) {
+        defer alloc.free(raw);
+        return @import("config_json.zig").normalize(alloc, raw);
+    }
+    return raw;
+}
+
 pub const WorkerCapabilities = struct {
     d1: bool = false,
     r2: bool = false,
@@ -84,7 +95,8 @@ pub fn resource(content: []const u8, provider: []const u8, name: []const u8, env
             }
             current = .{};
             binding = null;
-            active = std.mem.startsWith(u8, line, section) and (line.len == section.len or std.mem.trim(u8, line[section.len..], " \t")[0] == '#');
+            const trailing = if (std.mem.startsWith(u8, line, section)) std.mem.trim(u8, line[section.len..], " \t") else line;
+            active = std.mem.startsWith(u8, line, section) and (trailing.len == 0 or trailing[0] == '#');
         } else if (active) {
             if (quotedAssignment(line, binding_key)) |value| binding = value;
             if (quotedAssignment(line, id_key)) |value| current.identifier = value;
@@ -118,6 +130,11 @@ test "deployment bindings and vars do not inherit across environments" {
     try std.testing.expect(!(try resource(toml, "r2", "FILES", "preview")).present);
     try std.testing.expectEqualStrings("d1:REPORTS", (try environmentVar(toml, "production", "DATABASE_URL")).?);
     try std.testing.expect((try environmentVar(toml, "preview", "DATABASE_URL")) == null);
+}
+
+test "binding section accepts trailing whitespace without indexing an empty slice" {
+    const toml = "[[r2_buckets]]  \t\nbinding = 'FILES'\nbucket_name = 'files'\n";
+    try std.testing.expectEqualStrings("files", (try resource(toml, "r2", "FILES", null)).identifier.?);
 }
 
 /// Read generated/supported TOML binding declarations by section and key.
@@ -160,6 +177,7 @@ test "provider binding comparison does not match comments or wrong sections" {
 
 pub fn activeToml(alloc: std.mem.Allocator, bytes: []const u8) ![]u8 {
     var out: std.ArrayList(u8) = .empty;
+    errdefer out.deinit(alloc);
     var lines = std.mem.splitScalar(u8, bytes, '\n');
     while (lines.next()) |line| {
         const before_comment = if (std.mem.indexOfScalar(u8, line, '#')) |i| line[0..i] else line;
@@ -170,8 +188,10 @@ pub fn activeToml(alloc: std.mem.Allocator, bytes: []const u8) ![]u8 {
 }
 
 pub fn detectWorkerCapabilities(alloc: std.mem.Allocator, cfg: []const u8) !WorkerCapabilities {
-    const raw = try readFileAlloc(alloc, cfg, 4 * 1024 * 1024);
+    const raw = try readConfigAlloc(alloc, cfg, 4 * 1024 * 1024);
+    defer alloc.free(raw);
     const toml = try activeToml(alloc, raw);
+    defer alloc.free(toml);
     return .{
         .d1 = std.mem.indexOf(u8, toml, "[[d1_databases]]") != null,
         .r2 = std.mem.indexOf(u8, toml, "[[r2_buckets]]") != null,
@@ -201,7 +221,7 @@ pub fn printCapabilities(caps: WorkerCapabilities) void {
 /// Read the top-level `name = "..."` from a wrangler.toml (the key before any
 /// `[section]`). Returns an owned copy, or null if absent.
 pub fn readWranglerName(alloc: std.mem.Allocator, path: []const u8) !?[]const u8 {
-    const content = try readFileAlloc(alloc, path, 1 * 1024 * 1024);
+    const content = try readConfigAlloc(alloc, path, 1 * 1024 * 1024);
     defer alloc.free(content);
     var it = std.mem.splitScalar(u8, content, '\n');
     while (it.next()) |raw| {
@@ -219,7 +239,11 @@ pub fn readWranglerName(alloc: std.mem.Allocator, path: []const u8) !?[]const u8
 }
 
 pub fn defaultConfigPath() ?[]const u8 {
+    if (fileExists("deploy/wrangler.jsonc")) return "deploy/wrangler.jsonc";
+    if (fileExists("deploy/wrangler.json")) return "deploy/wrangler.json";
     if (fileExists("deploy/wrangler.toml")) return "deploy/wrangler.toml";
+    if (fileExists("wrangler.jsonc")) return "wrangler.jsonc";
+    if (fileExists("wrangler.json")) return "wrangler.json";
     if (fileExists("wrangler.toml")) return "wrangler.toml";
     return null;
 }
@@ -235,7 +259,7 @@ pub const D1Info = struct {
 /// Hand-rolled minimal TOML reader — wrangler files we generate are simple
 /// enough that this stays robust.
 pub fn readD1FromConfig(alloc: std.mem.Allocator, path: []const u8) !?D1Info {
-    const content = try readFileAlloc(alloc, path, 1 * 1024 * 1024);
+    const content = try readConfigAlloc(alloc, path, 1 * 1024 * 1024);
     defer alloc.free(content);
 
     var binding: ?[]const u8 = null;
@@ -269,9 +293,13 @@ pub fn readD1FromConfig(alloc: std.mem.Allocator, path: []const u8) !?D1Info {
         if (std.mem.eql(u8, k, "binding")) binding = v else if (std.mem.eql(u8, k, "database_name")) name = v else if (std.mem.eql(u8, k, "database_id")) id = v;
     }
     if (binding == null or name == null or id == null) return null;
+    const owned_binding = try alloc.dupe(u8, binding.?);
+    errdefer alloc.free(owned_binding);
+    const owned_name = try alloc.dupe(u8, name.?);
+    errdefer alloc.free(owned_name);
     return .{
-        .binding = try alloc.dupe(u8, binding.?),
-        .name = try alloc.dupe(u8, name.?),
+        .binding = owned_binding,
+        .name = owned_name,
         .id = try alloc.dupe(u8, id.?),
     };
 }

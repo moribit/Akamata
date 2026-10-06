@@ -45,6 +45,24 @@ with tempfile.TemporaryDirectory(prefix="akamata-capability-") as directory:
     assert production["environment"] == "production"
     assert all(p["readiness"] == "validated" for p in production["providers"])
     assert "MissingCapabilityBinding" in run(declaration, 1, ["--environment=preview"]).stderr
+    # JSONC is a read-only metadata view, with identical environment semantics.
+    toml_config = config
+    config = root / "wrangler.jsonc"
+    config.write_text('''{
+      // Root must not satisfy a named environment.
+      "r2_buckets": [{"binding":"FILES","bucket_name":"root"}],
+      "env": {"production": {
+        "d1_databases": [{"binding":"DB","database_id":"11111111-1111-1111-1111-111111111111"}],
+        "r2_buckets": [{"binding":"FILES","bucket_name":"production",}],
+        "vars": {"DATABASE_URL":"d1:DB",},
+      },},
+    }''')
+    jsonc = json.loads(run(declaration, extra=["--environment=production", "--strict"]).stderr)
+    assert all(p["readiness"] == "validated" for p in jsonc["providers"])
+    assert "MissingCapabilityBinding" in run(declaration, 1, ["--environment=preview"]).stderr
+    config.write_text('{"r2_buckets":false}')
+    assert "InvalidDeploymentConfig" in run(declaration, 1).stderr
+    config = toml_config
     config.write_text(config.read_text().replace('DATABASE_URL="d1:DB"', 'DATABASE_URL="https://redacted.invalid"'))
     drift = run(declaration, 1, ["--environment=production"])
     assert "ProviderConfigurationDrift" in drift.stderr and "redacted.invalid" not in drift.stderr

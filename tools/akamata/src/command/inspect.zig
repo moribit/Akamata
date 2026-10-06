@@ -102,7 +102,7 @@ pub fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !vo
         required_services[@backingInt(kind)] = true;
     }
     const config_path = config orelse defaultConfigPath();
-    const config_bytes: ?[]u8 = if (config_path) |path| try readFileAlloc(alloc, path, 4 * 1024 * 1024) else null;
+    const config_bytes: ?[]u8 = if (config_path) |path| try deployment.readConfigAlloc(alloc, path, 4 * 1024 * 1024) else null;
     defer if (config_bytes) |owned| alloc.free(owned);
     if (!json) std.debug.print("Target: {s}\nEnvironment: {s}\nApplication capabilities (remote resource readiness is not checked)\n", .{ target, environment orelse "default" });
     try root.object.put(parsed.arena.allocator(), "environment", if (environment) |env| .{ .string = env } else .null);
