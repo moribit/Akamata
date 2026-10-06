@@ -28,6 +28,16 @@ pub fn App(comptime declaration: anytype) type {
         pub fn initWithState(allocator: std.mem.Allocator, state: State) !Self {
             var app = Core.init(allocator, state);
             errdefer app.deinit();
+            if (comptime @hasField(@TypeOf(declaration), "middleware")) {
+                inline for (declaration.middleware) |middleware| {
+                    var configured: Core.Mw = .{ .call = middleware.call };
+                    inline for (@import("reflection.zig").fields(@typeInfo(Core.Mw).@"struct")) |field| {
+                        if (comptime @hasField(@TypeOf(middleware), field.name)) @field(configured, field.name) = @field(middleware, field.name);
+                    }
+                    _ = try app.useAll(configured);
+                }
+            }
+            if (comptime @hasField(@TypeOf(declaration), "configure")) try declaration.configure(&app);
             _ = try app.mountStatic(Graph);
             return .{ .core = app };
         }

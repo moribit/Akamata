@@ -23,6 +23,17 @@ pub fn noContent() Result(void, 204) {
     return .{ .value = {} };
 }
 
+/// Request-local borrow; authentication middleware retains responsibility for credentials.
+pub fn Principal(comptime T: type) type {
+    return struct {
+        pub const PrincipalType = T;
+        value: *const T,
+    };
+}
+fn isPrincipal(comptime T: type) bool {
+    return @typeInfo(T) == .@"struct" and @hasDecl(T, "PrincipalType");
+}
+
 fn isMarker(comptime T: type) bool {
     return @typeInfo(T) == .@"struct" and @hasDecl(T, "input_source") and @hasDecl(T, "read");
 }
@@ -59,7 +70,8 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
             context_count += 1;
             continue;
         }
-        if (!isMarker(T)) @compileError("unsupported Akamata handler parameter: use *Context(State), Path, Query, Header, Cookie or Json");
+        if (isPrincipal(T)) continue;
+        if (!isMarker(T)) @compileError("unsupported Akamata handler parameter: use *Context(State), Path, Query, Header, Cookie, Json or Principal");
         if (T.input_source == .json) {
             if (body != null) @compileError("Akamata handler may bind only one JSON body");
             if (@typeInfo(T.Value) != .@"struct") @compileError("Akamata Json request DTO must be a struct");
@@ -102,6 +114,7 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         .response_content_type = if (Payload == []const u8) "text/plain" else "application/json",
         .success_status = success,
         .operation_id = if (@hasField(@TypeOf(options), "operation_id")) options.operation_id else "",
+        .security = if (@hasField(@TypeOf(options), "security")) options.security else &.{},
         .summary = if (@hasField(@TypeOf(options), "summary")) options.summary else "",
     });
     const Metadata = struct {
@@ -142,6 +155,12 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
                 const T = maybe.?;
                 if (T == *Ctx) {
                     args[i] = c;
+                } else if (comptime isPrincipal(T)) {
+                    const principal = c.requirePrincipal(T.PrincipalType) catch {
+                        try c.json(.{ .error_kind = "unauthorized" }, 401);
+                        return;
+                    };
+                    args[i] = .{ .value = principal };
                 } else if (T.input_source == .json) {
                     const dto = (try c.validatedJson(T.Value)) orelse return;
                     args[i] = .{ .value = dto };

@@ -346,3 +346,5 @@ pub const runtime = struct {
 
 /// Build helper to embed in user-project build.zig files.
 pub const akamata_build = @import("build_helpers/akamata_build.zig");
+
+pub const Principal = @import("contract/handler.zig").Principal;

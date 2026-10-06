@@ -93,3 +93,33 @@ test "typed parameter metadata matches actual binding" {
     try std.testing.expectEqualStrings("query", parameters[1].object.get("in").?.string);
     try std.testing.expect(!parameters[1].object.get("required").?.bool);
 }
+
+const Identity = struct { id: u64 };
+const AuthState = struct { authenticated: bool = false, wrong_type: bool = false };
+fn attachIdentity(c: *ak.Context(AuthState), next: ak.Next(AuthState)) !void {
+    if (c.state().authenticated) {
+        if (c.state().wrong_type) try c.setPrincipal(@as(u64, 42)) else try c.setPrincipal(Identity{ .id = 42 });
+    }
+    try next.run(c);
+}
+fn profile(principal: ak.Principal(Identity)) Identity {
+    return principal.value.*;
+}
+test "principal binding uses middleware and rejects absent or incorrectly typed identity" {
+    const AuthApp = ak.App(.{ .State = AuthState, .middleware = .{.{ .call = attachIdentity }}, .routes = .{ak.get("/profile", profile)} });
+    var app = try AuthApp.init(std.testing.allocator);
+    defer app.deinit();
+    var client = app.client(std.testing.allocator);
+    var absent = try client.get("/profile").send();
+    defer absent.deinit();
+    try absent.expectStatus(401);
+    app.core.state_value.authenticated = true;
+    var authenticated = try client.get("/profile").send();
+    defer authenticated.deinit();
+    try authenticated.expectStatus(200);
+    try std.testing.expectEqual(@as(u64, 42), (try authenticated.json(Identity)).id);
+    app.core.state_value.wrong_type = true;
+    var wrong = try client.get("/profile").send();
+    defer wrong.deinit();
+    try wrong.expectStatus(401);
+}

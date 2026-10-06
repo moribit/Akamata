@@ -362,7 +362,9 @@ pub fn build(b: *std.Build) void {
             // Standalone src tests can import synchronization/cost directly,
             // outside the akamata module's dependency namespace.
             t_mod.addOptions("build_options", opts);
-            test_step.dependOn(&b.addRunArtifact(t).step);
+            const run_test = b.addRunArtifact(t);
+            test_step.dependOn(&run_test.step);
+            if (comptime std.mem.eql(u8, tf, "tests/dx_test.zig")) b.step("dx-test", "run developer API and documentation source contracts").dependOn(&run_test.step);
         }
         // CLI tests (parsing wrangler.toml, UUID extraction)
         const cli_test_mod = b.createModule(.{

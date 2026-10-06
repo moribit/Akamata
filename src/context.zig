@@ -238,6 +238,7 @@ pub fn Context(comptime State: type) type {
         user_data: ?*anyopaque = null,
         auth_data: ?*anyopaque = null,
         principal_data: ?*anyopaque = null,
+        principal_type_name: ?[]const u8 = null,
         session_data: ?*anyopaque = null,
         /// State owned by the currently executing middleware registration.
         /// Middleware factories use this to keep mutable state App-local.
@@ -262,11 +263,19 @@ pub fn Context(comptime State: type) type {
             const value = try self.arena.create(T);
             value.* = value_to_attach;
             self.principal_data = value;
+            self.principal_type_name = @typeName(T);
         }
 
         pub fn principal(self: *Self, comptime T: type) ?*const T {
             const erased = self.principal_data orelse return null;
+            const attached_type = self.principal_type_name orelse return null;
+            if (!std.mem.eql(u8, attached_type, @typeName(T))) return null;
             return @ptrCast(@alignCast(erased));
+        }
+
+        /// Borrow a correctly typed principal attached by authentication middleware.
+        pub fn requirePrincipal(self: *Self, comptime T: type) error{Unauthorized}!*const T {
+            return self.principal(T) orelse error.Unauthorized;
         }
 
         /// Explicit name for the allocator whose allocations live until the

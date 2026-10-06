@@ -21,3 +21,7 @@ try app.serve(.{});
 現在はrequest/response schemaと型付きOpenAPI parameterを接続しています。clientのquery/error生成、認証統合は後続作業です。static宣言後のroute登録はfreezeされます。動的routeは従来App(State)を使ってください。
 
 [実行可能なcontract](../../../../tests/dx_test.zig)と[英語Guide](../../../en/guides/typed-handlers.md)も参照してください。
+
+認証middlewareで `c.setPrincipal(identity)` を呼び、handlerの `ak.Principal(UserIdentity)` 引数でborrowできます。`.value` は `*const UserIdentity` です。未認証・型不一致はhandler実行前に401を返します。Contextからは `try c.requirePrincipal(UserIdentity)` も使えます。wrapperはcredentialを検証しないため、既存auth middlewareをそのまま実行してください。OpenAPI securityはendpointの `.security` とInfoのschemeで明示します。role/scope判定はapplication側です。erased principal_dataへの直接代入はtyped retrievalできません。setPrincipalを使ってください。
+
+middlewareはstatic graphのfreeze前に `.middleware = .{.{ .call = authenticate }}` で登録します。高度なstartup設定は `.configure = configure` と `fn configure(app: *ak.App(State)) !void` で既存coreに設定します。初期化後の `.core` は実行時のescape hatchで、登録methodのfreezeは維持します。
