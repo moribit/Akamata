@@ -46,6 +46,7 @@ pub const EndpointMeta = struct {
     /// fragments separated by commas — no leading or trailing comma) to
     /// `w`. Returns the number of params emitted. Comptime-bound to the
     /// query struct shape. `null` when the endpoint declares no `.query`.
+    parameters_fn: ?*const fn (w: *std.Io.Writer) anyerror!usize = null,
     query_params_fn: ?*const fn (w: *std.Io.Writer) anyerror!usize = null,
     /// Same shape, used by the TS client generator to type the `query`
     /// argument. Emits `key?: type;` lines.
@@ -365,7 +366,13 @@ fn writeOperation(w: *std.Io.Writer, op: OperationEntry) !void {
         }
     }
     const has_query_fn = op.meta.query_params_fn != null;
-    if (path_param_count > 0 or has_query_fn) {
+    if (op.meta.parameters_fn) |render| {
+        if (!first) try w.writeAll(",");
+        first = false;
+        try w.writeAll("\"parameters\":[");
+        _ = try render(w);
+        try w.writeAll("]");
+    } else if (path_param_count > 0 or has_query_fn) {
         if (!first) try w.writeAll(",");
         first = false;
         try w.writeAll("\"parameters\":[");
@@ -639,7 +646,7 @@ fn unwrapOptional(comptime T: type) type {
 /// Emit an OpenAPI scalar schema for the kinds of types you'd find in a
 /// query-string struct. Strings / numbers / bools / enums only — nested
 /// objects don't make sense in querystrings.
-fn writeQueryFieldSchema(comptime T: type, w: *std.Io.Writer) !void {
+pub fn writeQueryFieldSchema(comptime T: type, w: *std.Io.Writer) !void {
     switch (@typeInfo(T)) {
         .bool => try w.writeAll("{\"type\":\"boolean\"}"),
         .int => try w.writeAll("{\"type\":\"integer\"}"),

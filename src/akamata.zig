@@ -16,7 +16,19 @@ pub const backend: Backend = switch (build_options.backend) {
 
 // ===== Hono-style new API =====
 const app_mod = @import("app.zig");
-pub const App = app_mod.App;
+pub const App = @import("application.zig").App;
+pub const get = @import("application.zig").get;
+pub const post = @import("application.zig").post;
+pub const endpoint = @import("application.zig").endpoint;
+pub const Path = contract.Path;
+pub const Query = contract.Query;
+pub const Header = contract.Header;
+pub const Cookie = contract.Cookie;
+pub const Json = contract.Json;
+pub const created = @import("contract/handler.zig").created;
+pub const accepted = @import("contract/handler.zig").accepted;
+pub const noContent = @import("contract/handler.zig").noContent;
+pub const Result = @import("contract/handler.zig").Result;
 pub const Handler = app_mod.Handler;
 pub const ErrorHandler = app_mod.ErrorHandler;
 pub const Middleware = app_mod.Middleware;

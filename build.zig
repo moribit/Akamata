@@ -243,6 +243,7 @@ pub fn build(b: *std.Build) void {
     cloudflare_live_step.dependOn(&cloudflare_live_command.step);
     const test_targets = [_][]const u8{
         "tests/http_parser_test.zig",
+        "tests/dx_test.zig",
         "tests/ws_frame_test.zig",
         "tests/db_sqlite_test.zig",
         "tests/d1_mock_test.zig",
