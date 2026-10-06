@@ -12,9 +12,19 @@ for (const path of ["tools/akamata/src/templates/worker_index.mjs.tpl", "deploy/
   const writes = new Map(), lists = new Map(), messages = [];
   let failCondition = false;
   let encodedPage;
+  const realtimeRequests = [];
   const create = new Function("env", "readString", "readBytes", "writeBytes", "suspending", "r2ops", "r2lists",
-    `let nextR2Id = 1;\n${source.slice(start, end)}\nreturn { queueBridge, r2Bridge };`);
-  const { queueBridge: queue, r2Bridge: r2 } = create({
+    `let nextR2Id = 1;\n${source.slice(start, end)}\nreturn { queueBridge, r2Bridge, realtimeBridge };`);
+  const { queueBridge: queue, r2Bridge: r2, realtimeBridge: realtime } = create({
+    ROOMS: { idFromName(name) { assert.equal(name, "room-1"); return "deterministic-room"; }, get(id) {
+      assert.equal(id, "deterministic-room");
+      return { async fetch(request) {
+        assert.equal(new URL(request.url).pathname, "/__akamata/provider/realtime");
+        assert.equal(request.headers.get("X-Akamata-Provider-Control"), "1");
+        realtimeRequests.push(await request.json());
+        return Response.json({ connections: 2, members: 1 });
+      } };
+    } },
     FILES: { async list(options) {
       assert.equal(options.cursor, "opaque-token");
       assert.deepEqual(options.include, ["httpMetadata", "customMetadata"]);
@@ -36,6 +46,9 @@ for (const path of ["tools/akamata/src/templates/worker_index.mjs.tpl", "deploy/
   assert.deepEqual(JSON.parse(page.objects[0].custom_json), { owner: "test" });
   r2.akamata_r2_list_close(pageId);
   assert.equal(lists.size, 0);
+  strings.push("ROOMS", "room-1", JSON.stringify({ kind: "presence" }));
+  assert.equal(await realtime.akamata_realtime_operation(7, 5, 8, 6, 9, 1), (2n << 32n) | 1n);
+  assert.deepEqual(realtimeRequests, [{ kind: "presence" }]);
   let id = await r2.akamata_r2_put_begin(0, 5, 1, 12, 2, 29);
   assert.equal(await r2.akamata_r2_put_write(id, 0, 3), 0);
   assert.equal(await r2.akamata_r2_put_finish(id), 0);

@@ -5,6 +5,7 @@ const queue = @import("../queue.zig");
 const events = @import("../events.zig");
 const storage = @import("../storage.zig");
 const stream = @import("../stream.zig");
+pub const RealtimeOwner = @import("workers_realtime.zig").Owner;
 
 extern "akamata_queue" fn akamata_queue_send(
     binding_ptr: [*]const u8,

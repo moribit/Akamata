@@ -23,6 +23,33 @@ export class AkamataRealtimeRoom {
   }
 
   async fetch(request) {
+    if (new URL(request.url).pathname === "/__akamata/provider/realtime") {
+      if (request.method !== "POST" || request.headers.get("X-Akamata-Provider-Control") !== "1") return new Response(null, { status: 403 });
+      const text = await request.text();
+      if (new TextEncoder().encode(text).length > 128 * 1024) return new Response(null, { status: 413 });
+      let action; try { action = JSON.parse(text); } catch { return new Response(null, { status: 400 }); }
+      const sockets = this.ctx.getWebSockets();
+      if (action.kind === "presence") return Response.json(await this.presence());
+      const validId = id => typeof id === "string" && /^[1-9][0-9]{0,19}$/.test(id) && BigInt(id) <= 18446744073709551615n;
+      if (action.kind === "broadcast") {
+        if (typeof action.envelope !== "string" || (action.excluded != null && !validId(action.excluded))) return new Response(null, { status: 400 });
+        let delivered = 0;
+        for (const ws of sockets) {
+          if (action.excluded != null && ws.deserializeAttachment()?.portableConnectionId === action.excluded) continue;
+          try { ws.send(action.envelope); delivered++; } catch { /* stale socket */ }
+        }
+        return Response.json({ delivered });
+      }
+      if (!validId(action.connection)) return new Response(null, { status: 400 });
+      const ws = sockets.find(socket => socket.deserializeAttachment()?.portableConnectionId === action.connection);
+      if (!ws) return new Response(null, { status: 404 });
+      try {
+        if (action.kind === "direct" && typeof action.envelope === "string") ws.send(action.envelope);
+        else if (action.kind === "disconnect") ws.close(action.code ?? 1000, action.reason ?? "closed");
+        else return new Response(null, { status: 400 });
+      } catch { return new Response(null, { status: 500 }); }
+      return Response.json({ delivered: 1 });
+    }
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return Response.json(await this.presence());
     }
@@ -44,11 +71,20 @@ export class AkamataRealtimeRoom {
       return Response.json({ error: "invalid_metadata" }, { status: 400 });
     }
 
+    // Keep the legacy UUID identity; portable IDs are decimal u64 strings,
+    // never JS Numbers. Attachment persistence survives DO hibernation.
+    const usedIds = new Set(this.ctx.getWebSockets().map(ws => ws.deserializeAttachment()?.portableConnectionId));
+    let portableConnectionId;
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const candidate = crypto.getRandomValues(new BigUint64Array(1))[0].toString();
+      if (candidate !== "0" && !usedIds.has(candidate)) { portableConnectionId = candidate; break; }
+    }
+    if (!portableConnectionId) return new Response(null, { status: 503 });
     const pair = new WebSocketPair();
     const client = pair[0];
     const server = pair[1];
     const now = Date.now();
-    server.serializeAttachment({ connectionId, identity, principal, metadata, connectedAt: now });
+    server.serializeAttachment({ connectionId, portableConnectionId, identity, principal, metadata, connectedAt: now });
     this.ctx.acceptWebSocket(server);
     this.ctx.storage.sql.exec(
       `INSERT INTO akamata_presence(connection_id, identity, metadata, connected_at, last_seen)

@@ -458,7 +458,27 @@ async function instantiateOnce(env) {
     return bytes.length;
   }
 
+  const realtimeBridge = {
+    akamata_realtime_operation: suspending(async (bp, bl, rp, rl, ap, al) => {
+      const namespace = env?.[readString(bp, bl)]; if (!namespace?.idFromName || !namespace?.get) return -2n;
+      try {
+        const response = await namespace.get(namespace.idFromName(readString(rp, rl))).fetch(new Request("https://akamata.internal/__akamata/provider/realtime", {
+          method: "POST", headers: { "Content-Type": "application/json", "X-Akamata-Provider-Control": "1" }, body: readString(ap, al),
+        }));
+        if (response.status === 404) return -1n;
+        if (response.status === 413) return -3n;
+        if (!response.ok) return -5n;
+        const result = await response.json();
+        if ("connections" in result) {
+          if (!Number.isSafeInteger(result.connections) || result.connections < 0 || result.connections > 0x7fffffff || !Number.isSafeInteger(result.members) || result.members < 0 || result.members > 0xffffffff) return -5n;
+          return (BigInt(result.connections) << 32n) | BigInt(result.members);
+        }
+        return Number.isSafeInteger(result.delivered) && result.delivered >= 0 ? BigInt(result.delivered) : -5n;
+      } catch { return -5n; }
+    }),
+  };
   const imports = {
+    akamata_realtime: realtimeBridge,
     akamata_env: envBridge,
     akamata_d1: d1Bridge,
     akamata_http: httpBridge,

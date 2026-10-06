@@ -2,7 +2,7 @@ export const REALTIME_AUTHORIZE_PATH = "/__akamata/realtime/authorize";
 export const REALTIME_MESSAGE_PATH = "/realtime/message";
 
 export function isInternalRealtimePath(pathname) {
-  return pathname === REALTIME_AUTHORIZE_PATH || pathname === REALTIME_MESSAGE_PATH;
+  return pathname === "/__akamata/provider/realtime" || pathname === REALTIME_AUTHORIZE_PATH || pathname === REALTIME_MESSAGE_PATH;
 }
 
 export function rejectPublicInternalRoute(request) {

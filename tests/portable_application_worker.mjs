@@ -94,6 +94,14 @@ imports.akamata_queue = { akamata_queue_send(bp, bl, mp, ml, pp, pl) {
   assert.equal(meta.idempotency_key, "message:1"); assert.equal(meta.attempt, 2); assert.equal(meta.max_attempts, 7);
   assert.deepEqual(JSON.parse(decode(pp, pl)), { text: "hello" }); return 0;
 } };
+imports.akamata_realtime = { akamata_realtime_operation(bp, bl, rp, rl, ap, al) {
+  assert.equal(decode(bp, bl), "ROOMS"); assert.equal(decode(rp, rl), "room-1");
+  const action = JSON.parse(decode(ap, al));
+  if (action.kind === "presence") return (2n << 32n) | 1n;
+  if (action.kind === "broadcast") return 2n;
+  assert.equal(action.connection, "18446744073709551615");
+  return 1n;
+} };
 for (const item of WebAssembly.Module.imports(module)) {
   assert.equal(typeof imports[item.module]?.[item.name], "function", `unexpected external effect: ${item.module}.${item.name}`);
 }

@@ -23,11 +23,32 @@ function room(handler) {
 }
 
 test("internal realtime handlers are not public HTTP routes", async () => {
+  assert.equal(rejectPublicInternalRoute(new Request("https://public.example/__akamata/provider/realtime")).status, 404);
   const message = rejectPublicInternalRoute(new Request(`https://public.example${REALTIME_MESSAGE_PATH}`, { method: "POST" }));
   assert.equal(message.status, 404);
   const authorize = rejectPublicInternalRoute(new Request("https://public.example/__akamata/realtime/authorize", { method: "POST" }));
   assert.equal(authorize.status, 404);
   assert.equal(rejectPublicInternalRoute(new Request("https://public.example/health")), null);
+});
+
+test("portable control uses lossless u64 identities without changing UUID extensions", async () => {
+  const { value, sockets } = room(async () => Response.json([]));
+  const first = socket({ connectionId: "legacy-uuid", portableConnectionId: "18446744073709551615", identity: "user" });
+  const second = socket({ connectionId: "another-uuid", portableConnectionId: "1", identity: "user" });
+  sockets.push(first, second);
+  const call = action => value.fetch(new Request("https://internal/__akamata/provider/realtime", { method: "POST", headers: { "X-Akamata-Provider-Control": "1" }, body: JSON.stringify(action) }));
+  assert.equal((await call({ kind: "direct", connection: "18446744073709551615", envelope: "event" })).status, 200);
+  assert.deepEqual(first.sent, ["event"]);
+  const response = await call({ kind: "broadcast", excluded: "18446744073709551615", envelope: "others" });
+  assert.equal((await response.json()).delivered, 1);
+  assert.deepEqual(second.sent, ["others"]);
+  assert.deepEqual(await (await call({ kind: "presence" })).json(), { connections: 2, members: 1 });
+  assert.equal((await call({ kind: "direct", connection: "18446744073709551616", envelope: "event" })).status, 400);
+  assert.equal((await call({ kind: "direct", connection: "2", envelope: "event" })).status, 404);
+  assert.equal((await call({ kind: "disconnect", connection: "1", code: 1000, reason: "done" })).status, 200);
+  assert.deepEqual(second.closed, { code: 1000, reason: "done" });
+  assert.equal(await value.send("legacy-uuid", "extension"), true);
+  assert.equal((await value.fetch(new Request("https://internal/__akamata/provider/realtime", { method: "POST", body: "{}" }))).status, 403);
 });
 
 test("inbound event is never implicitly broadcast", async () => {

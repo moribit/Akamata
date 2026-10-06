@@ -75,6 +75,15 @@ fn platformAdapterContract() !void {
     try owner.consume(
         \\{"body":{"protocol_version":2,"event_type":"created","event_id":"application-event","attempt":1,"max_attempts":7,"payload":{"text":"hello"}},"event_id":"cloudflare-message","attempt":3}
     );
+    const realtime = try am.platform.workers.RealtimeOwner.create(std.heap.wasm_allocator, "ROOMS");
+    defer realtime.deinit();
+    const Protocol = am.events.Protocol(union(enum) { created: Payload }, 2);
+    const room = realtime.service().room(Protocol, "room-1");
+    const presence = try realtime.presenceChecked("room-1");
+    if (presence.connections != 2 or presence.members != 1) return error.RealtimeContractFailed;
+    if (try room.broadcast(std.heap.wasm_allocator, .{ .created = .{ .text = "hello" } }) != 2) return error.RealtimeContractFailed;
+    try room.send(std.heap.wasm_allocator, std.math.maxInt(u64), .{ .created = .{ .text = "hello" } });
+    try room.disconnect(std.math.maxInt(u64), 1000);
     const FailingReader = struct {
         closed: bool = false,
         fn read(_: *anyopaque, _: []u8) am.stream.Error!usize {
