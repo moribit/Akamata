@@ -26,9 +26,13 @@ fn ensureSchema(c: *am.Context(State), next: am.Next(State)) anyerror!void {
 
 fn ensureInit() !void {
     if (initialized) return;
-    app_storage = am.App(State).init(wasm_gpa, try app_mod.buildState(wasm_gpa));
+    const state = try app_mod.buildState(wasm_gpa);
+    errdefer state.db.close();
+    app_storage = am.App(State).init(wasm_gpa, state);
+    errdefer app_storage.deinit();
     _ = try app_storage.useAll(.{ .name = "ensureSchema", .call = ensureSchema });
     try app_mod.registerRoutes(&app_storage);
+    // Successful owners live with the Workers isolate, not individual requests.
     initialized = true;
 }
 

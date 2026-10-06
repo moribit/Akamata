@@ -18,8 +18,12 @@ var initialized: bool = false;
 
 fn ensureInit() !void {
     if (initialized) return;
-    app_storage = am.App(App).init(wasm_gpa, try setup.buildState(wasm_gpa));
+    const state = try setup.buildState(wasm_gpa);
+    errdefer state.db.close();
+    app_storage = am.App(App).init(wasm_gpa, state);
+    errdefer app_storage.deinit();
     try setup.registerRoutes(&app_storage);
+    // Successful owners live with the Workers isolate, not individual requests.
     initialized = true;
 }
 

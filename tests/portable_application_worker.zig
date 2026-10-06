@@ -33,6 +33,18 @@ fn databaseAdapterContract() !void {
     } else |err| {
         if (err != error.InvalidUrl) return err;
     }
+    // FixedBufferAllocator is freestanding; std.testing.FailingAllocator in
+    // Zig 0.17 pulls host-only stack tracing/Io into this WASM fixture.
+    var buffer: [256]u8 = undefined;
+    var failing = std.heap.FixedBufferAllocator.init(&buffer);
+    const limited = try am.db.open(failing.allocator(), "d1:REPORTS");
+    defer limited.close();
+    failing.end_index = buffer.len;
+    if (limited.prepare("SELECT ?")) |unexpected| {
+        var cleanup = unexpected;
+        cleanup.deinit();
+        return error.DatabaseContractFailed;
+    } else |err| if (err != error.OutOfMemory) return err;
 }
 export fn run_database_adapter_contract() u32 {
     databaseAdapterContract() catch |err| {

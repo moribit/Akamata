@@ -6,6 +6,7 @@ let memory;
 const decode = (ptr, len) => new TextDecoder().decode(new Uint8Array(memory.buffer, ptr, len));
 const statements = new Map();
 const selectedBindings = [];
+let nextStatement = 1;
 const d1 = {};
 for (const item of WebAssembly.Module.imports(module).filter(item => item.module === "akamata_d1")) {
   d1[item.name] = () => { throw new Error(`unexpected D1 test operation: ${item.name}`); };
@@ -24,8 +25,9 @@ Object.assign(d1, {
   d1_prepare_named(bp, bl, sp, sl) {
     selectedBindings.push(decode(bp, bl));
     assert.equal(decode(sp, sl), "SELECT ?");
-    statements.set(1, { value: 0n, cursor: 0 });
-    return 1;
+    const id = nextStatement++;
+    statements.set(id, { value: 0n, cursor: 0 });
+    return id;
   },
   d1_bind_int64(id, index, value) { assert.equal(index, 1); statements.get(id).value = value; return 0; },
   d1_run(id) { assert.ok(statements.has(id)); return 1; },
@@ -39,6 +41,9 @@ const imports = {
     akamata_unix_micros: () => BigInt(Date.now()) * 1000n,
   },
   akamata_d1: d1,
+  // Allocation-failure paths can keep the URL factory's Turso branch linked.
+  // Linking is allowed; performing an outbound effect in this fixture is not.
+  akamata_http: { akamata_fetch() { throw new Error("unexpected outbound HTTP in D1 adapter contract"); } },
 };
 const objects = new Map(), handles = new Map();
 let nextHandle = 1;
@@ -86,7 +91,7 @@ for (const item of WebAssembly.Module.imports(module)) {
 const { exports } = new WebAssembly.Instance(module, imports);
 memory = exports.memory;
 assert.equal(exports.run_database_adapter_contract(), 0);
-assert.deepEqual(selectedBindings, ["REPORTS", "REPORTS", "DB"]);
+assert.deepEqual(selectedBindings, ["REPORTS", "REPORTS", "DB", "REPORTS"]);
 assert.equal(statements.size, 0, "D1 statement handle leak");
 let warmedMemory;
 for (let i = 0; i < 10; i++) {

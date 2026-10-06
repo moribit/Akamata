@@ -65,6 +65,8 @@ storage readers still need close; storage spans time facade operations, not
 the entire subsequent reader lifetime. Context never destroys service owners.
 Copying a facade does not transfer ownership. Owners use existing App.own or
 explicit lifecycle/defer; App does not implicitly close State resources.
+Workers reference/scaffold setup cleans up App then DB if initialization fails;
+successful owners live for the isolate lifetime.
 
 ## Endpoints and tooling
 

@@ -74,6 +74,8 @@ ownerはentry point／provider／App.own等で明示します。Contextはborrow
 
 ## Endpointとschema
 
+Workers reference／scaffoldは初期化失敗時にApp、DBの順でcleanupします。成功したownerはisolate lifetimeです。D1ではhost prepare成功後のStmt allocation failureでもhandleをfinalizeすることをfault testで確認します。
+
 `capability.Uses(Endpoint, applications)`はroute-level requirementを追加します。`Requires(Endpoint, physicalKinds)`はplatform-specific escape hatchです。両decoratorを併用してもschema function、handler、error map、security、operation metadataを維持します。
 
 OpenAPIには`x-akamata-capabilities`と`x-akamata-platform-capabilities`を追加します。既存HTTP TS clientのschema collector／method名は変更しません。runtime App.endpointのsignatureも変更しません。typed registrationではState contractを検証します。runtimeで任意metadataを登録する旧経路からのcapability推論は行いません。

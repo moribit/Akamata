@@ -42,6 +42,12 @@ uses an operation arena because existing list metadata ownership is not yet
 uniform across adapters. Contract tests deliberately do not claim pagination
 cursor parity or host memory leak-freedom from a WASM page plateau.
 
+Additional ownership checks exhaust a freestanding fixed-buffer allocator after
+opening D1, then fail Stmt allocation after the host prepare succeeds. The host
+statement is finalized and the original statement remains valid until its own
+deinit. Workers reference/scaffold initialization now uses errdefer to destroy
+App before closing DB on a failed setup; successful owners retain isolate lifetime.
+
 CI remains in `.github/workflows/ci.yml`: Native/ReleaseSafe/OpenSSL, Linux/macOS
 runtime contracts, examples, package/container/fuzz, existing CLI protections,
 plus the new Workers application contract and CLI capability/compile-fail
