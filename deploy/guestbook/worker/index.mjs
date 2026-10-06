@@ -19,6 +19,7 @@ const wasmDispatchQueue = new WasmDispatchQueue();
 
 const d1stmts = new Map();
 let nextStmtId = 1;
+let lastD1Meta = { changes: 0, lastRowId: -1 };
 
 function readBytes(p, l) { return l === 0 ? new Uint8Array(0) : new Uint8Array(memory.buffer, p, l); }
 function readString(p, l) { return new TextDecoder().decode(readBytes(p, l)); }
@@ -69,7 +70,8 @@ async function instantiateOnce(env) {
   const d1Bridge = {
     // Synchronous: D1's .prepare() does no I/O. The one async step per
     // statement happens in d1_run.
-    d1_prepare(sp, sl) {
+    d1_prepare(sp, sl, binding = "DB") {
+      const d1 = env[binding];
       if (!d1) return -2;
       try {
         const stmt = d1.prepare(readString(sp, sl));
@@ -77,6 +79,9 @@ async function instantiateOnce(env) {
         d1stmts.set(id, { base: stmt, bindArgs: [], rows: null, cursor: 0, currentRow: null, columnNames: null });
         return id;
       } catch (e) { console.error("d1_prepare:", e?.message ?? e); return -3; }
+    },
+    d1_prepare_named(bp, bl, sp, sl) {
+      return d1Bridge.d1_prepare(sp, sl, readString(bp, bl));
     },
     d1_bind_int64(h, i, v) { const e = d1stmts.get(h); if (!e) return -1; e.bindArgs[i-1] = Number(v); return 0; },
     d1_bind_double(h, i, v) { const e = d1stmts.get(h); if (!e) return -1; e.bindArgs[i-1] = v; return 0; },
@@ -155,9 +160,24 @@ async function instantiateOnce(env) {
     // care about trailing punctuation, which matches SQLite's behaviour.
     d1_exec: suspending(async (sp, sl) => {
       if (!d1) return -2;
-      try { await d1.prepare(readString(sp, sl)).run(); return 0; }
+      try {
+        const result = await d1.prepare(readString(sp, sl)).run();
+        lastD1Meta = { changes: Number(result?.meta?.changes ?? result?.meta?.rows_written ?? 0), lastRowId: Number(result?.meta?.last_row_id ?? -1) };
+        return 0;
+      }
       catch (e) { console.error("d1_exec:", e?.message ?? e); return -3; }
     }),
+    d1_exec_named: suspending(async (bp, bl, sp, sl) => {
+      const database = env[readString(bp, bl)];
+      if (!database) return -2;
+      try {
+        const result = await database.prepare(readString(sp, sl)).run();
+        lastD1Meta = { changes: Number(result?.meta?.changes ?? result?.meta?.rows_written ?? 0), lastRowId: Number(result?.meta?.last_row_id ?? -1) };
+        return 0;
+      } catch { return -3; }
+    }),
+    d1_affected_rows() { return BigInt(lastD1Meta.changes); },
+    d1_last_insert_id() { return BigInt(lastD1Meta.lastRowId); },
   };
 
   const httpBridge = {

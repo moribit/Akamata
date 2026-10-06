@@ -88,12 +88,31 @@ async function instantiateOnce(env) {
     akamata_monotonic_ns() { return BigInt(Math.floor(performance.now() * 1_000_000)); },
   };
 
-  const d1 = env.DB;
+  async function executeD1(sql_ptr, sql_len, binding = "DB") {
+    const d1 = env[binding];
+    if (!d1) return -2;
+    try {
+      // .prepare().run() instead of .exec() — see deploy/guestbook/worker/index.mjs
+      // for the rationale (D1 .exec requires ; + \n separation that our DDL
+      // emitter doesn't produce).
+      const sql = readString(sql_ptr, sql_len);
+      const result = await d1.prepare(sql).run();
+      lastD1Meta = {
+        changes: Number(result?.meta?.changes ?? result?.meta?.rows_written ?? 0),
+        lastRowId: Number(result?.meta?.last_row_id ?? -1),
+      };
+      return 0;
+    } catch (e) {
+      console.error("d1_exec failed:", e?.message ?? e);
+      return -3;
+    }
+  }
   const d1Bridge = {
     // Synchronous: D1's .prepare() does no I/O, so wrapping it in Suspending
     // only buys a wasted wasm stack suspend/resume. The single async step per
     // statement happens in d1_run below.
-    d1_prepare(sql_ptr, sql_len) {
+    d1_prepare(sql_ptr, sql_len, binding = "DB") {
+      const d1 = env[binding];
       if (!d1) return -2;
       try {
         const sql = readString(sql_ptr, sql_len);
@@ -110,6 +129,10 @@ async function instantiateOnce(env) {
         console.error("d1_prepare failed:", e?.message ?? e);
         return -3;
       }
+    },
+
+    d1_prepare_named(binding_ptr, binding_len, sql_ptr, sql_len) {
+      return d1Bridge.d1_prepare(sql_ptr, sql_len, readString(binding_ptr, binding_len));
     },
 
     d1_bind_int64(h, idx, val) {
@@ -237,24 +260,8 @@ async function instantiateOnce(env) {
       d1stmts.delete(h);
     },
 
-    d1_exec: suspending(async (sql_ptr, sql_len) => {
-      if (!d1) return -2;
-      try {
-        // .prepare().run() instead of .exec() — see deploy/guestbook/worker/index.mjs
-        // for the rationale (D1 .exec requires ; + \n separation that our DDL
-        // emitter doesn't produce).
-        const sql = readString(sql_ptr, sql_len);
-        const result = await d1.prepare(sql).run();
-        lastD1Meta = {
-          changes: Number(result?.meta?.changes ?? result?.meta?.rows_written ?? 0),
-          lastRowId: Number(result?.meta?.last_row_id ?? -1),
-        };
-        return 0;
-      } catch (e) {
-        console.error("d1_exec failed:", e?.message ?? e);
-        return -3;
-      }
-    }),
+    d1_exec: suspending(executeD1),
+    d1_exec_named: suspending((binding_ptr, binding_len, sql_ptr, sql_len) => executeD1(sql_ptr, sql_len, readString(binding_ptr, binding_len))),
     d1_affected_rows() { return BigInt(lastD1Meta.changes); },
     d1_last_insert_id() { return BigInt(lastD1Meta.lastRowId); },
   };

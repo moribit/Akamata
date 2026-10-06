@@ -269,8 +269,10 @@ pub const db = struct {
         }
         if (std.mem.startsWith(u8, url, "d1:")) {
             if (backend != .workers) return error.UnsupportedOnBackend;
-            // D1 binding name is currently fixed; the URL is ignored here.
-            return openD1(gpa);
+            const binding_name = url[3..];
+            if (binding_name.len == 0) return error.InvalidUrl;
+            if (std.mem.eql(u8, binding_name, "DB")) return openD1(gpa);
+            return @import("db/d1.zig").openNamed(gpa, binding_name);
         }
         return error.UnknownScheme;
     }

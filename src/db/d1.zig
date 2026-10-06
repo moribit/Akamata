@@ -68,11 +68,14 @@ extern "akamata_d1" fn d1_column_is_null(stmt: i32, idx: i32) i32;
 extern "akamata_d1" fn d1_reset(stmt: i32) void;
 extern "akamata_d1" fn d1_finalize(stmt: i32) void;
 extern "akamata_d1" fn d1_exec(sql_ptr: [*]const u8, sql_len: usize) i32;
+extern "akamata_d1" fn d1_prepare_named(binding_ptr: [*]const u8, binding_len: usize, sql_ptr: [*]const u8, sql_len: usize) i32;
+extern "akamata_d1" fn d1_exec_named(binding_ptr: [*]const u8, binding_len: usize, sql_ptr: [*]const u8, sql_len: usize) i32;
 extern "akamata_d1" fn d1_affected_rows() i64;
 extern "akamata_d1" fn d1_last_insert_id() i64;
 
 pub const Backend = struct {
     gpa: std.mem.Allocator,
+    binding: ?[]const u8 = null,
 
     pub fn open(gpa: std.mem.Allocator) !db_mod.Db {
         const self = try gpa.create(Backend);
@@ -80,13 +83,25 @@ pub const Backend = struct {
         return .{ .ptr = self, .vt = &vtable, .backend = .d1 };
     }
 
+    pub fn openNamed(gpa: std.mem.Allocator, binding: []const u8) !db_mod.Db {
+        if (binding.len == 0) return error.InvalidUrl;
+        const owned = try gpa.dupe(u8, binding);
+        errdefer gpa.free(owned);
+        const database = try Backend.open(gpa);
+        const self: *Backend = @ptrCast(@alignCast(database.ptr));
+        self.binding = owned;
+        return database;
+    }
+
     fn closeBackend(ptr: *anyopaque) void {
         const self: *Backend = @ptrCast(@alignCast(ptr));
+        if (self.binding) |binding| self.gpa.free(binding);
         self.gpa.destroy(self);
     }
 
-    fn execBackend(_: *anyopaque, sql: []const u8) anyerror!void {
-        const rc = d1_exec(sql.ptr, sql.len);
+    fn execBackend(ptr: *anyopaque, sql: []const u8) anyerror!void {
+        const self: *Backend = @ptrCast(@alignCast(ptr));
+        const rc = if (self.binding) |binding| d1_exec_named(binding.ptr, binding.len, sql.ptr, sql.len) else d1_exec(sql.ptr, sql.len);
         return switch (rc) {
             0 => {},
             -2 => D1Error.BridgeNotImplemented,
@@ -102,9 +117,10 @@ pub const Backend = struct {
 
     fn prepareBackend(ptr: *anyopaque, sql: []const u8) anyerror!db_mod.Stmt {
         const self: *Backend = @ptrCast(@alignCast(ptr));
-        const h = d1_prepare(sql.ptr, sql.len);
+        const h = if (self.binding) |binding| d1_prepare_named(binding.ptr, binding.len, sql.ptr, sql.len) else d1_prepare(sql.ptr, sql.len);
         if (h == -2) return D1Error.BridgeNotImplemented;
         if (h < 0) return D1Error.PrepareFailed;
+        errdefer d1_finalize(h);
         const s = try self.gpa.create(StmtBackend);
         s.* = .{ .handle = h, .gpa = self.gpa, .column_allocations = .empty };
         return .{ .ptr = s, .vt = &stmt_vtable };
@@ -233,4 +249,8 @@ const stmt_vtable: db_mod.StmtVTable = .{
 
 pub fn open(gpa: std.mem.Allocator) !db_mod.Db {
     return Backend.open(gpa);
+}
+
+pub fn openNamed(gpa: std.mem.Allocator, binding: []const u8) !db_mod.Db {
+    return Backend.openNamed(gpa, binding);
 }
