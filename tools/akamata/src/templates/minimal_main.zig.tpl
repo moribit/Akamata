@@ -59,5 +59,6 @@ pub fn main(init: std.process.Init) !void {
     const configured_port = ak.env.get(gpa.allocator(), "PORT");
     defer if (configured_port) |value| gpa.allocator().free(value);
     const port = if (configured_port) |value| try std.fmt.parseInt(u16, value, 10) else 8080;
+    std.debug.print("Akamata: starting http://127.0.0.1:{d}/\n", .{port});
     try app.serve(.{ .port = port });
 }

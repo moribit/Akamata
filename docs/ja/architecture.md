@@ -1,4 +1,6 @@
 # Akamata アーキテクチャ
+Developer APIはordinary function → typed endpoint adapter → 既存static route graph → App/Context → Shared HTTPです。`src/application.zig`と`contract/handler.zig`の追加層はruntime/provider境界を維持します。[Getting Started](quickstart.md)から始め、[Application concept](guides/application.md)でownership/escape hatchを確認できます。production defaultはThreaded、ReactorはPark/fail-closedです。
+
 
 Native runtimeの最新の所有権・性能・メモリ評価は[Reactor CPU / memory調査](native-reactor-performance-memory.md)を参照。Threadedをdefaultとし、Reactorのpublic gateは維持しています。
 

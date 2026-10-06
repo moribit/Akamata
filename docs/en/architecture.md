@@ -1,4 +1,11 @@
 # Akamata architecture
+Developer API: ordinary functions → typed endpoint adapter → existing static
+route graph → App/Context → Shared HTTP. The additive `src/application.zig` and
+`contract/handler.zig` layer leaves the runtime/provider boundaries intact. Start
+with [Getting Started](quickstart.md); explicit ownership and escape hatches are
+in [Application concepts](guides/application.md). Threaded is production default;
+Reactor stays parked/fail-closed.
+
 
 See the [Reactor CPU / memory investigation](native-reactor-performance-memory.md) for current Native ownership, cost and memory evidence. Threaded stays default; the public Reactor gate stays closed.
 

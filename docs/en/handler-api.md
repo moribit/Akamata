@@ -1,9 +1,15 @@
 # Handler API Reference
+The main branch also adapts ordinary functions through `am.App(.{ .routes = ... })`,
+`am.get/post` and `am.endpoint`. String/JSON values, typed parameter markers and
+status helpers use this same core ABI. See [Typed handlers](guides/typed-handlers.md)
+and [Application ownership](guides/application.md); the reference below describes
+the preserved explicit App(State)/Context layer.
+
 
 For compile-time route graphs, reflected typed handlers, typed error mappings,
 and static/runtime trade-offs, see [Compile-time architecture](comptime-architecture.md).
 
-Handlers have one signature:
+The explicit core handler ABI is:
 
 ```zig
 fn handler(c: *am.Context(State)) !void

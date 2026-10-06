@@ -100,3 +100,28 @@ Run `zig build test`, `zig build integration`, and `zig build tasks-test`, then
 build every deployment target you use. Also test duplicate-route startup,
 missing required input, `HEAD`/`405`, proxy IP behavior, nullable model fields,
 and a deliberately failing migration.
+
+## Ordinary-function DX on main (after 6744595)
+
+Migration is optional. `App(State)`, explicit Context handlers, runtime routes,
+manual Response and manual provider owners remain supported. The additive
+`App(.{ .routes = ... })` returns a type initialized with an allocator; it freezes
+registration and uses existing static routes. Use `initWithState` for explicit
+services. See [Typed handlers](guides/typed-handlers.md) for parameter/error rules
+and [compiled contracts](../../tests/dx_test.zig) for old/new interoperability.
+
+The default scaffold is now Hello; use `--template=notes` for the old DB tutorial.
+Existing project source is never rewritten by update/sync. The dependency pin
+stays at v0.1.5, where the scaffold uses its release bootstrap; latest-main typed
+APIs require an explicit checkout/revision selection. Do not assume a stable
+release upgrade installs an unreleased API. Tooling modes on the pinned bootstrap
+fail with ToolingRequiresLatestMain rather than starting a server.
+
+Typed principal retrieval now verifies the type recorded by `setPrincipal`; direct
+writes to erased `principal_data` must migrate to `setPrincipal`. Testing `.as`
+injects through that path before middleware; middleware still authenticates,
+replaces or rejects the identity. This is a safety correction, not an auth bypass.
+
+Validation preserves existing 400/422 payloads and model rules. Typed DTO metadata
+adds strict diagnostics; byte-length/heuristic format constraints are not guessed
+as stronger JSON Schema guarantees. Native remains Threaded, Reactor parked.

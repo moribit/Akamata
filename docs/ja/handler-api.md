@@ -1,4 +1,6 @@
 # Handler API reference
+mainは`am.App(.{ .routes = ... })`、`am.get/post`、`am.endpoint`でordinary functionを既存ABIへ適応できます。typed marker、JSON/string値、status helperを使えます。[Typed handlers](guides/typed-handlers.md)、[Ownership](guides/application.md)を参照してください。以下は維持している明示App(State)/Context層のreferenceです。
+
 
 compile-time route graph、reflectionによるtyped handler、typed error mapping、
 static/runtimeのtrade-offは[Compile-time architecture](comptime-architecture.md)を参照してください。

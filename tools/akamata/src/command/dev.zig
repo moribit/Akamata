@@ -87,7 +87,7 @@ pub fn cmdDev(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
                 if (child <= 0) {
                     std.debug.print("dev: failed to spawn {s}\n", .{bin_path});
                 } else {
-                    std.debug.print("==> akamata dev: process started (pid {d}); application reports its own listening address\n", .{child});
+                    std.debug.print("==> akamata dev: process started (pid {d}); listening address is determined by application configuration\n", .{child});
                 }
             } else |_| {
                 if (!dev_running.load(.seq_cst)) break;
