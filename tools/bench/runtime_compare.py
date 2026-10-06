@@ -24,6 +24,7 @@ parser.add_argument("--rounds", type=int, default=3)
 parser.add_argument("--duration", default="5s")
 args = parser.parse_args()
 with socket.socket() as probe:
+    probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     probe.bind(("127.0.0.1", 8080))
 env = dict(os.environ)
 env.pop("BENCH_OBSERVABILITY", None)

@@ -1,0 +1,615 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "79b14a92213eeff59f0ef2eca5d2840a3a041026a9a8fdf58aa87ce9ccac5ba4",
+  "quick": true,
+  "runs": [
+    {
+      "adapter": "threaded",
+      "scenario": "idle-32",
+      "before": {
+        "rss_kib": 3824,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "loaded": {
+        "rss_kib": 6512,
+        "cpu_seconds": 0.01,
+        "threads": 34,
+        "fds": 36
+      },
+      "idle_cpu_percent": 0.0,
+      "shutdown_ms": 129.30387500091456,
+      "allocator": {
+        "calls": 207,
+        "requested": 78017,
+        "live": 0,
+        "peak": 67534
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "burst-churn-pipeline-reset",
+      "before": {
+        "rss_kib": 3824,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "connections": 64,
+      "elapsed_ms": 24.12499999627471,
+      "after": {
+        "rss_kib": 4224,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "shutdown_ms": 131.9873330066912,
+      "allocator": {
+        "calls": 271,
+        "requested": 139905,
+        "live": 0,
+        "peak": 23052
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "partial-read-large-body-stream-upgrade-errors",
+      "before": {
+        "rss_kib": 3808,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "after": {
+        "rss_kib": 4032,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "shutdown_ms": 126.28624998615123,
+      "allocator": {
+        "calls": 173,
+        "requested": 3177615,
+        "live": 0,
+        "peak": 2459888
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "slow-reader-load-forced-drain",
+      "before": {
+        "rss_kib": 3824,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "loaded": {
+        "rss_kib": 4256,
+        "cpu_seconds": 0.01,
+        "threads": 6,
+        "fds": 8
+      },
+      "shutdown_ms": 181.52845799340867,
+      "allocator": {
+        "calls": 153,
+        "requested": 79683,
+        "live": 0,
+        "peak": 69200
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "stream-latency-4",
+      "before": {
+        "rss_kib": 3808,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "requests": 40,
+      "throughput": 4373.6563302279,
+      "latency_ms": {
+        "50": 0.7554579933639616,
+        "95": 1.6749580099713057,
+        "99": 1.9611669995356351
+      },
+      "loaded": {
+        "rss_kib": 4016,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "cpu_percent": 0.0,
+      "shutdown_ms": 129.99179199687205,
+      "allocator": {
+        "calls": 261,
+        "requested": 669075,
+        "live": 0,
+        "peak": 36456
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "upgrade-latency-4",
+      "before": {
+        "rss_kib": 3808,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "requests": 40,
+      "throughput": 5276.841575562325,
+      "latency_ms": {
+        "50": 0.5457079969346523,
+        "95": 1.492999988840893,
+        "99": 1.5335409989347681
+      },
+      "loaded": {
+        "rss_kib": 4016,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "cpu_percent": 0.0,
+      "shutdown_ms": 122.17279199103359,
+      "allocator": {
+        "calls": 221,
+        "requested": 91555,
+        "live": 0,
+        "peak": 8098
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "upgrade-worker-isolation-gate",
+      "before": {
+        "rss_kib": 3824,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "unrelated_request_isolated": true,
+      "probe_ms": 0.1049999991664663,
+      "loaded": {
+        "rss_kib": 4192,
+        "cpu_seconds": 0.01,
+        "threads": 6,
+        "fds": 8
+      },
+      "shutdown_ms": 183.88854200020432,
+      "allocator": {
+        "calls": 151,
+        "requested": 23865,
+        "live": 0,
+        "peak": 13382
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "accept-fd-exhaustion-recovery",
+      "before": {
+        "rss_kib": 3824,
+        "cpu_seconds": 0.0,
+        "threads": 2,
+        "fds": 4
+      },
+      "admitted": 60,
+      "exhausted_cpu_percent": 0.0,
+      "after": {
+        "rss_kib": 5008,
+        "cpu_seconds": 0.01,
+        "threads": 2,
+        "fds": 4
+      },
+      "shutdown_ms": 129.1228749905713,
+      "accept_exhaustion_observed": true,
+      "allocator": {
+        "calls": 263,
+        "requested": 132169,
+        "live": 0,
+        "peak": 119752
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "idle-32",
+      "before": {
+        "rss_kib": 4000,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 7
+      },
+      "loaded": {
+        "rss_kib": 4384,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 39
+      },
+      "idle_cpu_percent": 0.0,
+      "shutdown_ms": 3.8324579945765436,
+      "allocator": {
+        "calls": 249,
+        "requested": 289273,
+        "live": 0,
+        "peak": 273782
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "burst-churn-pipeline-reset",
+      "before": {
+        "rss_kib": 4000,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 7
+      },
+      "connections": 64,
+      "elapsed_ms": 13.704833007068373,
+      "after": {
+        "rss_kib": 4240,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 7
+      },
+      "shutdown_ms": 1.3111669977661222,
+      "allocator": {
+        "calls": 345,
+        "requested": 511417,
+        "live": 0,
+        "peak": 155630
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "partial-read-large-body-stream-upgrade-errors",
+      "before": {
+        "rss_kib": 4016,
+        "cpu_seconds": 0.0,
+        "threads": 5,
+        "fds": 7
+      },
+      "after": {
+        "rss_kib": 4224,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 7
+      },
+      "shutdown_ms": 8.589374992880039,
+      "allocator": {
+        "calls": 199,
+        "requested": 3334383,
+        "live": 0,
+        "peak": 2505880
+      },
+      "success": true,
+      "sessions": {
+        "created": 5,
+        "closed": 5,
+        "close_reasons": [
+          3,
+          0,
+          0,
+          0,
+          2
+        ]
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "slow-reader-load-forced-drain",
+      "before": {
+        "rss_kib": 4000,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 7
+      },
+      "loaded": {
+        "rss_kib": 4272,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 11
+      },
+      "shutdown_ms": 180.19199999980628,
+      "allocator": {
+        "calls": 166,
+        "requested": 155027,
+        "live": 0,
+        "peak": 139536
+      },
+      "success": true,
+      "sessions": {
+        "created": 4,
+        "closed": 4,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          4,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "stream-latency-4",
+      "before": {
+        "rss_kib": 4016,
+        "cpu_seconds": 0.0,
+        "threads": 5,
+        "fds": 7
+      },
+      "requests": 40,
+      "throughput": 5734.836087360094,
+      "latency_ms": {
+        "50": 0.6098750018281862,
+        "95": 1.0539170034462586,
+        "99": 1.0624580027069896
+      },
+      "loaded": {
+        "rss_kib": 4288,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 7
+      },
+      "cpu_percent": 143.37090218400235,
+      "shutdown_ms": 1.3218329986557364,
+      "allocator": {
+        "calls": 310,
+        "requested": 1008587,
+        "live": 0,
+        "peak": 139536
+      },
+      "success": true,
+      "sessions": {
+        "created": 40,
+        "closed": 40,
+        "close_reasons": [
+          40,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "upgrade-latency-4",
+      "before": {
+        "rss_kib": 4016,
+        "cpu_seconds": 0.0,
+        "threads": 5,
+        "fds": 7
+      },
+      "requests": 40,
+      "throughput": 6229.963853605033,
+      "latency_ms": {
+        "50": 0.5057500093244016,
+        "95": 1.1381660006009042,
+        "99": 1.2313329934841022
+      },
+      "loaded": {
+        "rss_kib": 4368,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 7
+      },
+      "cpu_percent": 155.74909634012585,
+      "shutdown_ms": 1.3284580054460093,
+      "allocator": {
+        "calls": 390,
+        "requested": 1591627,
+        "live": 0,
+        "peak": 197840
+      },
+      "success": true,
+      "sessions": {
+        "created": 40,
+        "closed": 40,
+        "close_reasons": [
+          40,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "upgrade-worker-isolation-gate",
+      "before": {
+        "rss_kib": 4016,
+        "cpu_seconds": 0.0,
+        "threads": 5,
+        "fds": 7
+      },
+      "unrelated_request_isolated": true,
+      "probe_ms": 0.24229100381489843,
+      "loaded": {
+        "rss_kib": 4384,
+        "cpu_seconds": 0.0,
+        "threads": 5,
+        "fds": 11
+      },
+      "shutdown_ms": 178.14404198725242,
+      "allocator": {
+        "calls": 173,
+        "requested": 220241,
+        "live": 0,
+        "peak": 204750
+      },
+      "success": true,
+      "sessions": {
+        "created": 4,
+        "closed": 4,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          4,
+          0
+        ]
+      }
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "accept-fd-exhaustion-recovery",
+      "before": {
+        "rss_kib": 4016,
+        "cpu_seconds": 0.0,
+        "threads": 5,
+        "fds": 7
+      },
+      "admitted": 57,
+      "exhausted_cpu_percent": 0.0,
+      "after": {
+        "rss_kib": 4240,
+        "cpu_seconds": 0.01,
+        "threads": 5,
+        "fds": 7
+      },
+      "shutdown_ms": 1.331124993157573,
+      "accept_exhaustion_observed": true,
+      "allocator": {
+        "calls": 324,
+        "requested": 462823,
+        "live": 0,
+        "peak": 440390
+      },
+      "success": true,
+      "sessions": {
+        "created": 0,
+        "closed": 0,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ]
+}
