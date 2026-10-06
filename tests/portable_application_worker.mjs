@@ -144,8 +144,12 @@ api.getUsersById("bad", {});
 api.postUsers({});
 const unknownError: unknown = null;
 if (is_getUsersByIdError(unknownError)) {
-  const status: 404 = unknownError.status;
-  const discriminator: "NotFound" = unknownError.body.error_kind;
+  if (unknownError.status === 404) {
+    const discriminator: "NotFound" = unknownError.body.error_kind;
+  } else {
+    const status: 400 = unknownError.status;
+    const discriminator: "bad_request" = unknownError.body.error_kind;
+  }
 }
 `);
     const checked = spawnSync(process.execPath, [process.env.AKAMATA_DX_TSC, "--noEmit", "--strict", "--target", "ES2022", "--module", "ESNext", "--moduleResolution", "bundler", "--lib", "ES2022,DOM", join(directory, "usage.ts")], { encoding: "utf8", timeout: 30000 });

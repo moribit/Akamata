@@ -29,11 +29,15 @@ fn authenticate(c: *ak.Context(State), next: ak.Next(State)) !void {
 fn profile(principal: ak.Principal(Identity)) Identity {
     return principal.value.*;
 }
+fn secureCreate(body: ak.Json(Body), principal: ak.Principal(Identity)) User {
+    return .{ .id = principal.value.id, .name = body.value.name };
+}
 pub const Application = ak.App(.{ .State = State, .middleware = .{.{ .call = authenticate }}, .routes = .{
     ak.get("/", hello),
     ak.endpoint(.{ .method = .GET, .path = "/users/:id", .handler = user, .errors = .{ .NotFound = .not_found } }),
     ak.post("/users", create),
     ak.get("/profile", profile),
+    ak.post("/secure", secureCreate),
 } });
 fn expect(ok: bool) !void {
     if (!ok) return error.DeveloperContractFailed;
@@ -49,6 +53,8 @@ pub fn run(allocator: std.mem.Allocator) !void {
     const constraints = count_schema.object.get("allOf").?.array.items[1].object;
     try expect(constraints.get("minimum").?.integer == 0 and constraints.get("maximum").?.integer == 10);
     try expect(constraints.get("type") == null); // numeric keywords preserve nullable input
+    const create_responses = parsed_document.value.object.get("paths").?.object.get("/users").?.object.get("post").?.object.get("responses").?.object;
+    try expect(create_responses.get("400") != null and create_responses.get("422") != null);
     try @import("docs/minimal.zig").contract(allocator);
     var app = try Application.init(allocator);
     defer app.deinit();
@@ -82,6 +88,9 @@ pub fn run(allocator: std.mem.Allocator) !void {
     var absent = try client.get("/profile").send();
     defer absent.deinit();
     try expect(absent.status == 401);
+    var unauthorized_body = try client.post("/secure").body("application/json", "malformed JSON").send();
+    defer unauthorized_body.deinit();
+    try unauthorized_body.expectStatus(.unauthorized);
     var injected = try client.get("/profile").as(Identity{ .id = 7 }).send();
     defer injected.deinit();
     try injected.expectStatus(.ok);

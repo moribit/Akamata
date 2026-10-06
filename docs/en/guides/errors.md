@@ -29,4 +29,6 @@ try {
 }
 ```
 
-Unknown gateway/network/framework failures are not forced into that known-error union. Decode and validation errors preserve existing 400/422 envelopes and are separate from application error mappings. See [the shared source](../../../tests/dx_application_fixture.zig) and [DX tests](../../../tests/dx_test.zig). The Workers runner can transform and execute the generated client on supported Node versions; that smoke test is not a TypeScript static type check.
+Unknown gateway/network/framework failures are not forced into that known-error union. Typed input binding contributes `400/bad_request`, and JSON body binding contributes `422/validation`, to the same metadata and generated known-error union. Existing validation envelopes retain their field error details. Required Principal binding is checked before input decoding, regardless of parameter order; authentication middleware still runs first.
+
+See [the shared source](../../../tests/dx_application_fixture.zig) and [DX tests](../../../tests/dx_test.zig). Documentation CI runs TypeScript strict static checking separately from the Node syntax-transform and mocked HTTP tests.

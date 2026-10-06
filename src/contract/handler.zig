@@ -78,9 +78,9 @@ fn validateDto(comptime T: type) void {
     }
 }
 
-fn errorResponses(comptime mapping: anytype, comptime fallback: ?Code, comptime principal_required: bool) []const openapi.ResponseDoc {
+fn errorResponses(comptime mapping: anytype, comptime fallback: ?Code, comptime principal_required: bool, comptime input_bound: bool, comptime body_bound: bool) []const openapi.ResponseDoc {
     const fields = reflection.fields(@typeInfo(@TypeOf(mapping)).@"struct");
-    var docs: [fields.len + 2]openapi.ResponseDoc = undefined;
+    var docs: [fields.len + 4]openapi.ResponseDoc = undefined;
     var count: usize = 0;
     for (fields) |field| {
         const code = @backingInt(@as(Code, @field(mapping, field.name)));
@@ -98,6 +98,8 @@ fn errorResponses(comptime mapping: anytype, comptime fallback: ?Code, comptime 
     const extras = .{
         .{ .status = if (fallback) |code| @backingInt(code) else 0, .kind = "internal_server_error" },
         .{ .status = if (principal_required) 401 else 0, .kind = "unauthorized" },
+        .{ .status = if (input_bound) 400 else 0, .kind = "bad_request" },
+        .{ .status = if (body_bound) 422 else 0, .kind = "validation" },
     };
     inline for (extras) |extra| {
         if (extra.status == 0) continue;
@@ -207,6 +209,12 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         };
         break :blk false;
     };
+    const input_bound = blk: {
+        for (params) |maybe| if (maybe) |T| {
+            if (isMarker(T)) break :blk true;
+        };
+        break :blk false;
+    };
     const endpoint_meta = openapi.Spec(.{
         .request = body,
         .response = if (Payload == void) null else Payload,
@@ -214,7 +222,7 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         .success_status = success,
         .operation_id = if (@hasField(@TypeOf(options), "operation_id")) options.operation_id else "",
         .security = if (@hasField(@TypeOf(options), "security")) options.security else &.{},
-        .additional_responses = errorResponses(mapping, fallback, principal_required),
+        .additional_responses = errorResponses(mapping, fallback, principal_required, input_bound, body != null),
         .summary = if (@hasField(@TypeOf(options), "summary")) options.summary else "",
         .description = if (@hasField(@TypeOf(options), "description")) options.description else "",
         .tags = if (@hasField(@TypeOf(options), "tags")) options.tags else &.{},
@@ -304,16 +312,23 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         }
         pub fn handle(c: *Ctx) anyerror!void {
             var args: std.meta.ArgsTuple(@TypeOf(handler)) = undefined;
+            // Required identity is checked before decoding request data,
+            // independently of the user's parameter ordering.
             inline for (params, 0..) |maybe, i| {
                 const T = maybe.?;
-                if (T == *Ctx) {
-                    args[i] = c;
-                } else if (comptime isPrincipal(T)) {
+                if (comptime isPrincipal(T)) {
                     const principal = c.requirePrincipal(T.PrincipalType) catch {
                         try c.json(.{ .error_kind = "unauthorized" }, 401);
                         return;
                     };
                     args[i] = .{ .value = principal };
+                }
+            }
+            inline for (params, 0..) |maybe, i| {
+                const T = maybe.?;
+                if (comptime isPrincipal(T)) continue;
+                if (T == *Ctx) {
+                    args[i] = c;
                 } else if (T.input_source == .json) {
                     const dto = (try c.validatedJson(T.Value)) orelse return;
                     args[i] = .{ .value = dto };
