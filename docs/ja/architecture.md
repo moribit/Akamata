@@ -4,6 +4,8 @@ Native runtimeの最新の所有権・性能・メモリ評価は[Reactor CPU / 
 
 Akamataは同じZig applicationをNative／VPS／Container／Cloudflare Workersで動かすportable backendです。HTTPは`App → Context → endpoint/middleware → runtime`の単一系統です。
 
+[Portable Application Contract](portable-application-contract.md)でapplicationのrequirement、明示provider、physical capability、binding、Stateのborrowed serviceを接続します。route validation／OpenAPI／client生成は同じEndpoint metadataを使います。CLIでdeployment前に宣言・binding設定を確認でき、resourceの自動生成やremote readinessとは区別します。
+
 ## Applicationとadapter
 
 - `src/app.zig`がroute登録、middleware chain、lifecycle hook、dispatchを管理します。`src/context.zig`がrequest、response、application state、portable serviceを提供します。handlerは`*am.Context(State)`、middlewareはContextと`am.Next(State)`を受け取ります。

@@ -10,6 +10,35 @@ DB backend switch**. The exact same handler code runs against:
 Switching backends is a one-line change to the `DATABASE_URL` env var. No code
 changes, no recompile-with-different-flags.
 
+## Portable application contract
+
+`src/contract.zig` is the shared route/provider metadata source. The database
+requirement resolves to SQLite on Native/Containers and D1 (`DB`) on Workers.
+`State.application_contract` validates the target and borrowed `Db` facade;
+the entry point owns the database and closes it after App teardown. `/health`
+requires a database because it runs `SELECT 1`; `/` requires none.
+
+From the repository root, inspect the declaration without starting services:
+
+```bash
+zig build -Dexample=guestbook
+./zig-out/bin/guestbook akamata-capabilities workers > /tmp/guestbook-contract.json
+./zig-out/bin/akamata inspect capabilities --target=workers \
+  --manifest=/tmp/guestbook-contract.json --config=deploy/guestbook/wrangler.toml
+```
+
+The manifest is generated, never independently edited. Inspection validates
+binding names/kinds, not remote database readiness. `DATABASE_URL` remains a
+runtime override: using Turso must also change the explicit provider in
+`contract.zig` to `.turso` with no binding if inspecting that deployment.
+The facade type cannot prove which URL an opaque runtime provider opened.
+The domain handlers stay unchanged. Storage/queue/realtime effects are covered
+by the shared application contract fixture; this guestbook intentionally keeps
+its existing database-only domain.
+
+See [Portable Application Contract](../../docs/en/portable-application-contract.md)
+for declaration, ownership, adapter tests and known platform differences.
+
 ## Endpoints
 
 | Method | Path | Notes |

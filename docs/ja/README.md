@@ -31,6 +31,8 @@
 - [Security](security.md)
 - [Release process](releasing.md)
 
+- [Portable Application Contract](portable-application-contract.md) — requirements, explicit providers, bindings, borrowed services and application tests (main development API)
+
 ## API reference
 
 - [Handler API](handler-api.md) — `App`、`Context`、request／response helper、middleware、database、model／repository、HTTP client、認証、WebSocket、SSE

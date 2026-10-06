@@ -31,6 +31,8 @@ is development-oriented; pin a tagged release for reproducible builds.
 - [Security](security.md)
 - [Release process](releasing.md)
 
+- [Portable Application Contract](portable-application-contract.md) — requirements, explicit providers, bindings, borrowed services and application tests (main development API)
+
 ## API reference
 
 - [Handler API](handler-api.md) — `App`, `Context`, request/response helpers, middleware, database, model/repository, HTTP client, authentication, WebSocket, and SSE

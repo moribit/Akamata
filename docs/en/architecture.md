@@ -4,6 +4,8 @@ See the [Reactor CPU / memory investigation](native-reactor-performance-memory.m
 
 Akamata runs the same Zig application on Native/VPS/Containers and Cloudflare Workers. Its application-facing HTTP path is `App → Context → endpoint/middleware → runtime`.
 
+[Portable Application Contract](portable-application-contract.md) connects application requirements, explicit providers, physical capabilities, binding markers and borrowed State services. Endpoint metadata remains the source for route validation/OpenAPI/client generation. Capability inspection checks declarations/configuration before deployment without provisioning resources.
+
 ## Application and adapters
 
 - `src/app.zig` owns route registration, middleware chains, lifecycle hooks, and dispatch. `src/context.zig` provides request data, responses, application state, and portable services. Handlers receive `*am.Context(State)`; middleware receives that Context and `am.Next(State)`.

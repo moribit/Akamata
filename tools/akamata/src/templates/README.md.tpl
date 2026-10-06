@@ -39,3 +39,21 @@ akamata deploy --containers    # requires docker
 `build.zig.zon` pins a release-compatible Akamata revision and Zig content
 hash. To develop against a local Akamata checkout temporarily, run
 `zig build --fork=/path/to/Akamata`.
+
+## Portable requirements
+
+With a framework revision that exports `capability.Application`, the scaffold
+declares a database requirement and adds route-level requirements. Existing
+release dependencies keep their original registration behavior; capability
+inspection then reports `FrameworkUpgradeRequired` until upgraded.
+
+```bash
+akamata inspect capabilities --target=native
+akamata inspect capabilities --target=workers --config=deploy/wrangler.toml
+akamata check --quick --capabilities --target=workers --config=deploy/wrangler.toml
+```
+
+Workers database deployments require a D1 binding (`akamata init ... --d1`
+or explicitly configure `DB`). Inspection does not create resources. Provider
+declarations must match explicit runtime wiring, including any Turso URL
+override. Queue/Realtime owners and lifecycle remain application-controlled.
