@@ -39,6 +39,8 @@ pub fn build(b: *std.Build) void {
     });
 
     const documentation_step = b.step("documentation-test", "compile README source and run documentation application contracts");
+    const documentation_links = b.addSystemCommand(&.{ "python3", "tests/documentation_links.py" });
+    documentation_step.dependOn(&documentation_links.step);
     const opts = b.addOptions();
     opts.addOption(Backend, "backend", backend);
     opts.addOption(bool, "with_openssl", with_openssl);

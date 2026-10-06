@@ -93,3 +93,11 @@ Benchmark numbers are snapshots of the recorded environment, commands, and Akama
 Design records describe the reasoning at a point in time and may contain superseded examples. Use the [Handler API](handler-api.md) and current source for the supported interface.
 
 - [v0.2 Phase 1](v0.2-phase1.md)
+
+## Documentation maintenance
+
+Getting Started and the typed API guides are maintained in English and Japanese
+in the same change. Detailed provider references may be English-only and are
+labelled explicitly in navigation. Executable source fixtures are the authority
+for code examples; Native/Workers documentation-test builds them in CI. Release
+and main API availability are distinguished rather than silently backporting docs.

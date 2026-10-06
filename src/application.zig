@@ -20,6 +20,25 @@ pub fn App(comptime declaration: anytype) type {
         pub const Ctx = @import("context.zig").Context(State);
         pub const Endpoints = endpoints;
         pub const Core = core.App(State);
+        pub const RouteView = Core.RouteView;
+        /// Pure endpoint metadata for tooling, without acquiring State/providers
+        /// or running configure. Runtime middleware views remain on the App.
+        pub const Metadata = struct {
+            const views = blk: {
+                var result: [endpoints.len]RouteView = undefined;
+                for (endpoints, 0..) |Endpoint, index| result[index] = .{
+                    .method = Endpoint.http_method,
+                    .kind = .http,
+                    .path = Endpoint.route_path,
+                    .meta = Endpoint.meta,
+                    .middleware_names = &.{},
+                };
+                break :blk result;
+            };
+            pub fn routeViews(_: *const @This(), _: std.mem.Allocator) ![]const RouteView {
+                return &views;
+            }
+        };
         /// Explicit escape hatch; this owns the existing App, not providers.
         core: Core,
         pub fn init(allocator: std.mem.Allocator) !Self {
@@ -49,6 +68,9 @@ pub fn App(comptime declaration: anytype) type {
         }
         pub fn client(self: *Self, allocator: std.mem.Allocator) @import("testing.zig").Client(Core) {
             return .init(allocator, &self.core);
+        }
+        pub fn routeViews(self: *const Self, allocator: std.mem.Allocator) ![]const RouteView {
+            return self.core.routeViews(allocator);
         }
     };
 }

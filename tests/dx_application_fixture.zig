@@ -35,6 +35,10 @@ fn expect(ok: bool) !void {
     if (!ok) return error.DeveloperContractFailed;
 }
 pub fn run(allocator: std.mem.Allocator) !void {
+    var metadata: Application.Metadata = .{};
+    const document = try ak.openapi.generate(Application.Metadata, &metadata, allocator, .{ .title = "DX fixture", .version = "1" });
+    defer allocator.free(document);
+    if (std.mem.indexOf(u8, document, "text/plain") == null) return error.MissingEndpointMetadata;
     try @import("docs/minimal.zig").contract(allocator);
     var app = try Application.init(allocator);
     defer app.deinit();

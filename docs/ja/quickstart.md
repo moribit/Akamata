@@ -59,7 +59,7 @@ DTOの`validation` metadataは既存model ruleを再利用し、machine-readable
 
 必要なら明示ownerの`am.db.Db`をStateへ追加し、`am.db.open(allocator, url)`でopen、Contextからborrowします。SQLite/TursoとD1/Tursoは共通facadeで、deploy設定は異なります。
 
-[Database backends](db-backends.md) · [Provider lifecycle](provider-lifecycle.md)
+[Database backends](db-backends.md) · [Provider lifecycle (English)](../en/provider-lifecycle.md)
 
 ```sh
 akamata init notesapp --template=notes --target=both

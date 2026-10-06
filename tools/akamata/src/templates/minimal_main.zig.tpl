@@ -25,9 +25,35 @@ pub fn buildApplication(allocator: std.mem.Allocator) !Application {
     return app;
 }
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     var gpa: std.heap.DebugAllocator(.{}) = .init;
     defer _ = gpa.deinit();
+    var args_arena: std.heap.ArenaAllocator = .init(gpa.allocator());
+    defer args_arena.deinit();
+    const args = try init.minimal.args.toSlice(args_arena.allocator());
+    if (args.len > 1) {
+        const command = std.mem.sliceTo(args[1], 0);
+        if (std.mem.eql(u8, command, "akamata-openapi") or std.mem.eql(u8, command, "akamata-capabilities")) {
+            if (comptime !@hasDecl(ak, "get")) return error.ToolingRequiresLatestMain;
+            var buffer: [4096]u8 = undefined;
+            var stdout = std.Io.File.stdout().writer(init.io, &buffer);
+            if (std.mem.eql(u8, command, "akamata-openapi")) {
+                var metadata: Application.Metadata = .{};
+                const document = try ak.openapi.generate(Application.Metadata, &metadata, gpa.allocator(), .{ .title = "{{NAME}}", .version = "1.0.0" });
+                defer gpa.allocator().free(document);
+                try stdout.interface.writeAll(document);
+            } else {
+                const Contract = ak.capability.Contract("{{NAME}}", &.{}, &.{});
+                const target = if (args.len == 3) std.mem.sliceTo(args[2], 0) else "native";
+                if (std.mem.eql(u8, target, "workers")) try Contract.writeManifest(.workers, &stdout.interface, Application.Endpoints)
+                else if (std.mem.eql(u8, target, "native")) try Contract.writeManifest(.native, &stdout.interface, Application.Endpoints)
+                else if (std.mem.eql(u8, target, "containers")) try Contract.writeManifest(.containers, &stdout.interface, Application.Endpoints)
+                else return error.InvalidTarget;
+            }
+            return stdout.interface.flush();
+        }
+        return error.UnknownCommand;
+    }
     var app = try buildApplication(gpa.allocator());
     defer app.deinit();
     const configured_port = ak.env.get(gpa.allocator(), "PORT");

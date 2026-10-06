@@ -3,6 +3,15 @@ const ak = @import("akamata");
 test "README source executes through the in-process client" {
     try @import("docs/minimal.zig").contract(std.testing.allocator);
 }
+test "application metadata generates schemas without initializing provider state" {
+    const OwnedState = struct { uninitialized_owner: *u8 };
+    const Decl = ak.App(.{ .State = OwnedState, .routes = .{ak.get("/", hello)} });
+    var metadata: Decl.Metadata = .{};
+    const spec = try ak.openapi.generate(Decl.Metadata, &metadata, std.testing.allocator, .{ .title = "pure metadata", .version = "1" });
+    defer std.testing.allocator.free(spec);
+    try std.testing.expect(std.mem.indexOf(u8, spec, "text/plain") != null);
+    // State cannot default-initialize. No resource owner or handler is touched.
+}
 
 test "test storage owner asserts effects without changing Store" {
     var store = ak.testing.MemoryStore.init(std.testing.allocator);

@@ -51,22 +51,22 @@ Zig 0.17.x向けの入口です。Getting Startedから始めてください。o
 | Validation / error mapping | [Validation](guides/validation.md), [Errors](guides/errors.md) |
 | Authentication / roles / scopes | [Security](security.md), [Principal binding](guides/typed-handlers.md) |
 | Database | [SQLite / D1 / Turso](db-backends.md) |
-| Storage | [Storage pagination](storage-pagination.md), [Application building blocks](application-building-blocks.md) |
-| Background jobs / queue | [Queue providers](queue-providers.md) |
-| Realtime | [Realtime developer guide](guides/realtime.md), [Realtime owners](realtime-providers.md) |
+| Storage | [Storage pagination (English)](../en/storage-pagination.md), [Application building blocks](application-building-blocks.md) |
+| Background jobs / queue | [Queue providers (English)](../en/queue-providers.md) |
+| Realtime | [Realtime developer guide](guides/realtime.md), [Realtime owners (English)](../en/realtime-providers.md) |
 | Testing | [In-process testing](guides/testing.md) |
 | OpenAPI / generated HTTP client | [Developer tooling](developer-experience.md), [Typed errors / clients](guides/errors.md) |
-| Configuration / deployment preflight | [Deployment validation](deployment-validation.md) |
+| Configuration / deployment preflight | [Deployment validation (English)](../en/deployment-validation.md) |
 | Native / Workers / Containers | [Portable backend](portable-backend.md), [Cloudflare deployment](cloudflare.md) |
 | Observability | [Existing observability](observability.md) |
 
 ## Concepts
 
-[Application and lifetime](guides/application.md) · [Portable Application Contract](portable-application-contract.md) · [Portable Production Contract](portable-production-contract.md) · [Provider lifecycle](provider-lifecycle.md)
+[Application and lifetime](guides/application.md) · [Portable Application Contract](portable-application-contract.md) · [Portable Production Contract](portable-production-contract.md) · [Provider lifecycle (English)](../en/provider-lifecycle.md)
 
 ## Reference
 
-[Handler API](handler-api.md) · [CLI and generated artifacts](developer-experience.md) · [Configuration / readiness](deployment-validation.md) · [Capability/provider matrix](portable-production-contract.md) · [Error formats](guides/errors.md)
+[Handler API](handler-api.md) · [CLI and generated artifacts](developer-experience.md) · [Configuration / readiness (English)](../en/deployment-validation.md) · [Capability/provider matrix](portable-production-contract.md) · [Error formats](guides/errors.md)
 
 ## Examples
 
@@ -93,3 +93,11 @@ benchmark値は、記載された環境、command、Akamata revisionでの測定
 設計資料は特定時点の検討内容を記録したもので、現在は置き換えられた例を含む場合があります。対応中のinterfaceは[Handler API](handler-api.md)と現在のsource codeを確認してください。
 
 - [v0.2 Phase 1](v0.2-phase1.md)
+
+## Documentation maintenance
+
+Getting Started and the typed API guides are maintained in English and Japanese
+in the same change. Detailed provider references may be English-only and are
+labelled explicitly in navigation. Executable source fixtures are the authority
+for code examples; Native/Workers documentation-test builds them in CI. Release
+and main API availability are distinguished rather than silently backporting docs.

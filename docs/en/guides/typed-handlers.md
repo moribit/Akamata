@@ -40,3 +40,18 @@ TypeScript generation uses the same endpoint metadata: path scalars retain their
 Endpoint options preserve existing `description`, `tags`, `deprecated` and `limits` metadata. Limits retain their existing meaning; metadata alone is not a new timeout enforcement mechanism. Unknown options fail compilation. Typed success statuses must be final 2xx/3xx responses; 204/205 cannot carry a value, and a status helper cannot disagree with `success_status`. Use explicit Context for specialized responses.
 
 The `.configure` callback must not retain the temporary App/State address or start tasks borrowing it: initialization returns App by value. Acquire provider owners separately and keep their addresses stable for the application lifetime.
+
+`Application.Metadata` is a pure endpoint-only view accepted by existing
+`openapi.generate` and `client_gen.generate`; it does not initialize State, acquire
+providers or run `.configure`. Runtime middleware names are intentionally absent
+from this declaration view. For runtime middleware metadata use the initialized
+Application directly, whose `routeViews` delegates to the core.
+
+The minimal scaffold implements `akamata-openapi` and `akamata-capabilities`
+before App initialization. These tooling modes require latest main and fail
+explicitly on the pinned v0.1.5 bootstrap. With a local override, use
+`zig build --fork=/path/to/Akamata run -- akamata-openapi` or
+`zig build --fork=/path/to/Akamata run -- akamata-capabilities workers`.
+The latter emits a manifest accepted by `akamata inspect capabilities --manifest=PATH`.
+For a stateful application replace the empty Hello Contract with its existing
+explicit Contract/provider declarations; do not hand-edit generated manifests.

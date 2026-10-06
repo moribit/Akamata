@@ -1,5 +1,6 @@
 """Default scaffold: minimal files, Native HTTP and Workers compilation."""
 import os
+import json
 from pathlib import Path
 import signal
 import socket
@@ -22,11 +23,23 @@ with tempfile.TemporaryDirectory(prefix="akamata-minimal-") as directory:
     build = ["zig", "build"] + ([f"--fork={checkout}"] if checkout else [])
     subprocess.run(build + ["-Doptimize=ReleaseSafe"], cwd=project, check=True)
     subprocess.run(build + ["-Dbackend=workers", "-Doptimize=ReleaseSafe"], cwd=project, check=True)
+    binary = str(project / "zig-out/bin/minimalapp")
+    if checkout:
+        # Tooling reads the route declaration without opening an App/provider.
+        spec = subprocess.run([binary, "akamata-openapi"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
+        assert json.loads(spec.stdout)["paths"]["/"]["get"]["responses"]["200"]["content"].get("text/plain")
+        declaration = subprocess.run([binary, "akamata-capabilities", "workers"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
+        contract = json.loads(declaration.stdout)
+        assert contract["target"] == "workers" and contract["requirements"] == []
+        manifest = project / "contract.json"
+        manifest.write_text(declaration.stdout)
+        inspected = subprocess.run([cli, "inspect", "capabilities", "--target=workers", f"--manifest={manifest}"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
+        assert "GET /" in inspected.stderr
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
         port = reservation.getsockname()[1]
     env = dict(os.environ, PORT=str(port))
-    process = subprocess.Popen([str(project / "zig-out/bin/minimalapp")], cwd=project, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    process = subprocess.Popen([binary], cwd=project, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         deadline = time.monotonic() + 10
         while True:

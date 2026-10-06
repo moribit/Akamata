@@ -6,6 +6,6 @@ Contextはrequest中だけState/provider facadeをborrowします。decode input
 
 provider ownerはContextの外で明示作成し、安定したaddressを維持します。順に初期化しerrdeferでpartial failureをcleanup、background workをdrain/stopしてから依存resourceを破棄します。borrowしているAppをproviderより先にdeinitします。App.deinitは任意State resourceをcloseしません。`.configure`はmount前の一時App上で実行されるため、そのaddressの保持やborrowするtaskの開始は禁止です。
 
-Endpoint metadataは既存route graph、capability検証、OpenAPI、clientへ接続します。Capabilityはrequirement、Provisionはprovider選択、Bindingはplatform resourceです。validationはprovisioningではなく、offline証拠はlive readinessではありません。Helloには不要です。stateful applicationでは[Portable Application Contract](../portable-application-contract.md)、[Provider lifecycle](../provider-lifecycle.md)を参照します。
+Endpoint metadataは既存route graph、capability検証、OpenAPI、clientへ接続します。Capabilityはrequirement、Provisionはprovider選択、Bindingはplatform resourceです。validationはprovisioningではなく、offline証拠はlive readinessではありません。Helloには不要です。stateful applicationでは[Portable Application Contract](../portable-application-contract.md)、[Provider lifecycle (English)](../../en/provider-lifecycle.md)を参照します。
 
 platform extensionは明示的に維持します。Native production defaultはThreaded、ReactorはPark/fail-closedです。新scheduler、DI container、service locatorは導入しません。
