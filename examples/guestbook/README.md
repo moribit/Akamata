@@ -76,7 +76,8 @@ curl -s http://127.0.0.1:8080/entries
 
 ```bash
 turso db create akamata-guestbook
-turso db shell akamata-guestbook < examples/guestbook/src/schema.sql
+./zig-out/bin/guestbook --print-schema > /tmp/guestbook.sql
+turso db shell akamata-guestbook < /tmp/guestbook.sql
 turso db tokens create akamata-guestbook   # bearer JWT
 
 DATABASE_URL='libsql://akamata-guestbook-<org>.turso.io?authToken=eyJab.c' \
@@ -95,21 +96,23 @@ then deploy:
 zig build -Dexample=guestbook -Doptimize=ReleaseFast
 ./zig-out/bin/guestbook --print-schema > /tmp/guestbook.sql
 
-akamata deploy --workers \
-  --config=deploy/guestbook/wrangler.toml \
-  --migrate=/tmp/guestbook.sql
+# Apply reviewed SQL explicitly to your own configured D1 resource before deploy.
+zig build -Dexample=guestbook -Dbackend=workers
+npx wrangler deploy --config=deploy/guestbook/wrangler.toml
 ```
 
-On the first run `akamata`:
+Deploy does **not** create a missing database. Provision a dedicated D1 resource
+explicitly, replace the repository example database_id with your own resource identifier, and apply reviewed SQL.
+`--migrate` performs the requested root-environment remote migration before build
+and deploy; named-environment migration remains fail-closed. Configuration
+validation is not remote readiness. The guestbook example retains first-request
+schema initialization on Workers as a tutorial convenience; production operators
+should apply migrations explicitly before deployment.
 
-1. Sees `database_id = "00000000-..."` in `wrangler.toml`
-2. Runs `wrangler d1 create guestbook`, parses the new UUID, writes it back
-3. Runs `wrangler d1 execute guestbook --remote --file=/tmp/guestbook.sql`
-4. `zig build -Dbackend=workers -Doptimize=ReleaseSmall`
-5. `wrangler deploy --config=...`
-
-Subsequent runs skip step (1)–(2). To redeploy without re-running the
-migration, drop `--migrate`.
+When building this repository rather than a generated project, select the example
+explicitly: `zig build -Dexample=guestbook -Dbackend=workers`. The repository's
+default example is chat, so a plain CLI build must not be assumed to select this
+artifact. Use the reviewed deployment config and matching built WASM.
 
 ## Deploy to Cloudflare Workers + Turso
 
@@ -134,7 +137,8 @@ examples/guestbook/
     ├── app.zig         # State: { db: am.db.Db }
     ├── handlers.zig    # CRUD handlers (backend-agnostic)
     ├── setup.zig       # Shared route + state wiring (used by main and worker)
-    ├── schema.sql      # guestbook table + index
+    ├── models.zig      # schema source
+    ├── contract.zig    # route/provider metadata
     ├── main.zig        # native entry: reads DATABASE_URL, am.App.serve
     └── worker.zig      # Workers entry: same setup.zig, wasm export
 
@@ -151,7 +155,7 @@ deploy/guestbook/
 
 ```zig
 const url = am.env.get(alloc, "DATABASE_URL") orelse default;
-var database = try am.db.open(alloc, url);
+const database = try am.db.openForContract(alloc, Contract, url);
 ```
 
 `am.db.open` inspects the URL prefix:
@@ -168,3 +172,11 @@ wraps the wasm entry. The Zig side just calls them as ordinary synchronous
 functions.
 
 See `docs/en/db-backends.md` for the full picture.
+
+## Learning path
+
+This is the database/validation/provider-contract reference. For ordinary-function
+HTTP handlers start with [Getting Started](../../docs/en/quickstart.md) and the
+[compiled DX fixture](../../tests/dx_application_fixture.zig). For Queue/Realtime/Storage
+owner wiring use [device_messaging](../device_messaging/README.md). Both Native and
+Workers artifacts are built in CI; offline fixtures do not certify live resources.

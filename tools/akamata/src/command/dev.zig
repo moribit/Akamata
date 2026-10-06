@@ -82,8 +82,13 @@ pub fn cmdDev(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
                 // files (and takes time), so we don't want its own writes to
                 // immediately re-trigger. Then spawn the freshly built binary.
                 sig = watchSignature(alloc);
+                std.debug.print("==> akamata dev: build succeeded ({s})\n", .{bin_path});
                 child = spawnBinary(bin_path_z.ptr);
-                if (child <= 0) std.debug.print("dev: failed to spawn {s}\n", .{bin_path});
+                if (child <= 0) {
+                    std.debug.print("dev: failed to spawn {s}\n", .{bin_path});
+                } else {
+                    std.debug.print("==> akamata dev: process started (pid {d}); application reports its own listening address\n", .{child});
+                }
             } else |_| {
                 if (!dev_running.load(.seq_cst)) break;
                 std.debug.print("==> akamata dev: build failed — fix and save to retry\n", .{});
