@@ -196,31 +196,8 @@ unless capability validation is explicitly requested. `routes explain` prints
 portable/physical requirements from OpenAPI when the application exposes it;
 source-only route discovery cannot infer requirements from imported handlers.
 
-CLI binding inspection supports the repository's TOML array sections, exact
-resource kinds/names and quoted strings. JSONC, environment overrides, resource
-IDs, DO class/migration validity and live provisioning are not validated here.
-Statuses are `declared`, `binding_configured` and `missing_binding`; missing
-bindings fail the command. User configuration is not rewritten. Generated JS
-uses existing named adapter operations; metadata does not replace custom glue.
+The production wiring layer is documented in [Portable Production Contract](portable-production-contract.md). Named TOML environments, resource identifiers, provider URL drift and checked owner acquisition now have explicit validation. Local validation still does not certify remote resources, DO migrations or arbitrary custom glue. JSONC is not supported by capability inspection.
 
-Native jobs already provide a persistent SQLite job queue. Portable Producer
-and Consumer still require explicit callback wiring to a queue owner; no new
-automatic queue backend or scheduler is added. Workers QueueProducer uses the
-selected binding. Workers realtime uses the existing DO/HTTP action control
-plane; a general automatic DO-backed `Service` factory does not exist. Explicit
-Service providers/platform escape hatches remain necessary. Declaring a provider
-checks facility/wiring metadata, not arbitrary opaque vtable implementation.
+Existing manual facade APIs remain platform escape hatches. Checked factories connect Provision to actual adapter acquisition. Native jobs.Queue and Workers QueueOwner expose the same Producer/Consumer contract; Workers RealtimeOwner exposes the existing Service through the private DO control plane. Store.listPage owns its metadata and opaque continuation cursor; legacy list retains its original ownership contract.
 
-R2 list cursors remain platform tokens while filesystem cursors are lexical
-keys. R2 list metadata uses the caller allocator's operation lifetime (use an
-operation arena); the current Store list API lacks a portable next-cursor
-result. R2 head metadata is less complete than get metadata. Workers HTTP
-downloads and bounded R2 uploads still have host-side buffering limits. These
-are documented adapter differences, not erased by capability declarations.
-Queue acknowledgement/redelivery and DO connection ownership remain platform
-specific. Effects across DB/storage/queue/realtime are not one atomic transaction.
-
-The next DX work should add adapter ownership helpers for existing jobs/DO
-operations, strengthen list-page ownership/cursor semantics, then extend
-environment-specific deployment validation. It should reuse these existing
-facades rather than introduce a new framework. Reactor remains parked.
+DB/storage/queue/realtime effects are not an atomic distributed transaction. Host retry policy, DO socket ownership and buffered Workers HTTP downloads remain platform differences. Reactor remains parked; Native production uses Threaded.

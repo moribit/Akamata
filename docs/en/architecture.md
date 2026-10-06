@@ -4,7 +4,7 @@ See the [Reactor CPU / memory investigation](native-reactor-performance-memory.m
 
 Akamata runs the same Zig application on Native/VPS/Containers and Cloudflare Workers. Its application-facing HTTP path is `App → Context → endpoint/middleware → runtime`.
 
-[Portable Application Contract](portable-application-contract.md) connects application requirements, explicit providers, physical capabilities, binding markers and borrowed State services. Endpoint metadata remains the source for route validation/OpenAPI/client generation. Capability inspection checks declarations/configuration before deployment without provisioning resources.
+[Portable Application Contract](portable-application-contract.md) connects application requirements, explicit providers, physical capabilities, binding markers and borrowed State services. Endpoint metadata remains the source for route validation/OpenAPI/client generation. Capability inspection checks declarations/configuration before deployment without provisioning resources. [Portable Production Contract](portable-production-contract.md) connects checked provider owners, named-environment preflight and explicit live evidence to those declarations.
 
 ## Application and adapters
 
