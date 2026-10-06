@@ -1,0 +1,88 @@
+const std = @import("std");
+const fixture = @import("portable_application_fixture.zig");
+const am = @import("akamata");
+var last_error: []const u8 = "";
+pub const std_options: std.Options = .{ .logFn = log };
+fn log(comptime _: std.log.Level, comptime _: @TypeOf(.enum_literal), comptime _: []const u8, _: anytype) void {}
+export fn run_contract() u32 {
+    fixture.run(std.heap.wasm_allocator) catch |err| {
+        last_error = @errorName(err);
+        return 1;
+    };
+    return 0;
+}
+
+fn databaseAdapterContract() !void {
+    const allocator = std.heap.wasm_allocator;
+    var url = "d1:REPORTS".*;
+    const named = try am.db.open(allocator, &url);
+    defer named.close();
+    // The provider owns its binding name, not the caller's mutable URL.
+    @memset(&url, 'x');
+    try named.exec("INSERT INTO effects DEFAULT VALUES");
+    var statement = try named.prepare("SELECT ?");
+    defer statement.deinit();
+    try statement.bind(1, .{ .int = 42 });
+    if (try statement.step() != .row or try statement.columnInt(0) != 42) return error.DatabaseContractFailed;
+    const default = try am.db.open(allocator, "d1:DB");
+    defer default.close();
+    try default.exec("INSERT INTO effects DEFAULT VALUES");
+    if (am.db.open(allocator, "d1:")) |unexpected| {
+        unexpected.close();
+        return error.DatabaseContractFailed;
+    } else |err| {
+        if (err != error.InvalidUrl) return err;
+    }
+}
+export fn run_database_adapter_contract() u32 {
+    databaseAdapterContract() catch |err| {
+        last_error = @errorName(err);
+        return 1;
+    };
+    return 0;
+}
+fn platformAdapterContract() !void {
+    // R2 list metadata currently uses the supplied allocator's lifetime;
+    // isolate adapter allocations in a bounded operation arena.
+    var arena: std.heap.ArenaAllocator = .init(std.heap.wasm_allocator);
+    defer arena.deinit();
+    var store = am.platform.workers.R2Store.init(arena.allocator(), "FILES");
+    try fixture.storageContract(arena.allocator(), store.store());
+    const FailingReader = struct {
+        closed: bool = false,
+        fn read(_: *anyopaque, _: []u8) am.stream.Error!usize {
+            return error.BackendFailure;
+        }
+        fn close(ptr: *anyopaque) void {
+            const self: *@This() = @ptrCast(@alignCast(ptr));
+            self.closed = true;
+        }
+    };
+    var failing: FailingReader = .{};
+    if (store.store().put("objects/failing", .{ .ptr = &failing, .read_fn = FailingReader.read, .close_fn = FailingReader.close }, .{})) |_| {
+        return error.StorageContractFailed;
+    } else |err| if (err != error.BackendFailure) return err;
+    if (!failing.closed) return error.StorageContractFailed;
+    var producer: am.platform.workers.QueueProducer = .{ .binding = "EVENTS" };
+    const Event = am.events.Descriptor(struct { text: []const u8 }, .{ .name = "created", .version = 2 });
+    try producer.producer().dispatchDescriptor(arena.allocator(), Event, .{ .text = "hello" }, .{
+        .event_id = "event-1",
+        .correlation_id = "request-1",
+        .idempotency_key = "message:1",
+        .attempt = 2,
+        .max_attempts = 7,
+    });
+}
+export fn run_platform_adapter_contract() u32 {
+    platformAdapterContract() catch |err| {
+        last_error = @errorName(err);
+        return 1;
+    };
+    return 0;
+}
+export fn error_ptr() [*]const u8 {
+    return last_error.ptr;
+}
+export fn error_len() usize {
+    return last_error.len;
+}

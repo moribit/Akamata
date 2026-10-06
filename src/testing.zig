@@ -26,6 +26,8 @@ const status_mod = @import("http/status.zig");
 const db_mod = @import("db/db.zig");
 
 pub const Header = req_mod.Header;
+pub const MemoryStore = @import("testing/providers.zig").MemoryStore;
+pub const QueueRecorder = @import("testing/providers.zig").QueueRecorder;
 
 pub fn Client(comptime AppT: type) type {
     return struct {

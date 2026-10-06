@@ -34,6 +34,13 @@ pub const Provider = enum {
         return providerSupports(self, target);
     }
 
+    pub fn usesBinding(self: Provider) bool {
+        return switch (self.facility()) {
+            .d1, .r2, .queues, .durable_objects => true,
+            else => false,
+        };
+    }
+
     pub fn facility(self: Provider) Kind {
         return switch (self) {
             .sqlite => .sqlite,
@@ -101,6 +108,10 @@ pub fn Contract(comptime subject: []const u8, comptime requirements: []const App
                 requireKinds(subject ++ " capability " ++ @tagName(provision.capability) ++ " provider " ++ @tagName(provision.provider), &.{provision.provider.facility()}, target);
                 if (provision.binding) |binding_name| if (binding_name.len == 0)
                     @compileError(subject ++ ": empty binding for " ++ @tagName(provision.capability));
+                if (provision.provider.usesBinding() and provision.binding == null)
+                    @compileError(subject ++ " capability " ++ @tagName(provision.capability) ++ " provider " ++ @tagName(provision.provider) ++ ": missing Workers binding name for target " ++ @tagName(target));
+                if (!provision.provider.usesBinding() and provision.binding != null)
+                    @compileError(subject ++ ": provider " ++ @tagName(provision.provider) ++ " does not use a resource binding");
             }
             inline for (requirements) |needed| _ = resolve(needed);
         }
@@ -158,6 +169,7 @@ pub fn Contract(comptime subject: []const u8, comptime requirements: []const App
                 try std.json.Stringify.value(.{
                     .method = E.http_method,
                     .path = E.route_path,
+                    .operation_id = E.meta.operation_id,
                     .capabilities = E.meta.required_services,
                     .platform_capabilities = E.meta.required_capabilities,
                 }, .{}, writer);
@@ -258,7 +270,7 @@ pub fn requireKinds(comptime subject: []const u8, comptime required: []const Kin
     };
 }
 
-/// Decorate an Endpoint without cloning its route/OpenAPI metadata.
+/// Decorate endpoint metadata while preserving its schema functions and handler.
 pub fn Requires(comptime EndpointType: type, comptime required: []const Kind) type {
     return struct {
         pub const http_method = EndpointType.http_method;
@@ -291,7 +303,7 @@ test "portable provider mappings and explicit resolution" {
         inline for (@typeInfo(Application).@"enum".field_names) |name| {
             const kind = @field(Application, name);
             const provider = comptime defaultProvider(kind, target);
-            const C = Contract("fixture", &.{kind}, &.{.{ .capability = kind, .provider = provider }});
+            const C = Contract("fixture", &.{kind}, &.{.{ .capability = kind, .provider = provider, .binding = if (provider.usesBinding()) "RESOURCE" else null }});
             comptime C.validate(target);
             try std.testing.expectEqual(kind, C.resolve(kind).provider.application());
         }

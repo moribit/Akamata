@@ -26,6 +26,20 @@ pub fn main(init: std.process.Init) !void {
     // args[0] = exe; args[1..] = user-provided.
     if (args.len >= 2) {
         const arg = std.mem.sliceTo(args[1], 0);
+        if (std.mem.eql(u8, arg, "akamata-capabilities")) {
+            const target = if (args.len == 3) std.mem.sliceTo(args[2], 0) else "native";
+            var buffer: [4096]u8 = undefined;
+            var stdout = std.Io.File.stdout().writer(init.io, &buffer);
+            const declaration = @import("contract.zig");
+            if (std.mem.eql(u8, target, "workers")) {
+                try declaration.For(.workers).writeManifest(.workers, &stdout.interface, declaration.endpoints);
+            } else if (std.mem.eql(u8, target, "native")) {
+                try declaration.For(.native).writeManifest(.native, &stdout.interface, declaration.endpoints);
+            } else if (std.mem.eql(u8, target, "containers")) {
+                try declaration.For(.containers).writeManifest(.containers, &stdout.interface, declaration.endpoints);
+            } else return error.InvalidTarget;
+            return stdout.interface.flush();
+        }
         if (std.mem.eql(u8, arg, "--print-schema")) {
             return printSchema(alloc);
         }
@@ -34,7 +48,9 @@ pub fn main(init: std.process.Init) !void {
         }
     }
 
-    var app = am.App(App).init(alloc, try setup.buildState(alloc));
+    const state = try setup.buildState(alloc);
+    defer state.db.close();
+    var app = am.App(App).init(alloc, state);
     defer app.deinit();
     try setup.registerRoutes(&app);
 

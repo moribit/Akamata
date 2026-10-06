@@ -39,8 +39,35 @@ const Notes = am.model.repo(Note);
 // model-aware migrator walks `all_models` to keep the schema in sync.
 
 pub const State = struct {
+    // Older pinned releases still compile; upgrade the dependency to enable
+    // the portable application contract and its tooling protocol.
+    pub const application_contract = if (@hasDecl(Portable, "For")) Portable.For(if (am.backend == .workers) .workers else .native) else void;
     db: am.db.Db,
 };
+
+const Portable = if (@hasDecl(am.capability, "Application")) struct {
+    const DatabaseBinding = am.binding.D1("DB");
+    pub fn For(comptime target: am.capability.Target) type {
+        const C = am.capability.Contract("{{NAME}}", &.{.database}, &.{.{
+            .capability = .database,
+            .provider = am.capability.defaultProvider(.database, target),
+            .binding = if (target == .workers) DatabaseBinding.binding_name else null,
+        }});
+        comptime if (target == .workers) am.binding.validateContract(struct { db: DatabaseBinding }, C, target) else C.validate(target);
+        return C;
+    }
+    fn database(comptime method: am.Method, comptime path: []const u8, comptime handler: anytype, comptime operation: []const u8) type {
+        return am.capability.Uses(am.contract.Endpoint(method, path, handler, .{ .operation_id = operation }), &.{.database});
+    }
+    pub const endpoints = .{
+        am.contract.Endpoint(.GET, "/", index, .{ .operation_id = "index" }),
+        database(.GET, "/health", health, "health"),
+        database(.GET, "/notes", listNotes, "listNotes"),
+        database(.POST, "/notes", createNote, "createNote"),
+        database(.GET, "/notes/:id", showNote, "showNote"),
+        database(.DELETE, "/notes/:id", deleteNote, "deleteNote"),
+    };
+} else struct {};
 
 pub const all_models = [_]am.model.TableDef{
     am.model.tableDef(Note),
@@ -99,12 +126,16 @@ pub fn registerRoutes(app: *am.App(State)) !void {
     _ = try app.useAll(am.mw.recover(State));
     _ = try app.useAll(am.mw.logger(State));
 
-    _ = try app.get("/", index);
-    _ = try app.get("/health", health);
-    _ = try app.get("/notes", listNotes);
-    _ = try app.post("/notes", createNote);
-    _ = try app.get("/notes/:id", showNote);
-    _ = try app.delete("/notes/:id", deleteNote);
+    if (comptime @hasDecl(Portable, "endpoints")) {
+        inline for (Portable.endpoints) |Endpoint| try Endpoint.register(app);
+    } else {
+        _ = try app.get("/", index);
+        _ = try app.get("/health", health);
+        _ = try app.get("/notes", listNotes);
+        _ = try app.post("/notes", createNote);
+        _ = try app.get("/notes/:id", showNote);
+        _ = try app.delete("/notes/:id", deleteNote);
+    }
 }
 
 pub fn buildState(alloc: std.mem.Allocator) !State {
@@ -231,15 +262,35 @@ pub fn main(init: std.process.Init) !void {
     var args_arena: std.heap.ArenaAllocator = .init(alloc);
     defer args_arena.deinit();
     const args = try init.minimal.args.toSlice(args_arena.allocator());
+    // Metadata tooling runs before resource initialization/migration.
+    if (args.len >= 2 and std.mem.eql(u8, std.mem.sliceTo(args[1], 0), "akamata-capabilities")) {
+        if (comptime !@hasDecl(Portable, "For")) {
+            std.debug.print("capability inspection requires a newer Akamata dependency\n", .{});
+            return error.FrameworkUpgradeRequired;
+        } else {
+            const target = if (args.len == 3) std.mem.sliceTo(args[2], 0) else "native";
+            var stdout_buffer: [4096]u8 = undefined;
+            var stdout = std.Io.File.stdout().writer(init.io, &stdout_buffer);
+            if (std.mem.eql(u8, target, "native")) {
+                try Portable.For(.native).writeManifest(.native, &stdout.interface, Portable.endpoints);
+            } else if (std.mem.eql(u8, target, "workers")) {
+                try Portable.For(.workers).writeManifest(.workers, &stdout.interface, Portable.endpoints);
+            } else if (std.mem.eql(u8, target, "containers")) {
+                try Portable.For(.containers).writeManifest(.containers, &stdout.interface, Portable.endpoints);
+            } else return error.InvalidTarget;
+            return stdout.interface.flush();
+        }
+    }
     const migrate_up_mode = "migrate-up";
     _ = migrate_up_mode; // documents the runner contract used by the CLI
     if (args.len >= 2 and std.mem.startsWith(u8, std.mem.sliceTo(args[1], 0), "migrate-")) {
         return migrateCommand(alloc, std.mem.sliceTo(args[1], 0), args[2..]);
     }
 
-    var app = am.App(State).init(alloc, try buildState(alloc));
+    const state = try buildState(alloc);
+    defer state.db.close();
+    var app = am.App(State).init(alloc, state);
     defer app.deinit();
-    defer app.state().db.close();
     try registerRoutes(&app);
 
     if (args.len >= 2 and std.mem.eql(u8, std.mem.sliceTo(args[1], 0), "akamata-runner")) {

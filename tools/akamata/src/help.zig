@@ -207,11 +207,12 @@ pub fn commandUsage(command: []const u8) !void {
         \\  -h, --help                Show this help
         \\
     else if (std.mem.eql(u8, command, "check"))
-        \\Usage: akamata check [--quick]
+        \\Usage: akamata check [--quick] [--capabilities --target=native|workers|containers --manifest=PATH --config=PATH]
         \\Validate build files and source layout; without --quick also run `zig build test`.
         \\
     else if (std.mem.eql(u8, command, "inspect"))
         \\Usage: akamata inspect [--json]
+        \\       akamata inspect capabilities [--target=native|workers|containers] [--json] [--manifest=PATH] [--config=PATH]
         \\Show a deterministic project summary suitable for humans or tooling.
         \\
     else if (std.mem.eql(u8, command, "routes"))

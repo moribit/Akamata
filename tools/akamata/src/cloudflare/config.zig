@@ -15,6 +15,44 @@ pub const WorkerCapabilities = struct {
     realtime: bool = false,
 };
 
+/// Read generated/supported TOML binding declarations by section and key.
+/// A match is configuration presence only, never remote resource readiness.
+pub fn hasResourceBinding(content: []const u8, provider: []const u8, name: []const u8) bool {
+    const section: []const u8 = if (std.mem.eql(u8, provider, "d1")) "[[d1_databases]]" else if (std.mem.eql(u8, provider, "r2")) "[[r2_buckets]]" else if (std.mem.eql(u8, provider, "workers_queue")) "[[queues.producers]]" else if (std.mem.eql(u8, provider, "durable_objects")) "[[durable_objects.bindings]]" else return false;
+    const key = if (std.mem.eql(u8, provider, "durable_objects")) "name" else "binding";
+    var active = false;
+    var lines = std.mem.splitScalar(u8, content, '\n');
+    while (lines.next()) |raw| {
+        const line = std.mem.trim(u8, raw, " \t\r");
+        if (line.len == 0 or line[0] == '#') continue;
+        if (line[0] == '[') {
+            const closing = std.mem.indexOf(u8, line, "]]") orelse {
+                active = false;
+                continue;
+            };
+            active = std.mem.eql(u8, line[0 .. closing + 2], section);
+            continue;
+        }
+        if (!active) continue;
+        const eq = std.mem.indexOfScalar(u8, line, '=') orelse continue;
+        if (!std.mem.eql(u8, std.mem.trim(u8, line[0..eq], " \t"), key)) continue;
+        const value = std.mem.trim(u8, line[eq + 1 ..], " \t");
+        if (value.len < 2 or (value[0] != '"' and value[0] != '\'')) continue;
+        const end = std.mem.indexOfScalarPos(u8, value, 1, value[0]) orelse continue;
+        const rest = std.mem.trim(u8, value[end + 1 ..], " \t");
+        if (rest.len > 0 and rest[0] != '#') continue;
+        if (std.mem.eql(u8, value[1..end], name)) return true;
+    }
+    return false;
+}
+
+test "provider binding comparison does not match comments or wrong sections" {
+    const toml = "# [[r2_buckets]]\n# binding = \"FILES\"\n[[d1_databases]]\nbinding = \"FILES\"\n[[r2_buckets]] # actual\nbinding = 'OBJECTS' # configured\n";
+    try std.testing.expect(!hasResourceBinding(toml, "r2", "FILES"));
+    try std.testing.expect(hasResourceBinding(toml, "r2", "OBJECTS"));
+    try std.testing.expect(hasResourceBinding(toml, "d1", "FILES"));
+}
+
 pub fn activeToml(alloc: std.mem.Allocator, bytes: []const u8) ![]u8 {
     var out: std.ArrayList(u8) = .empty;
     var lines = std.mem.splitScalar(u8, bytes, '\n');

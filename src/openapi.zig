@@ -72,9 +72,9 @@ pub const Info = struct {
 pub const SpecBuilder = struct {
     arena: std.mem.Allocator,
     /// "User" -> JSON Schema object as already-stringified JSON text. We
-    /// keep the text rather than a value tree because std.json doesn't
-    /// have a stable typed Value graph in 0.16, and re-emitting from
-    /// strings is simpler.
+    /// retain serialized text to share the schema collector with the HTTP
+    /// client generator and compare duplicate definitions without introducing
+    /// a second schema AST.
     schemas: std.StringHashMap([]const u8),
 
     pub fn init(gpa: std.mem.Allocator) SpecBuilder {

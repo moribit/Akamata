@@ -13,9 +13,12 @@ const runChild = @import("../process.zig").runChild;
 // ---- project intelligence / generators ----
 pub fn cmdCheck(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     var quick = false;
+    var capabilities = false;
+    var capability_args: std.ArrayList([:0]const u8) = .empty;
+    defer capability_args.deinit(alloc);
     for (args) |raw| {
         const arg = std.mem.sliceTo(raw, 0);
-        if (std.mem.eql(u8, arg, "--quick")) quick = true else return error.UsageError;
+        if (std.mem.eql(u8, arg, "--quick")) quick = true else if (std.mem.eql(u8, arg, "--capabilities")) capabilities = true else if (std.mem.startsWith(u8, arg, "--target=") or std.mem.startsWith(u8, arg, "--manifest=") or std.mem.startsWith(u8, arg, "--config=")) try capability_args.append(alloc, raw) else return error.UsageError;
     }
     var failures: usize = 0;
     const required = [_][]const u8{ "build.zig", "build.zig.zon", "src" };
@@ -25,11 +28,15 @@ pub fn cmdCheck(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
         if (!exists) failures += 1;
     }
     if (failures != 0) return error.ProjectCheckFailed;
+    if (!capabilities and capability_args.items.len != 0) return error.UsageError;
+    if (capabilities) try cmdCapabilities(alloc, capability_args.items);
     if (!quick) try runChild(alloc, &.{ "zig", "build", "test" }, null);
     std.debug.print("check: project is healthy\n", .{});
 }
 
-pub fn cmdInspect(_: std.mem.Allocator, args: []const [:0]const u8) !void {
+pub fn cmdInspect(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
+    if (args.len > 0 and std.mem.eql(u8, std.mem.sliceTo(args[0], 0), "capabilities"))
+        return cmdCapabilities(alloc, args[1..]);
     var json = false;
     for (args) |raw| {
         const arg = std.mem.sliceTo(raw, 0);
@@ -45,6 +52,111 @@ pub fn cmdInspect(_: std.mem.Allocator, args: []const [:0]const u8) !void {
     } else {
         std.debug.print("Akamata {s}\ntargets: native={s}, workers={s}, containers={s}\nmigrations: {d}\n.env: {s}\n", .{ VERSION, yesNo(native), yesNo(workers), yesNo(containers), migrations, yesNo(dotenv) });
     }
+}
+
+/// The application emits the contract; never infer requirements from imports
+/// or turn configured resources into supposedly required application services.
+fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
+    var target: []const u8 = "native";
+    var json = false;
+    var manifest: ?[]const u8 = null;
+    var config: ?[]const u8 = null;
+    for (args) |raw| {
+        const arg = std.mem.sliceTo(raw, 0);
+        if (std.mem.eql(u8, arg, "--json")) json = true else if (std.mem.startsWith(u8, arg, "--target=")) target = arg[9..] else if (std.mem.startsWith(u8, arg, "--manifest=")) manifest = arg[11..] else if (std.mem.startsWith(u8, arg, "--config=")) config = arg[9..] else return error.UsageError;
+    }
+    if (!std.mem.eql(u8, target, "native") and !std.mem.eql(u8, target, "workers") and !std.mem.eql(u8, target, "containers")) return error.UsageError;
+    const bytes = if (manifest) |path| try readFileAlloc(alloc, path, 1024 * 1024) else blk: {
+        const source = readFileAlloc(alloc, "src/main.zig", 2 * 1024 * 1024) catch return error.ApplicationContractNotDeclared;
+        defer alloc.free(source);
+        if (std.mem.indexOf(u8, source, "akamata-capabilities") == null) {
+            std.debug.print("inspect capabilities: application must implement the akamata-capabilities tooling protocol, or pass --manifest=PATH emitted by capability.Contract.writeManifest. No application services were started.\n", .{});
+            return error.ApplicationContractNotDeclared;
+        }
+        break :blk try captureCmd(alloc, &.{ "zig", "build", "run", "--", "akamata-capabilities", target });
+    };
+    defer alloc.free(bytes);
+    var parsed = try std.json.parseFromSlice(std.json.Value, alloc, bytes, .{});
+    defer parsed.deinit();
+    const root = parsed.value;
+    if (root != .object) return error.InvalidCapabilityManifest;
+    const version = root.object.get("version") orelse return error.InvalidCapabilityManifest;
+    const declared_target = root.object.get("target") orelse return error.InvalidCapabilityManifest;
+    const providers = root.object.get("providers") orelse return error.InvalidCapabilityManifest;
+    if (version != .integer or version.integer != 1 or declared_target != .string or providers != .array) return error.InvalidCapabilityManifest;
+    if (!std.mem.eql(u8, declared_target.string, target)) return error.CapabilityTargetMismatch;
+    const cap = @import("akamata").capability;
+    const selected_target = std.meta.stringToEnum(cap.Target, target) orelse return error.InvalidCapabilityManifest;
+    const requirements = root.object.get("requirements") orelse return error.InvalidCapabilityManifest;
+    if (requirements != .array) return error.InvalidCapabilityManifest;
+    var seen: [@typeInfo(cap.Application).@"enum".field_names.len]bool = @splat(false);
+    var required_services: [@typeInfo(cap.Application).@"enum".field_names.len]bool = @splat(false);
+    for (requirements.array.items) |required| {
+        if (required != .string) return error.InvalidCapabilityManifest;
+        const kind = std.meta.stringToEnum(cap.Application, required.string) orelse return error.InvalidCapabilityManifest;
+        if (required_services[@backingInt(kind)]) return error.InvalidCapabilityManifest;
+        required_services[@backingInt(kind)] = true;
+    }
+    const config_path = config orelse defaultConfigPath();
+    const config_bytes: ?[]u8 = if (config_path) |path| try readFileAlloc(alloc, path, 4 * 1024 * 1024) else null;
+    defer if (config_bytes) |owned| alloc.free(owned);
+    if (!json) std.debug.print("Target: {s}\nApplication capabilities (remote resource readiness is not checked)\n", .{target});
+    var missing = false;
+    for (providers.array.items) |*item| {
+        if (item.* != .object) return error.InvalidCapabilityManifest;
+        const kind = item.object.get("capability") orelse return error.InvalidCapabilityManifest;
+        const provider = item.object.get("provider") orelse return error.InvalidCapabilityManifest;
+        if (kind != .string or provider != .string) return error.InvalidCapabilityManifest;
+        const needed = std.meta.stringToEnum(cap.Application, kind.string) orelse return error.InvalidCapabilityManifest;
+        const implementation = std.meta.stringToEnum(cap.Provider, provider.string) orelse return error.InvalidCapabilityManifest;
+        if (implementation.application() != needed or !implementation.supports(selected_target)) return error.InvalidCapabilityManifest;
+        const index = @backingInt(needed);
+        if (seen[index]) return error.InvalidCapabilityManifest;
+        seen[index] = true;
+        const needs_binding = implementation.usesBinding();
+        var status: []const u8 = "declared";
+        if (item.object.get("binding")) |binding_name| if (binding_name == .string) {
+            if (!needs_binding or binding_name.string.len == 0) return error.InvalidCapabilityManifest;
+            const present = if (config_bytes) |content| @import("../cloudflare/config.zig").hasResourceBinding(content, provider.string, binding_name.string) else false;
+            status = if (present) "binding_configured" else "missing_binding";
+            if (!present) missing = true;
+            if (!json) std.debug.print("{s}\n  provider: {s}\n  binding: {s}\n  status: {s}\n", .{ kind.string, provider.string, binding_name.string, status });
+        } else {
+            if (binding_name != .null or needs_binding) return error.InvalidCapabilityManifest;
+            if (!json) std.debug.print("{s}\n  provider: {s}\n  status: {s}\n", .{ kind.string, provider.string, status });
+        } else return error.InvalidCapabilityManifest;
+        try item.object.put(parsed.arena.allocator(), "status", .{ .string = status });
+    }
+    for (requirements.array.items) |required| {
+        if (required != .string) return error.InvalidCapabilityManifest;
+        const kind = std.meta.stringToEnum(cap.Application, required.string) orelse return error.InvalidCapabilityManifest;
+        if (!seen[@backingInt(kind)]) return error.InvalidCapabilityManifest;
+    }
+    if (root.object.get("routes")) |routes| {
+        if (routes != .array) return error.InvalidCapabilityManifest;
+        for (routes.array.items) |route| {
+            if (route != .object) return error.InvalidCapabilityManifest;
+            const method = route.object.get("method") orelse return error.InvalidCapabilityManifest;
+            const path = route.object.get("path") orelse return error.InvalidCapabilityManifest;
+            const needs = route.object.get("capabilities") orelse return error.InvalidCapabilityManifest;
+            if (method != .string or path != .string or needs != .array) return error.InvalidCapabilityManifest;
+            if (!json) std.debug.print("{s} {s}\n  capabilities:", .{ method.string, path.string });
+            for (needs.array.items) |need| {
+                if (need != .string) return error.InvalidCapabilityManifest;
+                const kind = std.meta.stringToEnum(cap.Application, need.string) orelse return error.InvalidCapabilityManifest;
+                if (!required_services[@backingInt(kind)]) return error.InvalidCapabilityManifest;
+                if (!json) std.debug.print(" {s}", .{need.string});
+            }
+            if (!json) std.debug.print("\n", .{});
+        }
+    }
+    if (json) {
+        var aw: std.Io.Writer.Allocating = .init(alloc);
+        defer aw.deinit();
+        try std.json.Stringify.value(root, .{}, &aw.writer);
+        std.debug.print("{s}\n", .{aw.written()});
+    }
+    if (missing) return error.MissingCapabilityBinding;
 }
 
 pub fn cmdRoutes(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
@@ -112,6 +224,13 @@ pub fn cmdRoutes(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
             for (v.array.items, 0..) |item, i| if (item == .string) std.debug.print("{s}{s}", .{ if (i == 0) "" else " -> ", item.string });
             std.debug.print("\n", .{});
         };
+        inline for (.{ "x-akamata-capabilities", "x-akamata-platform-capabilities" }) |key| {
+            if (operation.object.get(key)) |v| if (v == .array) {
+                std.debug.print("  {s} ", .{key});
+                for (v.array.items, 0..) |item, index| if (item == .string) std.debug.print("{s}{s}", .{ if (index == 0) "" else ", ", item.string });
+                std.debug.print("\n", .{});
+            };
+        }
         if (operation.object.get("x-akamata-limits")) |v| if (v == .object) {
             std.debug.print("  budgets       ", .{});
             var limits = v.object.iterator();

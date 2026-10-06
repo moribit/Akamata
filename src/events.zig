@@ -43,6 +43,8 @@ pub const EnvelopeMeta = struct {
     event_id: ?[]const u8 = null,
     correlation_id: ?[]const u8 = null,
     attempt: u16 = 1,
+    idempotency_key: ?[]const u8 = null,
+    max_attempts: u16 = 5,
 };
 
 pub fn Envelope(comptime Payload: type) type {
@@ -53,6 +55,8 @@ pub fn Envelope(comptime Payload: type) type {
         event_id: ?[]const u8 = null,
         correlation_id: ?[]const u8 = null,
         attempt: u16 = 1,
+        idempotency_key: ?[]const u8 = null,
+        max_attempts: u16 = 5,
         payload: Payload,
     };
 }
@@ -65,6 +69,15 @@ pub fn Protocol(comptime EventUnion: type, comptime version: u16) type {
         pub const Events = EventUnion;
         pub const protocol_version = version;
         pub const event_count = reflection.fields(@typeInfo(EventUnion).@"union").len;
+
+        /// Reuse a protocol event's payload/name/version for queue delivery.
+        pub fn descriptor(comptime tag: std.meta.Tag(EventUnion)) type {
+            const name = @tagName(tag);
+            inline for (reflection.fields(@typeInfo(EventUnion).@"union")) |field| {
+                if (comptime std.mem.eql(u8, field.name, name)) return Descriptor(field.type, .{ .name = name, .version = version });
+            }
+            unreachable;
+        }
 
         pub const DecodeError = error{
             MalformedEnvelope,

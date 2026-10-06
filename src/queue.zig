@@ -21,13 +21,21 @@ pub const Producer = struct {
 
     pub fn dispatch(self: Producer, allocator: std.mem.Allocator, comptime Event: type, value: Event, delivery: Delivery) !void {
         const D = events.Descriptor(Event, .{});
+        return self.dispatchDescriptor(allocator, D, value, delivery);
+    }
+
+    /// Queue and realtime can reuse the same named/versioned event descriptor.
+    pub fn dispatchDescriptor(self: Producer, allocator: std.mem.Allocator, comptime D: type, value: D.Payload, delivery: Delivery) !void {
         const bytes = try D.encode(allocator, value);
         defer allocator.free(bytes);
         return self.enqueue_fn(self.ptr, .{
+            .protocol_version = D.version,
             .event_type = D.name,
             .event_id = delivery.event_id,
             .correlation_id = delivery.correlation_id,
             .attempt = delivery.attempt,
+            .idempotency_key = delivery.idempotency_key,
+            .max_attempts = delivery.max_attempts,
         }, bytes);
     }
 };
@@ -42,6 +50,23 @@ pub fn Consumer(comptime Event: type) type {
             defer parsed.deinit();
             return self.handler(parsed.value, delivery);
         }
+
+        /// Validate a named/versioned descriptor before invoking the existing
+        /// typed consumer. Retry/dead-letter policy remains backend-owned.
+        pub fn consumeEnvelope(self: @This(), allocator: std.mem.Allocator, comptime D: type, meta: events.EnvelopeMeta, bytes: []const u8) !void {
+            if (D.Payload != Event) @compileError("queue consumer descriptor payload does not match Event");
+            if (meta.protocol_version != D.version) return error.UnsupportedVersion;
+            if (!std.mem.eql(u8, meta.event_type, D.name)) return error.UnknownEvent;
+            const event_id = meta.event_id orelse return error.InvalidDelivery;
+            if (meta.attempt == 0 or meta.max_attempts == 0) return error.InvalidDelivery;
+            return self.consume(allocator, bytes, .{
+                .event_id = event_id,
+                .correlation_id = meta.correlation_id,
+                .idempotency_key = meta.idempotency_key,
+                .attempt = meta.attempt,
+                .max_attempts = meta.max_attempts,
+            });
+        }
     };
 }
 
@@ -53,6 +78,7 @@ test "typed producer preserves delivery metadata" {
             const self: *@This() = @ptrCast(@alignCast(ptr));
             self.calls += 1;
             if (!std.mem.eql(u8, meta.event_id.?, "evt-1") or bytes.len == 0) return error.BackendFailure;
+            if (!std.mem.eql(u8, meta.idempotency_key.?, "record:1") or meta.max_attempts != 5) return error.BackendFailure;
         }
     };
     var sink: Sink = .{};

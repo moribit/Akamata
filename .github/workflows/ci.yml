@@ -34,6 +34,8 @@ jobs:
             cmd: zig build -Dexample=chat -Dbackend=workers -Doptimize=ReleaseSmall
           - name: guestbook-workers
             cmd: zig build -Dexample=guestbook -Dbackend=workers -Doptimize=ReleaseSmall
+          - name: portable-application-workers
+            cmd: zig build portable-application-test -Dbackend=workers -Doptimize=ReleaseSafe
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2.2.1
@@ -88,6 +90,7 @@ jobs:
       - run: ./third_party/sqlite/fetch.sh
       - run: zig build cli
       - run: zig build cli-operations-test
+      - run: zig build cli-capabilities-test compile-fail-test
       - run: zig build scaffold-local-test
       - run: zig build project-update-test
       - run: zig build workers-capability-sync-test

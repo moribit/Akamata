@@ -5,11 +5,10 @@
 const std = @import("std");
 const am = @import("akamata");
 const App = @import("app.zig").App;
-const h = @import("handlers.zig");
 const models = @import("models.zig");
 
 pub const default_native_url = "file:guestbook.db";
-pub const default_workers_url = "d1:DB";
+pub const default_workers_url = "d1:" ++ @import("contract.zig").For(.workers).resolve(.database).binding.?;
 
 /// Process-wide one-shot guard used by the deferred-migrate middleware on
 /// Workers. Native builds run migrate from `buildState` so this stays at
@@ -31,12 +30,7 @@ pub fn registerRoutes(app: *am.App(App)) !void {
     // On Workers, first request triggers schema migration through JSPI.
     _ = try app.useAll(am.Middleware(App){ .name = "ensureSchema", .call = ensureSchema });
 
-    _ = try app.get("/", h.index);
-    _ = try app.get("/health", h.health);
-    _ = try app.get("/entries", h.listEntries);
-    _ = try app.post("/entries", h.createEntry);
-    _ = try app.get("/entries/:id", h.showEntry);
-    _ = try app.delete("/entries/:id", h.deleteEntry);
+    inline for (@import("contract.zig").endpoints) |Endpoint| try Endpoint.register(app);
 }
 
 pub fn buildState(alloc: std.mem.Allocator) !App {
@@ -46,6 +40,7 @@ pub fn buildState(alloc: std.mem.Allocator) !App {
         const def = if (am.backend == .native) default_native_url else default_workers_url;
         break :blk try alloc.dupe(u8, def);
     };
+    defer alloc.free(url);
 
     const database = try am.db.open(alloc, url);
 

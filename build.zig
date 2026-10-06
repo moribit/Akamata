@@ -134,6 +134,27 @@ pub fn build(b: *std.Build) void {
     run.addPassthruArgs();
     b.step("run", "run the selected example (native)").dependOn(&run.step);
 
+    // The identical in-process application suite also runs as Workers WASM.
+    // Test providers isolate application semantics from live Cloudflare APIs.
+    if (backend == .workers) {
+        const fixture_module = b.createModule(.{
+            .root_source_file = b.path("tests/portable_application_worker.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{.{ .name = "akamata", .module = am_mod }},
+        });
+        const fixture = b.addExecutable(.{ .name = "portable-application-worker", .root_module = fixture_module });
+        fixture.entry = .disabled;
+        fixture.rdynamic = true;
+        const contract_runner = b.addSystemCommand(&.{ "node", "tests/portable_application_worker.mjs" });
+        contract_runner.addArtifactArg(fixture);
+        const binding_bridge = b.addSystemCommand(&.{ "node", "tests/d1_binding_bridge.mjs" });
+        contract_runner.step.dependOn(&binding_bridge.step);
+        const provider_bridge = b.addSystemCommand(&.{ "node", "tests/workers_provider_bridge_test.mjs" });
+        contract_runner.step.dependOn(&provider_bridge.step);
+        b.step("portable-application-test", "run shared application semantics inside Workers WASM with test providers").dependOn(&contract_runner.step);
+    }
+
     // === akamata-cli ===
     const cli_module = b.createModule(.{
         .root_source_file = b.path("tools/akamata/src/main.zig"),
@@ -199,9 +220,13 @@ pub fn build(b: *std.Build) void {
     const cli_operations = b.addSystemCommand(&.{ "python3", "tests/cli_operations_smoke.py" });
     cli_operations.addArtifactArg(cli_exe);
     b.step("cli-operations-test", "verify external CLI contracts without deployment").dependOn(&cli_operations.step);
+    const cli_capabilities = b.addSystemCommand(&.{ "python3", "tests/cli_capabilities_smoke.py" });
+    cli_capabilities.addArtifactArg(cli_exe);
+    b.step("cli-capabilities-test", "validate portable capability inspection without external services").dependOn(&cli_capabilities.step);
 
     // === Tests ===
     const test_step = b.step("test", "run unit tests");
+    if (backend == .native) b.step("portable-application-test", "run shared application semantics on Native").dependOn(test_step);
     const compile_fail_command = b.addSystemCommand(&.{ "bash", "tests/compile_fail.sh" });
     const compile_fail_step = b.step("compile-fail-test", "verify compile-time diagnostics");
     compile_fail_step.dependOn(&compile_fail_command.step);
@@ -236,6 +261,7 @@ pub fn build(b: *std.Build) void {
         "tests/security_middleware_test.zig",
         "tests/docs_examples_test.zig",
         "tests/comptime_framework_test.zig",
+        "tests/portable_application_test.zig",
         "tests/mimoc_parts_improvements_test.zig",
         "src/storage.zig",
         "src/events.zig",

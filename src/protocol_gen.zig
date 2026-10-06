@@ -6,6 +6,12 @@ const events = @import("events.zig");
 pub const Target = enum { typescript, c };
 pub const Options = struct { target: Target, name: []const u8 = "AkamataEvent", version: u16 = 1 };
 
+/// Prefer the existing Protocol as the version/type source of truth. The
+/// original union-based generate API remains available for compatibility.
+pub fn generateProtocol(comptime Protocol: type, allocator: std.mem.Allocator, options: struct { target: Target, name: []const u8 = "AkamataEvent" }) ![]u8 {
+    return generate(Protocol.Events, allocator, .{ .target = options.target, .name = options.name, .version = Protocol.protocol_version });
+}
+
 pub fn generate(comptime EventUnion: type, allocator: std.mem.Allocator, options: Options) ![]u8 {
     events.validateProtocol(EventUnion);
     var aw: std.Io.Writer.Allocating = .init(allocator);
