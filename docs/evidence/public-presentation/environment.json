@@ -1,0 +1,26 @@
+{
+  "source_commit": "a7605ba8a66e0eef9aefe83e563761e8745b4e6c",
+  "zig": "0.17.0",
+  "cpu": "Apple M2",
+  "memory_bytes": 17179869184,
+  "optimization": "ReleaseFast",
+  "runtime": "Threaded",
+  "network": "IPv4 loopback, keep-alive",
+  "build_command": "zig build -Dexample=bench -Doptimize=ReleaseFast",
+  "measurement_command": "python3 tools/bench/runtime_compare.py zig-out/bin/bench docs/evidence/public-presentation/threaded-main.json --rounds 3 --duration 3s",
+  "aggregation": "arithmetic mean of all three rounds, HTTP 200 count divided by measured duration",
+  "summary": {
+    "hello": {
+      "http_200_rps": 164610.47880128547,
+      "all_rounds_error_free": true
+    },
+    "echo": {
+      "http_200_rps": 163789.7958161503,
+      "all_rounds_error_free": true
+    },
+    "db": {
+      "http_200_rps": 86793.35585051877,
+      "all_rounds_error_free": true
+    }
+  }
+}
