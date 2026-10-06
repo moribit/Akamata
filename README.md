@@ -4,32 +4,30 @@
 
 [日本語](README.ja.md) | English
 
-A minimal web framework for Zig 0.17. Akamata builds its HTTP and WebSocket
-layers around Zig and its standard library, provides SQLite, D1, and Turso
-database backends, and targets native servers, Cloudflare Workers, and
-Cloudflare Containers.
+A portable Zig backend framework for Native and Cloudflare Workers. Start with ordinary functions, then add typed JSON APIs, authentication, database, storage, queue and realtime through existing application contracts and explicit provider owners. Native production uses Threaded; Reactor remains parked. Workers host simulation is tested separately from opt-in live Cloudflare validation.
 
 Latest release: **v0.1.5** · Requires **Zig 0.17.x** · [Release notes](CHANGELOG.md)
 
 ```zig
 const std = @import("std");
-const am = @import("akamata");
+const ak = @import("akamata");
 
-const State = struct {};
-
-fn hello(c: *am.Context(State)) !void {
-    try c.text("Hello, Akamata!");
+fn hello() []const u8 {
+    return "Hello, Akamata!";
 }
+
+pub const Application = ak.App(.{ .routes = .{ak.get("/", hello)} });
 
 pub fn main() !void {
     var gpa: std.heap.DebugAllocator(.{}) = .init;
     defer _ = gpa.deinit();
-    var app = am.App(State).init(gpa.allocator(), .{});
+    var app = try Application.init(gpa.allocator());
     defer app.deinit();
-    _ = try app.get("/", hello);
     try app.serve(.{ .port = 8080 });
 }
 ```
+
+The ordinary-function API below is available on latest main; v0.1.5 retains the explicit App(State) API. The [source](tests/docs/minimal.zig) is compiled and tested with `zig build documentation-test -Doptimize=ReleaseSafe`, including a Workers WASM application contract. Caller-owned initialization is explicit; no Context is needed for Hello World.
 
 ## Why Akamata?
 

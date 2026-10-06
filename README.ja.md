@@ -4,31 +4,30 @@
 
 [English](README.md) | 日本語
 
-Zig 0.17向けのミニマルWebフレームワークです。Zigと標準ライブラリを中心に
-HTTP/WebSocket層を構成し、SQLite、D1、TursoのDBバックエンドと、native server、
-Cloudflare Workers、Cloudflare Containersへのデプロイをサポートします。
+Native / Cloudflare Workers向けportable Zig backend frameworkです。普通の関数から始め、typed JSON API、認証、DB、Storage、Queue、Realtimeへ既存application contractと明示provider ownerを利用して成長できます。Native productionはThreaded、ReactorはParkを維持します。Workers host simulationとopt-in live Cloudflare検証の証拠は区別します。
 
 最新release: **v0.1.5** · 必須Zig: **0.17.x** · [Release notes](CHANGELOG.md)
 
 ```zig
 const std = @import("std");
-const am = @import("akamata");
+const ak = @import("akamata");
 
-const State = struct {};
-
-fn hello(c: *am.Context(State)) !void {
-    try c.text("Hello, Akamata!");
+fn hello() []const u8 {
+    return "Hello, Akamata!";
 }
+
+pub const Application = ak.App(.{ .routes = .{ak.get("/", hello)} });
 
 pub fn main() !void {
     var gpa: std.heap.DebugAllocator(.{}) = .init;
     defer _ = gpa.deinit();
-    var app = am.App(State).init(gpa.allocator(), .{});
+    var app = try Application.init(gpa.allocator());
     defer app.deinit();
-    _ = try app.get("/", hello);
     try app.serve(.{ .port = 8080 });
 }
 ```
+
+以下の普通の関数APIは最新main向けです。v0.1.5の既存App(State)も維持します。[同じsource](tests/docs/minimal.zig)を `zig build documentation-test -Doptimize=ReleaseSafe` でcompile/testし、Workers WASMでもapplication contractを検証します。初期化の所有権は明示し、Hello WorldにContextは不要です。
 
 ## Why Akamata?
 

@@ -19,6 +19,10 @@
 
 - [Zig 0.17への移行](zig-0.17-migration.md) — v0.1.5の変更点、移行手順、検証結果
 
+- [Typed handlers](guides/typed-handlers.md) — ordinary functions, explicit parameter binding and optional Context (main)
+- [Request validation](guides/validation.md) — DTO rules and compatibility
+- [Application errors](guides/errors.md) — finite error mapping, OpenAPI and client guards
+
 ## Guide
 
 - [アプリケーション向けbuilding blocks](application-building-blocks.md) — query、validation、session／CSRF、typed config、storage、testing、idempotency、D1 atomic pattern

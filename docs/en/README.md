@@ -19,6 +19,10 @@ is development-oriented; pin a tagged release for reproducible builds.
 
 - [Zig 0.17 migration](zig-0.17-migration.md) — v0.1.5 changes, upgrade steps, and validation
 
+- [Typed handlers](guides/typed-handlers.md) — ordinary functions, explicit parameter binding and optional Context (main)
+- [Request validation](guides/validation.md) — DTO rules and compatibility
+- [Application errors](guides/errors.md) — finite error mapping, OpenAPI and client guards
+
 ## Guides
 
 - [Application building blocks](application-building-blocks.md) — queries, validation, sessions/CSRF, typed config, storage, testing, idempotency, and D1 atomic patterns
