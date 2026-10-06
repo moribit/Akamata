@@ -10,7 +10,7 @@ zig build -Dbackend=workers
 
 `PORT` configures the Native port. Workers uses `src/worker.zig` and generated managed glue. Resource creation is explicit; deploy configuration does not certify remote readiness.
 
-The dependency is pinned to the published release. To try the latest typed API with a local checkout, use `zig build --fork=/path/to/Akamata run`. The bootstrap preserves the same Hello response on the pinned release. When growing the application, use the typed-handler guides on latest main or the existing explicit App/Context API on the release.
+The dependency is pinned to v0.2.0, including the ordinary-function typed API. For framework development, use `zig build --fork=/path/to/Akamata run`. Existing explicit App/Context handlers remain supported.
 
 For the DB/validation/migration tutorial instead, create a separate project with `akamata init <name> --template=notes`. Existing projects keep their source files during update/sync.
 Test the same Hello application without sockets with `akamata test` or `zig build test`.

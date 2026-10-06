@@ -48,10 +48,9 @@ from this declaration view. For runtime middleware metadata use the initialized
 Application directly, whose `routeViews` delegates to the core.
 
 The minimal scaffold implements `akamata-openapi` and `akamata-capabilities`
-before App initialization. These tooling modes require latest main and fail
-explicitly on the pinned v0.1.5 bootstrap. With a local override, use
-`zig build --fork=/path/to/Akamata run -- akamata-openapi` or
-`zig build --fork=/path/to/Akamata run -- akamata-capabilities workers`.
+before App initialization. These tooling modes are included in v0.2.0. Use
+`zig build run -- akamata-openapi` or
+`zig build run -- akamata-capabilities workers`.
 The latter emits a manifest accepted by `akamata inspect capabilities --manifest=PATH`.
 For a stateful application replace the empty Hello Contract with its existing
 explicit Contract/provider declarations; do not hand-edit generated manifests.

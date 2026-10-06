@@ -67,8 +67,8 @@ semantics. The reference apps and provider matrix explain their limits.
 
 - README strengths now lead with ordinary functions, typed contracts, portable
   services, tooling/testing and measured Threaded performance.
-- Getting Started uses init/dev and separates tagged bootstrap from main
-  dependency override. Install was exercised into an isolated temporary prefix.
+- Getting Started uses init/dev and the published v0.2.0 dependency; local
+  checkout overrides are reserved for framework development. Install was exercised into an isolated temporary prefix.
 - Tutorial/handbook are explicitly advanced App/Context/model guides and select
   `--template=notes`; they no longer describe notes as the minimal default.
 - Deploy no longer claims automatic D1 creation/config rewrite. Production table

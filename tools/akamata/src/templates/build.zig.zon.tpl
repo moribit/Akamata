@@ -7,8 +7,8 @@
         // Pinned to a release-compatible Akamata revision. During Akamata
         // development, override it with: zig build --fork=/path/to/Akamata
         .akamata = .{
-            .url = "https://github.com/moribit/Akamata/archive/refs/tags/v0.1.5.tar.gz",
-            .hash = "akamata-0.1.5-uJIoI1NfLQF6-Qs1SRcEg6mlm0XM5jC4rQ8jxqGuprie",
+            .url = "https://github.com/moribit/Akamata/archive/refs/tags/v0.2.0.tar.gz",
+            .hash = "akamata-0.2.0-uJIoI5q4OgFWiDgjeemHhRKrz22T9j6WdfVIWxIPfpUt",
         },
     },
     .paths = .{

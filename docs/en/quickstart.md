@@ -24,18 +24,13 @@ curl http://127.0.0.1:8080/
 
 The default project returns `Hello, myapp!` without opening a database or initializing providers. It contains build files, `src/main.zig`, README and `.gitignore`. `PORT` changes the Native port.
 
-Dependencies remain pinned to v0.1.5. The new typed APIs in this guide require latest main; use a local checkout override:
+Current CLI projects pin v0.2.0, which includes these typed APIs. If your CLI generated an older dependency, update it first:
 
 ```sh
-zig build --fork=/absolute/path/to/Akamata run
+akamata update --to=v0.2.0
 ```
 
-Use the override for typed examples until their tagged release is published.
-`akamata dev` starts the generated Hello project with its pinned dependency;
-the override starts the latest-main application directly. Do not mix the two
-API versions when copying a typed example.
-
-The generated bootstrap selects the ordinary-function API when available and preserves the same Hello response on v0.1.5. Update/sync do not rewrite existing application source.
+For framework development only, `zig build --fork=/absolute/path/to/Akamata run` selects a local checkout. Update/sync do not rewrite existing application source.
 
 ## 3. Routing
 

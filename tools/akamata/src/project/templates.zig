@@ -38,7 +38,7 @@ test "scaffold dependency is remote, pinned, and locally overridable" {
 }
 
 test "scaffold dependency tracks the current stable release" {
-    try std.testing.expect(std.mem.indexOf(u8, tmpl_build_zon, "archive/refs/tags/v0.1.5.tar.gz") != null);
+    try std.testing.expect(std.mem.indexOf(u8, tmpl_build_zon, "archive/refs/tags/v0.2.0.tar.gz") != null);
     try std.testing.expect(std.mem.indexOf(u8, tmpl_build_zon, STABLE_HASH) != null);
 }
 

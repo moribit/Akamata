@@ -1,8 +1,8 @@
 # Akamata Documentation
 
-Documentation for Zig 0.17.x. Start with Getting Started. Ordinary-function APIs are available on main; v0.1.5 retains the explicit App/Context API. Each guide identifies the development API where relevant.
+Documentation for Zig 0.17.x. Start with Getting Started. Ordinary-function APIs are available in v0.2.0; the explicit App/Context API remains supported.
 
-**Release status:** v0.1.5 is the current public 0.x release. The `main` branch
+**Release status:** v0.2.0 is the current public 0.x release. The `main` branch
 is development-oriented; pin a tagged release for reproducible builds.
 
 [日本語](../ja/README.md) · [Project README](../../README.md)
@@ -37,7 +37,7 @@ is development-oriented; pin a tagged release for reproducible builds.
 - [Security](security.md)
 - [Release process](releasing.md)
 
-- [Portable Application Contract](portable-application-contract.md) — requirements, explicit providers, bindings, borrowed services and application tests (main development API)
+- [Portable Application Contract](portable-application-contract.md) — requirements, explicit providers, bindings, borrowed services and application tests (v0.2.0 application API)
 
 ## API reference
 

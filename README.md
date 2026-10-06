@@ -6,7 +6,7 @@
 
 A portable Zig backend framework for Native and Cloudflare Workers. Start with ordinary functions, then add typed JSON APIs, authentication, database, storage, queue and realtime through existing application contracts and explicit provider owners. Native production uses Threaded; Reactor remains parked. Workers host simulation is tested separately from opt-in live Cloudflare validation.
 
-Latest release: **v0.1.5** · Requires **Zig 0.17.x** · [Release notes](CHANGELOG.md)
+Latest release: **v0.2.0** · Requires **Zig 0.17.x** · [Release notes](CHANGELOG.md)
 
 ```zig
 const std = @import("std");
@@ -27,7 +27,7 @@ pub fn main() !void {
 }
 ```
 
-The ordinary-function API below is available on latest main; v0.1.5 retains the explicit App(State) API. The [source](tests/docs/minimal.zig) is compiled and tested with `zig build documentation-test -Doptimize=ReleaseSafe`, including a Workers WASM application contract. Caller-owned initialization is explicit; no Context is needed for Hello World.
+The ordinary-function API below is available in v0.2.0; the explicit App(State) API remains supported. The [source](tests/docs/minimal.zig) is compiled and tested with `zig build documentation-test -Doptimize=ReleaseSafe`, including a Workers WASM application contract. Caller-owned initialization is explicit; no Context is needed for Hello World.
 
 ## Why Akamata?
 
@@ -67,8 +67,8 @@ curl -sS http://127.0.0.1:8080/
 The default project serves one Hello response without opening a database or
 configuring providers. `--target=both` adds Workers and Container deployment files.
 Choose `--template=notes` for the existing SQLite CRUD/validation/migration tutorial.
-The dependency remains pinned to v0.1.5; use a local checkout override for the new
-typed API. See [Getting Started](docs/en/quickstart.md) for both paths.
+Current CLI scaffolds pin v0.2.0. If an older CLI generated a v0.1.5 project, run
+`akamata update --to=v0.2.0` before using typed examples. See [Getting Started](docs/en/quickstart.md).
 
 Developing the CLI itself? Build without installing:
 

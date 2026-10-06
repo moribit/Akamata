@@ -1,8 +1,8 @@
 # Akamataドキュメント
 
-Zig 0.17.x向けの入口です。Getting Startedから始めてください。ordinary-function APIはmainで利用可能です。v0.1.5では従来の明示App/Context APIを使用します。
+Zig 0.17.x向けの入口です。Getting Startedから始めてください。ordinary-function APIはv0.2.0で利用可能です。従来の明示App/Context APIも維持します。
 
-**リリース状況:** v0.1.5は現在の公開0.x releaseです。`main`は開発向け
+**リリース状況:** v0.2.0は現在の公開0.x releaseです。`main`は開発向け
 のため、再現可能な build が必要な場合はタグ付き release を固定してください。
 
 [English](../en/README.md) · [プロジェクトREADME](../../README.ja.md)
@@ -37,7 +37,7 @@ Zig 0.17.x向けの入口です。Getting Startedから始めてください。o
 - [Security](security.md)
 - [Release process](releasing.md)
 
-- [Portable Application Contract](portable-application-contract.md) — requirements, explicit providers, bindings, borrowed services and application tests (main development API)
+- [Portable Application Contract](portable-application-contract.md) — requirements, explicit providers, bindings, borrowed services and application tests (v0.2.0 application API)
 
 ## API reference
 

@@ -6,7 +6,7 @@
 
 Native / Cloudflare Workers向けportable Zig backend frameworkです。普通の関数から始め、typed JSON API、認証、DB、Storage、Queue、Realtimeへ既存application contractと明示provider ownerを利用して成長できます。Native productionはThreaded、ReactorはParkを維持します。Workers host simulationとopt-in live Cloudflare検証の証拠は区別します。
 
-最新release: **v0.1.5** · 必須Zig: **0.17.x** · [Release notes](CHANGELOG.md)
+最新release: **v0.2.0** · 必須Zig: **0.17.x** · [Release notes](CHANGELOG.md)
 
 ```zig
 const std = @import("std");
@@ -27,7 +27,7 @@ pub fn main() !void {
 }
 ```
 
-以下の普通の関数APIは最新main向けです。v0.1.5の既存App(State)も維持します。[同じsource](tests/docs/minimal.zig)を `zig build documentation-test -Doptimize=ReleaseSafe` でcompile/testし、Workers WASMでもapplication contractを検証します。初期化の所有権は明示し、Hello WorldにContextは不要です。
+以下の普通の関数APIはv0.2.0で利用できます。既存App(State)も維持します。[同じsource](tests/docs/minimal.zig)を `zig build documentation-test -Doptimize=ReleaseSafe` でcompile/testし、Workers WASMでもapplication contractを検証します。初期化の所有権は明示し、Hello WorldにContextは不要です。
 
 ## Why Akamata?
 
@@ -67,7 +67,7 @@ curl -sS http://127.0.0.1:8080/
 default projectはDBやproviderを初期化せず、Hello responseを返します。
 `--target=both`はWorkersとContainerのdeploy fileを追加します。
 従来のSQLite CRUD・validation・migration tutorialは`--template=notes`で生成できます。
-依存はv0.1.5に固定されます。新しいtyped APIにはlocal checkout overrideを使用します。
+現在のCLIはv0.2.0へ固定します。旧CLIがv0.1.5 projectを生成した場合は、typed APIを使う前に`akamata update --to=v0.2.0`を実行してください。
 両方の手順は[Getting Started](docs/ja/quickstart.md)を参照してください。
 
 CLI自体を開発する場合は、installせず直接buildできます。

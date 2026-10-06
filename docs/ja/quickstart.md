@@ -24,13 +24,13 @@ curl http://127.0.0.1:8080/
 
 default projectはDB/providerを初期化せず`Hello, myapp!`を返します。build file、`src/main.zig`、README、`.gitignore`のみです。Native portは`PORT`で変更します。
 
-依存はv0.1.5へ固定されます。このguideの新typed APIには最新mainが必要です。local checkoutでoverrideします。
+現在のCLIはtyped APIを含むv0.2.0に固定します。旧CLIが古いdependencyを生成した場合は、先に更新します。
 
 ```sh
-zig build --fork=/absolute/path/to/Akamata run
+akamata update --to=v0.2.0
 ```
 
-生成bootstrapは利用可能ならordinary-function APIを選び、v0.1.5でも同じHello responseを返します。update/syncは既存application sourceを書き換えません。
+framework開発時のみ、`zig build --fork=/absolute/path/to/Akamata run`でlocal checkoutを選択できます。update/syncは既存application sourceを書き換えません。
 
 ## 3. Routing
 

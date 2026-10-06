@@ -101,7 +101,7 @@ build every deployment target you use. Also test duplicate-route startup,
 missing required input, `HEAD`/`405`, proxy IP behavior, nullable model fields,
 and a deliberately failing migration.
 
-## Ordinary-function DX on main (after 6744595)
+## Ordinary-function DX in v0.2.0
 
 Migration is optional. `App(State)`, explicit Context handlers, runtime routes,
 manual Response and manual provider owners remain supported. The additive
@@ -111,11 +111,9 @@ services. See [Typed handlers](guides/typed-handlers.md) for parameter/error rul
 and [compiled contracts](../../tests/dx_test.zig) for old/new interoperability.
 
 The default scaffold is now Hello; use `--template=notes` for the old DB tutorial.
-Existing project source is never rewritten by update/sync. The dependency pin
-stays at v0.1.5, where the scaffold uses its release bootstrap; latest-main typed
-APIs require an explicit checkout/revision selection. Do not assume a stable
-release upgrade installs an unreleased API. Tooling modes on the pinned bootstrap
-fail with ToolingRequiresLatestMain rather than starting a server.
+Existing project source is never rewritten by update/sync. Current CLI scaffolds
+pin v0.2.0. For an older project, run `akamata update --to=v0.2.0` before using
+typed APIs. A local checkout override is only needed for framework development.
 
 Typed principal retrieval now verifies the type recorded by `setPrincipal`; direct
 writes to erased `principal_data` must migrate to `setPrincipal`. Testing `.as`
