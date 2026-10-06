@@ -1,5 +1,7 @@
 # Long-run benchmark
 
+> 歴史的な測定記録です。toolchain・runtime・結果は当時のrevisionのものです。現在ReactorはPark/fail-closedです。[現行Native測定](public-performance.md)を参照してください。
+
 `benchmarks.md`の15秒smoke testより長い時間で、RSSの推移と高connection数などの条件を確認したstress testです。2026年5月時点のsnapshotであり、性能保証ではありません。元の測定には正確なGit commitが記録されていません。
 
 ## 実行環境

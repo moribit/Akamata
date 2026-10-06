@@ -17,7 +17,7 @@ Zig 0.17.xを使用し、`$HOME/.local/bin`へPATHを通します。Node.js/Wran
 ```sh
 akamata init myapp
 cd myapp
-zig build run
+akamata dev
 # another terminal
 curl http://127.0.0.1:8080/
 ```

@@ -1,5 +1,7 @@
 # Performance regression report — 2026-08-17
 
+> Historical measurement: toolchain, runtime availability and results describe the recorded revision. Reactor remains parked/fail-closed today. See [current Native performance](public-performance.md).
+
 This report compares the current developer-experience revision (`74fbe89`) with its pre-change baseline (`3a18d6c`) on the same machine, compiler, benchmark application, and load generator.
 
 ## Conclusion

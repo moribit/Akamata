@@ -10,8 +10,9 @@ Zig 0.17.x向けの入口です。Getting Startedから始めてください。o
 ## はじめに
 
 - [クイックスタート](quickstart.md) — CLIをインストールし、現在のscaffoldを生成して起動します
-- [Tutorial](tutorial.md) — アプリケーションを段階的に構築します
-- [Handbook](handbook.md) — model、repository、migration、deployを短時間で確認します
+- [紹介スライド（PDF）](slides.pdf) — 普通のZig関数からportable backendへ
+- [Tutorial](tutorial.md) — typed API導入後の明示App/ContextによるTodo応用編
+- [Handbook](handbook.md) — model、repository、migration、deployの応用編
 - [Tasks example](example-tasks.md) — example applicationを題材に学びます
 - [アップグレードガイド](upgrading.md) — v0.0.1以降の挙動変更
 - [開発体験](developer-experience.md) — contract、型付きinput／DI、project検査、generator、API diff、migration workflow
@@ -74,11 +75,14 @@ Zig 0.17.x向けの入口です。Getting Startedから始めてください。o
 
 ## 本番運用とperformance
 
+- [現在のNative Threaded測定](public-performance.md) — `a7605ba`の実測、条件、raw evidence
+- [Deployment validation](deployment-validation.md) — offline検証とremote readinessの区別
+
 - [2026-08-17 performance regression report](benchmarks-2026-08-17.md) — 現行revisionと変更前baselineの同一machine A/B測定
 - [Benchmarks](benchmarks.md)
 - [Long-run benchmarks](benchmarks-long-run.md)
 - [Performance follow-ups](perf-followups.md)
-- [Reactor design](perf-reactor-design.md)
+- [Reactor研究履歴](perf-reactor-design.md) — Park/fail-closed、production pathの対象外
 - [Native runtime／Transport Contract](runtime-transport.md) — 共通protocol、Zig 0.17 Io調査、分離したGroup PoCと性能比較
 
 benchmark値は、記載された環境、command、Akamata revisionでの測定結果です。別のmachineやworkloadで同じ性能を保証するものではありません。

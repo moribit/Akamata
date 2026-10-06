@@ -346,7 +346,7 @@ app.state().events = events;
 
 ## Synchronization Primitive (`am.sync`)
 
-Since `std.Thread.Mutex` / `Condition` have been dropped from Zig 0.16 std, Akamata provides a thinly wrapped replacement for libc pthreads:
+On Zig 0.17, Akamata uses small pthread wrappers for native synchronization outside an Io task cancellation scope. See the current [runtime/Io audit](runtime-transport.md) for why these remain:
 
 ```zig
 const m = am.sync.Mutex.init();  // = am.Mutex.init()

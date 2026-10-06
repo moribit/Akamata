@@ -327,7 +327,7 @@ app.state().events = events;
 
 ## 同期プリミティブ (`am.sync`)
 
-Zig 0.16 std からは `std.Thread.Mutex` / `Condition` が外れたので、Akamata は libc pthread を薄ラップした置き換えを提供しています:
+Zig 0.17では、Io taskのcancel scope外で使うNative同期に小さなpthread wrapperを利用します。維持する理由は[現在のruntime/Io audit（英語）](../en/runtime-transport.md)を参照してください:
 
 ```zig
 const m = am.sync.Mutex.init();  // = am.Mutex.init()

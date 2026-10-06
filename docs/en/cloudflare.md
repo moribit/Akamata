@@ -1,22 +1,24 @@
 # Cloudflare deployment
 
-Akamata works with both **Cloudflare Containers** and **Cloudflare Workers (WASM)**. Use the same handler code between two build targets.
+Akamata shares application contracts between Native and **Cloudflare Workers (WASM)**.
+Start with [Getting Started](quickstart.md); provider ownership and bindings stay explicit.
+Adapter contracts and WASM host simulation are offline evidence, not live certification.
 
 ## Cloudflare Containers
 
-Run native Linux binaries as-is in containers. Requires Workers Paid plan or higher.
+Containers run the Native Linux process and providers. Akamata's `--containers`
+path builds a binary and local Docker image; it does not provision or publish a
+Cloudflare Container deployment. Configure that separate platform control plane
+using the [current Cloudflare Containers guide](https://developers.cloudflare.com/containers/).
 
 ```bash
-zig build -Dbackend=native -Dtarget=x86_64-linux-musl -Doptimize=ReleaseFast
+zig build -Dexample=chat -Dbackend=native -Dtarget=x86_64-linux-musl -Doptimize=ReleaseFast
 docker build -f deploy/Dockerfile -t akamata-chat .
-wrangler containers build
-wrangler deploy
 ```
 
-Attention:
-- `linux/amd64` required (arm64 not possible)
-- Discs are ephemeral. If you want to make SQLite files persistent, use Durable Objects SQLite or D1
-- Scale zero possible with `sleepAfter`
+Filesystem and SQLite persistence need an explicitly durable volume/storage
+strategy. Akamata does not translate a local SQLite file into D1 or DO storage.
+Platform instance limits and APIs change; consult the linked platform documentation.
 
 ## Cloudflare Workers (WASM)
 
@@ -24,21 +26,28 @@ The JS thin wrapper loads `akamata_worker.wasm`, a stable alias produced for
 the Workers example selected by `-Dexample=...`, and dispatches the request.
 
 ```bash
-zig build -Dbackend=workers -Doptimize=ReleaseSmall
-wrangler d1 execute akamata --file=deploy/worker/d1_schema.sql --local   # First run
+# In a generated --target=workers/both project (Hello requires no D1):
+zig build -Dbackend=workers -Doptimize=ReleaseSafe
+cd deploy
 wrangler dev --local
 ```
 
 Deploy:
 
 ```bash
-wrangler d1 execute akamata --file=deploy/worker/d1_schema.sql --remote
-wrangler deploy
+# Return to the generated project root after local development:
+cd ..
+akamata deploy --workers
 ```
 
 ### D1
 
-Set `binding = "DB"` in `[[d1_databases]]` of `deploy/wrangler.toml`. Replace `database_id` with your production D1 ID (issued as `wrangler d1 create akamata`).
+For applications requiring D1, explicitly create/select a dedicated resource,
+configure its binding and real UUID, and apply reviewed migrations. Deploy refuses
+placeholder resources. [Deployment validation](deployment-validation.md) covers
+JSONC/TOML, environments and fail-closed named-environment migration. Validation
+never creates resources. Use [guestbook](../../examples/guestbook/README.md) for
+the model-backed example; do not apply its schema to the minimal Hello project.
 
 ### Durable Object: WebSocket
 
@@ -76,8 +85,9 @@ current generic HTTP-to-WASM bridge calls `request.arrayBuffer()` first and R2
 uploads are capped at the application limit, so they are bounded but not
 zero-copy. Downloads support byte ranges; the current response ABI reads in
 64 KiB chunks but accumulates the final response in WASM memory.
-`get` propagates ETag, Content-Type and custom metadata, and `list` returns a
-bounded page. The legacy `head` return shape exposes size only on R2; use
+`get` propagates ETag, Content-Type and custom metadata. Prefer caller-owned
+`listPage` with explicit cleanup and opaque pagination cursor over legacy `list`.
+The legacy `head` bridge exposes size only on R2; use
 `serveDownload`/`get` when conditional metadata is required.
 
 Run the deployed D1/R2 opt-in smoke test with:

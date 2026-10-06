@@ -1,7 +1,8 @@
 # Akamata 詳細チュートリアル — Todo リスト API をゼロから作る
 
-このチュートリアルは **Zig も Akamata も初めて**の人を対象に、空のディレクトリから
-始めて、最終的に **本番デプロイ可能な Todo リスト API + Web UI** を完成させます。
+まず[Getting Started](quickstart.md)と[Typed handlers](guides/typed-handlers.md)から始めてください。
+この詳細tutorialは既存の明示App/Context・model/repository APIでTodo APIとUIを作る応用編です。
+単純なAPIにはContext・model・DBは不要です。以下ではnotes templateを明示選択します。
 
 読了時間: 約 **60〜90 分**。途中で休憩可能です。各章の冒頭に「この章のゴール」を
 書いてあるので、知っている部分はスキップしてください。
@@ -132,7 +133,7 @@ Commands:
 
 ```bash
 cd ~/projects
-akamata init mytodo --target=both
+akamata init mytodo --target=both --template=notes
 ```
 
 `--target=both` は「ネイティブバイナリと Cloudflare Workers の両方で動く構成」を意味します。
@@ -1035,7 +1036,7 @@ Miniflare のシミュレートされた D1** に書き込まれます。
 # プロジェクトルートに戻る
 cd ..
 
-# 一発デプロイ (D1 作成 + マイグレーション + デプロイ)
+# 別途作成した専用D1 resourceのUUIDを設定してからdeploy
 akamata deploy --workers \
   --config=deploy/wrangler.toml \
   --migrate=migrations/20260810000000_initial.sql
@@ -1044,7 +1045,7 @@ akamata deploy --workers \
 このコマンドの裏で起こること:
 
 1. `wrangler.toml` の `[[d1_databases]]` ブロックを読む
-2. `database_id` がプレースホルダなら `wrangler d1 create` を実行、UUID を書き戻す
+2. missing/placeholder resourceは拒否する。D1は別途明示作成し、実UUIDを設定する。deployはresource作成・config書換えを行わない
 3. 確認済みのSQL fileを`wrangler d1 execute --remote`でD1へ適用する
 5. `zig build -Dbackend=workers -Doptimize=ReleaseSmall`
 6. `wrangler deploy`
@@ -1052,9 +1053,6 @@ akamata deploy --workers \
 期待出力 (一部):
 
 ```text
-==> akamata: provisioning D1 "mytodo" (database_id is placeholder)
-==> akamata: resolved D1 "mytodo" (id=abcdef12-3456-7890-...)
-==> akamata: wrote new database_id back to deploy/wrangler.toml
 ==> akamata: applying ... to remote D1 "mytodo"
 ==> akamata: building wasm (ReleaseSmall)
 ==> akamata: wrangler deploy
@@ -1065,7 +1063,7 @@ Deployed mytodo triggers (0.96 sec)
 ```
 
 最後の URL を**ブラウザで開く**と、ローカルと同じ UI が表示されます。
-D1 はサーバレスでスケールするので、ここから本番運用が始められます。
+これは利用者のapplication smoke確認です。frameworkのoffline検証をCloudflare production certificationと解釈しないでください。
 
 ### 9.3 デプロイ後の確認
 
@@ -1079,11 +1077,11 @@ curl -sS -X POST -H 'content-type: application/json' \
 curl -sS $URL/api/todos
 ```
 
-すべて 200 OK が返ってくれば成功です。
+readは200、createは201を確認します。これだけでproduction certificationを意味しません。
 
 > **トラブルシューティング**:
 > - `Did you mean ...?` のエラー → CLI のサブコマンドのタイポ
-> - `D1_EXEC_ERROR` → スキーマと既存テーブルの不整合。`wrangler d1 execute mytodo --remote --command="DROP TABLE todos"` で初期化してから再度 `akamata deploy --migrate`
+> - `D1_EXEC_ERROR` → schemaを調査し、backup後にレビュー済みmigrationを適用します。production tableのDROPを復旧手順にしないでください。named environment migrationはfail-closedです。
 
 ---
 

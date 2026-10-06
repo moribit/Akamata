@@ -31,21 +31,23 @@ The ordinary-function API below is available on latest main; v0.1.5 retains the 
 
 ## Why Akamata?
 
-- **One codebase, multiple runtimes** — share handlers between native servers,
-  Workers, and Containers; runtime entry points remain explicit.
-- **Unified database API** — use the same `Db`/`Stmt` and model repository APIs
-  with local SQLite, Cloudflare D1, or Turso.
-- **Zig-native developer experience** — typed `App(State)`, `Context(State)`,
-  input validation, middleware, model schemas, and repositories.
-- **Production observability** — request, DB, outbound HTTP, and custom span
-  timing through Prometheus metrics, structured logs, and `Server-Timing`.
+- **Zig-native typed handlers** — ordinary functions, structs and error sets
+  define typed inputs, validation, responses and HTTP error mappings.
+- **One application, Native or Workers** — share application contracts with
+  explicit platform entry points and owners. Containers run the Native path.
+- **Portable backend services** — existing DB, Storage, Queue and Realtime
+  contracts connect SQLite/filesystem/jobs to D1/R2/Queues/Durable Objects.
+- **Types reach your tools** — endpoint metadata feeds OpenAPI, TypeScript
+  clients and in-process tests, including Principal and provider effects.
+- **Measured Native runtime** — Threaded remains the production default.
+  See the [local benchmark and its conditions](docs/en/public-performance.md).
 
 ## Quick start
 
 The CLI installer is included in the repository; clone it first:
 
 ```bash
-git clone https://github.com/appleuser634/Akamata.git
+git clone https://github.com/moribit/Akamata.git
 cd Akamata
 ./scripts/install.sh
 
@@ -53,7 +55,7 @@ cd Akamata
 cd ~/projects
 akamata init myapp --target=both
 cd myapp
-zig build run
+akamata dev
 ```
 
 In another terminal:
@@ -119,15 +121,16 @@ Backend availability and API details are documented in the
 [Handler API](docs/en/handler-api.md), [DB backends](docs/en/db-backends.md),
 and [WebSocket guide](docs/en/websocket.md).
 
-The HTTP API follows `App → Context → endpoint/middleware → runtime`.
-Use `am.App(State)`, `am.Context(State)`, and `app.serve()`.
+Begin with ordinary functions and `ak.App(.{ .routes = ... })`.
+The explicit `App(State)`/`Context(State)` API remains available for advanced control.
 See the [v0.2 Phase 1 changes](docs/en/v0.2-phase1.md) for removed APIs.
 
 ## Examples
 
-- [`examples/chat/`](examples/chat/) — REST + native WebSocket chat with SQLite
-- [`examples/guestbook/`](examples/guestbook/) — model/repository guestbook for
-  SQLite, D1, and Turso
+- [Executable minimal](tests/docs/minimal.zig) — the first ordinary-function API
+- [`examples/guestbook/`](examples/guestbook/) — typed HTTP, validation and DB
+- [`examples/device_messaging/`](examples/device_messaging/) — portable provider ownership
+- [`examples/chat/`](examples/chat/) — realtime and native WebSocket, with an explicit Workers gateway path
 - [`examples/tasks/`](examples/tasks/) — reference REST API covering validation,
   OpenAPI, SSE, sessions, security middleware, jobs, and testing
 - [`examples/bench/`](examples/bench/) — reproducible framework benchmarks

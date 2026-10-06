@@ -1,5 +1,7 @@
 # Long-running benchmarks
 
+> Historical measurement: toolchain, runtime availability and results describe the recorded revision. Reactor remains parked/fail-closed today. See [current Native performance](public-performance.md).
+
 Production-oriented stress: longer than the 15-second smoke tests in
 `benchmarks.md`, with RSS sampling and adverse traffic patterns.
 

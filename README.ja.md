@@ -31,21 +31,23 @@ pub fn main() !void {
 
 ## Why Akamata?
 
-- **1つのコードベース、複数のruntime** — handlerをnative server、Workers、
-  Containersで共有できます。runtime固有のentry pointは明示的に分離されます。
-- **統一DB API** — ローカルSQLite、Cloudflare D1、Tursoで同じ`Db`/`Stmt`と
-  model repository APIを利用できます。
-- **Zigらしい開発体験** — 型付きの`App(State)`、`Context(State)`、入力検証、
-  middleware、model schema、repositoryを提供します。
-- **本番向けobservability** — request、DB、outbound HTTP、独自spanの時間を、
-  Prometheus metrics、structured log、`Server-Timing`から確認できます。
+- **Zigらしいtyped handler** — 普通の関数・struct・error setから、typed input、
+  validation、response、HTTP error mappingへつながります。
+- **共通applicationをNative / Workersへ** — platform entry pointとownerは明示。
+  ContainerではNative pathを使用します。
+- **Portable backend services** — DB / Storage / Queue / Realtime contractで
+  SQLite・filesystem・jobsとD1・R2・Queues・Durable Objectsを接続します。
+- **型をtoolingへ共有** — endpoint metadataからOpenAPI・TypeScript client・
+  in-process testへ。Principal注入やprovider effectsも検証できます。
+- **実測するNative runtime** — production defaultはThreadedです。
+  [測定値と条件](docs/ja/public-performance.md)を公開しています。
 
 ## クイックスタート
 
 CLI installerはリポジトリに含まれるため、最初にcloneします。
 
 ```bash
-git clone https://github.com/appleuser634/Akamata.git
+git clone https://github.com/moribit/Akamata.git
 cd Akamata
 ./scripts/install.sh
 
@@ -53,7 +55,7 @@ cd Akamata
 cd ~/projects
 akamata init myapp --target=both
 cd myapp
-zig build run
+akamata dev
 ```
 
 別のterminalから確認します。

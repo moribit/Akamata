@@ -17,7 +17,7 @@ Use Zig 0.17.x and put `$HOME/.local/bin` on PATH. Node.js/Wrangler are needed o
 ```sh
 akamata init myapp
 cd myapp
-zig build run
+akamata dev
 # another terminal
 curl http://127.0.0.1:8080/
 ```
@@ -29,6 +29,11 @@ Dependencies remain pinned to v0.1.5. The new typed APIs in this guide require l
 ```sh
 zig build --fork=/absolute/path/to/Akamata run
 ```
+
+Use the override for typed examples until their tagged release is published.
+`akamata dev` starts the generated Hello project with its pinned dependency;
+the override starts the latest-main application directly. Do not mix the two
+API versions when copying a typed example.
 
 The generated bootstrap selects the ordinary-function API when available and preserves the same Hello response on v0.1.5. Update/sync do not rewrite existing application source.
 

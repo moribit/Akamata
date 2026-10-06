@@ -1,5 +1,7 @@
 # Benchmarks
 
+> Historical measurement: toolchain, runtime availability and results describe the recorded revision. Reactor remains parked/fail-closed today. See [current Native performance](public-performance.md).
+
 > **Current regression assessment:** see the same-machine A/B in the
 > [2026-08-17 performance regression report](benchmarks-2026-08-17.md).
 > It found no material performance regression in the current revision.

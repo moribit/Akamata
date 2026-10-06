@@ -10,8 +10,9 @@ is development-oriented; pin a tagged release for reproducible builds.
 ## Getting started
 
 - [Quick Start](quickstart.md) — install the CLI, generate the current scaffold, and run it
-- [Tutorial](tutorial.md) — build an application step by step
-- [Handbook](handbook.md) — concise tour of models, repositories, migrations, and deployment
+- [Introduction slides (PDF)](slides.pdf) — ordinary Zig functions to portable backend applications
+- [Tutorial](tutorial.md) — explicit App/Context Todo application, after the typed API introduction
+- [Handbook](handbook.md) — advanced models, repositories, migrations, and deployment
 - [Tasks example](example-tasks.md) — guided example application
 - [Upgrade guide](upgrading.md) — behavior changes after v0.0.1
 - [Developer experience](developer-experience.md) — contracts, typed inputs/DI, project inspection, generators, API diff, and migration workflow
@@ -74,11 +75,14 @@ is development-oriented; pin a tagged release for reproducible builds.
 
 ## Production and performance
 
+- [Current Native Threaded snapshot](public-performance.md) — fresh `a7605ba` measurement, conditions and raw evidence
+- [Deployment validation](deployment-validation.md) — offline validation versus remote readiness and known restrictions
+
 - [2026-08-17 performance regression report](benchmarks-2026-08-17.md) — same-machine A/B of the current revision and its pre-change baseline
 - [Benchmarks](benchmarks.md)
 - [Long-run benchmarks](benchmarks-long-run.md)
 - [Performance follow-ups](perf-followups.md)
-- [Reactor design](perf-reactor-design.md)
+- [Reactor research history](perf-reactor-design.md) — parked/fail-closed, outside the production path
 - [Native runtime and Transport Contract](runtime-transport.md) — shared protocol, Zig 0.17 Io audit, isolated Group experiment and regression measurements
 
 Benchmark numbers are snapshots of the recorded environment, commands, and Akamata revision; they are not performance guarantees for another machine or workload.

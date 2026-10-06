@@ -1,9 +1,10 @@
 # Akamata Handbook — 15-minute tour
 
-Akamata is a Zig 0.17 web framework that targets two deploy shapes from one
-source: a native binary (VPS / Cloudflare Containers) and a Cloudflare Workers
-wasm module. The DB layer abstracts SQLite, Turso (libsql), and Cloudflare
-D1 behind a URL — your handler code doesn't know which one is live.
+Akamata is a portable Zig backend framework for Native and Cloudflare Workers.
+Begin with ordinary functions in [Getting Started](quickstart.md) and
+[Typed handlers](guides/typed-handlers.md). This handbook tours the existing
+explicit App/Context, model and repository APIs for applications that need them.
+Containers run the Native binary; persistent data requires volumes.
 
 This page covers everything you need to ship a CRUD API. Each section is
 ~2 minutes; skim or skip as needed.
@@ -13,7 +14,7 @@ This page covers everything you need to ship a CRUD API. Each section is
 ## 0. Install
 
 ```bash
-git clone https://github.com/appleuser634/Akamata.git
+git clone https://github.com/moribit/Akamata.git
 cd Akamata
 ./scripts/install.sh
 # For source development instead: zig build cli
@@ -30,14 +31,14 @@ You'll also want:
 ## 1. Scaffold a project (30 seconds)
 
 ```bash
-akamata init mynotes --target=both
+akamata init mynotes --target=both --template=notes
 cd mynotes
 zig build run
 # → mynotes listening on :8080
 ```
 
 `--target=both` generates files for **both** native (`src/main.zig`) and
-Workers (`src/worker.zig`) entry points. The generated `main.zig` is a
+Workers (`src/worker.zig`) entry points. The opt-in notes `main.zig` is a
 single-file model-based application with a validated `Note` model, automatic
 schema migration, and list/create/show/delete handlers. It also generates
 `deploy/Dockerfile`, `deploy/wrangler.toml`, and `deploy/worker/index.mjs`.
@@ -298,9 +299,8 @@ akamata deploy --workers \
 One command:
 
 1. Reads `wrangler.toml`'s `[[d1_databases]]` block
-2. If `database_id` is the `00000000-...` placeholder, runs
-   `wrangler d1 create <name>` and writes the real UUID back. If the DB already
-   exists in your account, adopts that UUID via `wrangler d1 list --json`.
+2. Refuses missing or placeholder resources. Configure a real D1 UUID after
+   explicit provisioning; deploy does not create resources or rewrite config.
 3. Applies the reviewed SQL file supplied via `--migrate` to the remote D1.
 4. `zig build -Dbackend=workers -Doptimize=ReleaseSmall`
 5. `wrangler deploy --config=...`

@@ -152,13 +152,15 @@ return switch (rc) {
 
 ### Performance characteristics (D1 vs Turso vs SQLite)
 
-| Backend | Theoretical latency for one query | Notes |
+| Backend | Execution boundary | Measurement consideration |
 |---|---|---|
-| SQLite (native) | ~10us | Same process, memory access only |
-| Turso (HTTP) | 1 RTT (~10-50ms) | Inter-region raw HTTP/2 |
-| D1 (JSPI / Workers) | ~5-15ms | Cloudflare internal, edge-local deployment |
+| SQLite (native) | Same-process SQL | Query, disk/cache and contention matter |
+| Turso (HTTP) | Remote HTTP request | Region, network and service behavior matter |
+| D1 (JSPI / Workers) | Suspending host adapter | Host scheduling and database placement matter |
 
-JSPI's wasm stack switch once is on the order of **µs**, but resume goes through the JS microtask queue, so the number of times is effective**. If you follow the "1 statement, 1 suspend" design (`d1_run` + synchronization `d1_step` above), it will be limited to 1 query and 1 suspend, and the network round trip can be ignored. On the other hand, if you suspend each row, dozens of stack switches will be accumulated in one request, resulting in a deviation of several ms compared to the native version (Actually measured P90 ~ 20 ms). What you should measure:
+The bridge suspends on statement execution and consumes buffered rows afterward.
+This avoids per-row host handoffs, but does not eliminate network/database cost.
+No live latency comparison is certified here. Measure the deployed application:
 
 1. **Cold start**: First time `handle_fetch` on `wrangler dev` (wasm instantiate + D1 connection)
 2. **P50/P99 Latency**: Hit simple `SELECT 1` in a loop
@@ -196,9 +198,10 @@ Use the scaffold migration path first so schema changes remain reviewable:
    `akamata deploy --migrate=migrations/001_add_notes.sql` (or the equivalent
    `wrangler d1 migrations apply` workflow).
 
-Fresh native scaffolds also run `am.model.migrate.diff/apply` at startup for
-local development. Workers scaffolds run `migrate_once.run` on the first
+The opt-in `--template=notes` native scaffold also runs `am.model.migrate.diff/apply` at startup for
+local development. Its Workers entry runs `migrate_once.run` on the first
 request. Prefer reviewed, versioned files for production deployments.
+The default minimal Hello scaffold does not initialize a DB or migrations.
 
 On SQLite and Turso, each migration file and its version record are one
 transaction and are rolled back together on failure. D1 cannot provide that

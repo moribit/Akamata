@@ -1,22 +1,22 @@
 # Cloudflare デプロイ
 
-Akamata は **Cloudflare Containers** と **Cloudflare Workers (WASM)** の両方で動く。同じハンドラコードを 2 つのビルドターゲットで使い分ける。
+AkamataはNativeとCloudflare Workers (WASM)でapplication contractを共有します。
+[Getting Started](quickstart.md)から始め、provider ownerとbindingは明示します。
+adapter contract / WASM host simulationはoffline証拠であり、live certificationではありません。
 
 ## Cloudflare Containers
 
-ネイティブ Linux バイナリをそのままコンテナで実行する。Workers Paid プラン以上が必要。
+ContainerはNative Linux process/providerを利用します。Akamataの`--containers`は
+binaryとlocal Docker imageをbuildし、Cloudflareへのprovision/publishは行いません。
+別途platform control planeを[最新Cloudflare Containers資料](https://developers.cloudflare.com/containers/)で設定してください。
 
 ```bash
-zig build -Dbackend=native -Dtarget=x86_64-linux-musl -Doptimize=ReleaseFast
+zig build -Dexample=chat -Dbackend=native -Dtarget=x86_64-linux-musl -Doptimize=ReleaseFast
 docker build -f deploy/Dockerfile -t akamata-chat .
-wrangler containers build
-wrangler deploy
 ```
 
-注意:
-- `linux/amd64` 必須 (arm64 不可)
-- ディスクはエフェメラル。SQLite ファイルを永続化したい場合は Durable Objects SQLite か D1 を使う
-- `sleepAfter` でスケールゼロ可
+filesystem/SQLiteの永続化には明示的なdurable volume/storage戦略が必要です。
+Akamataはlocal SQLite fileをD1/DOへ自動変換しません。platformの制限/APIは公式資料を参照してください。
 
 ## Cloudflare Workers (WASM)
 
@@ -24,21 +24,25 @@ JS薄ラッパーは`-Dexample=...`で選択したWorkers applicationの安定al
 `akamata_worker.wasm`をロードしてリクエストを送り込む。
 
 ```bash
-zig build -Dbackend=workers -Doptimize=ReleaseSmall
-wrangler d1 execute akamata --file=deploy/worker/d1_schema.sql --local   # 初回
+# --target=workers/bothで生成したproject内（HelloにD1は不要）
+zig build -Dbackend=workers -Doptimize=ReleaseSafe
+cd deploy
 wrangler dev --local
 ```
 
 デプロイ:
 
 ```bash
-wrangler d1 execute akamata --file=deploy/worker/d1_schema.sql --remote
-wrangler deploy
+cd ..
+akamata deploy --workers
 ```
 
 ### D1
 
-`deploy/wrangler.toml` の `[[d1_databases]]` で `binding = "DB"` を設定。`database_id` を本番の D1 ID に置き換える (`wrangler d1 create akamata` で発行)。
+D1が必要なappでは専用resourceを別途明示作成/選択し、binding・実UUIDを設定して
+レビュー済みmigrationを適用します。deployはplaceholderを拒否します。
+[Deployment validation](deployment-validation.md)を参照してください。validationはresourceを作成しません。
+[guestbook](../../examples/guestbook/README.md)のschemaを最小Hello projectへ適用する必要はありません。
 
 ### Durable Object: WebSocket
 

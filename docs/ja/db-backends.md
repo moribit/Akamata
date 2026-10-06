@@ -151,13 +151,15 @@ return switch (rc) {
 
 ### パフォーマンス特性 (D1 vs Turso vs SQLite)
 
-| バックエンド | 1 クエリの理論レイテンシ | 備考 |
+| バックエンド | 実行境界 | 測定時に考慮すること |
 |---|---|---|
-| SQLite (native) | ~10us | 同一プロセス、メモリアクセスのみ |
-| Turso (HTTP) | 1 RTT (~10-50ms) | リージョン間 raw HTTP/2 |
-| D1 (JSPI / Workers) | ~5-15ms | Cloudflare 内部、edge-local 配置 |
+| SQLite (native) | 同一processのSQL | query・disk/cache・contention |
+| Turso (HTTP) | remote HTTP request | region・network・service |
+| D1 (JSPI / Workers) | suspendするhost adapter | host scheduling・DB配置 |
 
-JSPI の wasm stack switch 1 回は **µs オーダー**だが、resume は JS のマイクロタスクキューを経由するため**回数が効く**。「1 ステートメント 1 サスペンド」設計（上記の `d1_run` + 同期 `d1_step`）を守れば 1 クエリ 1 サスペンドに収まり、ネットワーク往復に対して無視できる。逆に行ごとにサスペンドすると 1 リクエストで数十回のスタックスイッチが積み上がり、ネイティブ比で数 ms の乖離（実測で P90 ~20ms）になる。実測すべきは:
+bridgeはstatement実行でsuspendし、その後buffer済みrowを読みます。
+per-row host handoffを避けますが、network/DB costは残ります。
+ここではlive latency比較を認証していません。実際のapplicationで測定してください:
 
 1. **コールドスタート**: `wrangler dev` での初回 `handle_fetch` (wasm instantiate + D1 接続)
 2. **P50/P99 レイテンシ**: シンプルな `SELECT 1` をループで打つ
@@ -196,9 +198,9 @@ wrk -t4 -c100 -d15s --latency http://127.0.0.1:8080/api/messages
    `akamata deploy --migrate=migrations/001_add_notes.sql` で適用します
    （既存の Wrangler workflow では `wrangler d1 migrations apply` 相当）。
 
-native scaffold は local development のため起動時に
+明示選択する`--template=notes`のnative scaffoldはlocal developmentのため起動時に
 `am.model.migrate.diff/apply` も実行します。Workers scaffold は最初の
-request で `migrate_once.run` を実行します。本番ではレビュー済みの
+requestで`migrate_once.run`を実行します。defaultの最小Hello scaffoldにはDB/migrationがありません。本番ではレビュー済みの
 versioned file を優先してください。
 
 SQLiteとTursoでは、migration fileの適用とversion記録が1 transactionになり、失敗時は

@@ -1,8 +1,9 @@
 # Akamata Tutorial — Build a Todo List API from scratch
 
-This tutorial is for readers **new to both Zig and Akamata**. You'll go from
-an empty directory to a complete Todo list API + web UI in one
-sitting.
+Start with [Getting Started](quickstart.md) and [Typed handlers](guides/typed-handlers.md).
+This longer tutorial uses the explicit App/Context and model/repository APIs to
+build a Todo API and UI. These remain advanced escape hatches; a simple API does
+not need a model, Context or database. Select the notes template below explicitly.
 
 Reading time: **60–90 minutes**. Skip sections you already know — each one
 opens with a "goal" so you can decide.
@@ -135,7 +136,7 @@ any project directory:
 
 ```bash
 cd ~/projects
-akamata init mytodo --target=both
+akamata init mytodo --target=both --template=notes
 ```
 
 `--target=both` means "generate files for native binaries AND Cloudflare
@@ -972,7 +973,7 @@ More detail in [docs/en/observability.md](observability.md).
 ### Goal
 
 - Build the same source as a Workers wasm
-- Create a D1 database and auto-migrate it via Akamata
+- Configure an explicitly created D1 database and apply reviewed migrations
 - Verify production via the live URL
 
 ### 9.1 Try Workers mode locally
@@ -1022,7 +1023,7 @@ POST works too. Note: **this writes to a simulated D1, not your SQLite file**.
 # back to project root
 cd ..
 
-# one-shot deploy
+# Configure an existing, dedicated D1 resource before deploying.
 akamata deploy --workers \
   --config=deploy/wrangler.toml \
   --migrate=migrations/20260810000000_initial.sql
@@ -1031,8 +1032,8 @@ akamata deploy --workers \
 What this single command does:
 
 1. Reads the `[[d1_databases]]` block from `wrangler.toml`
-2. Sees the placeholder `database_id`, runs `wrangler d1 create`, writes
-   the real UUID back to the file
+2. Refuses missing/placeholder resources. Provision D1 separately and configure
+   its real database UUID; deploy does not create it or rewrite configuration
 3. Applies the reviewed SQL file with `wrangler d1 execute --remote`
 5. Runs `zig build -Dbackend=workers -Doptimize=ReleaseSmall`
 6. Runs `wrangler deploy`
@@ -1040,9 +1041,6 @@ What this single command does:
 Excerpt:
 
 ```text
-==> akamata: provisioning D1 "mytodo" (database_id is placeholder)
-==> akamata: resolved D1 "mytodo" (id=abcdef12-3456-7890-...)
-==> akamata: wrote new database_id back to deploy/wrangler.toml
 ==> akamata: applying ... to remote D1 "mytodo"
 ==> akamata: building wasm (ReleaseSmall)
 ==> akamata: wrangler deploy
@@ -1066,13 +1064,15 @@ curl -sS -X POST -H 'content-type: application/json' \
 curl -sS $URL/api/todos
 ```
 
-All 200 — you're live.
+Expect 200 for reads and 201 for creation. These application smoke checks do not
+establish production certification. Framework evidence remains offline unless
+the opt-in live provider workflow is actually run.
 
 > **Troubleshooting**:
 > - `Did you mean ...?` → typo in the CLI subcommand
-> - `D1_EXEC_ERROR` → schema drift. Run
->   `wrangler d1 execute mytodo --remote --command="DROP TABLE todos"`
->   then re-deploy with `--migrate=...`
+> - `D1_EXEC_ERROR` → inspect schema drift and prepare a reviewed migration.
+>   Back up the resource before changing schema. Do not drop production tables
+>   as a troubleshooting shortcut. Named-environment migration remains fail-closed.
 
 ---
 

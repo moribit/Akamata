@@ -1,10 +1,9 @@
 # Akamata ハンドブック — 15 分で始めるガイド
 
-Akamata は Zig 0.17 製の Web フレームワークです。**ひとつのソースコード**から
-2 通りのデプロイ形態を生成できます: native バイナリ (VPS / Cloudflare Containers)
-と Cloudflare Workers の wasm モジュール。DB 層は SQLite、Turso (libsql)、
-Cloudflare D1 を URL の違いだけで透過的に切り替えます — ハンドラのコードは
-どのバックエンドで動いているかを意識しません。
+AkamataはNative / Cloudflare Workers向けportable Zig backend frameworkです。
+まず[Getting Started](quickstart.md)と[Typed handlers](guides/typed-handlers.md)で普通の関数から始めます。
+このhandbookは、必要になった時に利用できる明示App/Context・model/repository APIの応用編です。
+ContainerではNative binaryを利用し、DB/filesystemの永続化にはvolumeが必要です。
 
 このドキュメントは CRUD API を 1 本書き上げるのに必要な情報を網羅します。
 各章は約 2 分で読めます。必要なところだけ拾い読みしてください。
@@ -31,7 +30,7 @@ cd Akamata
 ## 1. プロジェクトの雛形生成 (30 秒)
 
 ```bash
-akamata init mynotes --target=both
+akamata init mynotes --target=both --template=notes
 cd mynotes
 zig build run
 # → mynotes listening on :8080
@@ -291,7 +290,7 @@ akamata deploy --workers \
 このコマンド一発で:
 
 1. `wrangler.toml` の `[[d1_databases]]` ブロックを読む
-2. `database_id` がプレースホルダ (`00000000-...`) なら `wrangler d1 create <name>` を実行し、得た UUID を `wrangler.toml` に書き戻す。すでに同名 DB がアカウントに存在する場合は `wrangler d1 list --json` で UUID を取得して採用する
+2. missing/placeholder resourceは拒否する。D1は別途明示作成し実UUIDを設定する。deployはresource作成・config書換えを行わない
 3. `--migrate`で渡した確認済みSQL fileをremote D1へ適用する
 4. `zig build -Dbackend=workers -Doptimize=ReleaseSmall` でビルド
 5. `wrangler deploy --config=...` でデプロイ

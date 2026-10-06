@@ -1,5 +1,7 @@
 # Benchmarks
 
+> 歴史的な測定記録です。toolchain・runtime・結果は当時のrevisionのものです。現在ReactorはPark/fail-closedです。[現行Native測定](public-performance.md)を参照してください。
+
 > **現行revisionの回帰判定:** 2026-08-17に同一machineで実施したA/B測定は
 > [performance regression report](benchmarks-2026-08-17.md)を参照してください。
 > 現行revisionに明確なperformance劣化は確認されませんでした。

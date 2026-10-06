@@ -6,8 +6,9 @@ root = Path(__file__).resolve().parents[1]
 documents = [root / name for name in ("README.md", "README.ja.md")]
 for language in ("en", "ja"):
     base = root / "docs" / language
-    documents += [base / "README.md", base / "quickstart.md"]
+    documents += [base / name for name in ("README.md", "quickstart.md", "tutorial.md", "handbook.md", "handler-api.md", "public-performance.md")]
     documents += list((base / "guides").glob("*.md"))
+documents += list((root / "examples").glob("*/README.md"))
 missing = []
 for document in documents:
     for destination in re.findall(r"\]\(([^)]+)\)", document.read_text()):

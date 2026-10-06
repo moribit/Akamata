@@ -1,5 +1,7 @@
 # Performance regression report — 2026-08-17
 
+> 歴史的な測定記録です。toolchain・runtime・結果は当時のrevisionのものです。現在ReactorはPark/fail-closedです。[現行Native測定](public-performance.md)を参照してください。
+
 現行DX改善後revisionと変更直前revisionを、同じmachine・compiler・負荷生成toolでA/B測定したperformance regression reportです。
 
 ## 結論
