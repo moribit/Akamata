@@ -97,8 +97,14 @@ fn emitTypescript(
     while (sch_it.next()) |entry| {
         const name = entry.key_ptr.*;
         const json_schema = entry.value_ptr.*;
-        try w.print("export interface {s} ", .{name});
-        try writeTsInterfaceFromJsonSchema(w, json_schema);
+        if (findField(json_schema, "\"properties\":") != null) {
+            try w.print("export interface {s} ", .{name});
+            try writeTsInterfaceFromJsonSchema(w, json_schema);
+        } else {
+            try w.print("export type {s} = ", .{name});
+            try writeTsTypeFromJsonSchema(w, json_schema);
+            try w.writeAll(";");
+        }
         try w.writeAll("\n\n");
     }
 
@@ -141,7 +147,8 @@ fn emitTypescriptOperation(w: *std.Io.Writer, op: OpEntry) !void {
         while (seg_it.next()) |seg| {
             if (seg.len > 0 and seg[0] == ':') {
                 if (has_path_params) try w.writeAll(", ");
-                try w.print("{s}: string", .{seg[1..]});
+                try w.print("{s}: ", .{seg[1..]});
+                if (op.meta.path_ts_type_fn) |render| try render(seg[1..], w) else try w.writeAll("string");
                 has_path_params = true;
             }
         }
@@ -159,7 +166,7 @@ fn emitTypescriptOperation(w: *std.Io.Writer, op: OpEntry) !void {
         if (has_path_params or op.refs.request != null) try w.writeAll(", ");
         try w.writeAll("query: {\n");
         try op.meta.query_ts_fields_fn.?(w);
-        try w.writeAll("    } = {}");
+        try w.writeAll(if (op.meta.query_required) "    }" else "    } = {}");
     }
     try w.writeAll("): Promise<");
     if (op.refs.response) |res_ref| {
@@ -221,7 +228,7 @@ fn emitTypescriptOperation(w: *std.Io.Writer, op: OpEntry) !void {
         \\
     );
     if (op.refs.response != null) {
-        try w.writeAll("      return res.json();\n");
+        try w.writeAll(if (std.mem.eql(u8, op.meta.response_content_type, "text/plain")) "      return res.text();\n" else "      return res.json();\n");
     } else {
         try w.writeAll("      return;\n");
     }

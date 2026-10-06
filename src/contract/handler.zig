@@ -117,7 +117,41 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         .security = if (@hasField(@TypeOf(options), "security")) options.security else &.{},
         .summary = if (@hasField(@TypeOf(options), "summary")) options.summary else "",
     });
+    const has_query = blk: {
+        for (params) |maybe| if (maybe) |T| {
+            if (isMarker(T) and T.input_source == .query) break :blk true;
+        };
+        break :blk false;
+    };
+    const query_required = blk: {
+        for (params) |maybe| if (maybe) |T| {
+            if (isMarker(T) and T.input_source == .query and @typeInfo(T.Value) != .optional) break :blk true;
+        };
+        break :blk false;
+    };
     const Metadata = struct {
+        fn queryFields(w: *std.Io.Writer) anyerror!void {
+            inline for (params) |maybe| {
+                const T = maybe.?;
+                if (comptime isMarker(T) and T.input_source == .query) {
+                    try w.writeAll("    ");
+                    try std.json.Stringify.value(T.input_name, .{}, w);
+                    try w.writeAll(if (@typeInfo(T.Value) == .optional) "?: " else ": ");
+                    const Scalar = if (@typeInfo(T.Value) == .optional) @typeInfo(T.Value).optional.child else T.Value;
+                    try openapi.writeTsScalar(Scalar, w);
+                    try w.writeAll(";\n");
+                }
+            }
+        }
+        fn pathType(name: []const u8, w: *std.Io.Writer) anyerror!void {
+            inline for (params) |maybe| {
+                const T = maybe.?;
+                if (comptime isMarker(T) and T.input_source == .path) {
+                    if (std.mem.eql(u8, name, T.input_name)) return openapi.writeTsScalar(T.Value, w);
+                }
+            }
+            return error.MissingPathMetadata;
+        }
         fn parameters(w: *std.Io.Writer) anyerror!usize {
             var count: usize = 0;
             inline for (params) |maybe| {
@@ -138,6 +172,9 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         const value: openapi.EndpointMeta = blk: {
             var m = endpoint_meta.*;
             m.parameters_fn = parameters;
+            m.query_ts_fields_fn = if (has_query) queryFields else null;
+            m.query_required = query_required;
+            m.path_ts_type_fn = pathType;
             break :blk m;
         };
     };

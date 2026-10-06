@@ -50,6 +50,8 @@ pub const EndpointMeta = struct {
     query_params_fn: ?*const fn (w: *std.Io.Writer) anyerror!usize = null,
     /// Same shape, used by the TS client generator to type the `query`
     /// argument. Emits `key?: type;` lines.
+    query_required: bool = false,
+    path_ts_type_fn: ?*const fn (name: []const u8, w: *std.Io.Writer) anyerror!void = null,
     query_ts_fields_fn: ?*const fn (w: *std.Io.Writer) anyerror!void = null,
 
     pub const Refs = struct {
@@ -143,6 +145,14 @@ pub fn Spec(comptime opts: SpecOpts) *const EndpointMeta {
         }
     };
     const has_query = opts.query != null;
+    const query_required = blk: {
+        if (opts.query) |Q| {
+            inline for (reflection.fields(@typeInfo(Q).@"struct")) |f| {
+                if (@typeInfo(f.type) != .optional and f.defaultValue() == null) break :blk true;
+            }
+        }
+        break :blk false;
+    };
     const meta: EndpointMeta = .{
         .summary = opts.summary,
         .description = opts.description,
@@ -157,6 +167,7 @@ pub fn Spec(comptime opts: SpecOpts) *const EndpointMeta {
         .limits = opts.limits,
         .schema_fn = closure.schemaFn,
         .query_params_fn = if (has_query) closure.queryParamsFn else null,
+        .query_required = query_required,
         .query_ts_fields_fn = if (has_query) closure.queryTsFieldsFn else null,
     };
     // Need to return a pointer to const data with static lifetime: use a
@@ -686,6 +697,13 @@ pub fn writeTsScalar(comptime T: type, w: *std.Io.Writer) !void {
 }
 
 fn shortTypeName(comptime T: type) []const u8 {
+    if (T == []const u8 or T == []u8) return "String";
+    switch (@typeInfo(T)) {
+        .optional => |child| return "Nullable_" ++ shortTypeName(child.child),
+        .pointer => |ptr| if (ptr.size == .slice) return "Array_" ++ shortTypeName(ptr.child),
+        .array => |array| return std.fmt.comptimePrint("Array_{d}_", .{array.len}) ++ shortTypeName(array.child),
+        else => {},
+    }
     const full = @typeName(T);
     // Pick the segment after the last dot, e.g. "examples.user.User" -> "User".
     var last_dot: usize = 0;

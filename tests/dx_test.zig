@@ -127,3 +127,19 @@ test "principal binding uses middleware and rejects absent or incorrectly typed 
 test "shared Native Workers developer application contract" {
     try @import("dx_application_fixture.zig").run(std.testing.allocator);
 }
+
+fn search(term: ak.Query([]const u8, "term")) []const u8 {
+    return term.value;
+}
+test "client derives scalar responses and typed path and required query from endpoint metadata" {
+    const ClientApp = ak.App(.{ .routes = .{ ak.get("/", hello), ak.get("/search", search), ak.endpoint(.{ .method = .GET, .path = "/users/:id", .handler = show, .errors = .{ .NotFound = .not_found } }) } });
+    var app = try ClientApp.init(std.testing.allocator);
+    defer app.deinit();
+    const ts = try ak.client_gen.generate(ClientApp.Core, &app.core, std.testing.allocator, .{ .target = .typescript });
+    defer std.testing.allocator.free(ts);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "export type String = string;") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "getUsersById: async (id: number, query:") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "return res.text();") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "\"term\": string;\n    }): Promise<String>") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "\"name\"?: string;\n    } = {}") != null);
+}
