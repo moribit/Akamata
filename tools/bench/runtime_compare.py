@@ -23,6 +23,7 @@ parser.add_argument("output")
 parser.add_argument("--rounds", type=int, default=3)
 parser.add_argument("--duration", default="5s")
 args = parser.parse_args()
+Path(args.output).parent.mkdir(parents=True, exist_ok=True)
 with socket.socket() as probe:
     probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     probe.bind(("127.0.0.1", 8080))

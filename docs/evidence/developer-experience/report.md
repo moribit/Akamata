@@ -1,0 +1,48 @@
+# Developer Experience completion record
+
+Baseline: `6744595`. Native production default remains Threaded. Reactor remains parked and fail-closed. No production resource provisioning or live Cloudflare certification was performed.
+
+## Application API and compatibility
+
+The existing `App(State)`, `Context(State)`, static route graph, typed endpoint metadata, validation engine, providers, OpenAPI and client generators were the starting point. The main gap was connecting them without requiring every simple handler to manually decode and serialize requests. No new router, DB/Storage abstraction, queue engine, realtime backend, runtime or service locator was introduced.
+
+1. **Typed handlers:** `ak.App(.{ .routes = .{ ak.get("/", hello) } })` produces an application type, initialized with an explicit allocator. Ordinary functions lower to existing endpoint/Context dispatch. `App(State)` remains available.
+2. **Binding:** optional `*ak.Context(State)` plus explicit `Path(T, name)`, `Query`, `Header`, `Cookie`, `Json(DTO)` and `Principal(T)` wrappers. Values are accessed through `.value`. Struct types alone do not imply a data source.
+3. **Diagnostics:** missing/duplicate path bindings, duplicate bodies, unsupported/generic parameters, unsupported return types, unmapped errors, invalid validation metadata, unknown endpoint options and invalid status combinations fail at compile time.
+4. **DTOs:** ordinary Zig structs supply JSON decoding, validation, OpenAPI schemas and generated TypeScript types.
+5. **Validation:** additive `pub const validation` uses existing rules; old `__schema.validates` still works. Custom validation uses existing custom rules rather than a new DSL. Existing 400/422 envelopes remain. Exact representable integer constraints become OpenAPI minimum/maximum; byte lengths and heuristic formats are not misrepresented as Unicode/standard constraints.
+6. **Responses:** text slices produce text; supported ordinary values produce JSON. `created`, `accepted`, `noContent` and `Result` add explicit statuses. Context/manual Response, binary output, streaming and upgrade remain escape hatches.
+7. **Errors:** finite error sets require exhaustive mappings or explicit fallback; `anyerror` requires fallback. Mapped statuses and `error_kind` values are shared with OpenAPI and typed client errors. Input 400, body validation 422 and Principal 401 are included automatically.
+8. **Auth:** typed Principal retrieves the existing authenticated identity. Required identity is checked before input decoding independent of argument order, after middleware. Security scheme metadata stays explicit; scopes/roles use application authorization. Principal injection uses `setPrincipal`; direct erased pointer writes must migrate to that typed path.
+9. **Metadata:** method/path/input/output/errors/security/capabilities/options use the existing endpoint Spec. `Application.Metadata` exposes provider-free static inspection; actual App route views include runtime middleware. Configuration hooks run before mounting, but must not retain the temporary App address or launch borrowing tasks.
+10. **OpenAPI/client:** both consume shared endpoint metadata. Path/query/body/success and known errors are typed. Scalar aliases, text versus JSON decoding and no-content handling are tested. Generated `HttpError` unions/guards preserve unknown network/framework errors as unknown.
+11. **Testing:** client builders gain Principal injection and status assertions. Response JSON remains borrowed from response lifetime. Allocation-failure cleanup is tested. MemoryStore existence and QueueRecorder published-event assertions are testing-owner utilities, not production facade changes.
+12. **Realtime:** the developer policy uses existing Protocol/Service/Room and explicit owners. A `channel` shorthand was deliberately not added: Native WebSocket ownership and Workers DO gateway identity/authorization are different setup operations. Protocol and portable effects remain shared.
+
+## Developer journey
+
+13. **CLI:** dev reports build success, binary/process identity and rebuild failures; application startup reports its URL without claiming successful binding beforehand. Existing route/capability inspection consumes generated pure metadata where available.
+14. **Scaffold:** default is minimal Hello World; Native needs no DB, migrations or layered directories. `--template=notes` retains the DB tutorial. Native/Workers/Containers targets remain supported. The pinned released dependency can still run Hello World; latest-main tooling requires the documented local dependency override rather than pretending unreleased APIs exist in v0.1.5.
+15. **Production hardening:** readonly JSON/JSONC configuration projection supports named environment validation, comments, trailing commas and binding/vars non-inheritance. Input is not rewritten. Malformed or unrepresentable projected values fail explicitly. TOML remains a documented subset. Named-environment migration remains `EnvironmentMigrationUnsupported` until environment→binding→resource selection is proven. Arbitrary custom JS artifact wiring is not certified by symbol presence; managed host tests remain, custom glue needs its own host smoke proof. Local validation does not imply remote readiness.
+16. **Examples:** minimal teaches routing; guestbook teaches typed DB APIs; device_messaging demonstrates portable providers; chat explains realtime ownership and the separate Workers DO path. READMEs have corrected commands, platform limits and guide links; stale claims of automatic D1 provisioning were removed.
+17. **Documentation:** navigation is Getting Started, Guides, Concepts, Reference and Examples. English/Japanese important startup, architecture and migration information is updated together; detailed English-only provider references are identified instead of silently claiming translation parity.
+18. **Getting Started:** installation→Hello→routing→JSON→validation→DB→testing→Native→Workers. Internal provider/binding concepts are deferred until required.
+19. **Guides:** typed handlers, request data/routing, validation, responses/errors, authentication, database, storage, jobs/queue, realtime, testing, OpenAPI/client generation, configuration, deployment/containers and observability reuse or link existing guides. Application concepts explain explicit ownership and progressive disclosure.
+20. **README:** begins with portable Zig backend positioning and a real compiled minimal function example, then local run/test/deploy and documentation links. It makes no live Cloudflare certification claim.
+21. **Documentation tests:** shared Zig fixtures compile/test README, typed handlers and testing usage; documentation link checks cover 18 journey documents. Generated TypeScript is checked with TypeScript 5.9.3 strict/noEmit, including expected type errors, separately from Node transform/mock-fetch execution.
+
+## Evidence and regression
+
+22. **Native/Workers parity:** shared application fixture verifies routing, typed inputs, validation, error mapping, DB/storage/queue effects, realtime/event schema and capabilities. Workers WASM runs ten iterations using test providers; this is host simulation, not a live resource test.
+23. **DX compile-fail:** 32 expected-diagnostic cases passed. Invalid path/body/parameter/error/validation/status/metadata declarations are included.
+24. **Existing contracts:** Native ReleaseSafe tests, documentation tests, Workers WASM host fixtures, integration/tasks, CLI operations/capabilities, project update/sync, managed Workers glue, pinned and local scaffold tests passed. Transport suite passed 99 cases across Threaded and private research evaluation paths. Isolation/session/stress/fault/shutdown/stream/upgrade suites passed; production gate was not changed.
+25. **CI:** implementation candidate `9494d70` passed [full CI](https://github.com/moribit/Akamata/actions/runs/37473018680) and [Linux/macOS TSan](https://github.com/moribit/Akamata/actions/runs/37473019203). Final commit verification is recorded below when completed. No live Cloudflare tests were run.
+26. **Threaded performance:** three-round macOS ReleaseFast check against clean baseline showed hello +0.8%, echo +0.3%, db +1.6% throughput, with small latency/RSS variation. This shows no significant regression in this short check, not a performance improvement claim. [Raw data and exact reproduction](reproduce.md) record binary hashes, commands, environment and measurements.
+
+## Remaining limits and next work
+
+27. Existing low-level public APIs and manual service ownership remain. Intentional compatibility changes are the default minimal scaffold and typed Principal safety; migration guides cover the notes template and `setPrincipal` path. New developer APIs require latest main.
+28. Tagged-union/raw-pointer response inference is unsupported; use explicit Context/Response. No automatic DTO `validate` hook or new auth backend is invented. Explicit custom validation and existing middleware remain the escape hatches.
+29. Full arbitrary TOML/JSONC configuration semantics, named-environment migration and custom-glue behavioral artifact proof remain bounded/fail-closed concerns. Offline fixtures cannot establish remote reachability or production readiness.
+30. Recommended next DX work: safe environment-aware migration resource resolution, an explicit custom-glue host smoke workflow, and user feedback on real typed applications before adding more shorthand APIs. Realtime registration convenience must preserve explicit gateway ownership.
+31. No Reactor reopening, scheduler changes, universal schema AST, new provider engine or live resource creation was part of this work.
