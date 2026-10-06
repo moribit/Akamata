@@ -14,6 +14,8 @@ const std = @import("std");
 pub const ResponseDoc = struct {
     status: u16,
     description: []const u8,
+    /// Known application error discriminators; absent on legacy descriptions.
+    error_kinds: []const []const u8 = &.{},
 };
 
 pub const SecurityScheme = struct {
@@ -472,6 +474,14 @@ fn writeOperation(w: *std.Io.Writer, op: OperationEntry) !void {
         try writeJsonString(w, extra_status);
         try w.writeAll(":{\"description\":");
         try writeJsonString(w, response_doc.description);
+        if (response_doc.error_kinds.len > 0) {
+            try w.writeAll(",\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"required\":[\"error_kind\"],\"properties\":{\"error_kind\":{\"type\":\"string\",\"enum\":[");
+            for (response_doc.error_kinds, 0..) |kind, i| {
+                if (i > 0) try w.writeAll(",");
+                try writeJsonString(w, kind);
+            }
+            try w.writeAll("]}}}}}");
+        }
         try w.writeAll("}");
     }
     try w.writeAll("}");

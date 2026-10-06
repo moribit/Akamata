@@ -95,6 +95,10 @@ test "typed parameter metadata matches actual binding" {
     try std.testing.expect(parameters[0].object.get("required").?.bool);
     try std.testing.expectEqualStrings("query", parameters[1].object.get("in").?.string);
     try std.testing.expect(!parameters[1].object.get("required").?.bool);
+    const not_found = operation.object.get("responses").?.object.get("404").?;
+    const error_schema = not_found.object.get("content").?.object.get("application/json").?.object.get("schema").?;
+    const kinds = error_schema.object.get("properties").?.object.get("error_kind").?.object.get("enum").?.array.items;
+    try std.testing.expectEqualStrings("NotFound", kinds[0].string);
 }
 
 const Identity = struct { id: u64 };
@@ -145,4 +149,6 @@ test "client derives scalar responses and typed path and required query from end
     try std.testing.expect(std.mem.indexOf(u8, ts, "return res.text();") != null);
     try std.testing.expect(std.mem.indexOf(u8, ts, "\"term\": string;\n    }): Promise<String>") != null);
     try std.testing.expect(std.mem.indexOf(u8, ts, "\"name\"?: string;\n    } = {}") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "getUsersByIdError = { status: 404; body: { error_kind: \"NotFound\" } }") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "throw new HttpError(res.status, body, detail);") != null);
 }

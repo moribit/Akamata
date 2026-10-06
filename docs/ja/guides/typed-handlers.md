@@ -18,7 +18,7 @@ try app.serve(.{});
 
 有限error setは `.errors = .{ .NotFound = .not_found }` を指定した `ak.endpoint` で網羅的にmappingします。`anyerror` には明示 `.fallback` が必要です。fallbackは内部error名を公開しません。
 
-現在はrequest/response schemaと型付きOpenAPI parameterを接続しています。clientのquery/error生成、認証統合は後続作業です。static宣言後のroute登録はfreezeされます。動的routeは従来App(State)を使ってください。
+現在はrequest/response schemaと型付きOpenAPI parameterを接続しています。clientのtyped binding・error mapping・Principal bindingも接続しています。static宣言後のroute登録はfreezeされます。動的routeは従来App(State)を使ってください。
 
 [実行可能なcontract](../../../tests/dx_test.zig)と[英語Guide](../../en/guides/typed-handlers.md)も参照してください。
 
@@ -28,4 +28,4 @@ middlewareはstatic graphのfreeze前に `.middleware = .{.{ .call = authenticat
 
 The shared [application fixture](../../../tests/dx_application_fixture.zig) runs with `zig build dx-test -Doptimize=ReleaseSafe` and `zig build portable-application-test -Dbackend=workers -Doptimize=ReleaseSafe`. Workers executes the same contract ten times inside WASM with simulated host imports; this is offline application evidence, not live Cloudflare certification.
 
-TypeScript生成も同じmetadataを利用します。Pathのscalar型、Queryのoptional/required、scalar responseのtype alias、text responseのtext decodeを維持します。JavaScript numberは全u64を正確には表現できません。大きなIDの正確性が必要なら文字列IDを明示してください。既知application error bodyの型生成は後続作業です。
+TypeScript生成も同じmetadataを利用します。Pathのscalar型、Queryのoptional/required、scalar responseのtype alias、text responseのtext decodeを維持します。JavaScript numberは全u64を正確には表現できません。大きなIDの正確性が必要なら文字列IDを明示してください。同じmappingからoperation別error型とruntime判定関数を生成します。[Error handling](errors.md)を参照してください。

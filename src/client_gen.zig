@@ -91,6 +91,44 @@ fn emitTypescript(
         \\
     );
     try w.print("const DEFAULT_BASE = {f};\n\n", .{jsonString(base_url)});
+    try w.writeAll(
+        \\export class HttpError<Body = unknown> extends Error {
+        \\  constructor(public readonly status: number, public readonly body: Body, detail: string) {
+        \\    super(`HTTP ${status}${detail ? `: ${detail}` : ""}`);
+        \\    this.name = "HttpError";
+        \\  }
+        \\}
+        \\
+    );
+    for (ops) |op| {
+        var count: usize = 0;
+        for (op.meta.additional_responses) |response| count += response.error_kinds.len;
+        if (count == 0) continue;
+        try w.writeAll("export type ");
+        try writeOperationFnName(w, op.method, op.raw_path);
+        try w.writeAll("Error = ");
+        var emitted = false;
+        for (op.meta.additional_responses) |response| for (response.error_kinds) |kind| {
+            if (emitted) try w.writeAll(" | ");
+            emitted = true;
+            try w.print("{{ status: {d}; body: {{ error_kind: {f} }} }}", .{ response.status, jsonString(kind) });
+        };
+        try w.writeAll(";\n");
+        try w.writeAll("export function is_");
+        try writeOperationFnName(w, op.method, op.raw_path);
+        try w.writeAll("Error(value: unknown): value is HttpError<");
+        try writeOperationFnName(w, op.method, op.raw_path);
+        try w.writeAll("Error[\"body\"]> & ");
+        try writeOperationFnName(w, op.method, op.raw_path);
+        try w.writeAll("Error {\n  return value instanceof HttpError && value.body !== null && typeof value.body === \"object\" && \"error_kind\" in value.body && (\n");
+        emitted = false;
+        for (op.meta.additional_responses) |response| for (response.error_kinds) |kind| {
+            if (emitted) try w.writeAll(" ||\n");
+            emitted = true;
+            try w.print("    (value.status === {d} && value.body.error_kind === {f})", .{ response.status, jsonString(kind) });
+        };
+        try w.writeAll("\n  );\n}\n");
+    }
 
     // Type definitions for every collected schema.
     var sch_it = builder.schemas.iterator();
@@ -172,7 +210,7 @@ fn emitTypescriptOperation(w: *std.Io.Writer, op: OpEntry) !void {
     if (op.refs.response) |res_ref| {
         try w.writeAll(refToTypeName(res_ref));
     } else {
-        try w.writeAll(if (op.method == .HEAD) "void" else "unknown");
+        try w.writeAll(if (op.method == .HEAD or op.meta.success_status == 204 or op.meta.success_status == 205) "void" else "unknown");
     }
     try w.writeAll("> => {\n");
 
@@ -223,7 +261,9 @@ fn emitTypescriptOperation(w: *std.Io.Writer, op: OpEntry) !void {
     try w.writeAll(
         \\      if (!res.ok) {
         \\        const detail = await res.text().catch(() => "");
-        \\        throw new Error(`HTTP ${res.status}${detail ? `: ${detail}` : ""}`);
+        \\        let body: unknown = detail;
+        \\        try { body = JSON.parse(detail); } catch {}
+        \\        throw new HttpError(res.status, body, detail);
         \\      }
         \\
     );

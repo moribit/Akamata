@@ -78,6 +78,44 @@ fn validateDto(comptime T: type) void {
     }
 }
 
+fn errorResponses(comptime mapping: anytype, comptime fallback: ?Code, comptime principal_required: bool) []const openapi.ResponseDoc {
+    const fields = reflection.fields(@typeInfo(@TypeOf(mapping)).@"struct");
+    var docs: [fields.len + 2]openapi.ResponseDoc = undefined;
+    var count: usize = 0;
+    for (fields) |field| {
+        const code = @backingInt(@as(Code, @field(mapping, field.name)));
+        if (code < 400 or code > 599) @compileError("Akamata application error mapping must use a 4xx or 5xx HTTP status");
+        var found = false;
+        for (docs[0..count]) |*doc| if (doc.status == code) {
+            doc.error_kinds = doc.error_kinds ++ .{field.name};
+            found = true;
+        };
+        if (!found) {
+            docs[count] = .{ .status = code, .description = "Application error", .error_kinds = &.{field.name} };
+            count += 1;
+        }
+    }
+    const extras = .{
+        .{ .status = if (fallback) |code| @backingInt(code) else 0, .kind = "internal_server_error" },
+        .{ .status = if (principal_required) 401 else 0, .kind = "unauthorized" },
+    };
+    inline for (extras) |extra| {
+        if (extra.status == 0) continue;
+        if (extra.status < 400 or extra.status > 599) @compileError("Akamata fallback must use a 4xx or 5xx HTTP status");
+        var found = false;
+        for (docs[0..count]) |*doc| if (doc.status == extra.status) {
+            doc.error_kinds = doc.error_kinds ++ .{extra.kind};
+            found = true;
+        };
+        if (!found) {
+            docs[count] = .{ .status = extra.status, .description = "Application error", .error_kinds = &.{extra.kind} };
+            count += 1;
+        }
+    }
+    const result = docs[0..count].*;
+    return &result;
+}
+
 pub fn Endpoint(comptime State: type, comptime options: anytype) type {
     const handler = options.handler;
     const path = options.path;
@@ -95,6 +133,12 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         }
         if (isPrincipal(T)) continue;
         if (!isMarker(T)) @compileError("unsupported Akamata handler parameter: use *Context(State), Path, Query, Header, Cookie, Json or Principal");
+        if (T.input_source != .json) {
+            if (T.input_source == .path and @typeInfo(T.Value) == .optional) @compileError("Akamata Path binding is required and cannot use an optional type");
+            const Scalar = if (@typeInfo(T.Value) == .optional) @typeInfo(T.Value).optional.child else T.Value;
+            const supported = Scalar == []const u8 or @typeInfo(Scalar) == .int or @typeInfo(Scalar) == .float or (Scalar == bool and T.input_source != .path);
+            if (!supported) @compileError("unsupported Akamata input binding for " ++ T.input_name ++ ": use string, integer, float or a non-path boolean");
+        }
         if (T.input_source == .json) {
             if (body != null) @compileError("Akamata handler may bind only one JSON body");
             if (@typeInfo(T.Value) != .@"struct") @compileError("Akamata Json request DTO must be a struct");
@@ -127,11 +171,28 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
     validateValue(Payload);
     const mapping = if (@hasField(@TypeOf(options), "errors")) options.errors else .{};
     const fallback: ?Code = if (@hasField(@TypeOf(options), "fallback")) options.fallback else null;
+    const mapped_fields = reflection.fields(@typeInfo(@TypeOf(mapping)).@"struct");
+    if (!has_errors and mapped_fields.len > 0) @compileError("Akamata error mapping requires a handler with an error-union return type");
+    if (has_errors) if (@typeInfo(@typeInfo(Return).error_union.error_set).error_set.error_names) |names| {
+        inline for (mapped_fields) |field| {
+            comptime var exists = false;
+            inline for (names) |name| if (std.mem.eql(u8, name, field.name)) {
+                exists = true;
+            };
+            if (!exists) @compileError("HTTP mapping contains error not returned by handler: " ++ field.name);
+        }
+    };
     if (has_errors and fallback == null) {
         if (@typeInfo(@typeInfo(Return).error_union.error_set).error_set.error_names == null) @compileError("Akamata anyerror handler requires an explicit .fallback HTTP status");
         contract.validateErrorMap(handler, mapping);
     }
     const success: u16 = if (isResult(Value)) Value.status_code else if (@hasField(@TypeOf(options), "success_status")) options.success_status else 200;
+    const principal_required = blk: {
+        for (params) |maybe| if (maybe) |T| {
+            if (isPrincipal(T)) break :blk true;
+        };
+        break :blk false;
+    };
     const endpoint_meta = openapi.Spec(.{
         .request = body,
         .response = if (Payload == void) null else Payload,
@@ -139,6 +200,7 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         .success_status = success,
         .operation_id = if (@hasField(@TypeOf(options), "operation_id")) options.operation_id else "",
         .security = if (@hasField(@TypeOf(options), "security")) options.security else &.{},
+        .additional_responses = errorResponses(mapping, fallback, principal_required),
         .summary = if (@hasField(@TypeOf(options), "summary")) options.summary else "",
     });
     const has_query = blk: {
@@ -199,6 +261,8 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
             m.query_ts_fields_fn = if (has_query) queryFields else null;
             m.query_required = query_required;
             m.path_ts_type_fn = pathType;
+            m.required_services = if (@hasField(@TypeOf(options), "capabilities")) options.capabilities else &.{};
+            m.required_capabilities = if (@hasField(@TypeOf(options), "platform_capabilities")) options.platform_capabilities else &.{};
             break :blk m;
         };
     };
@@ -208,6 +272,7 @@ pub fn Endpoint(comptime State: type, comptime options: anytype) type {
         pub const meta = &Metadata.value;
         pub const ResponseType = Payload;
         pub fn register(app: anytype) !void {
+            app.validateEndpoint(http_method, route_path, meta);
             _ = try app.endpoint(http_method, route_path, handle, meta);
         }
         pub fn handle(c: *Ctx) anyerror!void {

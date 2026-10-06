@@ -122,4 +122,28 @@ for (let i = 0; i < 10; i++) {
   if (i === 2) warmedMemory = exports.memory.buffer.byteLength;
 }
 assert.equal(exports.memory.buffer.byteLength, warmedMemory, "test providers/application leak WASM pages after warmup");
+assert.equal(exports.prepare_developer_client(), 0, decode(exports.error_ptr(), exports.error_len()));
+const developerSource = decode(exports.developer_client_ptr(), exports.developer_client_len());
+exports.release_developer_client();
+// Syntax transformation is additional evidence when supported by the host
+// Node version, not a substitute for TypeScript's static type checker.
+const { stripTypeScriptTypes } = await import("node:module");
+if (typeof stripTypeScriptTypes === "function") {
+  const source = stripTypeScriptTypes(developerSource, { mode: "transform" });
+  const generated = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
+  const api = generated.createClient({ baseUrl: "https://fixture.test", fetch: async url => {
+    const request = new URL(url);
+    if (request.pathname === "/") return new Response("Hello, Akamata!");
+    if (request.pathname === "/users/0") return new Response(JSON.stringify({ error_kind: "NotFound" }), { status: 404 });
+    assert.equal(request.searchParams.get("name"), "Bob");
+    return new Response(JSON.stringify({ id: 42, name: "Bob" }));
+  } });
+  assert.equal(await api.get(), "Hello, Akamata!");
+  assert.deepEqual(await api.getUsersById(42, { name: "Bob" }), { id: 42, name: "Bob" });
+  await assert.rejects(api.getUsersById(0), error => generated.is_getUsersByIdError(error) && error.status === 404 && error.body.error_kind === "NotFound");
+  assert.equal(generated.is_getUsersByIdError(new Error("unrelated")), false);
+  console.log("generated DX client: TypeScript syntax transform and mocked HTTP text/query/error semantics passed");
+} else {
+  console.log("generated DX client syntax transform skipped: host Node lacks stripTypeScriptTypes");
+}
 console.log("Workers WASM: shared routing, typed input/validation/errors, DB effects, storage, queue, realtime/event schema and capability contract passed (10 runs; test providers)");

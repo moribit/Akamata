@@ -2,6 +2,7 @@ const std = @import("std");
 const fixture = @import("portable_application_fixture.zig");
 const am = @import("akamata");
 var last_error: []const u8 = "";
+var developer_client: []u8 = &.{};
 pub const std_options: std.Options = .{ .logFn = log };
 fn log(comptime _: std.log.Level, comptime _: @TypeOf(.enum_literal), comptime _: []const u8, _: anytype) void {}
 export fn run_contract() u32 {
@@ -138,4 +139,26 @@ export fn run_developer_contract() u32 {
         return 1;
     };
     return 0;
+}
+
+export fn prepare_developer_client() u32 {
+    release_developer_client();
+    const Application = @import("dx_application_fixture.zig").Application;
+    var app = Application.init(std.heap.wasm_allocator) catch return 1;
+    defer app.deinit();
+    developer_client = am.client_gen.generate(Application.Core, &app.core, std.heap.wasm_allocator, .{ .target = .typescript }) catch |err| {
+        last_error = @errorName(err);
+        return 1;
+    };
+    return 0;
+}
+export fn developer_client_ptr() [*]const u8 {
+    return developer_client.ptr;
+}
+export fn developer_client_len() usize {
+    return developer_client.len;
+}
+export fn release_developer_client() void {
+    if (developer_client.len > 0) std.heap.wasm_allocator.free(developer_client);
+    developer_client = &.{};
 }
