@@ -11,7 +11,7 @@
 
 import wasm from "../../zig-out/bin/akamata_worker.wasm";
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { REALTIME_AUTHORIZE_PATH, REALTIME_MESSAGE_PATH, rejectPublicInternalRoute } from "./internal_routes.mjs";
+import { REALTIME_AUTHORIZE_PATH, REALTIME_MESSAGE_PATH, rejectPublicInternalRoute, realtimeNamespace } from "./internal_routes.mjs";
 import { WasmDispatchQueue } from "./wasm_dispatch.mjs";
 
 let instance, memory, exports_ref, handleFetchAsync;
@@ -542,7 +542,9 @@ export default {
       internal.set("X-Akamata-Metadata", metadata);
       internal.set("X-Akamata-Authorized", "1");
       const doRequest = new Request(request.url, { method: "GET", headers: internal });
-      return env.AKAMATA_REALTIME.getByName(authorized.room).fetch(doRequest);
+      const namespace = realtimeNamespace(env);
+      if (!namespace?.getByName) return Response.json({ error: "realtime_binding_unavailable" }, { status: 503 });
+      return namespace.getByName(authorized.room).fetch(doRequest);
     }
     return dispatchWasm(request);
   },

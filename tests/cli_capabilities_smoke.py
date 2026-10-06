@@ -48,6 +48,11 @@ with tempfile.TemporaryDirectory(prefix="akamata-capability-") as directory:
     config.write_text(config.read_text().replace('DATABASE_URL="d1:DB"', 'DATABASE_URL="https://redacted.invalid"'))
     drift = run(declaration, 1, ["--environment=production"])
     assert "ProviderConfigurationDrift" in drift.stderr and "redacted.invalid" not in drift.stderr
+    realtime = dict(declaration, requirements=["realtime"], providers=[{"capability": "realtime", "provider": "durable_objects", "binding": "ROOMS"}], routes=[])
+    config.write_text("[[durable_objects.bindings]]\nname=\"ROOMS\"\nclass_name=\"Room\"\n")
+    assert "ProviderConfigurationDrift" in run(realtime, 1).stderr
+    config.write_text(config.read_text() + "[vars]\nAKAMATA_REALTIME_BINDING=\"ROOMS\"\n")
+    assert json.loads(run(realtime, extra=["--strict"]).stderr)["providers"][0]["readiness"] == "validated"
     # Restore legacy fixture expectations below.
     config.write_text('[[d1_databases]]\nbinding = "DB"\n[[r2_buckets]]\nbinding = "FILES"\n')
     invalid = dict(declaration, requirements=["database", "database", "object_storage"])

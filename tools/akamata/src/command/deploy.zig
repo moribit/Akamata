@@ -34,7 +34,7 @@ pub fn cmdDeploy(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
         const source = @import("../project/files.zig").readFileAlloc(alloc, "src/main.zig", 2 * 1024 * 1024) catch null;
         defer if (source) |bytes| alloc.free(bytes);
         const has_contract = if (source) |bytes| std.mem.indexOf(u8, bytes, "akamata-capabilities") != null else false;
-        if (preflight or has_contract or manifest != null) {
+        if (preflight or has_contract or manifest != null or environment != null) {
             var inspection: std.ArrayList([:0]const u8) = .empty;
             defer {
                 for (inspection.items) |arg| alloc.free(arg);
@@ -75,6 +75,15 @@ pub fn cmdDeploy(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
         try cloudflare.deployEnvironment(alloc, cfg, environment);
     }
     if (target_containers) {
+        if (environment != null) return error.ContainerEnvironmentUnsupported;
+        if (preflight or manifest != null) {
+            const manifest_arg = if (manifest) |path| try std.fmt.allocPrintSentinel(alloc, "--manifest={s}", .{path}, 0) else null;
+            defer if (manifest_arg) |arg| alloc.free(arg);
+            const base = [_][:0]const u8{ "--target=containers", "--strict" };
+            if (manifest_arg) |arg| {
+                try @import("inspect.zig").cmdCapabilities(alloc, &.{ base[0], base[1], arg });
+            } else try @import("inspect.zig").cmdCapabilities(alloc, &base);
+        }
         try runChild(alloc, &.{ "zig", "build", "-Dtarget=x86_64-linux-musl", "-Doptimize=ReleaseFast" }, null);
         try runChild(alloc, &.{ "docker", "build", "-f", "deploy/Dockerfile", "-t", "akamata-app", "." }, null);
     }

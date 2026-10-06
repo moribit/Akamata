@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { AkamataRealtimeRoom } from "../deploy/worker/realtime_object.mjs";
-import { REALTIME_MESSAGE_PATH, rejectPublicInternalRoute } from "../deploy/worker/internal_routes.mjs";
+import { REALTIME_MESSAGE_PATH, rejectPublicInternalRoute, realtimeNamespace } from "../deploy/worker/internal_routes.mjs";
+
+test("gateway namespace uses explicit binding configuration with legacy default", () => {
+  const selected = {};
+  assert.equal(realtimeNamespace({ ROOMS: selected, AKAMATA_REALTIME_BINDING: "ROOMS" }), selected);
+  assert.equal(realtimeNamespace({ AKAMATA_REALTIME: selected }), selected);
+  assert.equal(realtimeNamespace({ ROOMS: selected }), undefined);
+});
 
 function socket(attachment) {
   return {

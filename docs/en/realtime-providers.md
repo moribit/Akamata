@@ -21,3 +21,5 @@ Owner operations serialize a bounded 128 KiB control envelope, free it after hos
 WASM host simulation verifies copied binding ownership, typed broadcast/direct/disconnect and lossless maximum u64. Actual managed JS bridge tests verify deterministic namespace routing and presence packing. DO adapter tests verify UUID compatibility, portable direct/exclusion/disconnect, missing IDs, malformed IDs and public route rejection. These are offline adapter/host-simulation evidence, not live Durable Object certification.
 
 References: https://developers.cloudflare.com/durable-objects/best-practices/create-durable-object-stubs-and-send-requests/ and https://developers.cloudflare.com/durable-objects/best-practices/websockets/
+
+Custom namespace bindings require an explicit environment variable `AKAMATA_REALTIME_BINDING="ROOMS"` (replace ROOMS with the Contract binding). The gateway retains AKAMATA_REALTIME as its legacy default. CLI validation rejects disagreement between this selector and Provision; it never guesses a namespace or rewrites configuration. Named environments need their own variable and binding.

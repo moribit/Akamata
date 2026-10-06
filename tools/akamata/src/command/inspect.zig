@@ -135,6 +135,15 @@ pub fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !vo
             if (!present) missing = true;
             if (present and !resource.validated(provider.string)) invalid = true;
             if (resource.matches > 1) drift = true;
+            if (implementation == .durable_objects) {
+                const gateway_binding = if (config_bytes) |content| (try deployment.environmentVar(content, environment, "AKAMATA_REALTIME_BINDING")) orelse "AKAMATA_REALTIME" else "AKAMATA_REALTIME";
+                if (!std.mem.eql(u8, gateway_binding, binding_name.string)) {
+                    invalid = true;
+                    drift = true;
+                    readiness = "configured";
+                    if (!json) std.debug.print("  problem: Realtime gateway selects a different namespace; set environment AKAMATA_REALTIME_BINDING to {s}\n", .{binding_name.string});
+                }
+            }
             if (!json) std.debug.print("{s}\n  provider: {s}\n  binding: {s}\n  status: {s}\n", .{ kind.string, provider.string, binding_name.string, status });
             if (!present or !resource.validated(provider.string)) {
                 if (!json) std.debug.print("  environment: {s}\n  problem: {s}\n", .{ environment orelse "default", if (!present) "binding is not configured" else "resource identifier/class is missing, placeholder, or binding is duplicated" });
