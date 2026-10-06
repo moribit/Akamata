@@ -71,3 +71,13 @@ See [release notes](../../releases/v0.2.0.md) and both-language upgrading guides
 Next recommended public DX work: a reproducible full application walkthrough,
 explicit custom-glue smoke proof and opt-in live provider evidence; no runtime
 restart or new abstraction is needed.
+
+## Post-publication fixture correction
+
+The first post-pin CI run 37498134594 passed Native/Workers/runtime/PDF, scaffold
+and public journey but failed project-update-test: its legacy fixture only
+replaced the v0.1.5 pin, so the new v0.2.0 project was not a legacy project.
+The fixture now models v0.1.0 independently of the current stable version and
+reads the update target from release.zig. Production update/sync code is unchanged.
+The corrected suite retains dry-run immutability, user configuration/source
+protection, refusal on edited glue, forced backup and Native/Workers validation.
