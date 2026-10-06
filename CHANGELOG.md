@@ -2,6 +2,52 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-07
+
+### Highlights
+
+- Ordinary Zig functions as typed HTTP handlers, explicit compile-time path/query/
+  header/cookie/JSON/Principal binding, DTO validation, typed responses and
+  exhaustive error mapping. Existing App(State)/Context and manual Response remain.
+- Shared endpoint metadata for OpenAPI, typed TypeScript clients, capabilities,
+  route inspection and Native/Workers application tests.
+- Portable Application and Production Contracts connecting DB, Storage, Queue
+  and Realtime to explicit providers, bindings, owners and deployment validation.
+- Caller-owned Storage listPage results and opaque pagination, native jobs.Queue
+  provider wiring, Workers Queue/DO ownership and partial-startup cleanup tests.
+- Improved in-process testing, Principal injection, bounded provider assertions,
+  minimal Hello scaffold and a real application test build step. Notes stays an
+  explicit `--template=notes` tutorial.
+- Bilingual developer introduction PDFs, ordinary-function README/Getting Started,
+  guide navigation and fresh condition-labelled Native Threaded benchmark data.
+
+### Compatibility and migration
+
+- Remove legacy Router/Context/Middleware/HTTP Server namespaces and aliases;
+  migrate to App/Context. No compatibility shim remains.
+- Typed Principal retrieval requires setPrincipal rather than an untagged erased
+  pointer. Storage Error adds InvalidCursor/InvalidLimit; exhaustive switches need
+  those cases. listPage is additive; existing list remains.
+- Deploy refuses placeholder D1 resources instead of implicitly creating them.
+  Provision separately and configure bindings/UUIDs before deployment.
+- Require Zig 0.17.0 (support originally shipped in v0.1.5). Use pinned official
+  external translate-c for native SQLite/optional OpenSSL bindings.
+- CLI responsibilities are split into command/project/Cloudflare operation modules.
+  Update/sync retain managed-file protection and do not rewrite application source.
+
+### Validation and limitations
+
+- Native Threaded remains the production default. Shared HTTP lifecycle,
+  read/write deadlines, bounded output and I/O shutdown contracts are tested.
+- Reactor remains parked/fail-closed research code. std.Io.Group was not adopted.
+- Native/Workers adapter and WASM host simulation evidence is separate from live
+  Cloudflare validation; this release does not claim live production certification.
+- Named-environment migration and arbitrary custom Workers glue behavioral proof
+  remain restricted. Workers streaming and native socket APIs differ.
+
+See [v0.2.0 release notes](docs/releases/v0.2.0.md),
+[migration](docs/en/upgrading.md) and [public journey audit](docs/evidence/public-presentation/audit.md).
+
 ## [0.1.5] - 2026-10-03
 
 ### Changed

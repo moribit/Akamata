@@ -52,7 +52,7 @@ pub fn editDistance(a: []const u8, b: []const u8) usize {
 pub fn usage() !void {
     const msg =
         \\Usage: akamata <command> [args]
-        \\Version: akamata 0.1.5 (use `akamata --version` for the version)
+        \\Version: akamata 0.2.0 (use `akamata --version` for the version)
         \\
         \\Commands:
         \\  init <name> [--template=minimal|notes] [--target=native|workers|containers|both] [--d1] [--r2] [--queue] [--realtime]

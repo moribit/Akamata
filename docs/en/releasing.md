@@ -15,16 +15,25 @@ The version source of truth is `build.zig.zon`; keep the CLI version constant, s
 ## Checklist
 
 1. Update `main`, inspect existing tags, and confirm the working tree contains only intended changes.
-2. Update `build.zig.zon`, `tools/akamata/src/main.zig`, scaffold templates, README, and CHANGELOG.
+2. Update `build.zig.zon`, `tools/akamata/src/release.zig`, help/version references,
+   README and CHANGELOG. Keep the scaffold on the previous immutable tag until
+   the new tag hash exists, and explain that temporary bootstrap pin.
 3. Run the release gates:
 
    ```bash
    zig build test
    zig build cli
    zig build scaffold-test
+   zig build scaffold-local-test public-journey-test documentation-test -Doptimize=ReleaseSafe
+   zig build documentation-test -Dbackend=workers -Doptimize=ReleaseSafe
    zig build -Dexample=chat
    zig build -Dexample=chat -Dbackend=workers -Doptimize=ReleaseSmall
    ```
+
+   Full CI and Linux/macOS TSan must be green before tagging. For presentation
+   changes, regenerate both PDFs, inspect every page, run the PDF/link contract
+   and record benchmark environment/commit/binary hash. Offline Workers fixtures
+   do not authorize a live production certification claim.
 
 4. Run CLI checks: `akamata --version`, `akamata help`, `akamata deploy --help`, and `akamata migrate --help`.
 5. Commit the release preparation changes.
@@ -40,7 +49,7 @@ The version source of truth is `build.zig.zon`; keep the CLI version constant, s
 8. After the tag exists, fetch its archive with Zig and verify the content hash:
 
    ```bash
-   zig fetch https://github.com/appleuser634/Akamata/archive/refs/tags/vX.Y.Z.tar.gz
+   zig fetch https://github.com/moribit/Akamata/archive/refs/tags/vX.Y.Z.tar.gz
    ```
 
 9. Update the scaffold dependency to the stable tag and exact hash in a follow-up commit. This avoids a self-referential archive: a release archive cannot contain its own final archive hash. For the initial v0.0.1 release, the scaffold is pinned to the immutable release-preparation revision; subsequent releases should pin to the previous stable release.
