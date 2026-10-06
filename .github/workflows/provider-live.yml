@@ -1,0 +1,32 @@
+name: Opt-in live provider contract
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: provider-contract-test
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Validate dedicated deployment (never provision resources)
+        env:
+          AKAMATA_LIVE_BASE_URL: ${{ secrets.AKAMATA_CONTRACT_TEST_BASE_URL }}
+          AKAMATA_LIVE_SUBJECT: ${{ secrets.AKAMATA_CONTRACT_TEST_SUBJECT }}
+          AKAMATA_LIVE_LOGIN_SECRET: ${{ secrets.AKAMATA_CONTRACT_TEST_LOGIN_SECRET }}
+          AKAMATA_LIVE_RESOURCE_MANIFEST_JSON: ${{ secrets.AKAMATA_CONTRACT_TEST_RESOURCE_MANIFEST }}
+          AKAMATA_LIVE_ISOLATED: 1
+          AKAMATA_LIVE_SOURCE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p live-evidence
+          printf %s "$AKAMATA_LIVE_RESOURCE_MANIFEST_JSON" > live-evidence/resources.json
+          export AKAMATA_LIVE_RESOURCE_MANIFEST="$PWD/live-evidence/resources.json"
+          export AKAMATA_LIVE_OUTPUT="$PWD/live-evidence/result.json"
+          node tests/cloudflare_live.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: live-provider-contract
+          path: live-evidence/result.json
+          if-no-files-found: warn
