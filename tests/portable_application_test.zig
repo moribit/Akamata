@@ -106,3 +106,46 @@ fn completeStartup(allocator: std.mem.Allocator) !void {
 test "partial application startup releases earlier DB and realtime owners" {
     try std.testing.checkAllAllocationFailures(std.testing.allocator, completeStartup, .{});
 }
+
+fn metadataPageLifetime(allocator: std.mem.Allocator) !void {
+    const Backend = struct {
+        key: [7]u8 = "pages/a".*,
+        etag: [6]u8 = "etag-a".*,
+        content: [6]u8 = "test/x".*,
+        custom: [7]u8 = "{\"v\":1}".*,
+        cursor: [7]u8 = "token-a".*,
+        fn list(ptr: *anyopaque, alloc: std.mem.Allocator, _: []const u8, _: ?[]const u8, _: usize) am.storage.Error!am.storage.PageData {
+            const self: *@This() = @ptrCast(@alignCast(ptr));
+            const entries = alloc.alloc(am.storage.ListEntry, 1) catch return error.Unavailable;
+            entries[0] = .{ .key = &self.key, .metadata = .{ .size = 1, .etag = &self.etag, .content_type = &self.content, .custom_json = &self.custom } };
+            return .{ .entries = entries, .cursor = &self.cursor };
+        }
+    };
+    var memory = am.testing.MemoryStore.init(std.testing.allocator);
+    var vtable = memory.store().vtable.*;
+    vtable.list_page = Backend.list;
+    const owner = try std.testing.allocator.create(Backend);
+    owner.* = .{};
+    var alive = true;
+    defer if (alive) std.testing.allocator.destroy(owner);
+    const store: am.storage.Store = .{ .ptr = owner, .vtable = &vtable };
+    var page = store.listPage(allocator, "pages/", null, 1) catch |err| {
+        if (err == error.Unavailable) return error.OutOfMemory;
+        return err;
+    };
+    defer page.deinit();
+    // Destroy the adapter scratch/owner before inspecting every returned slice.
+    owner.* = undefined;
+    std.testing.allocator.destroy(owner);
+    alive = false;
+    try std.testing.expectEqualStrings("pages/a", page.entries[0].key);
+    try std.testing.expectEqualStrings("etag-a", page.entries[0].metadata.etag.?);
+    try std.testing.expectEqualStrings("test/x", page.entries[0].metadata.content_type.?);
+    try std.testing.expectEqualStrings("{\"v\":1}", page.entries[0].metadata.custom_json.?);
+    try std.testing.expectEqualStrings("token-a", page.cursor.?);
+}
+
+test "all page metadata survives adapter destruction with allocation-failure cleanup" {
+    try metadataPageLifetime(std.testing.allocator);
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, metadataPageLifetime, .{});
+}

@@ -80,4 +80,11 @@ with tempfile.TemporaryDirectory(prefix="akamata-capability-") as directory:
     (root / "src/main.zig").write_text("pub fn main() void {}")
     result = subprocess.run([cli, "inspect", "capabilities"], cwd=root, capture_output=True, text=True)
     assert result.returncode == 1 and "ApplicationContractNotDeclared" in result.stderr
+    result = subprocess.run([cli, "deploy", "--workers", "--environment=production", f"--config={config}"], cwd=root, capture_output=True, text=True)
+    assert result.returncode == 1 and "ApplicationContractNotDeclared" in result.stderr
+    assert "building wasm" not in result.stderr
+    manifest.write_text(json.dumps(declaration))
+    result = subprocess.run([cli, "deploy", "--containers", f"--manifest={manifest}"], cwd=root, capture_output=True, text=True)
+    assert result.returncode == 1 and "CapabilityTargetMismatch" in result.stderr
+    assert "docker build" not in result.stderr
 print("CLI capability inspection: resolution, config drift, invalid manifests, old-project fail-fast and read-only safety passed")

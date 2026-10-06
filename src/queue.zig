@@ -114,3 +114,24 @@ test "typed producer preserves delivery metadata" {
     try producer.dispatch(std.testing.allocator, Created, .{ .id = 1 }, .{ .event_id = "evt-1", .idempotency_key = "record:1" });
     try std.testing.expectEqual(@as(usize, 1), sink.calls);
 }
+
+test "consumer admission rejects missing or ambiguous ownership and borrows explicit context" {
+    const Event = struct { id: u64 };
+    const Owner = struct {
+        total: u64 = 0,
+        fn consume(ptr: *anyopaque, event: Event, _: Delivery) !void {
+            const self: *@This() = @ptrCast(@alignCast(ptr));
+            self.total += event.id;
+        }
+        fn legacy(_: Event, _: Delivery) !void {}
+    };
+    const C = Consumer(Event);
+    try std.testing.expectError(error.InvalidConsumer, (C{}).validate());
+    try std.testing.expectError(error.InvalidConsumer, (C{ .handler_with_context = Owner.consume }).validate());
+    var owner: Owner = .{};
+    try std.testing.expectError(error.InvalidConsumer, (C{ .handler = Owner.legacy, .context = &owner, .handler_with_context = Owner.consume }).validate());
+    const consumer: C = .{ .context = &owner, .handler_with_context = Owner.consume };
+    try consumer.consumeValue(.{ .id = 7 }, .{ .event_id = "owned" });
+    try std.testing.expectEqual(@as(u64, 7), owner.total);
+    try (C{ .handler = Owner.legacy }).consumeValue(.{ .id = 1 }, .{ .event_id = "legacy" });
+}

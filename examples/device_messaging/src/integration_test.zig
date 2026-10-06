@@ -49,5 +49,12 @@ test "reference production owners deliver queued reports and clean test effects"
     var removed = try client.request(.DELETE, delete_path).header("authorization", authorization).send();
     defer removed.deinit();
     try removed.expectStatus(204);
+    // At-least-once delivery after cleanup must not resurrect an effect.
+    try application.consumeReport(&effects, .{ .id = created.id }, .{ .event_id = "late", .attempt = 2, .max_attempts = 3 });
+    var count = try database.prepare("SELECT count(*) FROM report_deliveries WHERE report_id=?");
+    defer count.deinit();
+    try count.bindAll(.{created.id});
+    try std.testing.expect(try count.step() == .row);
+    try std.testing.expectEqual(@as(i64, 0), try count.columnInt(0));
     owner.stop();
 }

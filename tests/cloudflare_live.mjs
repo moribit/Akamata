@@ -126,10 +126,12 @@ function websocket(url, authorization) {
       socket.off("data", onHandshake);
       const head = buffered.subarray(0, end).toString("utf8");
       buffered = buffered.subarray(end + 4);
+      try {
       assert.match(head, /^HTTP\/1\.1 101 /);
       const expected = crypto.createHash("sha1").update(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").digest("base64");
       const acceptLine = head.split("\r\n").find(line => line.toLowerCase().startsWith("sec-websocket-accept:"));
       assert.equal(acceptLine?.slice(acceptLine.indexOf(":") + 1).trim(), expected);
+      } catch (error) { socket.destroy(error); return; }
       socket.on("data", data => { if (buffered.length + data.length > 256 * 1024) { socket.destroy(new Error("WebSocket buffer overflow")); return; } buffered = Buffer.concat([buffered, data]); drain(); });
       resolve({
         send(value) {
