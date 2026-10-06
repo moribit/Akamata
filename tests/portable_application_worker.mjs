@@ -112,6 +112,7 @@ assert.deepEqual(selectedBindings, ["REPORTS", "REPORTS", "DB", "REPORTS"]);
 assert.equal(statements.size, 0, "D1 statement handle leak");
 let warmedMemory;
 for (let i = 0; i < 10; i++) {
+  assert.equal(exports.run_developer_contract(), 0, decode(exports.error_ptr(), exports.error_len()));
   const result = exports.run_contract();
   const error = new TextDecoder().decode(new Uint8Array(exports.memory.buffer, exports.error_ptr(), exports.error_len()));
   assert.equal(result, 0, error);

@@ -123,3 +123,7 @@ test "principal binding uses middleware and rejects absent or incorrectly typed 
     defer wrong.deinit();
     try wrong.expectStatus(401);
 }
+
+test "shared Native Workers developer application contract" {
+    try @import("dx_application_fixture.zig").run(std.testing.allocator);
+}

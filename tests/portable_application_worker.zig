@@ -131,3 +131,11 @@ export fn error_ptr() [*]const u8 {
 export fn error_len() usize {
     return last_error.len;
 }
+
+export fn run_developer_contract() u32 {
+    @import("dx_application_fixture.zig").run(std.heap.wasm_allocator) catch |err| {
+        last_error = @errorName(err);
+        return 1;
+    };
+    return 0;
+}
