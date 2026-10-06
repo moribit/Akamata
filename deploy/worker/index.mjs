@@ -368,10 +368,11 @@ async function instantiateOnce(env) {
         const bytes = new Uint8Array(op.size);
         let offset = 0;
         for (const chunk of op.chunks) { bytes.set(chunk, offset); offset += chunk.length; }
-        await op.bucket.put(op.key, bytes, op.putOptions);
-        return 0;
+        const result = await op.bucket.put(op.key, bytes, op.putOptions);
+        return result === null ? -3 : 0;
       } catch { return -5; } finally { r2ops.delete(id); }
     }),
+    akamata_r2_put_abort(id) { r2ops.delete(id); },
     akamata_r2_get_begin: suspending(async (bindingPtr, bindingLen, keyPtr, keyLen, offset, length, hasRange, optionsPtr, optionsLen) => {
       const bucket = env?.[readString(bindingPtr, bindingLen)];
       if (!bucket?.get) return -2;

@@ -46,6 +46,7 @@ pub fn setQueueConsumer(handler: @import("../runtime/workers.zig").QueueFn) void
 extern "akamata_r2" fn akamata_r2_put_begin([*]const u8, usize, [*]const u8, usize, [*]const u8, usize) i32;
 extern "akamata_r2" fn akamata_r2_put_write(i32, [*]const u8, usize) i32;
 extern "akamata_r2" fn akamata_r2_put_finish(i32) i32;
+extern "akamata_r2" fn akamata_r2_put_abort(i32) void;
 extern "akamata_r2" fn akamata_r2_get_begin([*]const u8, usize, [*]const u8, usize, u64, u64, i32, [*]const u8, usize) i32;
 extern "akamata_r2" fn akamata_r2_get_size(i32) u64;
 extern "akamata_r2" fn akamata_r2_get_etag(i32, [*]u8, usize) i32;
@@ -102,6 +103,7 @@ pub const R2Store = struct {
         const encoded = writer.buffered();
         const handle = akamata_r2_put_begin(self.binding.ptr, self.binding.len, key.ptr, key.len, encoded.ptr, encoded.len);
         if (handle < 0) return mapCode(handle);
+        errdefer akamata_r2_put_abort(handle);
         defer body.close();
         var total: u64 = 0;
         var buffer: [64 * 1024]u8 = undefined;
