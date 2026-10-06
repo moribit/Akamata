@@ -118,9 +118,14 @@ pub const Store = struct {
             data = .{ .entries = entries[0..@min(entries.len, limit)], .cursor = if (entries.len > limit) entries[limit - 1].key else null };
         }
         if (data.entries.len > limit) return error.BackendFailure;
+        if (data.cursor) |next| {
+            if (next.len == 0 or next.len > 4096 or std.mem.indexOfScalar(u8, next, 0) != null) return error.BackendFailure;
+            if (cursor) |previous| if (std.mem.eql(u8, next, previous)) return error.BackendFailure;
+        }
         // Legacy adapters may return store-owned metadata. Snapshot every
         // string before returning a uniformly owned result.
         for (data.entries) |*entry| {
+            try validateKey(entry.key);
             entry.key = gpa.dupe(u8, entry.key) catch return error.Unavailable;
             entry.metadata.etag = try ownOptional(gpa, entry.metadata.etag);
             entry.metadata.content_type = try ownOptional(gpa, entry.metadata.content_type);

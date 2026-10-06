@@ -88,6 +88,11 @@ pub fn Provider(comptime D: type) type {
             try self.queue.handlerWithDelivery(D.name, self, consume);
             return self;
         }
+        pub fn createForContract(allocator: std.mem.Allocator, comptime C: type, db: db_mod.Db, consumer: portable.Consumer(D.Payload), options: Options) !*Self {
+            comptime C.validate(.native);
+            if (comptime C.resolve(.queue).provider != .native_queue) @compileError("jobs.Provider: contract must select native_queue");
+            return create(allocator, db, consumer, options);
+        }
 
         /// Additional finite jobs may share this owner's engine via
         /// owner.queue.handler/handlerWithDelivery. Never create independent

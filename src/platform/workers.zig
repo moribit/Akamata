@@ -60,6 +60,12 @@ pub fn QueueOwner(comptime D: type) type {
         pub fn producer(self: *Self) queue.Producer {
             return self.adapter.producer();
         }
+        pub fn createForContract(allocator: std.mem.Allocator, comptime C: type, consumer: queue.Consumer(D.Payload)) !*Self {
+            comptime C.validate(.workers);
+            const provision = comptime C.resolve(.queue);
+            if (comptime provision.provider != .workers_queue) @compileError("QueueOwner: contract must select workers_queue");
+            return create(allocator, provision.binding.?, consumer);
+        }
 
         pub fn consume(self: *Self, bytes: []const u8) !void {
             if (bytes.len > 128 * 1024) return error.PayloadTooLarge;

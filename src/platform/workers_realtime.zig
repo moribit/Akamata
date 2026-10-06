@@ -23,6 +23,12 @@ pub const Owner = struct {
     pub fn service(self: *Owner) realtime.Service {
         return .{ .backend = .{ .ptr = self, .vtable = &vtable } };
     }
+    pub fn createForContract(allocator: std.mem.Allocator, comptime C: type) !*Owner {
+        comptime C.validate(.workers);
+        const provision = comptime C.resolve(.realtime);
+        if (comptime provision.provider != .durable_objects) @compileError("RealtimeOwner: contract must select durable_objects");
+        return create(allocator, provision.binding.?);
+    }
     fn operation(self: *Owner, room: []const u8, value: anytype) realtime.Error!i64 {
         if (room.len == 0 or room.len > 1024) return error.Unsupported;
         const bytes = std.json.Stringify.valueAlloc(self.allocator, value, .{}) catch return error.Backpressure;

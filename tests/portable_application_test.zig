@@ -24,6 +24,24 @@ test "owned storage pages clean up every allocation failure" {
     try std.testing.checkAllAllocationFailures(std.testing.allocator, pageAllocationFailure, .{});
 }
 
+test "short empty pages continue by cursor and reject a nonadvancing backend" {
+    const PageBackend = struct {
+        fn page(_: *anyopaque, allocator: std.mem.Allocator, _: []const u8, _: ?[]const u8, _: usize) am.storage.Error!am.storage.PageData {
+            return .{ .entries = allocator.alloc(am.storage.ListEntry, 0) catch return error.Unavailable, .cursor = "next-page" };
+        }
+    };
+    var memory = am.testing.MemoryStore.init(std.testing.allocator);
+    var vtable = memory.store().vtable.*;
+    vtable.list_page = PageBackend.page;
+    var store = memory.store();
+    store.vtable = &vtable;
+    var first = try store.listPage(std.testing.allocator, "", null, 2);
+    defer first.deinit();
+    try std.testing.expectEqual(@as(usize, 0), first.entries.len);
+    try std.testing.expectEqualStrings("next-page", first.cursor.?);
+    try std.testing.expectError(error.BackendFailure, store.listPage(std.testing.allocator, "", first.cursor, 2));
+}
+
 const QueueEvent = struct { value: u32 };
 const QueueDescriptor = am.events.Descriptor(QueueEvent, .{ .name = "provider-test", .version = 2 });
 const QueueHandler = struct {
@@ -41,9 +59,11 @@ const QueueHandler = struct {
 };
 
 test "native queue provider preserves envelopes and actual retry delivery" {
-    var db = try am.db.open(std.testing.allocator, "file::memory:");
+    const C = am.capability.Contract("queue-owner", &.{ .database, .queue }, &.{ .{ .capability = .database, .provider = .sqlite }, .{ .capability = .queue, .provider = .native_queue } });
+    try std.testing.expectError(error.ProviderConfigurationDrift, am.db.openForContract(std.testing.allocator, C, "https://not-opened.invalid"));
+    var db = try am.db.openForContract(std.testing.allocator, C, "file::memory:");
     defer db.close();
-    const owner = try am.jobs.Provider(QueueDescriptor).create(std.testing.allocator, db, .{ .handler = QueueHandler.consume }, .{ .initial_backoff_seconds = 0 });
+    const owner = try am.jobs.Provider(QueueDescriptor).createForContract(std.testing.allocator, C, db, .{ .handler = QueueHandler.consume }, .{ .initial_backoff_seconds = 0 });
     defer owner.deinit();
     QueueHandler.calls = 0;
     try owner.producer().dispatchDescriptor(std.testing.allocator, QueueDescriptor, .{ .value = 42 }, .{ .event_id = "event-1", .correlation_id = "request-1", .idempotency_key = "operation-1", .max_attempts = 2 });
@@ -66,4 +86,23 @@ test "queue startup failure cleans partially initialized owner" {
     try std.testing.checkAllAllocationFailures(std.testing.allocator, ownerAllocationFailure, .{db});
     // The caller still owns and can use the earlier resource after failure.
     try db.execAll("CREATE TABLE provider_survived(id INTEGER)");
+}
+
+fn completeStartup(allocator: std.mem.Allocator) !void {
+    var database = try am.db.open(allocator, "file::memory:");
+    defer database.close();
+    // The Store borrows its filesystem directory in production; this owned
+    // test effect provider isolates allocation/cleanup ordering from OS paths.
+    var storage = am.testing.MemoryStore.init(allocator);
+    var realtime = am.realtime.Native.init(allocator);
+    defer realtime.deinit();
+    const owner = try am.jobs.Provider(QueueDescriptor).create(allocator, database, .{ .handler = QueueHandler.consume }, .{});
+    defer owner.deinit();
+    _ = storage.store();
+    _ = realtime.service();
+    owner.stop();
+}
+
+test "partial application startup releases earlier DB and realtime owners" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, completeStartup, .{});
 }

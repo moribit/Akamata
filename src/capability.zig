@@ -65,6 +65,28 @@ pub const Provision = struct {
     binding: ?[]const u8 = null,
 };
 
+/// Validate actual adapter selection before resource acquisition. URLs and
+/// credentials are never included in diagnostics or emitted manifests.
+pub fn validateDatabaseUrl(provision: Provision, url: []const u8) error{ProviderConfigurationDrift}!void {
+    const std = @import("std");
+    const matches = switch (provision.provider) {
+        .sqlite => std.mem.startsWith(u8, url, "file:"),
+        .turso => std.mem.startsWith(u8, url, "libsql://") or std.mem.startsWith(u8, url, "https://") or std.mem.startsWith(u8, url, "http://"),
+        .d1 => std.mem.startsWith(u8, url, "d1:") and provision.binding != null and std.mem.eql(u8, url[3..], provision.binding.?),
+        else => false,
+    };
+    if (provision.capability != .database or !matches) return error.ProviderConfigurationDrift;
+}
+
+test "database configuration matches resolved provider and exact binding" {
+    const std = @import("std");
+    const d1: Provision = .{ .capability = .database, .provider = .d1, .binding = "REPORTS" };
+    try validateDatabaseUrl(d1, "d1:REPORTS");
+    try std.testing.expectError(error.ProviderConfigurationDrift, validateDatabaseUrl(d1, "d1:DB"));
+    try std.testing.expectError(error.ProviderConfigurationDrift, validateDatabaseUrl(d1, "https://example.invalid"));
+    try validateDatabaseUrl(.{ .capability = .database, .provider = .sqlite }, "file::memory:");
+}
+
 fn providerSupports(provider: Provider, target: Target) bool {
     return switch (provider) {
         .turso => true,

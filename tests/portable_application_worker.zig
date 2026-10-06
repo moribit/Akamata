@@ -58,7 +58,7 @@ fn platformAdapterContract() !void {
     // isolate adapter allocations in a bounded operation arena.
     var arena: std.heap.ArenaAllocator = .init(std.heap.wasm_allocator);
     defer arena.deinit();
-    var store = am.platform.workers.R2Store.init(arena.allocator(), "FILES");
+    var store = try am.StorageFactory.initForContract(arena.allocator(), fixture.ApplicationContract, .{});
     try fixture.storageContract(arena.allocator(), store.store());
     try fixture.paginationContract(std.heap.wasm_allocator, store.store());
     const Payload = struct { text: []const u8 };
@@ -75,7 +75,7 @@ fn platformAdapterContract() !void {
     try owner.consume(
         \\{"body":{"protocol_version":2,"event_type":"created","event_id":"application-event","attempt":1,"max_attempts":7,"payload":{"text":"hello"}},"event_id":"cloudflare-message","attempt":3}
     );
-    const realtime = try am.platform.workers.RealtimeOwner.create(std.heap.wasm_allocator, "ROOMS");
+    const realtime = try am.platform.workers.RealtimeOwner.createForContract(std.heap.wasm_allocator, fixture.ApplicationContract);
     defer realtime.deinit();
     const Protocol = am.events.Protocol(union(enum) { created: Payload }, 2);
     const room = realtime.service().room(Protocol, "room-1");

@@ -13,6 +13,7 @@ const C = am.capability.Contract("portable application fixture", Requirements, &
     .{ .capability = .queue, .provider = am.capability.defaultProvider(.queue, target), .binding = if (target == .workers) "EVENTS" else null },
     .{ .capability = .realtime, .provider = am.capability.defaultProvider(.realtime, target), .binding = if (target == .workers) "ROOMS" else null },
 });
+pub const ApplicationContract = C;
 comptime {
     C.validate(target);
     if (target == .workers) am.binding.validateContract(struct {

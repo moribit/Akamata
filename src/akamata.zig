@@ -58,6 +58,11 @@ pub const StorageFactory = if (backend == .native) struct {
     pub fn store(self: *@This()) storage.Store {
         return self.owner.store();
     }
+    pub fn initForContract(allocator: std.mem.Allocator, comptime C: type, options: StorageOptions) !@This() {
+        comptime C.validate(.native);
+        if (comptime C.resolve(.object_storage).provider != .filesystem) @compileError("StorageFactory: Native contract must resolve object_storage to filesystem");
+        return init(allocator, options);
+    }
 } else struct {
     owner: @import("platform/workers.zig").R2Store,
     pub fn init(allocator: std.mem.Allocator, options: StorageOptions) !@This() {
@@ -65,6 +70,14 @@ pub const StorageFactory = if (backend == .native) struct {
     }
     pub fn store(self: *@This()) storage.Store {
         return self.owner.store();
+    }
+    pub fn initForContract(allocator: std.mem.Allocator, comptime C: type, options: StorageOptions) !@This() {
+        comptime C.validate(.workers);
+        const provision = comptime C.resolve(.object_storage);
+        if (comptime provision.provider != .r2) @compileError("StorageFactory: Workers contract must resolve object_storage to R2");
+        var resolved = options;
+        resolved.r2_binding = provision.binding.?;
+        return init(allocator, resolved);
     }
 };
 pub const net = @import("net.zig");
@@ -223,6 +236,15 @@ pub const db = struct {
     pub const Query = @import("db/static.zig").Query;
     pub const Pool = @import("db/pool.zig").Pool;
     pub const PoolLease = @import("db/pool.zig").Lease;
+
+    /// Opt-in checked factory; old open() remains available for explicit
+    /// platform/manual State wiring. Acquisition follows declared resolution.
+    pub fn openForContract(gpa: std.mem.Allocator, comptime ApplicationContract: type, url: []const u8) !Db {
+        comptime ApplicationContract.validate(if (backend == .native) .native else .workers);
+        const provision = comptime ApplicationContract.resolve(.database);
+        try capability.validateDatabaseUrl(provision, url);
+        return open(gpa, url);
+    }
 
     // Backend-specific openers. Use `open(url)` (below) for portable code.
     pub const openSqlite = if (backend == .native) @import("db/sqlite.zig").open else struct {}.@"openSqlite-workers-only";

@@ -192,6 +192,11 @@ pub const Native = struct {
     pub fn init(allocator: std.mem.Allocator) Native {
         return .{ .allocator = allocator, .mutex = .init(), .connections = .init(allocator) };
     }
+    pub fn initForContract(allocator: std.mem.Allocator, comptime C: type) Native {
+        comptime C.validate(.native);
+        if (comptime C.resolve(.realtime).provider != .native_realtime) @compileError("realtime.Native: contract must select native_realtime");
+        return init(allocator);
+    }
     pub fn deinit(self: *Native) void {
         var it = self.connections.valueIterator();
         while (it.next()) |entry| {

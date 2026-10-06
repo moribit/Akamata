@@ -44,7 +44,8 @@ pub fn buildState(alloc: std.mem.Allocator) !App {
     };
     defer alloc.free(url);
 
-    const database = try am.db.open(alloc, url);
+    const target: am.capability.Target = if (am.backend == .native) .native else .workers;
+    const database = try am.db.openForContract(alloc, @import("contract.zig").For(target), url);
 
     // Auto-migrate against the live DB. Only run during `buildState` on the
     // native side — Workers' `akamata_init` is called from the JS host's
