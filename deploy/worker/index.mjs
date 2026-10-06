@@ -432,6 +432,20 @@ async function instantiateOnce(env) {
         const id = nextR2Id++; r2lists.set(id, encoded); return id;
       } catch { return -5; }
     }),
+    akamata_r2_list_page_begin: suspending(async (bindingPtr, bindingLen, prefixPtr, prefixLen, cursorPtr, cursorLen, limit) => {
+      const bucket = env?.[readString(bindingPtr, bindingLen)]; if (!bucket?.list) return -2;
+      try {
+        const options = { prefix: readString(prefixPtr, prefixLen), limit: Number(limit), include: ["httpMetadata", "customMetadata"] };
+        const cursor = readString(cursorPtr, cursorLen); if (cursor) options.cursor = cursor;
+        const page = await bucket.list(options);
+        const encoded = new TextEncoder().encode(JSON.stringify({
+          objects: page.objects.map(o => ({ key: o.key, size: o.size, etag: o.httpEtag ?? o.etag ?? null,
+            content_type: o.httpMetadata?.contentType ?? null, custom_json: o.customMetadata ? JSON.stringify(o.customMetadata) : null })),
+          cursor: page.truncated ? page.cursor : null,
+        }));
+        const id = nextR2Id++; r2lists.set(id, encoded); return id;
+      } catch { return -5; }
+    }),
     akamata_r2_list_len(id) { return r2lists.get(id)?.length ?? 0; },
     akamata_r2_list_copy(id, ptr, cap) { const bytes = r2lists.get(id); if (!bytes || bytes.length > cap) return -5; writeBytes(ptr, bytes); return bytes.length; },
     akamata_r2_list_close(id) { r2lists.delete(id); },

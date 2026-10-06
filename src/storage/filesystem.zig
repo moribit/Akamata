@@ -169,10 +169,14 @@ pub const FileStore = struct {
             if (entry.kind != .file or std.mem.startsWith(u8, entry.path, ".akamata-meta/") or !std.mem.startsWith(u8, entry.path, prefix)) continue;
             if (cursor) |after| if (std.mem.order(u8, entry.path, after) != .gt) continue;
             const stat = entry.dir.statFile(self.io, entry.basename, .{}) catch continue;
+            const key = allocator.dupe(u8, entry.path) catch return error.Unavailable;
             entries.append(allocator, .{
-                .key = allocator.dupe(u8, entry.path) catch return error.Unavailable,
+                .key = key,
                 .metadata = .{ .size = stat.size, .modified_at_ms = @intCast(@divTrunc(stat.mtime.nanoseconds, std.time.ns_per_ms)) },
-            }) catch return error.Unavailable;
+            }) catch {
+                allocator.free(key);
+                return error.Unavailable;
+            };
         }
         std.mem.sort(storage.ListEntry, entries.items, {}, struct {
             fn less(_: void, a: storage.ListEntry, b: storage.ListEntry) bool {

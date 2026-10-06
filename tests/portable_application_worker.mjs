@@ -73,6 +73,15 @@ imports.akamata_r2 = {
     assert.equal(decode(bp, bl), "FILES"); assert.equal(decode(cp, cl), "");
     return handle(new TextEncoder().encode(JSON.stringify([...objects].filter(([key]) => key.startsWith(decode(pp, pl))).slice(0, limit).map(([key, item]) => ({ key, size: item.bytes.length, etag: item.etag })))));
   },
+  akamata_r2_list_page_begin(bp, bl, pp, pl, cp, cl, limit) {
+    assert.equal(decode(bp, bl), "FILES");
+    const token = decode(cp, cl);
+    const offset = token ? Number(token.slice(5)) : 0;
+    if (token && !/^page:[0-9]+$/.test(token)) return -6;
+    const all = [...objects].filter(([key]) => key.startsWith(decode(pp, pl))).sort(([a], [b]) => a.localeCompare(b));
+    const selected = all.slice(offset, offset + limit);
+    return handle(new TextEncoder().encode(JSON.stringify({ objects: selected.map(([key, item]) => ({ key, size: item.bytes.length, etag: item.etag, content_type: item.type })), cursor: offset + limit < all.length ? `page:${offset + limit}` : null })));
+  },
   akamata_r2_list_len(id) { return handles.get(id).length; },
   akamata_r2_list_copy(id, ptr, len) { return copy(handles.get(id), ptr, len); },
   akamata_r2_list_close(id) { assert.ok(handles.delete(id)); },

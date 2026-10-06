@@ -115,9 +115,45 @@ pub fn storageContract(allocator: std.mem.Allocator, store: am.storage.Store) !v
         allocator.free(entries);
     }
     try expect(entries.len == 1 and std.mem.eql(u8, entries[0].key, "objects/test"));
+    var page = try store.listPage(allocator, "objects/", null, 1);
+    defer page.deinit();
+    try expect(page.entries.len == 1 and page.cursor == null);
     try store.delete("objects/test");
+    try expect(std.mem.eql(u8, page.entries[0].key, "objects/test"));
     if (store.head("objects/test")) |_| return error.ContractAssertionFailed else |err| try expect(err == error.NotFound);
     if (store.head("../secret")) |_| return error.ContractAssertionFailed else |err| try expect(err == error.PermissionDenied);
+    try paginationContract(allocator, store);
+}
+
+pub fn paginationContract(allocator: std.mem.Allocator, store: am.storage.Store) !void {
+    var empty = try store.listPage(allocator, "pages/", null, 2);
+    defer empty.deinit();
+    try expect(empty.entries.len == 0 and empty.cursor == null);
+    for ([_][]const u8{ "pages/a", "pages/b", "pages/c" }) |key| {
+        var body = Source{ .bytes = "value" };
+        _ = try store.put(key, body.reader(), .{ .content_type = "text/plain" });
+    }
+    defer for ([_][]const u8{ "pages/a", "pages/b", "pages/c" }) |key| store.delete(key) catch {};
+    var first = try store.listPage(allocator, "pages/", null, 2);
+    defer first.deinit();
+    try expect(first.entries.len == 2 and first.cursor != null);
+    var next = try store.listPage(allocator, "pages/", first.cursor, 2);
+    defer next.deinit();
+    try expect(next.entries.len == 1 and next.cursor == null);
+    try expect(!std.mem.eql(u8, first.entries[0].key, next.entries[0].key));
+    try store.delete(first.entries[0].key);
+    try expect(std.mem.startsWith(u8, first.entries[0].key, "pages/"));
+    if (first.entries[0].metadata.content_type) |value| try expect(std.mem.eql(u8, value, "text/plain"));
+    if (store.listPage(allocator, "pages/", "", 2)) |result| {
+        var unexpected = result;
+        unexpected.deinit();
+        return error.ContractAssertionFailed;
+    } else |err| try expect(err == error.InvalidCursor);
+    if (store.listPage(allocator, "pages/", null, 0)) |result| {
+        var unexpected = result;
+        unexpected.deinit();
+        return error.ContractAssertionFailed;
+    } else |err| try expect(err == error.InvalidLimit);
 }
 
 pub fn run(allocator: std.mem.Allocator) !void {

@@ -4,7 +4,7 @@ const std = @import("std");
 const stream = @import("stream.zig");
 const mime = @import("http/mime.zig");
 
-pub const Error = error{ NotFound, InvalidRange, PreconditionFailed, PermissionDenied, Unavailable, BackendFailure };
+pub const Error = error{ NotFound, InvalidRange, InvalidCursor, InvalidLimit, PreconditionFailed, PermissionDenied, Unavailable, BackendFailure };
 pub const Range = struct { offset: u64, length: ?u64 = null };
 pub const Metadata = struct {
     size: u64,
@@ -17,6 +17,25 @@ pub const PutOptions = struct { content_type: ?[]const u8 = null, metadata_json:
 pub const GetOptions = struct { range: ?Range = null, if_match: ?[]const u8 = null, if_none_match: ?[]const u8 = null };
 pub const Object = struct { metadata: Metadata, body: stream.Reader };
 pub const ListEntry = struct { key: []const u8, metadata: Metadata };
+
+/// All slices, including metadata and the opaque continuation token, belong
+/// to this result. They survive store mutation and destruction. Do not copy
+/// an owning page or free its slices individually; call deinit exactly once.
+pub const ListPage = struct {
+    entries: []const ListEntry,
+    cursor: ?[]const u8,
+    arena: std.heap.ArenaAllocator,
+
+    pub fn deinit(self: *ListPage) void {
+        self.arena.deinit();
+        self.* = undefined;
+    }
+};
+pub const PageData = struct { entries: []ListEntry, cursor: ?[]const u8 = null };
+
+fn ownOptional(allocator: std.mem.Allocator, value: ?[]const u8) Error!?[]const u8 {
+    return if (value) |bytes| allocator.dupe(u8, bytes) catch error.Unavailable else null;
+}
 
 /// Object keys are portable relative paths, never filesystem paths or URLs.
 /// Adapters must call this at their trust boundary before accessing a backend.
@@ -46,6 +65,9 @@ pub const Store = struct {
         delete: *const fn (*anyopaque, []const u8) Error!void,
         head: *const fn (*anyopaque, []const u8) Error!Metadata,
         list: *const fn (*anyopaque, std.mem.Allocator, []const u8, ?[]const u8, usize) Error![]ListEntry,
+        /// Optional for source compatibility with custom stores. Without this
+        /// callback, list must implement sorted lexical key continuation.
+        list_page: ?*const fn (*anyopaque, std.mem.Allocator, []const u8, ?[]const u8, usize) Error!PageData = null,
     };
     pub fn put(self: Store, key: []const u8, body: stream.Reader, options: PutOptions) Error!Metadata {
         var span = if (self.trace) |trace| trace.startSpan("storage.put") else null;
@@ -71,6 +93,41 @@ pub const Store = struct {
         var span = if (self.trace) |trace| trace.startSpan("storage.list") else null;
         defer if (span) |*s| s.end();
         return self.vtable.list(self.ptr, allocator, prefix, cursor, limit);
+    }
+
+    /// Preferred listing API. Cursor is opaque, scoped to this store/prefix,
+    /// and not a snapshot: concurrent mutations may change subsequent pages.
+    /// The caller's allocator owns the operation arena, including on failure.
+    pub fn listPage(self: Store, allocator: std.mem.Allocator, prefix: []const u8, cursor: ?[]const u8, limit: usize) Error!ListPage {
+        if (limit == 0 or limit > 1000) return error.InvalidLimit;
+        if (prefix.len > 1024 or std.mem.indexOfScalar(u8, prefix, 0) != null or std.mem.indexOfScalar(u8, prefix, '\\') != null or std.mem.startsWith(u8, prefix, "/")) return error.PermissionDenied;
+        var parts = std.mem.splitScalar(u8, prefix, '/');
+        while (parts.next()) |part| if (std.mem.eql(u8, part, ".") or std.mem.eql(u8, part, "..")) return error.PermissionDenied;
+        if (cursor) |token| if (token.len == 0 or token.len > 4096 or std.mem.indexOfScalar(u8, token, 0) != null) return error.InvalidCursor;
+        var span = if (self.trace) |trace| trace.startSpan("storage.list") else null;
+        defer if (span) |*s| s.end();
+        var arena = std.heap.ArenaAllocator.init(allocator);
+        errdefer arena.deinit();
+        const gpa = arena.allocator();
+        var data: PageData = undefined;
+        if (self.vtable.list_page) |page| {
+            data = try page(self.ptr, gpa, prefix, cursor, limit);
+        } else {
+            if (cursor) |token| validateKey(token) catch return error.InvalidCursor;
+            const entries = try self.vtable.list(self.ptr, gpa, prefix, cursor, limit + 1);
+            data = .{ .entries = entries[0..@min(entries.len, limit)], .cursor = if (entries.len > limit) entries[limit - 1].key else null };
+        }
+        if (data.entries.len > limit) return error.BackendFailure;
+        // Legacy adapters may return store-owned metadata. Snapshot every
+        // string before returning a uniformly owned result.
+        for (data.entries) |*entry| {
+            entry.key = gpa.dupe(u8, entry.key) catch return error.Unavailable;
+            entry.metadata.etag = try ownOptional(gpa, entry.metadata.etag);
+            entry.metadata.content_type = try ownOptional(gpa, entry.metadata.content_type);
+            entry.metadata.custom_json = try ownOptional(gpa, entry.metadata.custom_json);
+        }
+        const next = try ownOptional(gpa, data.cursor);
+        return .{ .entries = data.entries, .cursor = next, .arena = arena };
     }
 };
 

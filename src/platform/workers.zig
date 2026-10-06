@@ -57,6 +57,7 @@ extern "akamata_r2" fn akamata_r2_get_close(i32) void;
 extern "akamata_r2" fn akamata_r2_delete([*]const u8, usize, [*]const u8, usize) i32;
 extern "akamata_r2" fn akamata_r2_head([*]const u8, usize, [*]const u8, usize) i64;
 extern "akamata_r2" fn akamata_r2_list_begin([*]const u8, usize, [*]const u8, usize, [*]const u8, usize, usize) i32;
+extern "akamata_r2" fn akamata_r2_list_page_begin([*]const u8, usize, [*]const u8, usize, [*]const u8, usize, usize) i32;
 extern "akamata_r2" fn akamata_r2_list_len(i32) usize;
 extern "akamata_r2" fn akamata_r2_list_copy(i32, [*]u8, usize) i32;
 extern "akamata_r2" fn akamata_r2_list_close(i32) void;
@@ -190,5 +191,25 @@ pub const R2Store = struct {
             else => error.BackendFailure,
         };
     }
-    const vtable: storage.Store.VTable = .{ .put = put, .get = get, .delete = delete, .head = head, .list = list };
+    fn listPage(raw: *anyopaque, allocator: std.mem.Allocator, prefix: []const u8, cursor: ?[]const u8, limit: usize) storage.Error!storage.PageData {
+        const self: *R2Store = @ptrCast(@alignCast(raw));
+        if (prefix.len > 1024 or std.mem.indexOf(u8, prefix, "..") != null or std.mem.indexOfScalar(u8, prefix, '\\') != null) return error.PermissionDenied;
+        const after = cursor orelse "";
+        const handle = akamata_r2_list_page_begin(self.binding.ptr, self.binding.len, prefix.ptr, prefix.len, after.ptr, after.len, limit);
+        if (handle == -6) return error.InvalidCursor;
+        if (handle < 0) return mapCode(handle);
+        defer akamata_r2_list_close(handle);
+        const bytes = allocator.alloc(u8, akamata_r2_list_len(handle)) catch return error.Unavailable;
+        const copied = akamata_r2_list_copy(handle, bytes.ptr, bytes.len);
+        if (copied < 0 or copied != bytes.len) return error.BackendFailure;
+        const Wire = struct {
+            objects: []struct { key: []const u8, size: u64, etag: ?[]const u8 = null, content_type: ?[]const u8 = null, custom_json: ?[]const u8 = null },
+            cursor: ?[]const u8 = null,
+        };
+        const page = std.json.parseFromSliceLeaky(Wire, allocator, bytes, .{ .ignore_unknown_fields = true }) catch return error.BackendFailure;
+        const entries = allocator.alloc(storage.ListEntry, page.objects.len) catch return error.Unavailable;
+        for (page.objects, entries) |item, *entry| entry.* = .{ .key = item.key, .metadata = .{ .size = item.size, .etag = item.etag, .content_type = item.content_type, .custom_json = item.custom_json } };
+        return .{ .entries = entries, .cursor = page.cursor };
+    }
+    const vtable: storage.Store.VTable = .{ .put = put, .get = get, .delete = delete, .head = head, .list = list, .list_page = listPage };
 };
