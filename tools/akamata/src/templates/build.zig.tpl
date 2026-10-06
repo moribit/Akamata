@@ -43,4 +43,15 @@ pub fn build(b: *std.Build) void {
     const run = b.addRunArtifact(exe);
     run.addPassthruArgs();
     b.step("run", "run the app (native)").dependOn(&run.step);
+
+    if (backend == .native) {
+        const unit_tests = b.addTest(.{ .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = native_target,
+            .optimize = optimize,
+            .imports = &.{.{ .name = "akamata", .module = am.module("akamata") }},
+        }) });
+        const run_tests = b.addRunArtifact(unit_tests);
+        b.step("test", "test the application without a listener").dependOn(&run_tests.step);
+    }
 }

@@ -45,10 +45,7 @@ pub fn main(init: std.process.Init) !void {
             } else {
                 const Contract = ak.capability.Contract("{{NAME}}", &.{}, &.{});
                 const target = if (args.len == 3) std.mem.sliceTo(args[2], 0) else "native";
-                if (std.mem.eql(u8, target, "workers")) try Contract.writeManifest(.workers, &stdout.interface, Application.Endpoints)
-                else if (std.mem.eql(u8, target, "native")) try Contract.writeManifest(.native, &stdout.interface, Application.Endpoints)
-                else if (std.mem.eql(u8, target, "containers")) try Contract.writeManifest(.containers, &stdout.interface, Application.Endpoints)
-                else return error.InvalidTarget;
+                if (std.mem.eql(u8, target, "workers")) try Contract.writeManifest(.workers, &stdout.interface, Application.Endpoints) else if (std.mem.eql(u8, target, "native")) try Contract.writeManifest(.native, &stdout.interface, Application.Endpoints) else if (std.mem.eql(u8, target, "containers")) try Contract.writeManifest(.containers, &stdout.interface, Application.Endpoints) else return error.InvalidTarget;
             }
             return stdout.interface.flush();
         }
@@ -61,4 +58,17 @@ pub fn main(init: std.process.Init) !void {
     const port = if (configured_port) |value| try std.fmt.parseInt(u16, value, 10) else 8080;
     std.debug.print("Akamata: starting http://127.0.0.1:{d}/\n", .{port});
     try app.serve(.{ .port = port });
+}
+
+test "Hello application contract" {
+    var app = try buildApplication(std.testing.allocator);
+    defer app.deinit();
+    var client = if (comptime @hasDecl(ak, "get"))
+        app.client(std.testing.allocator)
+    else
+        ak.testing.Client(Application).init(std.testing.allocator, &app);
+    var response = try client.get("/").send();
+    defer response.deinit();
+    try std.testing.expectEqual(@as(u16, 200), response.status);
+    try std.testing.expectEqualStrings("Hello, {{NAME}}!", response.body);
 }

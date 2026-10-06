@@ -22,6 +22,7 @@ with tempfile.TemporaryDirectory(prefix="akamata-minimal-") as directory:
     assert not any((project / folder).exists() for folder in ["controllers", "services", "repositories", "providers"])
     build = ["zig", "build"] + ([f"--fork={checkout}"] if checkout else [])
     subprocess.run(build + ["-Doptimize=ReleaseSafe"], cwd=project, check=True)
+    subprocess.run(build + ["test", "-Doptimize=ReleaseSafe"], cwd=project, check=True)
     subprocess.run(build + ["-Dbackend=workers", "-Doptimize=ReleaseSafe"], cwd=project, check=True)
     binary = str(project / "zig-out/bin/minimalapp")
     if checkout:

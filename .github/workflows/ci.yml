@@ -58,6 +58,21 @@ jobs:
             .zig-cache/runtime-session-validation.json
           if-no-files-found: ignore
 
+  public-presentation:
+    name: public documentation and PDF contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+      - run: node tools/docgen/build_slides.mjs
+      - run: git diff --exit-code -- tools/docgen/slides.html tools/docgen/slides.ja.html
+      - run: python3 tests/documentation_links.py
+      - run: python3 -m venv /tmp/akamata-pdfcheck
+      - run: /tmp/akamata-pdfcheck/bin/pip install pypdf==6.19.0
+      - run: /tmp/akamata-pdfcheck/bin/python tests/public_slides.py
+
   dx-typescript:
     name: generated DX client strict typecheck
     runs-on: ubuntu-latest
@@ -113,6 +128,7 @@ jobs:
       - run: zig build cli-operations-test
       - run: zig build cli-capabilities-test compile-fail-test workers-realtime-test workers-wasm-dispatch-test
       - run: zig build scaffold-local-test
+      - run: zig build public-journey-test
       - run: zig build project-update-test
       - run: zig build workers-capability-sync-test
       - run: |

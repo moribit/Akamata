@@ -13,3 +13,4 @@ zig build -Dbackend=workers
 The dependency is pinned to the published release. To try the latest typed API with a local checkout, use `zig build --fork=/path/to/Akamata run`. The bootstrap preserves the same Hello response on the pinned release. When growing the application, use the typed-handler guides on latest main or the existing explicit App/Context API on the release.
 
 For the DB/validation/migration tutorial instead, create a separate project with `akamata init <name> --template=notes`. Existing projects keep their source files during update/sync.
+Test the same Hello application without sockets with `akamata test` or `zig build test`.

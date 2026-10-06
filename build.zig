@@ -218,6 +218,10 @@ pub fn build(b: *std.Build) void {
     scaffold_local.addArtifactArg(cli_exe);
     scaffold_local.addDirectoryArg2(b.path("."), .{});
     const scaffold_local_step = b.step("scaffold-local-test", "generate and build a scaffold against this checkout");
+    const public_journey = b.addSystemCommand(&.{ "python3", "tests/public_journey.py" });
+    public_journey.addArtifactArg(cli_exe);
+    public_journey.addDirectoryArg2(b.path("."), .{});
+    b.step("public-journey-test", "verify the published init/dev/test and typed Native/Workers journey").dependOn(&public_journey.step);
     scaffold_local_step.dependOn(&scaffold_local.step);
     const minimal_scaffold = b.addSystemCommand(&.{ "python3", "tests/minimal_scaffold.py" });
     minimal_scaffold.addArtifactArg(cli_exe);
