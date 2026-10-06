@@ -18,7 +18,7 @@ pub fn cmdCheck(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     defer capability_args.deinit(alloc);
     for (args) |raw| {
         const arg = std.mem.sliceTo(raw, 0);
-        if (std.mem.eql(u8, arg, "--quick")) quick = true else if (std.mem.eql(u8, arg, "--capabilities")) capabilities = true else if (std.mem.startsWith(u8, arg, "--target=") or std.mem.startsWith(u8, arg, "--manifest=") or std.mem.startsWith(u8, arg, "--config=")) try capability_args.append(alloc, raw) else return error.UsageError;
+        if (std.mem.eql(u8, arg, "--quick")) quick = true else if (std.mem.eql(u8, arg, "--capabilities")) capabilities = true else if (std.mem.eql(u8, arg, "--strict") or std.mem.startsWith(u8, arg, "--environment=") or std.mem.startsWith(u8, arg, "--target=") or std.mem.startsWith(u8, arg, "--manifest=") or std.mem.startsWith(u8, arg, "--config=")) try capability_args.append(alloc, raw) else return error.UsageError;
     }
     var failures: usize = 0;
     const required = [_][]const u8{ "build.zig", "build.zig.zon", "src" };
@@ -56,15 +56,19 @@ pub fn cmdInspect(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
 
 /// The application emits the contract; never infer requirements from imports
 /// or turn configured resources into supposedly required application services.
-fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
+pub fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     var target: []const u8 = "native";
     var json = false;
     var manifest: ?[]const u8 = null;
     var config: ?[]const u8 = null;
+    var environment: ?[]const u8 = null;
+    var strict = false;
     for (args) |raw| {
         const arg = std.mem.sliceTo(raw, 0);
-        if (std.mem.eql(u8, arg, "--json")) json = true else if (std.mem.startsWith(u8, arg, "--target=")) target = arg[9..] else if (std.mem.startsWith(u8, arg, "--manifest=")) manifest = arg[11..] else if (std.mem.startsWith(u8, arg, "--config=")) config = arg[9..] else return error.UsageError;
+        if (std.mem.eql(u8, arg, "--json")) json = true else if (std.mem.eql(u8, arg, "--strict")) strict = true else if (std.mem.startsWith(u8, arg, "--environment=")) environment = arg[14..] else if (std.mem.startsWith(u8, arg, "--target=")) target = arg[9..] else if (std.mem.startsWith(u8, arg, "--manifest=")) manifest = arg[11..] else if (std.mem.startsWith(u8, arg, "--config=")) config = arg[9..] else return error.UsageError;
     }
+    const deployment = @import("../cloudflare/config.zig");
+    try deployment.validateEnvironment(environment);
     if (!std.mem.eql(u8, target, "native") and !std.mem.eql(u8, target, "workers") and !std.mem.eql(u8, target, "containers")) return error.UsageError;
     const bytes = if (manifest) |path| try readFileAlloc(alloc, path, 1024 * 1024) else blk: {
         const source = readFileAlloc(alloc, "src/main.zig", 2 * 1024 * 1024) catch return error.ApplicationContractNotDeclared;
@@ -78,7 +82,7 @@ fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     defer alloc.free(bytes);
     var parsed = try std.json.parseFromSlice(std.json.Value, alloc, bytes, .{});
     defer parsed.deinit();
-    const root = parsed.value;
+    var root = parsed.value;
     if (root != .object) return error.InvalidCapabilityManifest;
     const version = root.object.get("version") orelse return error.InvalidCapabilityManifest;
     const declared_target = root.object.get("target") orelse return error.InvalidCapabilityManifest;
@@ -100,8 +104,11 @@ fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     const config_path = config orelse defaultConfigPath();
     const config_bytes: ?[]u8 = if (config_path) |path| try readFileAlloc(alloc, path, 4 * 1024 * 1024) else null;
     defer if (config_bytes) |owned| alloc.free(owned);
-    if (!json) std.debug.print("Target: {s}\nApplication capabilities (remote resource readiness is not checked)\n", .{target});
+    if (!json) std.debug.print("Target: {s}\nEnvironment: {s}\nApplication capabilities (remote resource readiness is not checked)\n", .{ target, environment orelse "default" });
+    try root.object.put(parsed.arena.allocator(), "environment", if (environment) |env| .{ .string = env } else .null);
     var missing = false;
+    var invalid = false;
+    var drift = false;
     for (providers.array.items, 0..) |*item, provider_index| {
         if (item.* != .object) return error.InvalidCapabilityManifest;
         const kind = item.object.get("capability") orelse return error.InvalidCapabilityManifest;
@@ -115,20 +122,53 @@ fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
         seen[index] = true;
         const needs_binding = implementation.usesBinding();
         var status: []const u8 = "declared";
+        var readiness: []const u8 = "declared";
         if (item.object.get("binding")) |binding_name| if (binding_name == .string) {
             if (!needs_binding or binding_name.string.len == 0) return error.InvalidCapabilityManifest;
             for (providers.array.items[0..provider_index]) |previous| {
                 if (previous.object.get("binding")) |prior| if (prior == .string and std.mem.eql(u8, prior.string, binding_name.string)) return error.InvalidCapabilityManifest;
             }
-            const present = if (config_bytes) |content| @import("../cloudflare/config.zig").hasResourceBinding(content, provider.string, binding_name.string) else false;
+            const resource = if (config_bytes) |content| try deployment.resource(content, provider.string, binding_name.string, environment) else deployment.Resource{};
+            const present = resource.present;
             status = if (present) "binding_configured" else "missing_binding";
+            readiness = if (resource.validated(provider.string)) "validated" else if (present) "configured" else "declared";
             if (!present) missing = true;
+            if (present and !resource.validated(provider.string)) invalid = true;
+            if (resource.matches > 1) drift = true;
             if (!json) std.debug.print("{s}\n  provider: {s}\n  binding: {s}\n  status: {s}\n", .{ kind.string, provider.string, binding_name.string, status });
+            if (!present or !resource.validated(provider.string)) {
+                if (!json) std.debug.print("  environment: {s}\n  problem: {s}\n", .{ environment orelse "default", if (!present) "binding is not configured" else "resource identifier/class is missing, placeholder, or binding is duplicated" });
+                if (!json) if (root.object.get("routes")) |routes| if (routes == .array) {
+                    for (routes.array.items) |route| {
+                        if (route != .object) continue;
+                        const needs = route.object.get("capabilities") orelse continue;
+                        if (needs != .array) continue;
+                        for (needs.array.items) |need| if (need == .string and std.mem.eql(u8, need.string, kind.string)) {
+                            const method = route.object.get("method") orelse continue;
+                            const path = route.object.get("path") orelse continue;
+                            if (method == .string and path == .string) std.debug.print("  required by: {s} {s}\n", .{ method.string, path.string });
+                        };
+                    }
+                };
+            }
         } else {
             if (binding_name != .null or needs_binding) return error.InvalidCapabilityManifest;
             if (!json) std.debug.print("{s}\n  provider: {s}\n  status: {s}\n", .{ kind.string, provider.string, status });
         } else return error.InvalidCapabilityManifest;
+        if (needed == .database) if (config_bytes) |content| {
+            if (try deployment.environmentVar(content, environment, "DATABASE_URL")) |url| {
+                const binding_name = item.object.get("binding");
+                cap.validateDatabaseUrl(.{ .capability = .database, .provider = implementation, .binding = if (binding_name != null and binding_name.? == .string) binding_name.?.string else null }, url) catch {
+                    invalid = true;
+                    drift = true;
+                    readiness = "configured";
+                    if (!json) std.debug.print("  problem: DATABASE_URL selects a different provider/binding (value redacted)\n", .{});
+                };
+            }
+        };
         try item.object.put(parsed.arena.allocator(), "status", .{ .string = status });
+        try item.object.put(parsed.arena.allocator(), "readiness", .{ .string = readiness });
+        if (!json) std.debug.print("  readiness: {s}\n", .{readiness});
     }
     for (requirements.array.items) |required| {
         if (required != .string) return error.InvalidCapabilityManifest;
@@ -160,6 +200,7 @@ fn cmdCapabilities(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
         std.debug.print("{s}\n", .{aw.written()});
     }
     if (missing) return error.MissingCapabilityBinding;
+    if (drift or (strict and invalid)) return error.ProviderConfigurationDrift;
 }
 
 pub fn cmdRoutes(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {

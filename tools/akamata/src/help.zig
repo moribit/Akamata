@@ -63,16 +63,17 @@ pub fn usage() !void {
         \\      Run the app natively with hot reload: watches ./src (and
         \\      build.zig, .env), rebuilds and restarts on change. Ctrl-C to
         \\      stop. --no-watch does a one-shot `zig build run`.
-        \\  deploy [--workers|--containers] [--config=PATH] [--migrate=SQL] [--optimize=MODE]
+        \\  deploy [--workers|--containers] [--config=PATH] [--environment=NAME] [--preflight] [--migrate=SQL] [--optimize=MODE]
         \\      Build and deploy. For --workers:
         \\        * --config=PATH      wrangler.toml location
         \\                             (default: deploy/wrangler.toml, then wrangler.toml)
         \\        * --optimize=MODE    wasm optimize mode (default: ReleaseFast).
         \\                             ReleaseSmall for the smallest bundle.
         \\        * --migrate=SQL      apply the SQL file to the remote D1 before deploy.
-        \\                             If the D1 in wrangler.toml has the placeholder
-        \\                             database_id, it is auto-created and the ID is
-        \\                             written back into the config.
+        \\        * --environment=NAME select non-inheritable environment bindings.
+        \\        * --preflight       require strict local application contract checks.
+        \\      Contract-aware projects preflight automatically. Deploy does not
+        \\      create resources; provision explicitly and replace placeholder IDs.
         \\  sync-glue [--config=PATH] [--force]
         \\      Deprecated alias for the safe managed-file `sync` command.
         \\  sync [--force] [--dry-run] [--config=PATH]
@@ -207,12 +208,12 @@ pub fn commandUsage(command: []const u8) !void {
         \\  -h, --help                Show this help
         \\
     else if (std.mem.eql(u8, command, "check"))
-        \\Usage: akamata check [--quick] [--capabilities --target=native|workers|containers --manifest=PATH --config=PATH]
+        \\Usage: akamata check [--quick] [--capabilities --target=native|workers|containers --manifest=PATH --config=PATH --environment=NAME --strict]
         \\Validate build files and source layout; without --quick also run `zig build test`.
         \\
     else if (std.mem.eql(u8, command, "inspect"))
         \\Usage: akamata inspect [--json]
-        \\       akamata inspect capabilities [--target=native|workers|containers] [--json] [--manifest=PATH] [--config=PATH]
+        \\       akamata inspect capabilities [--target=native|workers|containers] [--json] [--manifest=PATH] [--config=PATH] [--environment=NAME] [--strict]
         \\Show a deterministic project summary suitable for humans or tooling.
         \\
     else if (std.mem.eql(u8, command, "routes"))

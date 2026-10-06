@@ -46,24 +46,19 @@ elif mode == 'fail-build' and args[0] == 'zig': sys.exit(1)
             assert result.returncode == 1, result.returncode
         return [json.loads(line) for line in log.read_text().splitlines()]
 
-    for mode in ['create', 'exists']:
-        config.write_text(initial)
-        calls = run(['deploy', '--workers', '--config=custom.toml', '--migrate=schema.sql'], mode)
-        expected = [['npx', 'wrangler', 'd1', 'create', 'test-db']]
-        if mode == 'exists': expected += [['npx', 'wrangler', 'd1', 'list', '--json']]
-        expected += [
-            ['npx', 'wrangler', 'd1', 'execute', 'test-db', '--remote', '--config', 'custom.toml', '--file', 'schema.sql', '--yes'],
-            ['zig', 'build', '-Dbackend=workers', '-Doptimize=ReleaseFast'],
-            ['npx', 'wrangler', 'deploy', '--config', 'custom.toml'],
-        ]
-        assert calls == expected, calls
-        assert config.read_text() == initial.replace('00000000-0000-0000-0000-000000000000', uuid)
-        calls = run(['deploy', '--workers', '--config=custom.toml', '--optimize=ReleaseSafe'])
-        assert calls == [['zig', 'build', '-Dbackend=workers', '-Doptimize=ReleaseSafe'], ['npx', 'wrangler', 'deploy', '--config', 'custom.toml']]
     config.write_text(initial)
-    calls = run(['deploy', '--workers', '--config=custom.toml'], 'fail', False)
-    assert len(calls) == 1
-    assert config.read_text() == initial
+    calls = run(["deploy", "--workers", "--config=custom.toml", "--migrate=schema.sql"], success=False)
+    assert calls == [], calls
+    assert config.read_text() == initial, "deploy provisioned or mutated placeholder resource"
+    config.write_text(initial.replace("00000000-0000-0000-0000-000000000000", uuid))
+    calls = run(["deploy", "--workers", "--config=custom.toml", "--migrate=schema.sql"])
+    assert calls == [
+        ["npx", "wrangler", "d1", "execute", "test-db", "--remote", "--config", "custom.toml", "--file", "schema.sql", "--yes"],
+        ["zig", "build", "-Dbackend=workers", "-Doptimize=ReleaseFast"],
+        ["npx", "wrangler", "deploy", "--config", "custom.toml"],
+    ], calls
+    calls = run(["deploy", "--workers", "--config=custom.toml", "--optimize=ReleaseSafe"])
+    assert calls == [["zig", "build", "-Dbackend=workers", "-Doptimize=ReleaseSafe"], ["npx", "wrangler", "deploy", "--config", "custom.toml"]]
     config.write_text(initial.replace('00000000-0000-0000-0000-000000000000', uuid))
     calls = run(['deploy', '--workers', '--config=custom.toml'], 'fail-build', False)
     assert calls == [['zig', 'build', '-Dbackend=workers', '-Doptimize=ReleaseFast']]
@@ -117,4 +112,4 @@ while True: time.sleep(0.1)
         except ProcessLookupError:
             continue
         raise AssertionError(f'dev orphaned child {pid}')
-print('CLI operations smoke: deploy, D1 provisioning, failure safety, build, dev restart/shutdown and containers OK')
+print('CLI operations smoke: deploy, no implicit provisioning, failure safety, build, dev restart/shutdown and containers OK')

@@ -25,6 +25,9 @@ pub const Operations = struct {
     pub fn deploy(self: Operations, alloc: std.mem.Allocator, config: []const u8) !void {
         return wrangler.deploy(self.runner, alloc, config);
     }
+    pub fn deployEnvironment(self: Operations, alloc: std.mem.Allocator, config: []const u8, environment: ?[]const u8) !void {
+        return wrangler.deployEnvironment(self.runner, alloc, config, environment);
+    }
     pub fn executeD1(self: Operations, alloc: std.mem.Allocator, opts: ExecuteOptions) !void {
         return wrangler.executeD1(self.runner, alloc, opts);
     }

@@ -135,7 +135,11 @@ const operations = @import("operations.zig");
 const process = @import("../process.zig");
 
 pub fn deploy(runner: operations.Runner, alloc: std.mem.Allocator, config: []const u8) !void {
+    return deployEnvironment(runner, alloc, config, null);
+}
+pub fn deployEnvironment(runner: operations.Runner, alloc: std.mem.Allocator, config: []const u8, environment: ?[]const u8) !void {
     std.debug.print("==> akamata: wrangler deploy\n", .{});
+    if (environment) |env| return runner.run(alloc, &.{ "npx", "wrangler", "deploy", "--config", config, "--env", env }, null);
     return runner.run(alloc, &.{ "npx", "wrangler", "deploy", "--config", config }, null);
 }
 pub fn executeD1(runner: operations.Runner, alloc: std.mem.Allocator, opts: operations.ExecuteOptions) !void {

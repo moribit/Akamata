@@ -15,6 +15,111 @@ pub const WorkerCapabilities = struct {
     realtime: bool = false,
 };
 
+pub const Resource = struct {
+    present: bool = false,
+    matches: usize = 0,
+    identifier: ?[]const u8 = null,
+    class_name: ?[]const u8 = null,
+    script_name: ?[]const u8 = null,
+
+    pub fn validated(self: Resource, provider: []const u8) bool {
+        if (!self.present or self.matches != 1) return false;
+        if (std.mem.eql(u8, provider, "durable_objects")) return self.class_name != null and self.class_name.?.len != 0;
+        const id = self.identifier orelse return false;
+        if (std.mem.eql(u8, provider, "d1")) {
+            if (id.len != 36 or std.mem.eql(u8, id, PLACEHOLDER_UUID)) return false;
+            for (id, 0..) |c, index| {
+                if (index == 8 or index == 13 or index == 18 or index == 23) {
+                    if (c != '-') return false;
+                } else if (!std.ascii.isHex(c)) return false;
+            }
+        }
+        return id.len != 0;
+    }
+};
+
+pub fn validateEnvironment(environment: ?[]const u8) !void {
+    if (environment) |name| {
+        if (name.len == 0 or name.len > 128) return error.InvalidEnvironment;
+        for (name) |c| if (!std.ascii.isAlphanumeric(c) and c != '-' and c != '_') return error.UnsupportedEnvironmentSyntax;
+    }
+}
+
+fn quotedAssignment(line: []const u8, key: []const u8) ?[]const u8 {
+    const eq = std.mem.indexOfScalar(u8, line, '=') orelse return null;
+    if (!std.mem.eql(u8, std.mem.trim(u8, line[0..eq], " \t"), key)) return null;
+    const value = std.mem.trim(u8, line[eq + 1 ..], " \t");
+    if (value.len < 2 or (value[0] != '"' and value[0] != '\'')) return null;
+    const end = std.mem.indexOfScalarPos(u8, value, 1, value[0]) orelse return null;
+    const rest = std.mem.trim(u8, value[end + 1 ..], " \t");
+    if (rest.len > 0 and rest[0] != '#') return null;
+    const bytes = value[1..end];
+    if (std.mem.indexOfScalar(u8, bytes, '\\') != null) return null;
+    return bytes;
+}
+
+/// Bindings/vars are non-inheritable: named environments never borrow root
+/// resource declarations. Results borrow config bytes, not global scratch.
+pub fn resource(content: []const u8, provider: []const u8, name: []const u8, environment: ?[]const u8) !Resource {
+    try validateEnvironment(environment);
+    const suffix = if (std.mem.eql(u8, provider, "d1")) "d1_databases" else if (std.mem.eql(u8, provider, "r2")) "r2_buckets" else if (std.mem.eql(u8, provider, "workers_queue")) "queues.producers" else if (std.mem.eql(u8, provider, "durable_objects")) "durable_objects.bindings" else return Resource{};
+    var buffer: [256]u8 = undefined;
+    const section = if (environment) |env| try std.fmt.bufPrint(&buffer, "[[env.{s}.{s}]]", .{ env, suffix }) else try std.fmt.bufPrint(&buffer, "[[{s}]]", .{suffix});
+    const binding_key = if (std.mem.eql(u8, provider, "durable_objects")) "name" else "binding";
+    const id_key = if (std.mem.eql(u8, provider, "d1")) "database_id" else if (std.mem.eql(u8, provider, "r2")) "bucket_name" else "queue";
+    var found: Resource = .{};
+    var current: Resource = .{};
+    var binding: ?[]const u8 = null;
+    var active = false;
+    var lines = std.mem.splitScalar(u8, content, '\n');
+    while (true) {
+        const raw = lines.next();
+        const line = if (raw) |bytes| std.mem.trim(u8, bytes, " \t\r") else "[end]";
+        if (std.mem.startsWith(u8, line, "[")) {
+            if (active and binding != null and std.mem.eql(u8, binding.?, name)) {
+                const count = found.matches + 1;
+                found = current;
+                found.present = true;
+                found.matches = count;
+            }
+            current = .{};
+            binding = null;
+            active = std.mem.startsWith(u8, line, section) and (line.len == section.len or std.mem.trim(u8, line[section.len..], " \t")[0] == '#');
+        } else if (active) {
+            if (quotedAssignment(line, binding_key)) |value| binding = value;
+            if (quotedAssignment(line, id_key)) |value| current.identifier = value;
+            if (quotedAssignment(line, "class_name")) |value| current.class_name = value;
+            if (quotedAssignment(line, "script_name")) |value| current.script_name = value;
+        }
+        if (raw == null) break;
+    }
+    return found;
+}
+
+pub fn environmentVar(content: []const u8, environment: ?[]const u8, key: []const u8) !?[]const u8 {
+    try validateEnvironment(environment);
+    var buffer: [256]u8 = undefined;
+    const section = if (environment) |env| try std.fmt.bufPrint(&buffer, "[env.{s}.vars]", .{env}) else "[vars]";
+    var active = false;
+    var lines = std.mem.splitScalar(u8, content, '\n');
+    while (lines.next()) |raw| {
+        const line = std.mem.trim(u8, raw, " \t\r");
+        const header = std.mem.trim(u8, line[0 .. std.mem.indexOfScalar(u8, line, '#') orelse line.len], " \t");
+        if (std.mem.startsWith(u8, line, "[")) active = std.mem.eql(u8, header, section) else if (active) {
+            if (quotedAssignment(line, key)) |value| return value;
+        }
+    }
+    return null;
+}
+
+test "deployment bindings and vars do not inherit across environments" {
+    const toml = "[[r2_buckets]]\nbinding=\"FILES\"\nbucket_name=\"root\"\n[[env.production.r2_buckets]]\nbinding=\"FILES\"\nbucket_name=\"production\"\n[vars]\nDATABASE_URL=\"d1:DB\"\n[env.production.vars]\nDATABASE_URL=\"d1:REPORTS\"\n";
+    try std.testing.expectEqualStrings("production", (try resource(toml, "r2", "FILES", "production")).identifier.?);
+    try std.testing.expect(!(try resource(toml, "r2", "FILES", "preview")).present);
+    try std.testing.expectEqualStrings("d1:REPORTS", (try environmentVar(toml, "production", "DATABASE_URL")).?);
+    try std.testing.expect((try environmentVar(toml, "preview", "DATABASE_URL")) == null);
+}
+
 /// Read generated/supported TOML binding declarations by section and key.
 /// A match is configuration presence only, never remote resource readiness.
 pub fn hasResourceBinding(content: []const u8, provider: []const u8, name: []const u8) bool {
