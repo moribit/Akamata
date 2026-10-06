@@ -38,6 +38,16 @@ Slide decks live in `tools/docgen/` because they're hand-authored HTML (the
 16:9 layout + page breaks aren't a good fit for Markdown). Markdown sources
 for handbook/tutorial live next to the other docs in `../../docs/`.
 
+The bilingual 13-page introduction now comes from `build_slides.mjs`, using the
+compiled minimal source and saved public benchmark raw data. `npm run build:slides`
+regenerates HTML before both PDFs. It keeps the repository's green/amber ASCII
+branding and uses selectable text, embedded fonts and real PDF links.
+
+Verify committed PDF structure/links with `python tests/public_slides.py` in a
+venv containing `pypdf==6.19.0`, and render every page with Poppler for visual
+review. CI checks deterministic HTML regeneration and PDF links/page counts;
+it does not claim that those checks replace visual review.
+
 ## How it works
 
 1. `marked` converts Markdown (GFM tables, fenced code) → HTML

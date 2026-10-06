@@ -5,7 +5,11 @@ fn hello() []const u8 {
     return "Hello, Akamata!";
 }
 
-pub const Application = ak.App(.{ .routes = .{ak.get("/", hello)} });
+pub const Application = ak.App(.{
+    .routes = .{
+        ak.get("/", hello),
+    },
+});
 
 pub fn main() !void {
     var gpa: std.heap.DebugAllocator(.{}) = .init;

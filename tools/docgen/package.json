@@ -8,7 +8,7 @@
     "build": "npm run build:handbook && npm run build:tutorial && npm run build:slides",
     "build:handbook": "npm run build:handbook:en && npm run build:handbook:ja",
     "build:tutorial": "npm run build:tutorial:en && npm run build:tutorial:ja",
-    "build:slides": "npm run build:slides:en && npm run build:slides:ja",
+    "build:slides": "node build_slides.mjs && npm run build:slides:en && npm run build:slides:ja",
     "build:handbook:en": "node md_to_pdf.mjs ../../docs/en/handbook.md ../../docs/en/handbook.pdf --title='Akamata Handbook'",
     "build:handbook:ja": "node md_to_pdf.mjs ../../docs/ja/handbook.md ../../docs/ja/handbook.pdf --title='Akamata ハンドブック'",
     "build:tutorial:en": "node md_to_pdf.mjs ../../docs/en/tutorial.md ../../docs/en/tutorial.pdf --title='Akamata Tutorial'",
