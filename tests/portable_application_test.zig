@@ -149,3 +149,27 @@ test "all page metadata survives adapter destruction with allocation-failure cle
     try metadataPageLifetime(std.testing.allocator);
     try std.testing.checkAllAllocationFailures(std.testing.allocator, metadataPageLifetime, .{});
 }
+
+fn filesystemPageAllocationFailure(allocator: std.mem.Allocator) !void {
+    var temporary = std.testing.tmpDir(.{});
+    defer temporary.cleanup();
+    try temporary.dir.writeFile(std.testing.io, .{ .sub_path = "a.txt", .data = "a" });
+    try temporary.dir.writeFile(std.testing.io, .{ .sub_path = "b.txt", .data = "b" });
+    var filesystem = am.storage.filesystem.FileStore.init(std.testing.allocator, std.testing.io, temporary.dir);
+    var page = filesystem.store().listPage(allocator, "", null, 1) catch |err| {
+        // The walker maps its allocation/read errors to BackendFailure.
+        // This fixture has valid files; induced allocation failure is the
+        // only failure condition under checkAllAllocationFailures.
+        if (err == error.Unavailable or err == error.BackendFailure) return error.OutOfMemory;
+        return err;
+    };
+    defer page.deinit();
+    try std.testing.expectEqual(@as(usize, 1), page.entries.len);
+    try std.testing.expect(page.cursor != null);
+    // Listing owns a separate traversal handle, never the caller directory.
+    try temporary.dir.writeFile(std.testing.io, .{ .sub_path = "still-open.txt", .data = "ok" });
+}
+
+test "filesystem pagination releases walker and page after allocation failure" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, filesystemPageAllocationFailure, .{});
+}

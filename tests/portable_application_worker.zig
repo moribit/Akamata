@@ -61,6 +61,15 @@ fn platformAdapterContract() !void {
     var store = try am.StorageFactory.initForContract(arena.allocator(), fixture.ApplicationContract, .{});
     try fixture.storageContract(arena.allocator(), store.store());
     try fixture.paginationContract(std.heap.wasm_allocator, store.store());
+    // Bounded allocation failure after host page acquisition must close its
+    // handle and reclaim operation state (runner verifies zero host handles).
+    var page_buffer: [32]u8 = undefined;
+    var page_allocator = std.heap.FixedBufferAllocator.init(&page_buffer);
+    if (store.store().listPage(page_allocator.allocator(), "", null, 1)) |result| {
+        var unexpected = result;
+        unexpected.deinit();
+        return error.ExpectedAllocationFailure;
+    } else |err| if (err != error.Unavailable) return err;
     const Payload = struct { text: []const u8 };
     const D = am.events.Descriptor(Payload, .{ .name = "created", .version = 2 });
     const Handler = struct {
