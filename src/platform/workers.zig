@@ -50,6 +50,7 @@ pub fn QueueOwner(comptime D: type) type {
         consumer: queue.Consumer(D.Payload),
 
         pub fn create(allocator: std.mem.Allocator, binding: []const u8, consumer: queue.Consumer(D.Payload)) !*Self {
+            try consumer.validate();
             if (binding.len == 0) return error.InvalidBinding;
             const self = try allocator.create(Self);
             errdefer allocator.destroy(self);
@@ -79,7 +80,7 @@ pub fn QueueOwner(comptime D: type) type {
             if (event_id.len == 0 or parsed.value.attempt == 0 or value.max_attempts == 0) return error.InvalidDelivery;
             // max_attempts is application metadata; Workers retry/dead-letter
             // enforcement is configured on the consumer deployment resource.
-            try self.consumer.handler(value.payload, .{ .event_id = event_id, .correlation_id = value.correlation_id, .idempotency_key = value.idempotency_key, .attempt = parsed.value.attempt, .max_attempts = value.max_attempts });
+            try self.consumer.consumeValue(value.payload, .{ .event_id = event_id, .correlation_id = value.correlation_id, .idempotency_key = value.idempotency_key, .attempt = parsed.value.attempt, .max_attempts = value.max_attempts });
         }
 
         /// Call only after application dispatch has stopped borrowing owner.

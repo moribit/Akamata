@@ -5,11 +5,14 @@ const am = @import("akamata");
 const contracts = @import("contracts.zig");
 
 pub const State = struct {
+    pub const application_contract = contracts.For(if (am.backend == .native) .native else .workers);
     db: am.db.Db,
-    objects: am.storage.Store,
+    store: am.storage.Store,
+    queue: am.queue.Producer,
     jwt_secret: []const u8,
     login_secret: []const u8,
-    realtime: ?am.realtime.Service = null,
+    realtime: am.realtime.Service,
+    test_deployment: ?[]const u8 = null,
     schema_ready: bool = false,
 };
 const Ctx = am.Context(State);
@@ -17,18 +20,34 @@ const Ctx = am.Context(State);
 pub fn register(app: *am.App(State)) !void {
     _ = try app.useAll(am.mw.recover(State));
     _ = try app.useAll(.{ .name = "portable-schema", .call = ensureSchemaMiddleware });
-    _ = try app.get("/health", health);
-    _ = try app.post("/login", login);
-    _ = try app.post("/__akamata/realtime/authorize", authorizeRealtime);
-    _ = try app.post("/realtime/message", realtimeMessage);
-    _ = try app.ws("/realtime/:resource", nativeRealtime);
-    _ = try app.post("/records", createRecord);
-    _ = try app.get("/records", listRecords);
-    _ = try app.post("/reports", submitReport);
-    _ = try app.put("/objects/*key", uploadObject);
-    _ = try app.get("/objects/*key", downloadObject);
-    _ = try app.head("/objects/*key", downloadObject);
+    inline for (endpoints) |E| {
+        if (comptime std.mem.eql(u8, E.route_path, "/realtime/:resource")) {
+            comptime am.contract.validateApplication(.{E}, State.application_contract, if (am.backend == .native) .native else .workers);
+            _ = try app.ws(E.route_path, E.handle);
+        } else try E.register(app);
+    }
 }
+
+fn Endpoint(comptime method: am.Method, comptime path: []const u8, comptime handler: anytype, comptime operation: []const u8, comptime requires: []const am.capability.Application) type {
+    return am.capability.Uses(am.contract.Endpoint(method, path, handler, .{ .operation_id = operation }), requires);
+}
+pub const endpoints = .{
+    Endpoint(.GET, "/health", health, "health", &.{}),
+    Endpoint(.POST, "/login", login, "login", &.{}),
+    Endpoint(.POST, "/__akamata/realtime/authorize", authorizeRealtime, "authorizeRealtime", &.{.realtime}),
+    Endpoint(.POST, "/realtime/message", realtimeMessage, "realtimeMessage", &.{.realtime}),
+    Endpoint(.GET, "/realtime/:resource", nativeRealtime, "connectRealtime", &.{.realtime}),
+    Endpoint(.POST, "/records", createRecord, "createRecord", &.{.database}),
+    Endpoint(.GET, "/records", listRecords, "listRecords", &.{.database}),
+    Endpoint(.DELETE, "/records/:id", deleteRecord, "deleteRecord", &.{.database}),
+    Endpoint(.POST, "/reports", submitReport, "submitReport", &.{ .database, .queue }),
+    Endpoint(.GET, "/reports/:id/delivery", reportDelivery, "reportDelivery", &.{.database}),
+    Endpoint(.DELETE, "/reports/:id", deleteReport, "deleteReport", &.{.database}),
+    Endpoint(.PUT, "/objects/*key", uploadObject, "uploadObject", &.{.object_storage}),
+    Endpoint(.GET, "/objects/*key", downloadObject, "downloadObject", &.{.object_storage}),
+    Endpoint(.HEAD, "/objects/*key", downloadObject, "headObject", &.{.object_storage}),
+    Endpoint(.DELETE, "/objects/*key", deleteObject, "deleteObject", &.{.object_storage}),
+};
 
 fn ensureSchemaMiddleware(c: *Ctx, next: am.Next(State)) anyerror!void {
     // Realtime control-plane handlers run through a named service entrypoint
@@ -47,10 +66,11 @@ fn ensureSchemaMiddleware(c: *Ctx, next: am.Next(State)) anyerror!void {
 pub fn ensureSchema(db: am.db.Db) !void {
     try db.exec("CREATE TABLE IF NOT EXISTS portable_records (id INTEGER PRIMARY KEY, principal TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL)");
     try db.exec("CREATE TABLE IF NOT EXISTS device_reports (id INTEGER PRIMARY KEY, principal TEXT NOT NULL, firmware_version TEXT NOT NULL, hardware_revision TEXT, uptime_seconds INTEGER NOT NULL, error_code INTEGER, created_at INTEGER NOT NULL)");
+    try db.exec("CREATE TABLE IF NOT EXISTS report_deliveries (event_id TEXT PRIMARY KEY, report_id INTEGER NOT NULL, attempt INTEGER NOT NULL)");
 }
 
 fn health(c: *Ctx) !void {
-    try c.json(.{ .status = "ok", .protocol_version = contracts.Protocol.protocol_version }, 200);
+    try c.json(.{ .status = "ok", .protocol_version = contracts.Protocol.protocol_version, .test_deployment = c.state().test_deployment }, 200);
 }
 
 const LoginInput = struct { subject: []const u8, credential: []const u8 };
@@ -131,7 +151,7 @@ fn nativeRealtime(c: *Ctx) !void {
     const identity = try c.arena.dupe(u8, subject);
     const principal_name = am.BoundedString(64).init(subject) catch return c.forbidden("principal exceeds protocol bound");
     const principal: contracts.Principal = .{ .client = principal_name };
-    const service = c.state().realtime orelse return error.RealtimeUnavailable;
+    const service = c.realtime();
     var connection = try am.ws.upgrade(Ctx, c, .{ .max_message_bytes = 64 * 1024 });
     defer connection.deinit();
     const connection_id = next_connection_id.fetchAdd(1, .monotonic);
@@ -196,11 +216,13 @@ fn createRecord(c: *Ctx) !void {
     const subject = authenticatedSubject(c) catch return c.unauthorized("invalid credential");
     const input = c.req.json(RecordInput) catch return c.badRequest("invalid record");
     if (input.body.len == 0 or input.body.len > 1024) return c.badRequest("body exceeds 1024 bytes");
-    var stmt = try c.state().db.prepare("INSERT INTO portable_records(principal,body,created_at) VALUES(?,?,?)");
+    var stmt = try c.db().prepare("INSERT INTO portable_records(principal,body,created_at) VALUES(?,?,?) RETURNING id");
     defer stmt.deinit();
     try stmt.bindAll(.{ subject, input.body, am.observability.clock.unixSeconds() });
+    if (try stmt.step() != .row) return error.RecordInsertFailed;
+    const id = try stmt.columnInt(0);
     _ = try stmt.step();
-    try c.json(.{ .stored = true }, 201);
+    try c.json(.{ .stored = true, .id = id }, 201);
 }
 
 fn listRecords(c: *Ctx) !void {
@@ -228,17 +250,85 @@ fn submitReport(c: *Ctx) !void {
     const input = c.req.json(ReportInput) catch return c.badRequest("invalid report");
     if (input.firmware_version.len == 0 or input.firmware_version.len > 64 or (input.hardware_revision != null and input.hardware_revision.?.len > 64))
         return c.badRequest("report field exceeds contract bound");
-    var stmt = try c.state().db.prepare("INSERT INTO device_reports(principal,firmware_version,hardware_revision,uptime_seconds,error_code,created_at) VALUES(?,?,?,?,?,?)");
+    var stmt = try c.db().prepare("INSERT INTO device_reports(principal,firmware_version,hardware_revision,uptime_seconds,error_code,created_at) VALUES(?,?,?,?,?,?) RETURNING id");
     defer stmt.deinit();
     try stmt.bindAll(.{ subject, input.firmware_version, input.hardware_revision, input.uptime_seconds, input.error_code, am.observability.clock.unixSeconds() });
+    if (try stmt.step() != .row) return error.ReportInsertFailed;
+    const id: u64 = @intCast(try stmt.columnInt(0));
     _ = try stmt.step();
-    try c.json(.{ .stored = true }, 201);
+    const event_id = try std.fmt.allocPrint(c.arena, "device-report:{d}", .{id});
+    try c.queue().dispatchDescriptor(c.arena, contracts.ReportDescriptor, .{ .id = id }, .{ .event_id = event_id, .idempotency_key = event_id, .correlation_id = c.requestId() });
+    try c.json(.{ .stored = true, .id = id }, 201);
+}
+
+/// Borrowed DB facade for finite queue work. Native main / Workers isolate
+/// own this context and keep it alive until consumer dispatch has stopped.
+pub const ReportEffects = struct { db: am.db.Db };
+pub fn consumeReport(raw: *anyopaque, event: contracts.ReportCreated, delivery: am.queue.Delivery) !void {
+    const effects: *ReportEffects = @ptrCast(@alignCast(raw));
+    try ensureSchema(effects.db);
+    var stmt = try effects.db.prepare("INSERT INTO report_deliveries(event_id,report_id,attempt) SELECT ?,id,? FROM device_reports WHERE id=? ON CONFLICT(event_id) DO UPDATE SET attempt=excluded.attempt");
+    defer stmt.deinit();
+    try stmt.bindAll(.{ delivery.event_id, delivery.attempt, event.id });
+    _ = try stmt.step();
+}
+
+fn reportDelivery(c: *Ctx) !void {
+    const subject = authenticatedSubject(c) catch return c.unauthorized("invalid credential");
+    const id = requestIdParameter(c) catch return c.badRequest("invalid report id");
+    var stmt = try c.db().prepare("SELECT d.attempt FROM device_reports r LEFT JOIN report_deliveries d ON d.report_id=r.id WHERE r.id=? AND r.principal=?");
+    defer stmt.deinit();
+    try stmt.bindAll(.{ id, subject });
+    if (try stmt.step() != .row) return c.notFound();
+    const row = try stmt.readRow(struct { attempt: ?i64 });
+    const attempt = row.attempt orelse 0;
+    try c.json(.{ .delivered = attempt > 0, .attempt = attempt }, 200);
+}
+
+fn requestIdParameter(c: *Ctx) !i64 {
+    const value = try c.req.param("id");
+    const id = try std.fmt.parseInt(i64, value, 10);
+    if (id <= 0) return error.InvalidResourceId;
+    return id;
+}
+
+fn deleteRecord(c: *Ctx) !void {
+    const subject = authenticatedSubject(c) catch return c.unauthorized("invalid credential");
+    const id = requestIdParameter(c) catch return c.badRequest("invalid record id");
+    var stmt = try c.db().prepare("DELETE FROM portable_records WHERE id=? AND principal=? RETURNING id");
+    defer stmt.deinit();
+    try stmt.bindAll(.{ id, subject });
+    if (try stmt.step() != .row) return c.notFound();
+    c.status(204);
+}
+
+fn deleteReport(c: *Ctx) !void {
+    const subject = authenticatedSubject(c) catch return c.unauthorized("invalid credential");
+    const id = requestIdParameter(c) catch return c.badRequest("invalid report id");
+    // Delete the parent first: a late delivery cannot recreate a marker.
+    var stmt = try c.db().prepare("DELETE FROM device_reports WHERE id=? AND principal=? RETURNING id");
+    defer stmt.deinit();
+    try stmt.bindAll(.{ id, subject });
+    if (try stmt.step() != .row) return c.notFound();
+    _ = try stmt.step();
+    var remove = try c.db().prepare("DELETE FROM report_deliveries WHERE report_id=?");
+    defer remove.deinit();
+    try remove.bindAll(.{id});
+    _ = try remove.step();
+    c.status(204);
+}
+
+fn deleteObject(c: *Ctx) !void {
+    _ = authenticatedSubject(c) catch return c.unauthorized("invalid credential");
+    const key = c.req.param("key") catch return c.notFound();
+    try c.storage().delete(key);
+    c.status(204);
 }
 
 fn downloadObject(c: *Ctx) !void {
     _ = authenticatedSubject(c) catch return c.unauthorized("invalid credential");
     const key = c.req.param("key") catch return c.notFound();
-    am.storage.serveDownload(c, c.state().objects, key) catch |err| switch (err) {
+    am.storage.serveDownload(c, c.storage(), key) catch |err| switch (err) {
         error.NotFound => return c.notFound(),
         error.PermissionDenied => return c.forbidden("invalid object key"),
         else => return err,
@@ -265,7 +355,7 @@ fn uploadObject(c: *Ctx) !void {
     var source = Source{ .bytes = bytes };
     const metadata = c.req.header("x-object-metadata");
     if (metadata != null and metadata.?.len > 4096) return c.badRequest("metadata exceeds 4096 bytes");
-    const result = try c.state().objects.put(key, .{ .ptr = &source, .read_fn = Source.read, .close_fn = Source.close }, .{
+    const result = try c.storage().put(key, .{ .ptr = &source, .read_fn = Source.read, .close_fn = Source.close }, .{
         .content_type = c.req.header("content-type"),
         .metadata_json = metadata,
     });

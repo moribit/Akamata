@@ -21,3 +21,5 @@ Workers delivery attempts come from Message.attempts, overriding the body attemp
 ## Offline evidence
 
 The Native application test uses actual SQLite + jobs leases/retries to verify attempt 1 failure, attempt 2 success, stable event/correlation/idempotency/version, stop admission and all owner-create allocation failures. WASM host tests verify the Workers owner decodes the existing host delivery wrapper, preserves application event ID and uses host attempt. Managed glue tests verify producer envelopes. These tests do not establish live Cloudflare delivery semantics.
+
+A Consumer may retain its original `handler` callback or select `handler_with_context` with an explicit borrowed `context`. Exactly one callback is required. Checked owners validate this before acquiring resources. The context and its resources must outlive the owner and all in-flight consumer calls; the owner does not destroy them. This supports instance-specific DB effects without global registration.

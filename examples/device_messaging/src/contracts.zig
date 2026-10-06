@@ -6,6 +6,8 @@ pub const Signal = struct { session_id: am.BoundedString(64), value: u8 };
 pub const PresenceChanged = struct { connections: u32 };
 pub const RealtimeEvent = union(enum) { signal: Signal, presence: PresenceChanged };
 pub const Protocol = am.events.Protocol(RealtimeEvent, 1);
+pub const ReportCreated = struct { id: u64 };
+pub const ReportDescriptor = am.events.Descriptor(ReportCreated, .{ .name = "report_created", .version = 1 });
 
 pub const WorkersEnv = struct {
     db: am.binding.D1("DB"),
@@ -17,4 +19,15 @@ pub const WorkersEnv = struct {
 
 comptime {
     am.binding.validate(WorkersEnv, .workers);
+}
+
+pub fn For(comptime target: am.capability.Target) type {
+    const C = am.capability.Contract("device_messaging", &.{ .database, .object_storage, .queue, .realtime }, &.{
+        .{ .capability = .database, .provider = am.capability.defaultProvider(.database, target), .binding = if (target == .workers) @FieldType(WorkersEnv, "db").binding_name else null },
+        .{ .capability = .object_storage, .provider = am.capability.defaultProvider(.object_storage, target), .binding = if (target == .workers) @FieldType(WorkersEnv, "storage").binding_name else null },
+        .{ .capability = .queue, .provider = am.capability.defaultProvider(.queue, target), .binding = if (target == .workers) @FieldType(WorkersEnv, "events").binding_name else null },
+        .{ .capability = .realtime, .provider = am.capability.defaultProvider(.realtime, target), .binding = if (target == .workers) @FieldType(WorkersEnv, "rooms").binding_name else null },
+    });
+    comptime if (target == .workers) am.binding.validateContract(WorkersEnv, C, target) else C.validate(target);
+    return C;
 }

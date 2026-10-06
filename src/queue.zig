@@ -53,12 +53,30 @@ pub const Producer = struct {
 pub fn Consumer(comptime Event: type) type {
     events.validateEventType(Event);
     return struct {
-        handler: *const fn (Event, Delivery) anyerror!void,
+        handler: *const fn (Event, Delivery) anyerror!void = noHandler,
+        /// Borrowed explicit application owner, never a global service lookup.
+        context: ?*anyopaque = null,
+        handler_with_context: ?*const fn (*anyopaque, Event, Delivery) anyerror!void = null,
+
+        pub fn validate(self: @This()) !void {
+            if ((self.handler != noHandler) == (self.handler_with_context != null)) return error.InvalidConsumer;
+            if (self.handler_with_context != null and self.context == null) return error.InvalidConsumer;
+        }
+
+        pub fn consumeValue(self: @This(), value: Event, delivery: Delivery) !void {
+            try self.validate();
+            if (self.handler_with_context) |callback| return callback(self.context.?, value, delivery);
+            return self.handler(value, delivery);
+        }
+
+        fn noHandler(_: Event, _: Delivery) anyerror!void {
+            return error.InvalidConsumer;
+        }
 
         pub fn consume(self: @This(), allocator: std.mem.Allocator, bytes: []const u8, delivery: Delivery) !void {
             var parsed = try events.Descriptor(Event, .{}).decode(allocator, bytes);
             defer parsed.deinit();
-            return self.handler(parsed.value, delivery);
+            return self.consumeValue(parsed.value, delivery);
         }
 
         /// Validate a named/versioned descriptor before invoking the existing

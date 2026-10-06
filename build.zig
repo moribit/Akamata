@@ -262,6 +262,7 @@ pub fn build(b: *std.Build) void {
         "tests/docs_examples_test.zig",
         "tests/comptime_framework_test.zig",
         "tests/portable_application_test.zig",
+        "examples/device_messaging/src/integration_test.zig",
         "tests/mimoc_parts_improvements_test.zig",
         "src/storage.zig",
         "src/events.zig",

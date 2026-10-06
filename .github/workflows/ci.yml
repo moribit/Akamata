@@ -32,6 +32,10 @@ jobs:
             cmd: zig build -Dexample=chat
           - name: chat-workers
             cmd: zig build -Dexample=chat -Dbackend=workers -Doptimize=ReleaseSmall
+          - name: device-messaging-native
+            cmd: zig build -Dexample=device_messaging -Doptimize=ReleaseSafe
+          - name: device-messaging-workers
+            cmd: zig build -Dexample=device_messaging -Dbackend=workers -Doptimize=ReleaseSafe
           - name: guestbook-workers
             cmd: zig build -Dexample=guestbook -Dbackend=workers -Doptimize=ReleaseSmall
           - name: portable-application-workers

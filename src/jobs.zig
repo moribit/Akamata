@@ -81,6 +81,7 @@ pub fn Provider(comptime D: type) type {
         consumer: portable.Consumer(D.Payload),
 
         pub fn create(allocator: std.mem.Allocator, db: db_mod.Db, consumer: portable.Consumer(D.Payload), options: Options) !*Self {
+            try consumer.validate();
             const self = try allocator.create(Self);
             errdefer allocator.destroy(self);
             self.* = .{ .allocator = allocator, .queue = try Queue.init(allocator, db, options), .consumer = consumer };
