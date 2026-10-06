@@ -60,6 +60,21 @@ fn platformAdapterContract() !void {
     defer arena.deinit();
     var store = am.platform.workers.R2Store.init(arena.allocator(), "FILES");
     try fixture.storageContract(arena.allocator(), store.store());
+    try fixture.paginationContract(std.heap.wasm_allocator, store.store());
+    const Payload = struct { text: []const u8 };
+    const D = am.events.Descriptor(Payload, .{ .name = "created", .version = 2 });
+    const Handler = struct {
+        fn consume(value: Payload, delivery: am.queue.Delivery) !void {
+            if (!std.mem.eql(u8, value.text, "hello") or delivery.attempt != 3 or delivery.max_attempts != 7 or !std.mem.eql(u8, delivery.event_id, "application-event")) return error.QueueContractFailed;
+        }
+    };
+    var binding = "EVENTS".*;
+    const owner = try am.platform.workers.QueueOwner(D).create(std.heap.wasm_allocator, &binding, .{ .handler = Handler.consume });
+    defer owner.deinit();
+    @memset(&binding, 'x');
+    try owner.consume(
+        \\{"body":{"protocol_version":2,"event_type":"created","event_id":"application-event","attempt":1,"max_attempts":7,"payload":{"text":"hello"}},"event_id":"cloudflare-message","attempt":3}
+    );
     const FailingReader = struct {
         closed: bool = false,
         fn read(_: *anyopaque, _: []u8) am.stream.Error!usize {

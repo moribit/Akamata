@@ -64,10 +64,79 @@ pub const schema_sql =
 ;
 
 pub const HandlerFn = *const fn (gpa: std.mem.Allocator, payload: []const u8) anyerror!void;
+pub const JobDelivery = struct { id: i64, attempt: u32, max_attempts: u32 };
+pub const DeliveryHandlerFn = *const fn (*anyopaque, std.mem.Allocator, []const u8, JobDelivery) anyerror!void;
+
+/// Explicit owner adapting the existing persisted jobs engine to one typed
+/// event descriptor. The DB is borrowed. Stop and join all Worker callers
+/// before deinit; Context only borrows producer(). No hidden thread is started.
+pub fn Provider(comptime D: type) type {
+    const portable = @import("queue.zig");
+    const events = @import("events.zig");
+    return struct {
+        const Self = @This();
+        const Envelope = struct { meta: events.EnvelopeMeta, payload: []const u8 };
+        allocator: std.mem.Allocator,
+        queue: Queue,
+        consumer: portable.Consumer(D.Payload),
+
+        pub fn create(allocator: std.mem.Allocator, db: db_mod.Db, consumer: portable.Consumer(D.Payload), options: Options) !*Self {
+            const self = try allocator.create(Self);
+            errdefer allocator.destroy(self);
+            self.* = .{ .allocator = allocator, .queue = try Queue.init(allocator, db, options), .consumer = consumer };
+            errdefer self.queue.deinit();
+            try self.queue.handlerWithDelivery(D.name, self, consume);
+            return self;
+        }
+
+        /// Additional finite jobs may share this owner's engine via
+        /// owner.queue.handler/handlerWithDelivery. Never create independent
+        /// polling owners for the same table: each engine must know all names.
+        pub fn producer(self: *Self) portable.Producer {
+            return .{ .ptr = self, .enqueue_fn = enqueue };
+        }
+
+        pub fn worker(self: *Self) Worker {
+            return Worker.init(&self.queue);
+        }
+
+        pub fn stop(self: *Self) void {
+            self.queue.shutdown.store(true, .seq_cst);
+        }
+
+        pub fn deinit(self: *Self) void {
+            const allocator = self.allocator;
+            self.queue.deinit();
+            allocator.destroy(self);
+        }
+
+        fn enqueue(raw: *anyopaque, meta: events.EnvelopeMeta, payload: []const u8) portable.Error!void {
+            const self: *Self = @ptrCast(@alignCast(raw));
+            if (self.queue.shutdown.load(.seq_cst)) return error.Unavailable;
+            try portable.validateEnvelope(meta, payload);
+            if (!std.mem.eql(u8, meta.event_type, D.name) or meta.protocol_version != D.version) return error.Rejected;
+            const bytes = std.json.Stringify.valueAlloc(self.allocator, Envelope{ .meta = meta, .payload = payload }, .{}) catch return error.Unavailable;
+            defer self.allocator.free(bytes);
+            _ = self.queue.enqueue(D.name, bytes, .{ .max_attempts = meta.max_attempts }) catch return error.BackendFailure;
+        }
+
+        fn consume(raw: *anyopaque, allocator: std.mem.Allocator, bytes: []const u8, delivery: JobDelivery) !void {
+            const self: *Self = @ptrCast(@alignCast(raw));
+            var envelope = try std.json.parseFromSlice(Envelope, allocator, bytes, .{});
+            defer envelope.deinit();
+            var meta = envelope.value.meta;
+            meta.attempt = std.math.cast(u16, delivery.attempt) orelse return error.InvalidDelivery;
+            meta.max_attempts = std.math.cast(u16, delivery.max_attempts) orelse return error.InvalidDelivery;
+            try self.consumer.consumeEnvelope(allocator, D, meta, envelope.value.payload);
+        }
+    };
+}
 
 const Handler = struct {
     name: []const u8,
-    func: HandlerFn,
+    func: ?HandlerFn = null,
+    context: ?*anyopaque = null,
+    delivery_func: ?DeliveryHandlerFn = null,
 };
 
 const CronEntry = struct {
@@ -122,11 +191,23 @@ pub const Queue = struct {
     pub fn handler(self: *Queue, name: []const u8, func: HandlerFn) !void {
         for (self.handlers.items) |*h| {
             if (std.mem.eql(u8, h.name, name)) {
-                h.func = func;
+                h.* = .{ .name = name, .func = func };
                 return;
             }
         }
         try self.handlers.append(self.gpa, .{ .name = name, .func = func });
+    }
+
+    /// Borrow the callback owner until the worker has stopped and joined.
+    /// Actual lease/retry attempts come from the persisted job row.
+    pub fn handlerWithDelivery(self: *Queue, name: []const u8, context: *anyopaque, func: DeliveryHandlerFn) !void {
+        for (self.handlers.items) |*h| {
+            if (std.mem.eql(u8, h.name, name)) {
+                h.* = .{ .name = name, .context = context, .delivery_func = func };
+                return;
+            }
+        }
+        try self.handlers.append(self.gpa, .{ .name = name, .context = context, .delivery_func = func });
     }
 
     /// Schedule a job. `payload` is copied into the DB row.
@@ -199,6 +280,13 @@ pub const Worker = struct {
 
     pub fn stop(self: *Worker) void {
         self.queue.shutdown.store(true, .seq_cst);
+    }
+
+    /// One bounded polling batch; caller owns scheduling and DB concurrency.
+    pub fn tick(self: *Worker) !void {
+        if (self.queue.shutdown.load(.seq_cst)) return;
+        try self.tickCrons();
+        try self.drainBatch();
     }
 
     fn tickCrons(self: *Worker) !void {
@@ -274,18 +362,20 @@ pub const Worker = struct {
         const q = self.queue;
 
         // Find the handler.
-        const handler_fn: ?HandlerFn = blk: {
+        const handler: ?Handler = blk: {
             for (q.handlers.items) |h| {
-                if (std.mem.eql(u8, h.name, row.name)) break :blk h.func;
+                if (std.mem.eql(u8, h.name, row.name)) break :blk h;
             }
             break :blk null;
         };
-        if (handler_fn == null) {
+        if (handler == null) {
             try self.markFailed(row, "no handler registered");
             return;
         }
 
-        handler_fn.?(q.gpa, row.payload) catch |err| {
+        const h = handler.?;
+        const result = if (h.delivery_func) |func| func(h.context.?, q.gpa, row.payload, .{ .id = row.id, .attempt = @intCast(row.attempts + 1), .max_attempts = @intCast(row.max_attempts) }) else h.func.?(q.gpa, row.payload);
+        result catch |err| {
             const next_attempts = row.attempts + 1;
             if (next_attempts >= row.max_attempts) {
                 try self.markFailed(row, @errorName(err));

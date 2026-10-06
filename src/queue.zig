@@ -15,6 +15,16 @@ pub const Delivery = struct {
 pub const DeadLetterStrategy = union(enum) { discard, retain, queue: []const u8 };
 pub const Error = error{ Unavailable, Rejected, PayloadTooLarge, BackendFailure };
 
+/// Portable producer admission limits, independent of backend retry policy.
+pub fn validateEnvelope(meta: events.EnvelopeMeta, payload: []const u8) Error!void {
+    if (payload.len > 64 * 1024) return error.PayloadTooLarge;
+    const id = meta.event_id orelse return error.Rejected;
+    if (id.len == 0 or meta.event_type.len == 0 or meta.attempt == 0 or meta.max_attempts == 0) return error.Rejected;
+    for ([_]?[]const u8{ id, meta.event_type, meta.correlation_id, meta.idempotency_key }) |value| {
+        if (value) |text| if (text.len > 256) return error.PayloadTooLarge;
+    }
+}
+
 pub const Producer = struct {
     ptr: *anyopaque,
     enqueue_fn: *const fn (*anyopaque, events.EnvelopeMeta, []const u8) Error!void,

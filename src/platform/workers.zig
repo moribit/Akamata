@@ -24,6 +24,7 @@ pub const QueueProducer = struct {
 
     fn enqueue(ptr: *anyopaque, meta: events.EnvelopeMeta, payload: []const u8) queue.Error!void {
         const self: *QueueProducer = @ptrCast(@alignCast(ptr));
+        try queue.validateEnvelope(meta, payload);
         var buffer: [1024]u8 = undefined;
         var writer: std.Io.Writer = .fixed(&buffer);
         std.json.Stringify.value(meta, .{}, &writer) catch return error.BackendFailure;
@@ -36,6 +37,52 @@ pub const QueueProducer = struct {
         };
     }
 };
+
+/// Isolate-owned binding + typed consumer. The application explicitly calls
+/// consume from its existing setQueueConsumer dispatch function. This owner
+/// installs no global callback and creates no remote queue resource.
+pub fn QueueOwner(comptime D: type) type {
+    return struct {
+        const Self = @This();
+        allocator: std.mem.Allocator,
+        adapter: QueueProducer,
+        consumer: queue.Consumer(D.Payload),
+
+        pub fn create(allocator: std.mem.Allocator, binding: []const u8, consumer: queue.Consumer(D.Payload)) !*Self {
+            if (binding.len == 0) return error.InvalidBinding;
+            const self = try allocator.create(Self);
+            errdefer allocator.destroy(self);
+            self.* = .{ .allocator = allocator, .adapter = .{ .binding = try allocator.dupe(u8, binding) }, .consumer = consumer };
+            return self;
+        }
+
+        pub fn producer(self: *Self) queue.Producer {
+            return self.adapter.producer();
+        }
+
+        pub fn consume(self: *Self, bytes: []const u8) !void {
+            if (bytes.len > 128 * 1024) return error.PayloadTooLarge;
+            const HostDelivery = struct { body: events.Envelope(D.Payload), event_id: []const u8, attempt: u16 };
+            var parsed = try std.json.parseFromSlice(HostDelivery, self.allocator, bytes, .{ .ignore_unknown_fields = true });
+            defer parsed.deinit();
+            const value = parsed.value.body;
+            if (value.protocol_version != D.version) return error.UnsupportedVersion;
+            if (!std.mem.eql(u8, value.event_type, D.name)) return error.UnknownEvent;
+            const event_id = value.event_id orelse parsed.value.event_id;
+            if (event_id.len == 0 or parsed.value.attempt == 0 or value.max_attempts == 0) return error.InvalidDelivery;
+            // max_attempts is application metadata; Workers retry/dead-letter
+            // enforcement is configured on the consumer deployment resource.
+            try self.consumer.handler(value.payload, .{ .event_id = event_id, .correlation_id = value.correlation_id, .idempotency_key = value.idempotency_key, .attempt = parsed.value.attempt, .max_attempts = value.max_attempts });
+        }
+
+        /// Call only after application dispatch has stopped borrowing owner.
+        pub fn deinit(self: *Self) void {
+            const allocator = self.allocator;
+            allocator.free(self.adapter.binding);
+            allocator.destroy(self);
+        }
+    };
+}
 
 /// Install a raw queue consumer at application startup. Typed consumers can
 /// decode the versioned envelope and delegate to `queue.Consumer(T)`.
