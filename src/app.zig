@@ -737,6 +737,41 @@ pub fn App(comptime State: type) type {
             io_ptr: ?*anyopaque,
             peer_ip: ?[]const u8,
         ) !void {
+            const Unprepared = struct {
+                fn apply(_: @This(), _: *Ctx) !void {}
+            };
+            return self.dispatchPrepared(arena, request, response, stream_ptr, io_ptr, peer_ip, Unprepared{});
+        }
+
+        /// Explicit in-process testing entry. The identity is attached using
+        /// Context.setPrincipal before middleware; authentication and
+        /// authorization middleware still execute and may reject/replace it.
+        pub fn dispatchWithPrincipal(
+            self: *Self,
+            arena: std.mem.Allocator,
+            request: *req_mod.Request,
+            response: *res_mod.Response,
+            identity: anytype,
+        ) !void {
+            const Prepared = struct {
+                value: @TypeOf(identity),
+                fn apply(prepared: @This(), c: *Ctx) !void {
+                    try c.setPrincipal(prepared.value);
+                }
+            };
+            return self.dispatchPrepared(arena, request, response, null, null, null, Prepared{ .value = identity });
+        }
+
+        fn dispatchPrepared(
+            self: *Self,
+            arena: std.mem.Allocator,
+            request: *req_mod.Request,
+            response: *res_mod.Response,
+            stream_ptr: ?*anyopaque,
+            io_ptr: ?*anyopaque,
+            peer_ip: ?[]const u8,
+            preparation: anytype,
+        ) !void {
             var name_buf: [16][]const u8 = undefined;
             var value_buf: [16][]const u8 = undefined;
 
@@ -820,6 +855,7 @@ pub fn App(comptime State: type) type {
             ctx.trace.begin();
             defer ctx.trace.finish();
             ctx.req.params_ref = &ctx.params;
+            try preparation.apply(&ctx);
 
             var method_not_allowed = false;
             if (matched == null) {

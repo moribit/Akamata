@@ -22,6 +22,7 @@ is development-oriented; pin a tagged release for reproducible builds.
 - [Typed handlers](guides/typed-handlers.md) — ordinary functions, explicit parameter binding and optional Context (main)
 - [Request validation](guides/validation.md) — DTO rules and compatibility
 - [Application errors](guides/errors.md) — finite error mapping, OpenAPI and client guards
+- [Application testing](guides/testing.md) — typed responses, principal injection and bounded provider effects
 
 ## Guides
 

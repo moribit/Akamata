@@ -178,6 +178,7 @@ pub fn run(allocator: std.mem.Allocator) !void {
     defer ok.deinit();
     try expect(ok.status == 201 and std.mem.indexOf(u8, ok.body, "true") != null);
     try expect(db.calls == 1 and queue.items.items.len == 1 and sink.calls == 1);
+    try queue.expectPublished(Created);
     const item = queue.items.items[0];
     try expect(item.meta.protocol_version == 2 and item.meta.attempt == 2 and item.meta.max_attempts == 7);
     try expect(std.mem.eql(u8, item.meta.event_type, Created.name) and std.mem.eql(u8, item.meta.idempotency_key.?, "message:1"));

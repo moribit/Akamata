@@ -120,6 +120,27 @@ pub fn RequestBuilder(comptime AppT: type) type {
         /// literals). The Response will free these on deinit.
         owned_strings: std.ArrayList([]const u8),
 
+        /// Shallow-copy a test identity. Referenced data must outlive send().
+        /// This sets a normal Context principal and never disables middleware.
+        pub fn as(self: Self, identity: anytype) PrincipalRequest(@TypeOf(identity)) {
+            return .{ .builder = self, .identity = identity };
+        }
+        pub fn PrincipalRequest(comptime Identity: type) type {
+            return struct {
+                builder: Self,
+                identity: Identity,
+                pub fn send(prepared: @This()) !Response {
+                    return prepared.builder.sendWithPrincipal(prepared.identity);
+                }
+                pub fn json(prepared: @This(), value: anytype) @This() {
+                    return .{ .builder = prepared.builder.json(value), .identity = prepared.identity };
+                }
+                pub fn header(prepared: @This(), name: []const u8, value: []const u8) @This() {
+                    return .{ .builder = prepared.builder.header(name, value), .identity = prepared.identity };
+                }
+            };
+        }
+
         /// Stage a header. The caller owns both `name` and `value` (typically
         /// string literals). For values that must be allocated (bearer,
         /// cookie, json content-type), use the typed helpers.
@@ -208,6 +229,19 @@ pub fn RequestBuilder(comptime AppT: type) type {
         /// Run the request through the app. Returns a Response that owns
         /// its arena and must be `.deinit()`ed.
         pub fn send(self: Self) !Response {
+            return self.sendWithPrincipal(null);
+        }
+
+        fn sendWithPrincipal(self: Self, identity: anytype) !Response {
+            // send consumes the builder. Before a Response takes ownership,
+            // failure must release staged JSON/header/path allocations too.
+            errdefer {
+                for (self.owned_strings.items) |owned| self.gpa.free(owned);
+                var owned = self.owned_strings;
+                owned.deinit(self.gpa);
+                var headers = self.headers;
+                headers.deinit(self.gpa);
+            }
             var arena_state = try self.gpa.create(std.heap.ArenaAllocator);
             errdefer self.gpa.destroy(arena_state);
             arena_state.* = .init(self.gpa);
@@ -235,7 +269,9 @@ pub fn RequestBuilder(comptime AppT: type) type {
                 .keep_alive = false,
             };
             var response: res_mod.Response = .init(arena);
-            try self.app.dispatchWithPeer(arena, &request, &response, null, null, null);
+            if (comptime @TypeOf(identity) == @TypeOf(null)) {
+                try self.app.dispatchWithPeer(arena, &request, &response, null, null, null);
+            } else try self.app.dispatchWithPrincipal(arena, &request, &response, identity);
 
             return .{
                 .gpa = self.gpa,
@@ -284,8 +320,16 @@ pub const Response = struct {
         });
     }
 
-    pub fn expectStatus(self: Response, expected: u16) !void {
-        try std.testing.expectEqual(expected, self.status);
+    pub fn expectStatus(self: Response, expected: anytype) !void {
+        const code: u16 = switch (@typeInfo(@TypeOf(expected))) {
+            .@"enum", .enum_literal => @backingInt(@as(@import("http/status.zig").Code, expected)),
+            else => expected,
+        };
+        if (comptime @import("build_options").backend == .workers) {
+            // std.testing's failure printer pulls host Io into freestanding
+            // WASM. Keep the identical assertion error without that printer.
+            if (code != self.status) return error.TestExpectedEqual;
+        } else try std.testing.expectEqual(code, self.status);
     }
     pub fn expectHeader(self: Response, name: []const u8) ![]const u8 {
         return self.header(name) orelse error.MissingExpectedHeader;

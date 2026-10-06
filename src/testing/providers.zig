@@ -30,6 +30,10 @@ pub const MemoryStore = struct {
     pub fn store(self: *MemoryStore) storage.Store {
         return .{ .ptr = self, .vtable = &vtable };
     }
+    /// Test assertion over this bounded owner, not an extra Store operation.
+    pub fn expectExists(self: *MemoryStore, key: []const u8) !void {
+        if (self.lookup(key) == null) return error.MissingExpectedObject;
+    }
     fn lookup(self: *MemoryStore, key: []const u8) ?*Entry {
         for (&self.entries) |*entry| if (entry.used and std.mem.eql(u8, entry.key[0..entry.key_len], key)) return entry;
         return null;
@@ -165,6 +169,17 @@ pub const QueueRecorder = struct {
     }
     pub fn producer(self: *QueueRecorder) queue.Producer {
         return .{ .ptr = self, .enqueue_fn = enqueue };
+    }
+    /// Verify name/version and decode a matching typed event. This assertion
+    /// does not claim delivery, retries, durability or exactly-once behavior.
+    pub fn expectPublished(self: *QueueRecorder, comptime Descriptor: type) !void {
+        for (self.items.items) |item| {
+            if (!std.mem.eql(u8, item.meta.event_type, Descriptor.name) or item.meta.protocol_version != Descriptor.version) continue;
+            var payload = try Descriptor.decode(self.allocator, item.payload);
+            defer payload.deinit();
+            return;
+        }
+        return error.MissingExpectedEvent;
     }
     fn enqueue(ptr: *anyopaque, meta: events.EnvelopeMeta, bytes: []const u8) queue.Error!void {
         const self: *QueueRecorder = @ptrCast(@alignCast(ptr));

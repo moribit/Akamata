@@ -54,6 +54,7 @@ pub fn run(allocator: std.mem.Allocator) !void {
     try expect(invalid.status == 400);
     var created = try client.post("/users").json(.{ .name = "Alice" }).send();
     defer created.deinit();
+    try created.expectStatus(.created);
     try expect(created.status == 201);
     var validation = try client.post("/users").json(.{ .name = "" }).send();
     defer validation.deinit();
@@ -61,6 +62,10 @@ pub fn run(allocator: std.mem.Allocator) !void {
     var absent = try client.get("/profile").send();
     defer absent.deinit();
     try expect(absent.status == 401);
+    var injected = try client.get("/profile").as(Identity{ .id = 7 }).send();
+    defer injected.deinit();
+    try injected.expectStatus(.ok);
+    try expect((try injected.json(Identity)).id == 7);
     app.core.state_value.authenticated = true;
     var authenticated = try client.get("/profile").send();
     defer authenticated.deinit();

@@ -3,6 +3,33 @@ const ak = @import("akamata");
 test "README source executes through the in-process client" {
     try @import("docs/minimal.zig").contract(std.testing.allocator);
 }
+
+test "test storage owner asserts effects without changing Store" {
+    var store = ak.testing.MemoryStore.init(std.testing.allocator);
+    try std.testing.expectError(error.MissingExpectedObject, store.expectExists("objects/test"));
+    const Empty = struct {
+        fn read(_: *anyopaque, _: []u8) ak.stream.Error!usize {
+            return 0;
+        }
+        fn close(_: *anyopaque) void {}
+    };
+    var source: u8 = 0;
+    _ = try store.store().put("objects/test", .{ .ptr = &source, .read_fn = Empty.read, .close_fn = Empty.close }, .{});
+    try store.expectExists("objects/test");
+    try store.store().delete("objects/test");
+    try std.testing.expectError(error.MissingExpectedObject, store.expectExists("objects/test"));
+}
+
+test "request failure releases staged test-client allocations" {
+    var app = try Application.init(std.testing.allocator);
+    defer app.deinit();
+    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{});
+    var client = app.client(failing.allocator());
+    const request = client.post("/users").json(.{ .name = "Alice" });
+    failing.fail_index = failing.alloc_index;
+    try std.testing.expectError(error.OutOfMemory, request.send());
+    try std.testing.expectEqual(failing.allocated_bytes, failing.freed_bytes);
+}
 fn hello() []const u8 {
     return "Hello, Akamata!";
 }
@@ -102,8 +129,10 @@ test "typed parameter metadata matches actual binding" {
 }
 
 const Identity = struct { id: u64 };
-const AuthState = struct { authenticated: bool = false, wrong_type: bool = false };
+const AuthState = struct { authenticated: bool = false, wrong_type: bool = false, middleware_calls: usize = 0, deny: bool = false };
 fn attachIdentity(c: *ak.Context(AuthState), next: ak.Next(AuthState)) !void {
+    c.state().middleware_calls += 1;
+    if (c.state().deny) return c.json(.{ .error_kind = "forbidden" }, 403);
     if (c.state().authenticated) {
         if (c.state().wrong_type) try c.setPrincipal(@as(u64, 42)) else try c.setPrincipal(Identity{ .id = 42 });
     }
@@ -129,6 +158,18 @@ test "principal binding uses middleware and rejects absent or incorrectly typed 
     var wrong = try client.get("/profile").send();
     defer wrong.deinit();
     try wrong.expectStatus(401);
+    app.core.state_value.authenticated = false;
+    app.core.state_value.wrong_type = false;
+    const before = app.core.state_value.middleware_calls;
+    var injected = try client.get("/profile").as(Identity{ .id = 7 }).send();
+    defer injected.deinit();
+    try injected.expectStatus(.ok);
+    try std.testing.expectEqual(@as(u64, 7), (try injected.json(Identity)).id);
+    try std.testing.expectEqual(before + 1, app.core.state_value.middleware_calls);
+    app.core.state_value.deny = true;
+    var denied = try client.get("/profile").as(Identity{ .id = 7 }).send();
+    defer denied.deinit();
+    try denied.expectStatus(.forbidden);
 }
 
 test "shared Native Workers developer application contract" {
