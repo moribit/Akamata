@@ -16,7 +16,7 @@ pub fn renderWorkerIndex(alloc: std.mem.Allocator, name: []const u8, caps: Worke
     var rendered = try std.mem.replaceOwned(u8, alloc, tmpl_worker_index, "../../zig-out/bin/akamata_worker.wasm", wasm_name);
     if (!caps.realtime) {
         rendered = try std.mem.replaceOwned(u8, alloc, rendered, "import { WorkerEntrypoint } from \"cloudflare:workers\";\n", "");
-        rendered = try std.mem.replaceOwned(u8, alloc, rendered, "import { REALTIME_AUTHORIZE_PATH, REALTIME_MESSAGE_PATH, rejectPublicInternalRoute } from \"./internal_routes.mjs\";\n", "");
+        rendered = try std.mem.replaceOwned(u8, alloc, rendered, "import { REALTIME_AUTHORIZE_PATH, REALTIME_MESSAGE_PATH, rejectPublicInternalRoute, realtimeNamespace } from \"./internal_routes.mjs\";\n", "");
         rendered = try removeSpan(alloc, rendered, "    const url = new URL(request.url);\n    // These handlers", "    return dispatchWasm(request);\n");
         rendered = try removeSpan(alloc, rendered, "/// Service-binding-only control-plane entrypoint.", "async function dispatchWasm(request)");
         rendered = try std.mem.replaceOwned(u8, alloc, rendered, "export { AkamataRealtimeRoom } from \"./realtime_object.mjs\";\n", "");

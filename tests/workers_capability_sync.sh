@@ -63,6 +63,10 @@ printf '%s\n' "$realtime_remove_dry" | grep -F 'would delete deploy/worker/realt
 test -f deploy/worker/realtime_object.mjs
 "$cli" sync
 test ! -e deploy/worker/internal_routes.mjs
+if grep -F "./internal_routes.mjs" deploy/worker/index.mjs >/dev/null; then
+  echo "disabled realtime retains missing module import" >&2
+  exit 1
+fi
 test ! -e deploy/worker/realtime_object.mjs
 if grep -F 'realtime_object.mjs' .akamata/managed-files.json >/dev/null; then
   echo "manifest retained disabled Realtime glue" >&2
