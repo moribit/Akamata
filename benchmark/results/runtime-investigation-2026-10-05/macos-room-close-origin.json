@@ -1,0 +1,59 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "f2d99bd75064584e599cd95120594c5eb493519623e8ffd6646af69bf9ce512b",
+  "adapter": "kqueue",
+  "test": "test_upgrade_hub_snapshot_disconnect_ownership",
+  "requested_repeats": 30,
+  "runs": [
+    {
+      "repeat": 1,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 2,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 3,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 4,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 5,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 6,
+      "passed": false,
+      "fixture_log": "info: experimental multiplexed reactor listening on port 62972\nwarning: FAIL token=8589934601 phase=application busy=false\n/Users/mimoc/Akamata/src/runtime/reactor.zig:410:33: 0x104f0ad6f in refresh (runtime-contract-server)\n                    std.log.warn(\"reactor session error: {t}\", .{err});\n                                ^\n/Users/mimoc/Akamata/src/runtime/reactor.zig:711:61: 0x104efdf4f in run (runtime-contract-server)\n                    if (self.lookup(token)) |c| self.refresh(c);\n                                                            ^\n/Users/mimoc/Akamata/src/runtime/reactor.zig:38:16: 0x104ea2063 in evaluate__func_773 (runtime-contract-server)\n    try ctx.run();\n               ^\n/Users/mimoc/.zvm/0.17.0/lib/std/start.zig:827:30: 0x104ea2d5f in callMain (runtime-contract-server)\n    return wrapMain(root.main(.{\n                             ^\n???:?:?: 0x18fcafe7f in start (/usr/lib/dyld)\nwarning: refresh close token=8589934601 phase=closing failed=true closed=false task=false\nwarning: FAIL token=4294967304 phase=application busy=false\n/Users/mimoc/.zvm/0.17.0/lib/std/c.zig:77:16: 0x104f02d1f in readApplication (runtime-contract-server)\n    return if (rc == -1) @fromBackingInt(@intCast(_errno().*)) else .SUCCESS;\n               ^\n/Users/mimoc/Akamata/src/runtime/reactor.zig:38:16: 0x104ea2063 in evaluate__func_773 (runtime-contract-server)\n    try ctx.run();\n               ^\n/Users/mimoc/.zvm/0.17.0/lib/std/start.zig:827:30: 0x104ea2d5f in callMain (runtime-contract-server)\n    return wrapMain(root.main(.{\n                             ^\n???:?:?: 0x18fcafe7f in start (/usr/lib/dyld)\nwarning: FAIL token=4294967303 phase=application busy=false\n/Users/mimoc/.zvm/0.17.0/lib/std/c.zig:77:16: 0x104f02d1f in readApplication (runtime-contract-server)\n    return if (rc == -1) @fromBackingInt(@intCast(_errno().*)) else .SUCCESS;\n               ^\n/Users/mimoc/Akamata/src/runtime/reactor.zig:38:16: 0x104ea2063 in evaluate__func_773 (runtime-contract-server)\n    try ctx.run();\n               ^\n/Users/mimoc/.zvm/0.17.0/lib/std/start.zig:827:30: 0x104ea2d5f in callMain (runtime-contract-server)\n    return wrapMain(root.main(.{\n                             ^\n???:?:?: 0x18fcafe7f in start (/usr/lib/dyld)\nwarning: refresh close token=4294967304 phase=closing failed=true closed=false task=false\nwarning: refresh close token=4294967303 phase=closing failed=true closed=false task=false\nSESSION_STATS {\"created\":3,\"closed\":3,\"close_reasons\":[0,2,0,1,0]}\nBENCH_STATS {\"calls\":178,\"requested\":154088,\"live\":0,\"peak\":123458}\n",
+      "errors": [],
+      "failures": [
+        "Traceback (most recent call last):\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 567, in test_upgrade_hub_snapshot_disconnect_ownership\n    receive(peers[0])\n    ~~~~~~~^^^^^^^^^^\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 556, in receive\n    self.assertTrue(data)\n    ~~~~~~~~~~~~~~~^^^^^^\nAssertionError: b'' is not true\n"
+      ]
+    }
+  ],
+  "failure_snapshots": [
+    {
+      "error": "AssertionError(\"b'' is not true\")",
+      "stats": "{\"live\":87910,\"peak\":123458,\"calls\":176,\"created\":3,\"closed\":1,\"mailbox_overflows\":0,\"close_reasons\":[0,1,0,0,0]}"
+    }
+  ]
+}

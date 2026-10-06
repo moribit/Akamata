@@ -1,0 +1,767 @@
+Analysis of sampling runtime-reactor-bench (pid 23750) every 1 millisecond
+Process:         runtime-reactor-bench [23750]
+Path:            /Users/USER/*/runtime-reactor-bench
+Load Address:    0x10273c000
+Identifier:      runtime-reactor-bench
+Version:         0
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  Python [22765]
+Target Type:     live task
+
+Date/Time:       2026-10-05 13:38:02.858 +0000
+Launch Time:     2026-10-05 13:38:00.600 +0000
+OS Version:      macOS 26.6.2 (25G83)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         10.1M
+Physical footprint (peak):  10.3M
+Idle exit:                  untracked
+----
+
+Call graph:
+    2923 Thread_220634   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 2923 start  (in dyld) + 6992  [0x18e5504e4]
+    +   2923 main  (in runtime-reactor-bench) + 1536  [0x102746550]  start.zig:754
+    +     892 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 12408  [0x102744844]  reactor.zig:38
+    +     ! 443 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1004  [0x10277e254]  reactor.zig:373
+    +     ! : 437 pthread_cond_signal  (in libsystem_pthread.dylib) + 708  [0x18e91af88]
+    +     ! : | 437 __psynch_cvsignal  (in libsystem_kernel.dylib) + 8  [0x18e8dca64]
+    +     ! : 3 pthread_cond_signal  (in libsystem_pthread.dylib) + 736  [0x18e91afa4]
+    +     ! : | 3 _pthread_cond_updateval  (in libsystem_pthread.dylib) + 0,60,...  [0x18e918c3c,0x18e918c78,...]
+    +     ! : 2 pthread_cond_signal  (in libsystem_pthread.dylib) + 276,708  [0x18e91add8,0x18e91af88]
+    +     ! : 1 DYLD-STUB$$pthread_cond_signal  (in runtime-reactor-bench) + 0  [0x10287d3c8]
+    +     ! 224 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1020  [0x10277e264]  reactor.zig:374
+    +     ! : 223 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     ! : | 223 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     ! : |   223 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     ! : 1 pthread_mutex_unlock  (in libsystem_pthread.dylib) + 0  [0x18e916944]
+    +     ! 61 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 460  [0x10277e034]  reactor.zig:354
+    +     ! : 61 runtime.reactor_selector.Kqueue.set  (in runtime-reactor-bench) + 140  [0x102740b10]  reactor_selector.zig:83
+    +     ! :   61 kevent  (in libsystem_kernel.dylib) + 8  [0x18e8ddfc4]
+    +     ! 49 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 288,268,...  [0x10277df88,0x10277df74,...]  reactor.zig:345
+    +     ! 22 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3324  [0x10277eb64]  reactor.zig:345
+    +     ! : 21 mem.SplitIterator(u8,.sequence).next  (in runtime-reactor-bench) + 76  [0x10278151c]  mem.zig:3470
+    +     ! : | 16 mem.findPos__func_736  (in runtime-reactor-bench) + 360  [0x1027804bc]  mem.zig:1613
+    +     ! : | + 9 mem.eql__func_28  (in runtime-reactor-bench) + 0,32,...  [0x10279895c,0x10279897c,...]  mem.zig:803
+    +     ! : | + 7 mem.findPos__func_736  (in runtime-reactor-bench) + 360  [0x1027804bc]  mem.zig:1613
+    +     ! : | +   4 mem.eql__func_28  (in runtime-reactor-bench) + 284  [0x102798a78]  mem.zig:0
+    +     ! : | +   3 mem.eql__func_28  (in runtime-reactor-bench) + 56,88  [0x102798994,0x1027989b4]  mem.zig:803
+    +     ! : | 3 mem.findPos__func_736  (in runtime-reactor-bench) + 364  [0x1027804c0]  mem.zig:1613
+    +     ! : | 2 mem.findPos__func_736  (in runtime-reactor-bench) + 20  [0x102780368]  mem.zig:1604
+    +     ! : 1 mem.SplitIterator(u8,.sequence).next  (in runtime-reactor-bench) + 40  [0x1027814f8]  mem.zig:0
+    +     ! 13 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 400  [0x10277dff8]  reactor.zig:354
+    +     ! : 12 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! : | 12 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! : |   12 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! : 1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 0  [0x18e9163fc]
+    +     ! 12 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 796  [0x10277e184]  reactor.zig:364
+    +     ! : 12 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! :   12 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :     12 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 9 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 500  [0x10277e05c]  reactor.zig:354
+    +     ! : 9 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     ! :   9 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     ! :     9 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     ! 8 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 4844  [0x10277f154]  reactor.zig:345
+    +     ! : 3 http.parser.validHost  (in runtime-reactor-bench) + 580  [0x1027808c8]  parser.zig:239
+    +     ! : | 2 http.parser.validPort  (in runtime-reactor-bench) + 404,412  [0x102780d10,0x102780d18]  parser.zig:254
+    +     ! : | 1 http.parser.validPort  (in runtime-reactor-bench) + 336  [0x102780ccc]  fmt.zig:0
+    +     ! : 2 http.parser.validHost  (in runtime-reactor-bench) + 704  [0x102780944]  parser.zig:0
+    +     ! : 1 http.parser.validHost  (in runtime-reactor-bench) + 8  [0x10278068c]  parser.zig:227
+    +     ! : 1 http.parser.validHost  (in runtime-reactor-bench) + 304  [0x1027807b4]  parser.zig:236
+    +     ! : 1 http.parser.validHost  (in runtime-reactor-bench) + 532  [0x102780898]  parser.zig:237
+    +     ! 7 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3240  [0x10277eb10]  reactor.zig:345
+    +     ! : 7 mem.SplitIterator(u8,.sequence).next  (in runtime-reactor-bench) + 76  [0x10278151c]  mem.zig:3470
+    +     ! :   3 mem.findPos__func_736  (in runtime-reactor-bench) + 360  [0x1027804bc]  mem.zig:1613
+    +     ! :   | 2 mem.findPos__func_736  (in runtime-reactor-bench) + 360  [0x1027804bc]  mem.zig:1613
+    +     ! :   | + 2 mem.eql__func_28  (in runtime-reactor-bench) + 56,280  [0x102798994,0x102798a74]  mem.zig:803
+    +     ! :   | 1 mem.eql__func_28  (in runtime-reactor-bench) + 0  [0x10279895c]  mem.zig:803
+    +     ! :   3 mem.findPos__func_736  (in runtime-reactor-bench) + 340,364,...  [0x1027804a8,0x1027804c0,...]  mem.zig:1613
+    +     ! :   1 mem.findPos__func_736  (in runtime-reactor-bench) + 776  [0x10278065c]  mem.zig:0
+    +     ! 7 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 760  [0x10277e160]  reactor.zig:361
+    +     ! : 4 runtime.deadline_heap.Heap.down  (in runtime-reactor-bench) + 208,116,...  [0x10277f9a0,0x10277f944,...]  deadline_heap.zig:42
+    +     ! : 3 runtime.deadline_heap.Heap.down  (in runtime-reactor-bench) + 160,260  [0x10277f970,0x10277f9d4]  deadline_heap.zig:43
+    +     ! 5 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 204  [0x10277df34]  reactor.zig:345
+    +     ! : 3 heap.ArenaAllocator.reset  (in runtime-reactor-bench) + 0  [0x102781f3c]  ArenaAllocator.zig:112
+    +     ! : 1 heap.ArenaAllocator.reset  (in runtime-reactor-bench) + 664  [0x1027821d4]  ArenaAllocator.zig:0
+    +     ! : 1 heap.ArenaAllocator.reset  (in runtime-reactor-bench) + 64  [0x102781f7c]  ArenaAllocator.zig:143
+    +     ! 5 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3188  [0x10277eadc]  reactor.zig:345
+    +     ! : 2 ???  (in runtime-reactor-bench)  load address 0x10273c000 + 0x1e2c  [0x10273de2c]
+    +     ! : 1 ???  (in runtime-reactor-bench)  load address 0x10273c000 + 0x1e9c  [0x10273de9c]
+    +     ! : 1 array_list.Aligned(http.request.Header,null).ensureTotalCapacity  (in runtime-reactor-bench) + 28  [0x1027811d8]  array_list.zig:1348
+    +     ! : 1 heap.ArenaAllocator.alloc  (in runtime-reactor-bench) + 908  [0x1027826c4]  ArenaAllocator.zig:0
+    +     ! 5 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1004  [0x10277e254]  reactor.zig:374
+    +     ! 3 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3376  [0x10277eb98]  reactor.zig:345
+    +     ! : 3 mem.findScalar__func_92  (in runtime-reactor-bench) + 16,132,...  [0x10274cf90,0x10274d004,...]  mem.zig:1288
+    +     ! 3 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3440  [0x10277ebd8]  reactor.zig:345
+    +     ! : 2 http.parser.validFieldName  (in runtime-reactor-bench) + 28  [0x102781150]  parser.zig:201
+    +     ! : 1 http.parser.validFieldName  (in runtime-reactor-bench) + 92  [0x102781190]  parser.zig:0
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1804,1840  [0x10277e574,0x10277e598]  reactor.zig:0
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3040  [0x10277ea48]  reactor.zig:345
+    +     ! : 2 http.parser.validRequestTarget  (in runtime-reactor-bench) + 72  [0x10278145c]  parser.zig:0
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3416  [0x10277ebc0]  reactor.zig:345
+    +     ! : 1 mem.trim__func_23  (in runtime-reactor-bench) + 36  [0x102798cf8]  mem.zig:1273
+    +     ! : 1 mem.trim__func_23  (in runtime-reactor-bench) + 212  [0x102798da8]  mem.zig:1275
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3552  [0x10277ec48]  reactor.zig:345
+    +     ! : 2 array_list.Aligned(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Value,null).append  (in runtime-reactor-bench) + 0  [0x102769ed8]  array_list.zig:1026
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 716,748  [0x10277e134,0x10277e154]  reactor.zig:361
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 2992  [0x10277ea18]  reactor.zig:345
+    +     ! : 1 mem.eql__func_28  (in runtime-reactor-bench) + 0  [0x10279895c]  mem.zig:803
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 3100  [0x10277ea84]  reactor.zig:345
+    +     ! : 1 mem.findScalar__func_92  (in runtime-reactor-bench) + 0  [0x10274cf80]  mem.zig:1287
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 6256  [0x10277f6d8]  reactor.zig:345
+    +     ! : 1 mem.eql__func_28  (in runtime-reactor-bench) + 0  [0x10279895c]  mem.zig:803
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 532  [0x10277e07c]  reactor.zig:355
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 760  [0x10277e160]  reactor.zig:364
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 6228  [0x10277f6bc]  sync.zig:0
+    +     627 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 14540  [0x102745098]  reactor.zig:38
+    +     ! 627 __sendto  (in libsystem_kernel.dylib) + 8  [0x18e8dc390]
+    +     543 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 12368  [0x10274481c]  reactor.zig:38
+    +     ! 541 __recvfrom  (in libsystem_kernel.dylib) + 8  [0x18e8dc3bc]
+    +     ! 1 DYLD-STUB$$__recvfrom  (in libsystem_c.dylib) + 8  [0x18e822418]
+    +     ! 1 recv  (in libsystem_c.dylib) + 0  [0x18e7bb674]
+    +     305 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 9476  [0x102743cd0]  reactor.zig:38
+    +     ! 305 kevent  (in libsystem_kernel.dylib) + 8  [0x18e8ddfc4]
+    +     220 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 11840  [0x10274460c]  reactor.zig:38
+    +     ! 176 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 2168  [0x102783af8]  reactor.zig:392
+    +     ! : 153 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1756  [0x10277e544]  reactor.zig:350
+    +     ! : | 96 runtime.reactor_selector.Kqueue.set  (in runtime-reactor-bench) + 140  [0x102740b10]  reactor_selector.zig:83
+    +     ! : | + 96 kevent  (in libsystem_kernel.dylib) + 8,4  [0x18e8ddfc4,0x18e8ddfc0]
+    +     ! : | 57 runtime.reactor_selector.Kqueue.set  (in runtime-reactor-bench) + 288  [0x102740ba4]  reactor_selector.zig:84
+    +     ! : |   56 kevent  (in libsystem_kernel.dylib) + 8  [0x18e8ddfc4]
+    +     ! : |   1 DYLD-STUB$$kevent  (in runtime-reactor-bench) + 4  [0x10287d0b4]
+    +     ! : 8 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1780  [0x10277e55c]  reactor.zig:350
+    +     ! : | 6 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     ! : | + 6 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     ! : | +   6 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     ! : | 1 DYLD-STUB$$pthread_mutex_unlock  (in runtime-reactor-bench) + 4  [0x10287d444]
+    +     ! : | 1 pthread_mutex_unlock  (in libsystem_pthread.dylib) + 12  [0x18e916950]
+    +     ! : 6 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1104  [0x10277e2b8]  reactor.zig:345
+    +     ! : | 6 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     ! : |   4 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     ! : |   + 4 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     ! : |   +   3 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     ! : |   +   ! 3 mach_absolute_time  (in libsystem_kernel.dylib) + 48  [0x18e8d80d0]
+    +     ! : |   +   1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 36  [0x18e8d9c1c]
+    +     ! : |   1 _mach_boottime_usec  (in libsystem_c.dylib) + 80  [0x18e7dd4c0]
+    +     ! : |   + 1 mach_boottime_usec  (in libsystem_kernel.dylib) + 8  [0x18e8ec8fc]
+    +     ! : |   1 _mach_boottime_usec  (in libsystem_c.dylib) + 12  [0x18e7dd47c]
+    +     ! : 4 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1696  [0x10277e508]  reactor.zig:350
+    +     ! : | 2 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! : | + 2 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! : | +   2 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! : | 1 DYLD-STUB$$pthread_mutex_lock  (in runtime-reactor-bench) + 4  [0x10287d42c]
+    +     ! : | 1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 52  [0x18e916430]
+    +     ! : 2 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 0  [0x10277de68]  reactor.zig:340
+    +     ! : 2 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1804  [0x10277e574]  reactor.zig:351
+    +     ! : | 2 runtime.deadline_heap.Heap.set  (in runtime-reactor-bench) + 20  [0x10277f7fc]  deadline_heap.zig:0
+    +     ! : 1 runtime.deadline_heap.Heap.down  (in runtime-reactor-bench) + 320  [0x10277fa10]  deadline_heap.zig:45
+    +     ! 10 runtime.reactor.Context(runtime_group_bench.State).destroy  (in runtime-reactor-bench) + 392,408,...  [0x102782f98,0x102782fa8,...]  reactor.zig:294
+    +     ! 10 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 2112  [0x102783ac0]  reactor.zig:392
+    +     ! : 9 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     ! : | 6 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     ! : | + 6 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     ! : | +   5 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     ! : | +   ! 5 mach_absolute_time  (in libsystem_kernel.dylib) + 48,52  [0x18e8d80d0,0x18e8d80d4]
+    +     ! : | +   1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 36  [0x18e8d9c1c]
+    +     ! : | 1 _mach_boottime_usec  (in libsystem_c.dylib) + 32  [0x18e7dd490]
+    +     ! : | + 1 mach_boottime_usec  (in libsystem_kernel.dylib) + 8  [0x18e8ec8fc]
+    +     ! : | 1 _mach_boottime_usec  (in libsystem_c.dylib) + 80  [0x18e7dd4c0]
+    +     ! : | + 1 mach_boottime_usec  (in libsystem_kernel.dylib) + 0  [0x18e8ec8f4]
+    +     ! : | 1 _mach_boottime_usec  (in libsystem_c.dylib) + 52  [0x18e7dd4a4]
+    +     ! : 1 clock_gettime  (in libsystem_c.dylib) + 0  [0x18e7b7d24]
+    +     ! 6 runtime.reactor.Context(runtime_group_bench.State).destroy  (in runtime-reactor-bench) + 676  [0x1027830b4]  reactor.zig:307
+    +     ! : 6 heap.debug_allocator.DebugAllocator(.{ .stack_trace_frames = 0, .enable_memory_limit = false, .safety = false, .thread_safe = true, .never_unmap = false, .retain_metadata = false, .verbose_log = false, .backing_allocator_zeroes = true, .resize_stack_traces = false, .canary = 10534666094765928719, .page_size = 131072 }).free  (in runtime-reactor-bench) + 312  [0x1027999e8]  debug_allocator.zig:977
+    +     ! :   6 heap.PageAllocator.free  (in runtime-reactor-bench) + 28  [0x10279b98c]  PageAllocator.zig:185
+    +     ! :     6 __munmap  (in libsystem_kernel.dylib) + 8  [0x18e8db728]
+    +     ! 5 runtime.reactor.Context(runtime_group_bench.State).failReason  (in runtime-reactor-bench) + 396  [0x102782c74]  reactor.zig:320
+    +     ! : 5 shutdown  (in libsystem_kernel.dylib) + 8  [0x18e8dc440]
+    +     ! 3 runtime.reactor.Context(runtime_group_bench.State).destroy  (in runtime-reactor-bench) + 304  [0x102782f40]  reactor.zig:294
+    +     ! : 3 __close_nocancel  (in libsystem_kernel.dylib) + 8  [0x18e8d9584]
+    +     ! 3 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 100  [0x1027832e4]  reactor.zig:383
+    +     ! : 3 pthread_mutex_lock  (in libsystem_pthread.dylib) + 0,12  [0x18e9163fc,0x18e916408]
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 1828  [0x1027839a4]  reactor.zig:392
+    +     ! : 2 pthread_mutex_lock  (in libsystem_pthread.dylib) + 52  [0x18e916430]
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 1056,2080  [0x1027836a0,0x102783aa0]  reactor.zig:392
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 64  [0x1027832c0]  reactor.zig:383
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 340  [0x1027833d4]  reactor.zig:392
+    +     ! : 1 DYLD-STUB$$pthread_mutex_lock  (in runtime-reactor-bench) + 4  [0x10287d42c]
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 1848  [0x1027839b8]  reactor.zig:392
+    +     !   1 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !     1 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !       1 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     179 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 8044  [0x102743738]  reactor.zig:38
+    +     ! 122 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 1572  [0x1027838a4]  reactor.zig:392
+    +     ! : 122 runtime.reactor_selector.Kqueue.set  (in runtime-reactor-bench) + 288  [0x102740ba4]  reactor_selector.zig:84
+    +     ! :   121 kevent  (in libsystem_kernel.dylib) + 8  [0x18e8ddfc4]
+    +     ! :   1 DYLD-STUB$$kevent  (in runtime-reactor-bench) + 4  [0x10287d0b4]
+    +     ! 17 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 916,1256,...  [0x102783614,0x102783768,...]  reactor.zig:392
+    +     ! 13 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 1512  [0x102783868]  reactor.zig:392
+    +     ! : 10 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! : | 10 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! : |   10 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! : 2 pthread_mutex_lock  (in libsystem_pthread.dylib) + 52  [0x18e916430]
+    +     ! : 1 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 120  [0x18e916880]
+    +     ! 9 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 1592  [0x1027838b8]  reactor.zig:392
+    +     ! : 9 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     ! :   9 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     ! :     9 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     ! 7 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 1468  [0x10278383c]  reactor.zig:392
+    +     ! : 4 runtime.reactor_output.Output(runtime.reactor.Context(runtime_group_bench.State)).offer  (in runtime-reactor-bench) + 204  [0x102740ce0]  reactor_output.zig:50
+    +     ! : | 3 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     ! : | + 2 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     ! : | + ! 2 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     ! : | + !   2 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     ! : | + !     2 mach_absolute_time  (in libsystem_kernel.dylib) + 48  [0x18e8d80d0]
+    +     ! : | + 1 _mach_boottime_usec  (in libsystem_c.dylib) + 48  [0x18e7dd4a0]
+    +     ! : | 1 clock_gettime  (in libsystem_c.dylib) + 0  [0x18e7b7d24]
+    +     ! : 2 runtime.reactor_output.Output(runtime.reactor.Context(runtime_group_bench.State)).offer  (in runtime-reactor-bench) + 68  [0x102740c58]  reactor_output.zig:43
+    +     ! : | 1 DYLD-STUB$$pthread_mutex_lock  (in runtime-reactor-bench) + 4  [0x10287d42c]
+    +     ! : | 1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 52  [0x18e916430]
+    +     ! : 1 runtime.reactor_output.Output(runtime.reactor.Context(runtime_group_bench.State)).offer  (in runtime-reactor-bench) + 292  [0x102740d38]  reactor_output.zig:44
+    +     ! :   1 pthread_mutex_unlock  (in libsystem_pthread.dylib) + 32  [0x18e916964]
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 132  [0x102783304]  reactor.zig:383
+    +     ! : 1 DYLD-STUB$$pthread_mutex_unlock  (in runtime-reactor-bench) + 4  [0x10287d444]
+    +     ! : 1 pthread_mutex_unlock  (in libsystem_pthread.dylib) + 116  [0x18e9169b8]
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 92  [0x1027832dc]  reactor.zig:383
+    +     ! 1 ???  (in runtime-reactor-bench)  load address 0x10273c000 + 0x1e2c  [0x10273de2c]
+    +     ! 1 ???  (in runtime-reactor-bench)  load address 0x10273c000 + 0x1e64  [0x10273de64]
+    +     ! 1 ???  (in runtime-reactor-bench)  load address 0x10273c000 + 0x1e88  [0x10273de88]
+    +     ! 1 runtime.deadline_heap.Heap.set  (in runtime-reactor-bench) + 0  [0x10277f7e8]  deadline_heap.zig:59
+    +     ! 1 runtime.deadline_heap.Heap.up  (in runtime-reactor-bench) + 68  [0x1027815b0]  deadline_heap.zig:32
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 152  [0x102783318]  reactor.zig:21
+    +     ! 1 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 172  [0x10278332c]  reactor.zig:386
+    +     46 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 11824  [0x1027445fc]  reactor.zig:38
+    +     ! 46 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !   46 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !     46 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     30 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 11928,12368,...  [0x102744664,0x10274481c,...]  reactor.zig:38
+    +     22 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 14476  [0x102745058]  reactor.zig:38
+    +     ! 21 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     ! : 21 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     ! :   21 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     ! :     21 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     ! :       21 mach_absolute_time  (in libsystem_kernel.dylib) + 48,16  [0x18e8d80d0,0x18e8d80b0]
+    +     ! 1 clock_gettime  (in libsystem_c.dylib) + 0  [0x18e7b7d24]
+    +     16 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 12040  [0x1027446d4]  reactor.zig:38
+    +     ! 16 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     !   11 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     !   : 10 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     !   : | 9 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     !   : | + 9 mach_absolute_time  (in libsystem_kernel.dylib) + 48  [0x18e8d80d0]
+    +     !   : | 1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 92  [0x18e8d9c54]
+    +     !   : 1 gettimeofday  (in libsystem_c.dylib) + 0  [0x18e7afd88]
+    +     !   2 _mach_boottime_usec  (in libsystem_c.dylib) + 32  [0x18e7dd490]
+    +     !   : 1 DYLD-STUB$$mach_boottime_usec  (in libsystem_c.dylib) + 0  [0x18e822ba0]
+    +     !   : 1 mach_boottime_usec  (in libsystem_kernel.dylib) + 0  [0x18e8ec8f4]
+    +     !   2 _mach_boottime_usec  (in libsystem_c.dylib) + 64,96  [0x18e7dd4b0,0x18e7dd4d0]
+    +     !   1 _mach_boottime_usec  (in libsystem_c.dylib) + 80  [0x18e7dd4c0]
+    +     !     1 DYLD-STUB$$mach_boottime_usec  (in libsystem_c.dylib) + 0  [0x18e822ba0]
+    +     9 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 9984  [0x102743ecc]  reactor.zig:38
+    +     ! 5 heap.debug_allocator.DebugAllocator(.{ .stack_trace_frames = 0, .enable_memory_limit = false, .safety = false, .thread_safe = true, .never_unmap = false, .retain_metadata = false, .verbose_log = false, .backing_allocator_zeroes = true, .resize_stack_traces = false, .canary = 10534666094765928719, .page_size = 131072 }).alloc  (in runtime-reactor-bench) + 256  [0x10279a4fc]  debug_allocator.zig:789
+    +     ! : 3 heap.PageAllocator.alloc  (in runtime-reactor-bench) + 132  [0x10279b8c0]  PageAllocator.zig:166
+    +     ! : | 3 mmap  (in libsystem_kernel.dylib) + 80  [0x18e8d89bc]
+    +     ! : |   3 __mmap  (in libsystem_kernel.dylib) + 8  [0x18e8d8a18]
+    +     ! : 2 heap.PageAllocator.alloc  (in runtime-reactor-bench) + 260  [0x10279b940]  PageAllocator.zig:166
+    +     ! :   2 __munmap  (in libsystem_kernel.dylib) + 8  [0x18e8db728]
+    +     ! 4 heap.debug_allocator.DebugAllocator(.{ .stack_trace_frames = 0, .enable_memory_limit = false, .safety = false, .thread_safe = true, .never_unmap = false, .retain_metadata = false, .verbose_log = false, .backing_allocator_zeroes = true, .resize_stack_traces = false, .canary = 10534666094765928719, .page_size = 131072 }).alloc  (in runtime-reactor-bench) + 308  [0x10279a530]  debug_allocator.zig:792
+    +     7 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 9680  [0x102743d9c]  reactor.zig:38
+    +     ! 7 read  (in libsystem_kernel.dylib) + 8  [0x18e8d891c]
+    +     5 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 9748  [0x102743de0]  reactor.zig:38
+    +     ! 5 __accept  (in libsystem_kernel.dylib) + 8  [0x18e8e06cc]
+    +     5 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 14588  [0x1027450c8]  reactor.zig:38
+    +     ! 5 pthread_cond_broadcast  (in libsystem_pthread.dylib) + 48,0  [0x18e916d34,0x18e916d04]
+    +     4 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 7876  [0x102743690]  reactor.zig:38
+    +     ! 2 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! : 2 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :   2 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 1 DYLD-STUB$$pthread_mutex_lock  (in runtime-reactor-bench) + 4  [0x10287d42c]
+    +     ! 1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 112  [0x18e91646c]
+    +     4 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 11208  [0x102744394]  reactor.zig:38
+    +     ! 4 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   4 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     4 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     2 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 10844  [0x102744228]  reactor.zig:38
+    +     ! 2 runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench) + 1756  [0x10277e544]  reactor.zig:350
+    +     !   2 runtime.reactor_selector.Kqueue.set  (in runtime-reactor-bench) + 140  [0x102740b10]  reactor_selector.zig:83
+    +     !     2 kevent  (in libsystem_kernel.dylib) + 8  [0x18e8ddfc4]
+    +     1 runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench) + 784  [0x102783590]  reactor.zig:0
+    +     1 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 8088  [0x102743764]  reactor.zig:38
+    +     ! 1 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   1 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     1 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     1 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 9956  [0x102743eb0]  reactor.zig:38
+    +     ! 1 setsockopt  (in libsystem_kernel.dylib) + 8  [0x18e8dc1a0]
+    +     1 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 10216  [0x102743fb4]  reactor.zig:38
+    +     ! 1 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     !   1 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     !     1 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     !       1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     !         1 mach_absolute_time  (in libsystem_kernel.dylib) + 48  [0x18e8d80d0]
+    +     1 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 10460  [0x1027440a8]  reactor.zig:38
+    +     ! 1 pthread_mutex_init  (in libsystem_pthread.dylib) + 108  [0x18e91747c]
+    +     1 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 10732  [0x1027441b8]  reactor.zig:38
+    +     ! 1 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   1 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     1 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     1 runtime.reactor.evaluate__func_29  (in runtime-reactor-bench) + 11776  [0x1027445cc]  reactor.zig:38
+    +       1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 32  [0x18e91641c]
+    2923 Thread_220635
+    + 2923 thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+    +   2923 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+    +     2643 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+    +     ! 2517 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+    +     ! : 2517 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18e8db50c]
+    +     ! 125 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+    +     ! : 125 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! :   125 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :     125 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 1 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+    +     249 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+    +     ! 249 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   249 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     249 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     13 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+    +     ! 13 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   13 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     13 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     7 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+    +     ! 7 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !   7 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !     7 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     6 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+    +     ! 6 runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+    +     !   6 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !     6 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !       6 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     2 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 8724  [0x10278632c]  Thread.zig:753
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 15268  [0x10278c49c]  app.zig:806
+    +     ! : 1 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     ! :   1 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     ! :     1 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     ! :       1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     ! :         1 mach_absolute_time  (in libsystem_kernel.dylib) + 52  [0x18e8d80d4]
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 4240  [0x102789988]  app.zig:848
+    +     !   1 runtime_group_bench.hello  (in runtime-reactor-bench) + 56  [0x102798b38]  runtime_group_bench.zig:50
+    +     !     1 http.response.validateHeaderName  (in runtime-reactor-bench) + 68  [0x10278ef80]  response.zig:51
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 5144  [0x102785530]  Thread.zig:753
+    +     ! 1 Io.Writer.Allocating.drain  (in runtime-reactor-bench) + 388  [0x10279ac14]  Writer.zig:2845
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 9620  [0x1027866ac]  Thread.zig:753
+    +     ! 1 http.response_cursor.Cursor.init  (in runtime-reactor-bench) + 192  [0x10278c7fc]  response_cursor.zig:24
+    +     !   1 Io.Writer.print__func_835  (in runtime-reactor-bench) + 496  [0x10278d474]  Writer.zig:805
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+    2923 Thread_220636
+    + 2923 thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+    +   2923 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+    +     2637 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+    +     ! 2539 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+    +     ! : 2539 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18e8db50c]
+    +     ! 96 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+    +     ! : 95 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! : | 95 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! : |   95 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! : 1 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! 1 _pthread_cond_wait  (in libsystem_pthread.dylib) + 208  [0x18e91be24]
+    +     ! : 1 pthread_testcancel  (in libsystem_pthread.dylib) + 24  [0x18e9189e8]
+    +     ! 1 _pthread_cond_wait  (in libsystem_pthread.dylib) + 988  [0x18e91c130]
+    +     !   1 pthread_testcancel  (in libsystem_pthread.dylib) + 0  [0x18e9189d0]
+    +     241 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+    +     ! 240 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! : 240 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :   240 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 140  [0x18e916488]
+    +     20 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+    +     ! 20 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   20 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     20 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     11 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+    +     ! 8 runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+    +     ! : 8 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! :   8 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :     8 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 3 write  (in libsystem_kernel.dylib) + 8  [0x18e8db834]
+    +     8 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+    +     ! 7 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     ! : 7 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     ! :   7 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     ! 1 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 12  [0x18e916ac4]
+    +     3 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 8724  [0x10278632c]  Thread.zig:753
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 2112  [0x102789138]  app.zig:753
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3796  [0x1027897cc]  app.zig:805
+    +     ! : 1 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     ! :   1 _mach_boottime_usec  (in libsystem_c.dylib) + 0  [0x18e7dd470]
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 4240  [0x102789988]  app.zig:848
+    +     !   1 runtime_group_bench.hello  (in runtime-reactor-bench) + 56  [0x102798b38]  runtime_group_bench.zig:50
+    +     !     1 http.response.validateHeaderName  (in runtime-reactor-bench) + 24  [0x10278ef54]  response.zig:51
+    +     2 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1360,1896  [0x102784668,0x102784880]  Thread.zig:753
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 5144  [0x102785530]  Thread.zig:753
+    +       1 ???  (in runtime-reactor-bench)  load address 0x10273c000 + 0x1e34  [0x10273de34]
+    2923 Thread_220637
+    + 2923 thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+    +   2923 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+    +     2628 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+    +     ! 2524 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+    +     ! : 2524 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18e8db50c]
+    +     ! 103 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+    +     ! : 102 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! : | 102 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! : |   102 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! : 1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 140  [0x18e916488]
+    +     ! 1 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1028  [0x18e91c158]
+    +     262 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+    +     ! 262 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   262 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     262 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     17 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+    +     ! 15 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! : 15 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :   15 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 2 pthread_mutex_lock  (in libsystem_pthread.dylib) + 72,112  [0x18e916444,0x18e91646c]
+    +     5 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+    +     ! 5 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !   5 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !     5 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     4 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 8724  [0x10278632c]  Thread.zig:753
+    +     ! 2 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3796  [0x1027897cc]  app.zig:805
+    +     ! : 2 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     ! :   1 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     ! :   | 1 gettimeofday  (in libsystem_c.dylib) + 0  [0x18e7afd88]
+    +     ! :   1 _mach_boottime_usec  (in libsystem_c.dylib) + 0  [0x18e7dd470]
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3732  [0x10278978c]  app.zig:801
+    +     ! : 1 __bzero  (in libsystem_platform.dylib) + 0  [0x18e925030]
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 13296  [0x10278bce8]  app.zig:874
+    +     !   1 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     !     1 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     !       1 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     !         1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     !           1 mach_absolute_time  (in libsystem_kernel.dylib) + 48  [0x18e8d80d0]
+    +     4 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+    +     ! 4 runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+    +     !   4 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !     4 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !       4 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     2 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 2272,3508  [0x1027849f8,0x102784ecc]  Thread.zig:753
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 9620  [0x1027866ac]  Thread.zig:753
+    +       1 http.response_cursor.Cursor.init  (in runtime-reactor-bench) + 192  [0x10278c7fc]  response_cursor.zig:24
+    +         1 Io.Writer.print__func_835  (in runtime-reactor-bench) + 360  [0x10278d3ec]  Writer.zig:0
+    2923 Thread_220638
+    + 2923 thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+    +   2923 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+    +     2622 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+    +     ! 2486 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+    +     ! : 2486 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18e8db50c]
+    +     ! 136 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+    +     !   136 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !     136 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !       136 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     264 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+    +     ! 264 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   264 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     264 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     19 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+    +     ! 19 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   19 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     19 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     5 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+    +     ! 5 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !   5 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !     5 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     5 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+    +     ! 5 runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+    +     !   5 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !     5 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !       5 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     3 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 8724  [0x10278632c]  Thread.zig:753
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 1932  [0x102789084]  app.zig:739
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 4240  [0x102789988]  app.zig:848
+    +     ! : 1 runtime_group_bench.hello  (in runtime-reactor-bench) + 56  [0x102798b38]  runtime_group_bench.zig:50
+    +     ! :   1 http.response.validateHeaderName  (in runtime-reactor-bench) + 68  [0x10278ef80]  response.zig:51
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 13296  [0x10278bce8]  app.zig:874
+    +     !   1 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     !     1 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     !       1 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     !         1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     !           1 mach_absolute_time  (in libsystem_kernel.dylib) + 28  [0x18e8d80bc]
+    +     3 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 816,5160,...  [0x102784448,0x102785540,...]  Thread.zig:753
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1560  [0x102784730]  Thread.zig:753
+    +     ! 1 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !   1 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !     1 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 9620  [0x1027866ac]  Thread.zig:753
+    +       1 http.response_cursor.Cursor.init  (in runtime-reactor-bench) + 1364  [0x10278cc90]  response_cursor.zig:32
+    2923 Thread_220639
+    + 2923 thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+    +   2923 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+    +     2640 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+    +     ! 2528 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+    +     ! : 2528 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18e8db50c]
+    +     ! 112 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+    +     !   112 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !     112 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !       112 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     260 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+    +     ! 260 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   260 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     260 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     12 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+    +     ! 12 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   12 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     12 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     4 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+    +     ! 3 runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+    +     ! : 3 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! :   3 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :     3 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 1 write  (in libsystem_kernel.dylib) + 8  [0x18e8db834]
+    +     3 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+    +     ! 3 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !   3 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !     3 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     3 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1756,5096,...  [0x1027847f4,0x102785500,...]  Thread.zig:753
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1560  [0x102784730]  Thread.zig:753
+    +       1 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +         1 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +           1 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    2923 Thread_220640
+    + 2923 thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+    +   2923 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+    +     2637 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+    +     ! 2513 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+    +     ! : 2513 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18e8db50c]
+    +     ! 123 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+    +     ! : 123 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! :   123 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :     123 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 1 _pthread_cond_wait  (in libsystem_pthread.dylib) + 596  [0x18e91bfa8]
+    +     !   1 _pthread_mutex_droplock  (in libsystem_pthread.dylib) + 384  [0x18e918b84]
+    +     258 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+    +     ! 258 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   258 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     258 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     11 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+    +     ! 11 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   11 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     11 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     8 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+    +     ! 8 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !   8 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !     8 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     4 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 8724  [0x10278632c]  Thread.zig:753
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 2696  [0x102789380]  app.zig:754
+    +     ! : 1 hash.wyhash.Wyhash.hash  (in runtime-reactor-bench) + 392  [0x10275c480]  wyhash.zig:195
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3732  [0x10278978c]  app.zig:801
+    +     ! : 1 _platform_memset  (in libsystem_platform.dylib) + 140  [0x18e92511c]
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3796  [0x1027897cc]  app.zig:805
+    +     ! : 1 clock_gettime  (in libsystem_c.dylib) + 0  [0x18e7b7d24]
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 15268  [0x10278c49c]  app.zig:806
+    +     !   1 _mach_boottime_usec  (in libsystem_c.dylib) + 112  [0x18e7dd4e0]
+    +     4 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+    +     ! 4 runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+    +     !   4 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !     4 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !       4 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 5028  [0x1027854bc]  Thread.zig:753
+    2923 Thread_220641
+    + 2923 thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+    +   2923 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+    +     2628 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+    +     ! 2512 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+    +     ! : 2512 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18e8db50c]
+    +     ! 115 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+    +     ! : 115 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! :   115 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :     115 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 1 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+    +     263 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+    +     ! 263 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   263 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     263 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     13 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+    +     ! 13 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     !   13 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     !     13 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     7 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+    +     ! 7 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+    +     !   7 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+    +     !     7 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+    +     7 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+    +     ! 6 runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+    +     ! : 6 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+    +     ! :   6 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+    +     ! :     6 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+    +     ! 1 write  (in libsystem_kernel.dylib) + 8  [0x18e8db834]
+    +     2 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 8724  [0x10278632c]  Thread.zig:753
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3796  [0x1027897cc]  app.zig:805
+    +     ! : 1 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+    +     ! :   1 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+    +     ! :     1 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+    +     ! :       1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+    +     ! :         1 mach_absolute_time  (in libsystem_kernel.dylib) + 48  [0x18e8d80d0]
+    +     ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 15268  [0x10278c49c]  app.zig:806
+    +     !   1 clock_gettime  (in libsystem_c.dylib) + 280  [0x18e7b7e3c]
+    +     2 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1660,1828  [0x102784794,0x10278483c]  Thread.zig:753
+    +     1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1348  [0x10278465c]  Thread.zig:753
+    +       1 pthread_mutex_unlock  (in libsystem_pthread.dylib) + 0  [0x18e916944]
+    2923 Thread_220642
+      2923 thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+        2923 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+          2620 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+          ! 2509 _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+          ! : 2509 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x18e8db50c]
+          ! 111 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+          !   111 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+          !     111 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+          !       111 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+          264 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+          ! 263 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+          ! : 263 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+          ! :   263 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+          ! 1 DYLD-STUB$$pthread_mutex_lock  (in runtime-reactor-bench) + 4  [0x10287d42c]
+          20 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+          ! 20 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+          !   20 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+          !     20 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+          5 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+          ! 5 runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+          !   5 _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+          !     5 _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+          !       5 __psynch_mutexwait  (in libsystem_kernel.dylib) + 8  [0x18e8da9dc]
+          4 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+          ! 4 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+          !   4 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+          !     4 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+          3 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 8724  [0x10278632c]  Thread.zig:753
+          ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 2696  [0x102789380]  app.zig:754
+          ! : 1 hash.wyhash.Wyhash.hash  (in runtime-reactor-bench) + 0  [0x10275c2f8]  wyhash.zig:178
+          ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3732  [0x10278978c]  app.zig:801
+          ! : 1 _platform_memset  (in libsystem_platform.dylib) + 140  [0x18e92511c]
+          ! 1 app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3796  [0x1027897cc]  app.zig:805
+          !   1 clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+          !     1 _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+          !       1 gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+          !         1 __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+          !           1 mach_absolute_time  (in libsystem_kernel.dylib) + 48  [0x18e8d80d0]
+          3 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756,900,...  [0x10278440c,0x10278449c,...]  Thread.zig:753
+          2 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1560  [0x102784730]  Thread.zig:753
+          ! 2 _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+          !   2 _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+          !     2 __psynch_mutexdrop  (in libsystem_kernel.dylib) + 8  [0x18e8daba8]
+          1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1320  [0x102784640]  Thread.zig:753
+          ! 1 pthread_mutex_lock  (in libsystem_pthread.dylib) + 0  [0x18e9163fc]
+          1 Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 9620  [0x1027866ac]  Thread.zig:753
+            1 Io.Writer.print__func_835  (in runtime-reactor-bench) + 772  [0x10278d588]  Writer.zig:0
+
+Total number in stack (recursive counted multiple, when >=5):
+        40       __psynch_mutexwait  (in libsystem_kernel.dylib) + 0  [0x18e8da9d4]
+        40       _pthread_mutex_firstfit_lock_slow  (in libsystem_pthread.dylib) + 216  [0x18e9168e0]
+        40       _pthread_mutex_firstfit_lock_wait  (in libsystem_pthread.dylib) + 84  [0x18e918e9c]
+        17       __psynch_mutexdrop  (in libsystem_kernel.dylib) + 0  [0x18e8daba0]
+        17       _pthread_mutex_firstfit_unlock_slow  (in libsystem_pthread.dylib) + 220  [0x18e916b94]
+        17       _pthread_mutex_firstfit_wake  (in libsystem_pthread.dylib) + 28  [0x18e918f0c]
+        13       clock_gettime  (in libsystem_c.dylib) + 296  [0x18e7b7e4c]
+        12       _mach_boottime_usec  (in libsystem_c.dylib) + 64  [0x18e7dd4b0]
+        12       pthread_mutex_lock  (in libsystem_pthread.dylib) + 0  [0x18e9163fc]
+        11       __commpage_gettimeofday_internal  (in libsystem_kernel.dylib) + 44  [0x18e8d9c24]
+        11       gettimeofday  (in libsystem_c.dylib) + 56  [0x18e7afdc0]
+        11       mach_absolute_time  (in libsystem_kernel.dylib) + 0  [0x18e8d80a0]
+        8       Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 0  [0x102784118]  Thread.zig:753
+        8       Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 14312  [0x102787900]  Thread.zig:753
+        8       Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 1528  [0x102784710]  Thread.zig:753
+        8       Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 740  [0x1027843fc]  Thread.zig:753
+        8       Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 756  [0x10278440c]  Thread.zig:753
+        8       Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 916  [0x1027844ac]  Thread.zig:753
+        8       __psynch_cvwait  (in libsystem_kernel.dylib) + 0  [0x18e8db504]
+        8       _pthread_cond_wait  (in libsystem_pthread.dylib) + 1120  [0x18e91c1b4]
+        8       _pthread_cond_wait  (in libsystem_pthread.dylib) + 980  [0x18e91c128]
+        8       _pthread_start  (in libsystem_pthread.dylib) + 136  [0x18e91bc58]
+        8       runtime.reactor.Context(runtime_group_bench.State).notify  (in runtime-reactor-bench) + 64  [0x102781a34]  reactor.zig:268
+        8       thread_start  (in libsystem_pthread.dylib) + 8  [0x18e916c1c]
+        7       Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench) + 8724  [0x10278632c]  Thread.zig:753
+        7       _mach_boottime_usec  (in libsystem_c.dylib) + 0  [0x18e7dd470]
+        6       kevent  (in libsystem_kernel.dylib) + 0  [0x18e8ddfbc]
+        6       mem.eql__func_28  (in runtime-reactor-bench) + 0  [0x10279895c]  mem.zig:803
+        5       DYLD-STUB$$pthread_mutex_lock  (in runtime-reactor-bench) + 0  [0x10287d428]
+        5       app.App(runtime_group_bench.State).dispatchWithPeer  (in runtime-reactor-bench) + 3796  [0x1027897cc]  app.zig:805
+        5       clock_gettime  (in libsystem_c.dylib) + 0  [0x18e7b7d24]
+        5       pthread_mutex_unlock  (in libsystem_pthread.dylib) + 0  [0x18e916944]
+
+Sort by top of stack, same collapsed (when >= 5):
+        __psynch_cvwait  (in libsystem_kernel.dylib)        20128
+        __psynch_mutexwait  (in libsystem_kernel.dylib)        3186
+        kevent  (in libsystem_kernel.dylib)        641
+        __sendto  (in libsystem_kernel.dylib)        627
+        __recvfrom  (in libsystem_kernel.dylib)        541
+        __psynch_cvsignal  (in libsystem_kernel.dylib)        437
+        __psynch_mutexdrop  (in libsystem_kernel.dylib)        344
+        runtime.reactor.Context(runtime_group_bench.State).drive  (in runtime-reactor-bench)        63
+        mach_absolute_time  (in libsystem_kernel.dylib)        46
+        runtime.reactor.evaluate__func_29  (in runtime-reactor-bench)        30
+        runtime.reactor.Context(runtime_group_bench.State).refresh  (in runtime-reactor-bench)        25
+        mem.eql__func_28  (in runtime-reactor-bench)        21
+        Thread.PosixThreadImpl.spawn__func_781.Instance.entryFn  (in runtime-reactor-bench)        17
+        pthread_mutex_lock  (in libsystem_pthread.dylib)        17
+        runtime.reactor.Context(runtime_group_bench.State).destroy  (in runtime-reactor-bench)        10
+        mem.findPos__func_736  (in runtime-reactor-bench)        9
+        __munmap  (in libsystem_kernel.dylib)        8
+        _mach_boottime_usec  (in libsystem_c.dylib)        8
+        runtime.deadline_heap.Heap.down  (in runtime-reactor-bench)        8
+        read  (in libsystem_kernel.dylib)        7
+        DYLD-STUB$$pthread_mutex_lock  (in runtime-reactor-bench)        5
+        __accept  (in libsystem_kernel.dylib)        5
+        clock_gettime  (in libsystem_c.dylib)        5
+        heap.ArenaAllocator.reset  (in runtime-reactor-bench)        5
+        http.parser.validHost  (in runtime-reactor-bench)        5
+        pthread_cond_broadcast  (in libsystem_pthread.dylib)        5
+        pthread_mutex_unlock  (in libsystem_pthread.dylib)        5
+        shutdown  (in libsystem_kernel.dylib)        5
+        write  (in libsystem_kernel.dylib)        5
+
+Binary Images:
+       0x10273c000 -        0x1028b423f +runtime-reactor-bench (0) <91DEF17B-9C66-3D9B-A31F-DDF55D20A046> /Users/*/runtime-reactor-bench
+       0x18e4a8000 -        0x18e4fab4b  libobjc.A.dylib (951.7) <03BD9E32-CF0A-37B0-898A-3CE8DE06D842> /usr/lib/libobjc.A.dylib
+       0x18e4fb000 -        0x18e52fd58  libdyld.dylib (1387) <957F93B3-8805-39C7-9C51-EDD1715F550E> /usr/lib/system/libdyld.dylib
+       0x18e530000 -        0x18e5e34ff  dyld (1.0.0 - 1387) <74E52480-C2BD-3C8D-812D-95FE2B74A096> /usr/lib/dyld
+       0x18e5e4000 -        0x18e5e7228  libsystem_blocks.dylib (96) <E0AC1231-27AA-3A13-8FAC-41D5802B1F3C> /usr/lib/system/libsystem_blocks.dylib
+       0x18e5e8000 -        0x18e63c55f  libxpc.dylib (3102.160.5) <33E44C2D-D65E-37A6-B85F-1A4CF524A050> /usr/lib/system/libxpc.dylib
+       0x18e63d000 -        0x18e65d9ff  libsystem_trace.dylib (1861.160.4) <93F1DD8C-6CD9-32B9-B222-D23DA5D161B4> /usr/lib/system/libsystem_trace.dylib
+       0x18e65e000 -        0x18e70c5f7  libcorecrypto.dylib (1922.160.10) <0642DDAD-4771-3C82-805C-E7C6701C1461> /usr/lib/system/libcorecrypto.dylib
+       0x18e70d000 -        0x18e75d257  libsystem_malloc.dylib (812.160.5) <D969A907-3E43-3951-9365-8C2DB3812E9D> /usr/lib/system/libsystem_malloc.dylib
+       0x18e75e000 -        0x18e7a523f  libdispatch.dylib (1542.160.2) <B2000CD5-F580-314A-A141-E036719D854E> /usr/lib/system/libdispatch.dylib
+       0x18e7a6000 -        0x18e7a8ffb  libsystem_featureflags.dylib (103) <FEE12F9C-344B-33B3-8EDD-283580EF1C67> /usr/lib/system/libsystem_featureflags.dylib
+       0x18e7a9000 -        0x18e82a1e7  libsystem_c.dylib (1752.160.4) <D77CEB62-AFF6-3CEC-BA9B-4F057FBE2EB5> /usr/lib/system/libsystem_c.dylib
+       0x18e82b000 -        0x18e8bbae7  libc++.1.dylib (2100.43) <F0FD393C-15BC-3C75-A19D-897F7B225C78> /usr/lib/libc++.1.dylib
+       0x18e8bc000 -        0x18e8d675f  libc++abi.dylib (2100.43) <F38A9C58-22AB-3798-BBAE-8DCD9CC0CE27> /usr/lib/libc++abi.dylib
+       0x18e8d7000 -        0x18e9142e7  libsystem_kernel.dylib (12377.161.14) <C6A4A4CB-92E6-3BAF-AAE0-E8306259209A> /usr/lib/system/libsystem_kernel.dylib
+       0x18e915000 -        0x18e921b3b  libsystem_pthread.dylib (539.100.4) <A373F0B0-9880-326A-88B4-DD8BE4E33072> /usr/lib/system/libsystem_pthread.dylib
+       0x18e922000 -        0x18e92a963  libsystem_platform.dylib (375.120.2) <EDB83A19-EC17-32DE-9350-6145970A85D6> /usr/lib/system/libsystem_platform.dylib
+       0x18e92b000 -        0x18e95a6eb  libsystem_info.dylib (600) <9B5FB84B-31AD-3EA7-8F89-8C700D369DC8> /usr/lib/system/libsystem_info.dylib
+       0x1928f8000 -        0x192901e5f  libsystem_darwin.dylib (1752.160.4) <8E07D22E-CE5A-38A0-B091-5B0338C326F5> /usr/lib/system/libsystem_darwin.dylib
+       0x192d63000 -        0x192d751b6  libsystem_notify.dylib (348.160.3) <15799128-6CBD-30D6-A2BB-B9D02B4470C0> /usr/lib/system/libsystem_notify.dylib
+       0x195034000 -        0x19504ef7b  libsystem_networkextension.dylib (2226.161.1) <9C7B1EEB-47BE-3791-93A9-CFC693CB9417> /usr/lib/system/libsystem_networkextension.dylib
+       0x1950d1000 -        0x1950e8fdf  libsystem_asl.dylib (406) <54439739-33EE-3273-839F-CBA67D7F5CB1> /usr/lib/system/libsystem_asl.dylib
+       0x196c8a000 -        0x196c92387  libsystem_symptoms.dylib (2169.160.3) <229122B9-B8B1-3F2F-870E-8650AE3C4FB5> /usr/lib/system/libsystem_symptoms.dylib
+       0x19af2f000 -        0x19af675b7  libsystem_containermanager.dylib (725.160.3) <14B2A47F-19C8-392F-8FDB-FE8AE375DD41> /usr/lib/system/libsystem_containermanager.dylib
+       0x19c341000 -        0x19c3455d7  libsystem_configuration.dylib (1405.160.3) <D8D6280B-783D-3550-BDBA-2861AE40604F> /usr/lib/system/libsystem_configuration.dylib
+       0x19c346000 -        0x19c34c99f  libsystem_sandbox.dylib (2680.160.6) <54688162-B50D-3D31-A1E8-7B9766D3530D> /usr/lib/system/libsystem_sandbox.dylib
+       0x19d9a1000 -        0x19d9a41fb  libquarantine.dylib (196.160.2) <EEE5AADB-52E1-3C4C-881A-70405770B1F1> /usr/lib/system/libquarantine.dylib
+       0x19e140000 -        0x19e146d03  libsystem_coreservices.dylib (191.5.1) <D4ACD2AC-5702-3C45-85A0-300B2C2D19E1> /usr/lib/system/libsystem_coreservices.dylib
+       0x19e6cf000 -        0x19e70ca77  libsystem_m.dylib (3312.100.1) <B54FBE99-DB0B-32C7-ABDD-C2206DF606A4> /usr/lib/system/libsystem_m.dylib
+       0x19e70e000 -        0x19e711527  libmacho.dylib (1387) <949131E5-BDA2-39BA-AA50-62651BB51802> /usr/lib/system/libmacho.dylib
+       0x19e72b000 -        0x19e7383a7  libcommonCrypto.dylib (600035) <3B110564-5278-3CB0-85F1-2CE8431FF935> /usr/lib/system/libcommonCrypto.dylib
+       0x19e739000 -        0x19e742ca3  libunwind.dylib (2100.2) <05FD0014-55B1-3B8A-A6BA-6C7A389C4123> /usr/lib/system/libunwind.dylib
+       0x19e74b000 -        0x19e755bef  libcopyfile.dylib (240.160.2.0.1) <D0009B8A-8ECC-3D56-9206-7E1839707F93> /usr/lib/system/libcopyfile.dylib
+       0x19e756000 -        0x19e759987  libcompiler_rt.dylib (103.3) <6FB345CA-7F5C-3263-A23F-143F7539FD8A> /usr/lib/system/libcompiler_rt.dylib
+       0x19e75a000 -        0x19e75e78b  libsystem_collections.dylib (1752.160.4) <C8160BD2-5941-3DC0-BB40-F8C2B8156EC4> /usr/lib/system/libsystem_collections.dylib
+       0x19e75f000 -        0x19e7624cf  libsystem_secinit.dylib (168.100.7) <ECABC024-8F02-374A-BB7E-29437CEA2ABD> /usr/lib/system/libsystem_secinit.dylib
+       0x19e763000 -        0x19e765bf7  libremovefile.dylib (85.100.6) <7460B5AE-469A-36A0-A7EC-6C7D69628E86> /usr/lib/system/libremovefile.dylib
+       0x19e766000 -        0x19e766f27  libkeymgr.dylib (31) <7E863FCA-F3FF-32C7-8A8C-F983E946AFC3> /usr/lib/system/libkeymgr.dylib
+       0x19e767000 -        0x19e76fe37  libsystem_dnssd.dylib (2881.160.4) <305F4398-E688-3384-B351-02D865EC8A04> /usr/lib/system/libsystem_dnssd.dylib
+       0x19e770000 -        0x19e77509b  libcache.dylib (95) <9CD7B1E1-3E47-339C-A193-2392E3E0ED23> /usr/lib/system/libcache.dylib
+       0x19e776000 -        0x19e777ce3  libSystem.B.dylib (1356) <4FED5EE2-5D3E-35B1-A170-9859C4B683BB> /usr/lib/libSystem.B.dylib
+       0x292739000 -        0x292740349  libRosetta.dylib (367.9) <0C7397C6-D747-31F2-8BC1-4096213BDE5C> /usr/lib/libRosetta.dylib
+       0x29434c000 -        0x29434fa4b  libsystem_darwindirectory.dylib (122) <971A4F65-493D-39F3-846D-0D33FA2769FD> /usr/lib/system/libsystem_darwindirectory.dylib
+       0x294350000 -        0x29435a39b  libsystem_eligibility.dylib (319.160.17) <750CA446-92EA-3A56-9A7B-CC0841686C50> /usr/lib/system/libsystem_eligibility.dylib
+       0x29435b000 -        0x29436288b  libsystem_sanitizers.dylib (26.1) <D88EC709-9AA8-3083-B22B-D3CB39678D71> /usr/lib/system/libsystem_sanitizers.dylib
+       0x294363000 -        0x294363bb7  libsystem_trial.dylib (474.2.18.2) <7194FF5B-A6C5-3D67-B00A-90209F10D603> /usr/lib/system/libsystem_trial.dylib

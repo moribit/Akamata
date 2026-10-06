@@ -1,0 +1,485 @@
+{
+  "source_sha": "97f04ac53b6a2d998f7af9e26da13a5b19b8a5a7",
+  "working_tree_dirty": true,
+  "close_reason_order": [
+    "completed",
+    "disconnected",
+    "timeout",
+    "shutdown",
+    "application_error"
+  ],
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "zig_version": "0.17.0",
+  "binary_sha256": "504fd761c9ff88c12a89e80dc5bd3f4b02e6b6431131be7ad9bf8a45430d06e0",
+  "command": [
+    "tools/bench/runtime_certify.py",
+    "/private/tmp/akamata-memory-before/bin/runtime-contract-server",
+    "--output",
+    "benchmark/results/runtime-investigation-2026-10-05/macos-memory-before.json",
+    "--adapters",
+    "kqueue",
+    "--idle-levels",
+    "1000",
+    "5000",
+    "--mixed-idle",
+    "100",
+    "--soak-seconds",
+    "5",
+    "--session-rounds",
+    "1"
+  ],
+  "thread_count_method": "ps-M-minus-header",
+  "rlimit_nofile": [
+    16384,
+    9223372036854775807
+  ],
+  "runs": [
+    {
+      "adapter": "kqueue",
+      "scenario": "session-performance",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 14928,
+          "cpu_percent": 0.1,
+          "fds": 107,
+          "threads": 5,
+          "allocator": {
+            "live": 9833426,
+            "peak": 10157580,
+            "calls": 884,
+            "created": 132,
+            "closed": 32,
+            "close_reasons": [
+              32,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5216,
+        "cpu_percent": 0.1,
+        "fds": 7,
+        "threads": 5
+      },
+      "broadcast": {
+        "p50_ms": 1.9963339873356745,
+        "p95_ms": 1.9963339873356745,
+        "p99_ms": 1.9963339873356745,
+        "recipients": 100,
+        "rounds": 1,
+        "observed_frames_per_second": 50091.81862072133
+      },
+      "stream": {
+        "p50_ms": 0.633166499028448,
+        "p95_ms": 1.1740830086637288,
+        "p99_ms": 1.2089169904356822,
+        "requests": 32,
+        "observed_requests_per_second": 6965.859012054797
+      },
+      "shutdown_ms": 181.6558749997057,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 884,
+        "requested": 11484925,
+        "live": 0,
+        "peak": 10157580
+      },
+      "sessions_final": {
+        "created": 132,
+        "closed": 132,
+        "close_reasons": [
+          32,
+          0,
+          0,
+          100,
+          0
+        ]
+      },
+      "runtime_memory": {
+        "connection_size": 21368,
+        "http_session_size": 112,
+        "output_size": 16592,
+        "writer_buffer": 4096,
+        "http_input_capacity": 518,
+        "arena_capacity": 62952,
+        "application_session_size": 16768,
+        "slot_size": 16,
+        "fixed_queue_capacity": 16384
+      },
+      "application_memory": {
+        "upgrade_state_size": 8272,
+        "mailbox_bytes": 8192,
+        "group_size": 131144
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "disconnect-fd-reuse-races",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 5552,
+          "cpu_percent": 11.4,
+          "fds": 7,
+          "threads": 5,
+          "allocator": {
+            "live": 1337758,
+            "peak": 2443073,
+            "calls": 1945,
+            "created": 192,
+            "closed": 192,
+            "close_reasons": [
+              0,
+              192,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5200,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "iterations": 256,
+      "recovered_http_ms": 0.10404200293123722,
+      "shutdown_ms": 1.2925409973831847,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 1948,
+        "requested": 20246927,
+        "live": 0,
+        "peak": 2443073
+      },
+      "sessions_final": {
+        "created": 192,
+        "closed": 192,
+        "close_reasons": [
+          0,
+          192,
+          0,
+          0,
+          0
+        ]
+      },
+      "runtime_memory": {
+        "connection_size": 21368,
+        "http_session_size": 112,
+        "output_size": 16592,
+        "writer_buffer": 4096,
+        "http_input_capacity": 518,
+        "arena_capacity": 62952,
+        "application_session_size": 16768,
+        "slot_size": 16,
+        "fixed_queue_capacity": 16384
+      },
+      "application_memory": {
+        "upgrade_state_size": 8272,
+        "mailbox_bytes": 8192,
+        "group_size": 131144
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "shutdown-disconnect-completion-race",
+      "samples": [],
+      "baseline": {
+        "rss_kib": 5216,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "shutdown_requested": true,
+      "connections": 64,
+      "shutdown_ms": 729.9591659975704,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 604,
+        "requested": 7066511,
+        "live": 0,
+        "peak": 6784804
+      },
+      "sessions_final": {
+        "created": 64,
+        "closed": 64,
+        "close_reasons": [
+          0,
+          1,
+          0,
+          63,
+          0
+        ]
+      },
+      "runtime_memory": {
+        "connection_size": 21368,
+        "http_session_size": 112,
+        "output_size": 16592,
+        "writer_buffer": 4096,
+        "http_input_capacity": 518,
+        "arena_capacity": 62952,
+        "application_session_size": 16768,
+        "slot_size": 16,
+        "fixed_queue_capacity": 16384
+      },
+      "application_memory": {
+        "upgrade_state_size": 8272,
+        "mailbox_bytes": 8192,
+        "group_size": 131144
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "idle",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 99072,
+          "cpu_percent": 22.5,
+          "fds": 1007,
+          "threads": 5,
+          "allocator": {
+            "live": 86252758,
+            "peak": 86252758,
+            "calls": 6153,
+            "created": 1000,
+            "closed": 0,
+            "close_reasons": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5200,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "count": 1000,
+      "establishment_ms": 137.2503749880707,
+      "broadcast_ms": 17.628333007451147,
+      "http_probe_ms": 0.08420800440944731,
+      "shutdown_ms": 184.41362500016112,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 6159,
+        "requested": 86312079,
+        "live": 0,
+        "peak": 86256926
+      },
+      "sessions_final": {
+        "created": 1000,
+        "closed": 1000,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          1000,
+          0
+        ]
+      },
+      "runtime_memory": {
+        "connection_size": 21368,
+        "http_session_size": 112,
+        "output_size": 16592,
+        "writer_buffer": 4096,
+        "http_input_capacity": 518,
+        "arena_capacity": 62952,
+        "application_session_size": 16768,
+        "slot_size": 16,
+        "fixed_queue_capacity": 16384
+      },
+      "application_memory": {
+        "upgrade_state_size": 8272,
+        "mailbox_bytes": 8192,
+        "group_size": 131144
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "idle",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 474288,
+          "cpu_percent": 55.2,
+          "fds": 5007,
+          "threads": 5,
+          "allocator": {
+            "live": 425912758,
+            "peak": 425912758,
+            "calls": 30153,
+            "created": 5000,
+            "closed": 0,
+            "close_reasons": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5216,
+        "cpu_percent": 1.1,
+        "fds": 7,
+        "threads": 5
+      },
+      "count": 5000,
+      "establishment_ms": 681.2355830043089,
+      "broadcast_ms": 90.62958300637547,
+      "http_probe_ms": 0.08600000001024455,
+      "shutdown_ms": 290.34999999566935,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 30159,
+        "requested": 425972079,
+        "live": 0,
+        "peak": 425916926
+      },
+      "sessions_final": {
+        "created": 5000,
+        "closed": 5000,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          5000,
+          0
+        ]
+      },
+      "runtime_memory": {
+        "connection_size": 21368,
+        "http_session_size": 112,
+        "output_size": 16592,
+        "writer_buffer": 4096,
+        "http_input_capacity": 518,
+        "arena_capacity": 62952,
+        "application_session_size": 16768,
+        "slot_size": 16,
+        "fixed_queue_capacity": 16384
+      },
+      "application_memory": {
+        "upgrade_state_size": 8272,
+        "mailbox_bytes": 8192,
+        "group_size": 131144
+      },
+      "clean": true
+    },
+    {
+      "adapter": "kqueue",
+      "scenario": "mixed-soak-races",
+      "samples": [
+        {
+          "elapsed_s": 0.009168374992441386,
+          "rss_kib": 16912,
+          "cpu_percent": 0.0,
+          "fds": 123,
+          "threads": 5,
+          "allocator": {
+            "live": 11670926,
+            "peak": 12136034,
+            "calls": 1237,
+            "created": 124,
+            "closed": 8,
+            "close_reasons": [
+              0,
+              8,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5200,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "requested_soak_s": 5,
+      "mixed_results": [
+        {
+          "http_p50_ms": 0.7407290031551383,
+          "http_max_ms": 2.0792499999515712,
+          "broadcast_ms": 2.7200000040465966
+        },
+        {
+          "http_p50_ms": 1.183187501737848,
+          "http_max_ms": 2.652666997164488,
+          "broadcast_ms": 2.8109999984735623
+        },
+        {
+          "http_p50_ms": 1.90800050040707,
+          "http_max_ms": 3.136584011372179,
+          "broadcast_ms": 4.02158300857991
+        }
+      ],
+      "elapsed_s": 5.005034500005422,
+      "iterations": 3,
+      "http_isolated": true,
+      "shutdown_ms": 182.35454200475942,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 1549,
+        "requested": 15616837,
+        "live": 0,
+        "peak": 12246864
+      },
+      "sessions_final": {
+        "created": 140,
+        "closed": 140,
+        "close_reasons": [
+          0,
+          24,
+          0,
+          116,
+          0
+        ]
+      },
+      "runtime_memory": {
+        "connection_size": 21368,
+        "http_session_size": 112,
+        "output_size": 16592,
+        "writer_buffer": 4096,
+        "http_input_capacity": 518,
+        "arena_capacity": 62952,
+        "application_session_size": 16768,
+        "slot_size": 16,
+        "fixed_queue_capacity": 16384
+      },
+      "application_memory": {
+        "upgrade_state_size": 8272,
+        "mailbox_bytes": 8192,
+        "group_size": 131144
+      },
+      "clean": true
+    }
+  ],
+  "limitations": [
+    "Python load generator is not a peak throughput benchmark",
+    "allocator counters exclude libc/SQLite and thread stacks",
+    "application callbacks remain cooperatively bounded"
+  ],
+  "passed": true,
+  "long_soak_completed": false
+}

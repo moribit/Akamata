@@ -1,5 +1,7 @@
 # Native HTTP runtime / Transport Contract（Zig 0.17）
 
+最新の[CPU / memory investigation](native-reactor-performance-memory.md)では、有限outputの借用、error fallbackのlazy allocation、内部Sessionのgpa所有、一度のcompletion観測を採用しました。以下の共通HTTP / deadline / admission contractは維持します。
+
 Threadedがproduction defaultです。public Reactorはsocketを開く前にfail-closedします。[application execution](reactor-application-execution.md)、[Phase 7測定](../../benchmark/results/runtime-phase7-2026-10-05/README.md)、過去の[Phases 2〜5](native-runtime-phases.md)も参照してください。
 
 ```text

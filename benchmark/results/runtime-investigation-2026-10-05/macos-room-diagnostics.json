@@ -1,0 +1,29 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "a8060236c85be6555663b5ed8c324434ab88d0506dbd511c2f984919c2186e3a",
+  "adapter": "kqueue",
+  "test": "test_upgrade_hub_snapshot_disconnect_ownership",
+  "requested_repeats": 100,
+  "runs": [
+    {
+      "repeat": 1,
+      "passed": true,
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 2,
+      "passed": false,
+      "errors": [],
+      "failures": [
+        "Traceback (most recent call last):\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 565, in test_upgrade_hub_snapshot_disconnect_ownership\n    receive(peers[0])\n    ~~~~~~~^^^^^^^^^^\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 554, in receive\n    self.assertTrue(data)\n    ~~~~~~~~~~~~~~~^^^^^^\nAssertionError: b'' is not true\n"
+      ]
+    }
+  ],
+  "failure_snapshots": [
+    {
+      "error": "AssertionError(\"b'' is not true\")",
+      "stats": "{\"live\":87910,\"peak\":127562,\"calls\":255,\"created\":12,\"closed\":10,\"mailbox_overflows\":0,\"close_reasons\":[0,10,0,0,0]}"
+    }
+  ]
+}

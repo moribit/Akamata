@@ -1,0 +1,21 @@
+{
+  "baseline": "97f04ac",
+  "candidate": "44eeb29",
+  "files": [
+    "src/runtime/threaded.zig",
+    "src/http/connection.zig",
+    "src/http/session.zig",
+    "src/http/response_cursor.zig",
+    "src/sync.zig"
+  ],
+  "native_shared_diff": "",
+  "local_symbol_checks": {
+    "before": [],
+    "after": []
+  },
+  "limitations": [
+    "Symbol absence supports probe elimination but is not complete machine-code identity",
+    "Local and CI matched before/after performance in report-tables; hosted macOS shows large sign-varying changes",
+    "No systematic Threaded slowdown reproduced locally or on Linux"
+  ]
+}

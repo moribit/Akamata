@@ -1,5 +1,7 @@
 # Akamata アーキテクチャ
 
+Native runtimeの最新の所有権・性能・メモリ評価は[Reactor CPU / memory調査](native-reactor-performance-memory.md)を参照。Threadedをdefaultとし、Reactorのpublic gateは維持しています。
+
 Akamataは同じZig applicationをNative／VPS／Container／Cloudflare Workersで動かすportable backendです。HTTPは`App → Context → endpoint/middleware → runtime`の単一系統です。
 
 ## Applicationとadapter

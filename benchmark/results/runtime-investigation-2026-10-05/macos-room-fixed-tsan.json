@@ -1,0 +1,359 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "8cad74c523aae9ed44e13cd5bbfa5a5e8e93a86b11605bbef187b288cfae3fac",
+  "adapter": "kqueue",
+  "test": "test_upgrade_hub_snapshot_disconnect_ownership",
+  "requested_repeats": 50,
+  "runs": [
+    {
+      "repeat": 1,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 2,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 3,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 4,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 5,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 6,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 7,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 8,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 9,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 10,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 11,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 12,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 13,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 14,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 15,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 16,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 17,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 18,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 19,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 20,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 21,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 22,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 23,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 24,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 25,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 26,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 27,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 28,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 29,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 30,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 31,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 32,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 33,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 34,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 35,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 36,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 37,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 38,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 39,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 40,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 41,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 42,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 43,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 44,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 45,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 46,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 47,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 48,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 49,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 50,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    }
+  ]
+}

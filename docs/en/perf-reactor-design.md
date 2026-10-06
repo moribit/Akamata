@@ -1,5 +1,7 @@
 # Reactor design: private multiplexed evaluation
 
+The [CPU / memory investigation](native-reactor-performance-memory.md) records current measurements and the Park decision. Finite output borrows connection/session storage until drain; gpa owns the internal Session separately from the request arena.
+
 `App.serve(.runtime = .reactor)` and both direct `serve` entrypoints remain
 fail-closed. Threaded is the production default.
 

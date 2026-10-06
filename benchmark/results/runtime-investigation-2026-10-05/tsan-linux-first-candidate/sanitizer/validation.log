@@ -1,0 +1,125 @@
+info: fetching lazy dependency translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5
+test_absolute_write_deadline_slow_reader (__main__.Contract_threaded.test_absolute_write_deadline_slow_reader) ... ok
+test_application_execution_capability_is_explicit (__main__.Contract_threaded.test_application_execution_capability_is_explicit) ... ok
+test_application_isolation_with_active_idle_upgrades_and_slow_streams (__main__.Contract_threaded.test_application_isolation_with_active_idle_upgrades_and_slow_streams) ... ok
+test_backpressure_does_not_starve_other_connections (__main__.Contract_threaded.test_backpressure_does_not_starve_other_connections) ... ok
+test_chunked_request (__main__.Contract_threaded.test_chunked_request) ... ok
+test_fixed_length_stream_and_truncation (__main__.Contract_threaded.test_fixed_length_stream_and_truncation) ... ok
+test_forced_drain_partial_request (__main__.Contract_threaded.test_forced_drain_partial_request) ... ok
+test_forced_drain_slow_writer_and_repeated_signal (__main__.Contract_threaded.test_forced_drain_slow_writer_and_repeated_signal) ... ok
+test_forced_drain_upgraded_connection (__main__.Contract_threaded.test_forced_drain_upgraded_connection) ... ok
+test_fragment_control_utf8_and_invalid_upgrade_cleanup (__main__.Contract_threaded.test_fragment_control_utf8_and_invalid_upgrade_cleanup) ... ok
+test_graceful_shutdown_and_idle_connections (__main__.Contract_threaded.test_graceful_shutdown_and_idle_connections) ... ok
+test_handler_and_stream_outlive_grace_without_preemption (__main__.Contract_threaded.test_handler_and_stream_outlive_grace_without_preemption) ... ok
+test_header_and_body_limits (__main__.Contract_threaded.test_header_and_body_limits) ... ok
+test_header_body_and_total_timeout (__main__.Contract_threaded.test_header_body_and_total_timeout) ... ok
+test_idle_timeout (__main__.Contract_threaded.test_idle_timeout) ... ok
+test_keep_alive_multiple_and_request_limit (__main__.Contract_threaded.test_keep_alive_multiple_and_request_limit) ... ok
+test_malformed_and_transfer_encoding (__main__.Contract_threaded.test_malformed_and_transfer_encoding) ... ok
+test_max_connections_overload_and_recovery (__main__.Contract_threaded.test_max_connections_overload_and_recovery) ... ok
+test_normal_request_and_disconnect (__main__.Contract_threaded.test_normal_request_and_disconnect) ... ok
+test_partial_request_and_partial_next_header (__main__.Contract_threaded.test_partial_request_and_partial_next_header) ... ok
+test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_threaded.test_partial_upgrade_budget_survives_external_broadcast) ... ok
+test_peer_and_trusted_proxy (__main__.Contract_threaded.test_peer_and_trusted_proxy) ... ok
+test_pipeline_and_buffer_residue (__main__.Contract_threaded.test_pipeline_and_buffer_residue) ... ok
+test_shutdown_drains_inflight_response (__main__.Contract_threaded.test_shutdown_drains_inflight_response) ... ok
+test_shutdown_with_partial_request (__main__.Contract_threaded.test_shutdown_with_partial_request) ... ok
+test_stream_and_stream_error (__main__.Contract_threaded.test_stream_and_stream_error) ... ok
+test_stream_write_deadline_while_producer_pauses (__main__.Contract_threaded.test_stream_write_deadline_while_producer_pauses) ... ok
+test_trickle_does_not_reset_header_deadline (__main__.Contract_threaded.test_trickle_does_not_reset_header_deadline) ... ok
+test_upgrade_hub_snapshot_disconnect_ownership (__main__.Contract_threaded.test_upgrade_hub_snapshot_disconnect_ownership) ... ok
+test_upgrade_ownership (__main__.Contract_threaded.test_upgrade_ownership) ... ok
+test_upgrade_preserves_coalesced_frame (__main__.Contract_threaded.test_upgrade_preserves_coalesced_frame) ... ok
+test_upgraded_writer_forced_drain_and_disconnect (__main__.Contract_threaded.test_upgraded_writer_forced_drain_and_disconnect) ... ok
+test_zero_write_budget_permits_no_socket_output (__main__.Contract_threaded.test_zero_write_budget_permits_no_socket_output) ... ok
+test_absolute_write_deadline_slow_reader (__main__.Contract_epoll.test_absolute_write_deadline_slow_reader) ... ok
+test_application_execution_capability_is_explicit (__main__.Contract_epoll.test_application_execution_capability_is_explicit) ... ok
+test_application_isolation_with_active_idle_upgrades_and_slow_streams (__main__.Contract_epoll.test_application_isolation_with_active_idle_upgrades_and_slow_streams) ... ok
+test_backpressure_does_not_starve_other_connections (__main__.Contract_epoll.test_backpressure_does_not_starve_other_connections) ... ok
+test_chunked_request (__main__.Contract_epoll.test_chunked_request) ... ok
+test_fixed_length_stream_and_truncation (__main__.Contract_epoll.test_fixed_length_stream_and_truncation) ... ok
+test_forced_drain_partial_request (__main__.Contract_epoll.test_forced_drain_partial_request) ... ok
+test_forced_drain_slow_writer_and_repeated_signal (__main__.Contract_epoll.test_forced_drain_slow_writer_and_repeated_signal) ... ok
+test_forced_drain_upgraded_connection (__main__.Contract_epoll.test_forced_drain_upgraded_connection) ... ok
+test_fragment_control_utf8_and_invalid_upgrade_cleanup (__main__.Contract_epoll.test_fragment_control_utf8_and_invalid_upgrade_cleanup) ... ok
+test_graceful_shutdown_and_idle_connections (__main__.Contract_epoll.test_graceful_shutdown_and_idle_connections) ... ok
+test_handler_and_stream_outlive_grace_without_preemption (__main__.Contract_epoll.test_handler_and_stream_outlive_grace_without_preemption) ... ok
+test_header_and_body_limits (__main__.Contract_epoll.test_header_and_body_limits) ... ok
+test_header_body_and_total_timeout (__main__.Contract_epoll.test_header_body_and_total_timeout) ... ok
+test_idle_timeout (__main__.Contract_epoll.test_idle_timeout) ... ok
+test_keep_alive_multiple_and_request_limit (__main__.Contract_epoll.test_keep_alive_multiple_and_request_limit) ... ok
+test_malformed_and_transfer_encoding (__main__.Contract_epoll.test_malformed_and_transfer_encoding) ... ok
+test_max_connections_overload_and_recovery (__main__.Contract_epoll.test_max_connections_overload_and_recovery) ... ok
+test_normal_request_and_disconnect (__main__.Contract_epoll.test_normal_request_and_disconnect) ... ok
+test_partial_request_and_partial_next_header (__main__.Contract_epoll.test_partial_request_and_partial_next_header) ... ok
+test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_epoll.test_partial_upgrade_budget_survives_external_broadcast) ... ok
+test_peer_and_trusted_proxy (__main__.Contract_epoll.test_peer_and_trusted_proxy) ... ok
+test_pipeline_and_buffer_residue (__main__.Contract_epoll.test_pipeline_and_buffer_residue) ... ok
+test_shutdown_drains_inflight_response (__main__.Contract_epoll.test_shutdown_drains_inflight_response) ... ok
+test_shutdown_with_partial_request (__main__.Contract_epoll.test_shutdown_with_partial_request) ... ok
+test_stream_and_stream_error (__main__.Contract_epoll.test_stream_and_stream_error) ... ok
+test_stream_write_deadline_while_producer_pauses (__main__.Contract_epoll.test_stream_write_deadline_while_producer_pauses) ... ok
+test_trickle_does_not_reset_header_deadline (__main__.Contract_epoll.test_trickle_does_not_reset_header_deadline) ... ok
+test_upgrade_hub_snapshot_disconnect_ownership (__main__.Contract_epoll.test_upgrade_hub_snapshot_disconnect_ownership) ... FAIL
+test_upgrade_ownership (__main__.Contract_epoll.test_upgrade_ownership) ... ok
+test_upgrade_preserves_coalesced_frame (__main__.Contract_epoll.test_upgrade_preserves_coalesced_frame) ... ok
+test_upgraded_writer_forced_drain_and_disconnect (__main__.Contract_epoll.test_upgraded_writer_forced_drain_and_disconnect) ... ok
+test_zero_write_budget_permits_no_socket_output (__main__.Contract_epoll.test_zero_write_budget_permits_no_socket_output) ... ok
+test_absolute_write_deadline_slow_reader (__main__.Contract_threaded_incremental.test_absolute_write_deadline_slow_reader) ... ok
+test_application_execution_capability_is_explicit (__main__.Contract_threaded_incremental.test_application_execution_capability_is_explicit) ... ok
+test_application_isolation_with_active_idle_upgrades_and_slow_streams (__main__.Contract_threaded_incremental.test_application_isolation_with_active_idle_upgrades_and_slow_streams) ... ok
+test_backpressure_does_not_starve_other_connections (__main__.Contract_threaded_incremental.test_backpressure_does_not_starve_other_connections) ... ok
+test_chunked_request (__main__.Contract_threaded_incremental.test_chunked_request) ... ok
+test_fixed_length_stream_and_truncation (__main__.Contract_threaded_incremental.test_fixed_length_stream_and_truncation) ... ok
+test_forced_drain_partial_request (__main__.Contract_threaded_incremental.test_forced_drain_partial_request) ... ok
+test_forced_drain_slow_writer_and_repeated_signal (__main__.Contract_threaded_incremental.test_forced_drain_slow_writer_and_repeated_signal) ... ok
+test_forced_drain_upgraded_connection (__main__.Contract_threaded_incremental.test_forced_drain_upgraded_connection) ... ok
+test_fragment_control_utf8_and_invalid_upgrade_cleanup (__main__.Contract_threaded_incremental.test_fragment_control_utf8_and_invalid_upgrade_cleanup) ... ok
+test_graceful_shutdown_and_idle_connections (__main__.Contract_threaded_incremental.test_graceful_shutdown_and_idle_connections) ... ok
+test_handler_and_stream_outlive_grace_without_preemption (__main__.Contract_threaded_incremental.test_handler_and_stream_outlive_grace_without_preemption) ... ok
+test_header_and_body_limits (__main__.Contract_threaded_incremental.test_header_and_body_limits) ... ok
+test_header_body_and_total_timeout (__main__.Contract_threaded_incremental.test_header_body_and_total_timeout) ... ok
+test_idle_timeout (__main__.Contract_threaded_incremental.test_idle_timeout) ... ok
+test_keep_alive_multiple_and_request_limit (__main__.Contract_threaded_incremental.test_keep_alive_multiple_and_request_limit) ... ok
+test_malformed_and_transfer_encoding (__main__.Contract_threaded_incremental.test_malformed_and_transfer_encoding) ... ok
+test_max_connections_overload_and_recovery (__main__.Contract_threaded_incremental.test_max_connections_overload_and_recovery) ... ok
+test_normal_request_and_disconnect (__main__.Contract_threaded_incremental.test_normal_request_and_disconnect) ... ok
+test_partial_request_and_partial_next_header (__main__.Contract_threaded_incremental.test_partial_request_and_partial_next_header) ... ok
+test_partial_upgrade_budget_survives_external_broadcast (__main__.Contract_threaded_incremental.test_partial_upgrade_budget_survives_external_broadcast) ... ok
+test_peer_and_trusted_proxy (__main__.Contract_threaded_incremental.test_peer_and_trusted_proxy) ... ok
+test_pipeline_and_buffer_residue (__main__.Contract_threaded_incremental.test_pipeline_and_buffer_residue) ... ok
+test_shutdown_drains_inflight_response (__main__.Contract_threaded_incremental.test_shutdown_drains_inflight_response) ... ok
+test_shutdown_with_partial_request (__main__.Contract_threaded_incremental.test_shutdown_with_partial_request) ... ok
+test_stream_and_stream_error (__main__.Contract_threaded_incremental.test_stream_and_stream_error) ... ok
+test_stream_write_deadline_while_producer_pauses (__main__.Contract_threaded_incremental.test_stream_write_deadline_while_producer_pauses) ... ok
+test_trickle_does_not_reset_header_deadline (__main__.Contract_threaded_incremental.test_trickle_does_not_reset_header_deadline) ... ok
+test_upgrade_hub_snapshot_disconnect_ownership (__main__.Contract_threaded_incremental.test_upgrade_hub_snapshot_disconnect_ownership) ... ok
+test_upgrade_ownership (__main__.Contract_threaded_incremental.test_upgrade_ownership) ... ok
+test_upgrade_preserves_coalesced_frame (__main__.Contract_threaded_incremental.test_upgrade_preserves_coalesced_frame) ... ok
+test_upgraded_writer_forced_drain_and_disconnect (__main__.Contract_threaded_incremental.test_upgraded_writer_forced_drain_and_disconnect) ... ok
+test_zero_write_budget_permits_no_socket_output (__main__.Contract_threaded_incremental.test_zero_write_budget_permits_no_socket_output) ... ok
+
+======================================================================
+FAIL: test_upgrade_hub_snapshot_disconnect_ownership (__main__.Contract_epoll.test_upgrade_hub_snapshot_disconnect_ownership)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/Akamata/Akamata/tests/transport_contract.py", line 565, in test_upgrade_hub_snapshot_disconnect_ownership
+    receive(peers[0])
+  File "/home/runner/work/Akamata/Akamata/tests/transport_contract.py", line 554, in receive
+    self.assertTrue(data)
+AssertionError: b'' is not true
+
+----------------------------------------------------------------------
+Ran 99 tests in 20.265s
+
+FAILED (failures=1)
+application isolation evidence saved; isolation_passed=true
+transport-contract-test
++- run python3 failure
+error: process exited with code 1
+failed command: python3 tests/transport_contract.py ./.zig-cache/o/30867bb176b84eb0d2243af2a3274239/runtime-contract-server
+
+Build Summary: 30/32 steps succeeded (1 failed)
+transport-contract-test transitive failure
++- run python3 failure
+

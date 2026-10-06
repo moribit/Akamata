@@ -1,0 +1,59 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "64b2e0925d576184c1bcd91139a28edefd0a42a9cb08ec0b3f90801bfdf6caa1",
+  "adapter": "kqueue",
+  "test": "test_upgrade_hub_snapshot_disconnect_ownership",
+  "requested_repeats": 100,
+  "runs": [
+    {
+      "repeat": 1,
+      "passed": true,
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 2,
+      "passed": true,
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 3,
+      "passed": true,
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 4,
+      "passed": true,
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 5,
+      "passed": true,
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 6,
+      "passed": true,
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 7,
+      "passed": false,
+      "errors": [],
+      "failures": [
+        "Traceback (most recent call last):\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 570, in test_upgrade_hub_snapshot_disconnect_ownership\n    receive(peers[0]); receive(peers[2])\n    ~~~~~~~^^^^^^^^^^\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 554, in receive\n    self.assertTrue(data)\n    ~~~~~~~~~~~~~~~^^^^^^\nAssertionError: b'' is not true\n"
+      ]
+    }
+  ],
+  "failure_snapshots": [
+    {
+      "error": "AssertionError(\"b'' is not true\")",
+      "stats": "{\"error_kind\":\"not_found\",\"path\":\"/stats\"}"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Reactor application execution — Phase 6 implementation
 
+For current output/Session ownership, memory costs and completion publication fixes, see [CPU / memory investigation](native-reactor-performance-memory.md). The Phase 6 measurements below are historical.
+
 The user selected explicit incremental execution for Reactor. Threaded retains synchronous stream/upgrade APIs; Reactor rejects them with `UnsupportedApplicationExecution` (HTTP 501 in the default error handler). The public Reactor gate remains disabled.
 
 `am.http.application_session.Definition.init(State, state, callback, mode)` creates one callback ABI with a compile-time adapter, matching the existing endpoint convention. No transport vtable or per-step allocation is introduced. Native `Response.streamSession()` / `am.ws.upgradeSession()` transfer arena-owned state after initializer return; Context/Conn stack pointers must not escape. Workers currently returns explicit unsupported until its event adapter exists; core events/actions contain no platform API.

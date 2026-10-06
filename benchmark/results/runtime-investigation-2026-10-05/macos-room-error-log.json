@@ -1,0 +1,73 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "29f9da6b919c9db0a6cdb764eb8056955617ba992f8cf2a876246ff1e57a73cd",
+  "adapter": "kqueue",
+  "test": "test_upgrade_hub_snapshot_disconnect_ownership",
+  "requested_repeats": 100,
+  "runs": [
+    {
+      "repeat": 1,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 2,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 3,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 4,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 5,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 6,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 7,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 8,
+      "passed": false,
+      "fixture_log": "info: experimental multiplexed reactor listening on port 49381\nSESSION_STATS {\"created\":6,\"closed\":6,\"close_reasons\":[0,5,0,1,0]}\nBENCH_STATS {\"calls\":204,\"requested\":281385,\"live\":0,\"peak\":127562}\n",
+      "errors": [],
+      "failures": [
+        "Traceback (most recent call last):\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 567, in test_upgrade_hub_snapshot_disconnect_ownership\n    receive(peers[0])\n    ~~~~~~~^^^^^^^^^^\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 556, in receive\n    self.assertTrue(data)\n    ~~~~~~~~~~~~~~~^^^^^^\nAssertionError: b'' is not true\n"
+      ]
+    }
+  ],
+  "failure_snapshots": [
+    {
+      "error": "AssertionError(\"b'' is not true\")",
+      "stats": "{\"live\":87910,\"peak\":127562,\"calls\":202,\"created\":6,\"closed\":4,\"mailbox_overflows\":0,\"close_reasons\":[0,4,0,0,0]}"
+    }
+  ]
+}

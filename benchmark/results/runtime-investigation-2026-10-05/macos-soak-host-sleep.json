@@ -1,0 +1,9 @@
+{
+  "capture_utc": "2026-10-05T22:59:36.963597+00:00",
+  "file_birth_local": "2026-10-05 23:30:31",
+  "file_final_local": "2026-10-06 00:01:19",
+  "sleep_wake_events": [
+    "2026-10-05 23:55:01 +0900 Sleep               \tEntering Sleep state due to 'Idle Sleep':TCPKeepAlive=active <power-source details omitted>",
+    "2026-10-06 00:01:19 +0900 Wake                \tWake from Deep Idle [CDNVA] : due to MTP.DOCK.CHANNELS.AP0.IRQ RTP.multi-touch/HID Activity <power-source details omitted>"
+  ]
+}

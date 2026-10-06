@@ -1,0 +1,27 @@
+{
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "binary_sha256": "b75ef11c23bf00dd27477fadcb7d8853496ea6e94147fe094a5bb07e2f6aa6de",
+  "command": [
+    "strace",
+    "-f",
+    "-c",
+    "-o",
+    "certification/syscalls-reactor-hello/syscalls.txt",
+    "/home/runner/work/Akamata/Akamata/candidate/bin/runtime-reactor-bench"
+  ],
+  "limitation": "ptrace changes scheduling and throughput; syscall counts cover startup/shutdown too",
+  "load_command": [
+    "oha",
+    "--no-tui",
+    "--output-format",
+    "json",
+    "-c",
+    "32",
+    "-n",
+    "10000",
+    "-w",
+    "http://127.0.0.1:8080/hello"
+  ],
+  "load_exit_code": 0,
+  "exit_code": 0
+}

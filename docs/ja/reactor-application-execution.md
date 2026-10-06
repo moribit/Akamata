@@ -1,5 +1,7 @@
 # Reactor application execution — Phase 6実装
 
+現在のoutput / Session所有権、メモリ費用、completion publication修正は[CPU / memory調査](native-reactor-performance-memory.md)を参照。以下のPhase 6測定は当時の記録。
+
 同期APIの互換方針はユーザー指定により確定しました。Threadedは既存同期stream/upgradeを維持し、Reactorでは`UnsupportedApplicationExecution`、default error handlerではHTTP 501を返します。incremental APIを必須とします。public Reactor gateは引き続きfail-closedです。
 
 ## 実装したsession lifecycle

@@ -1,0 +1,80 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "98807e292c99a094aa289e47ff738b7f05cfbaa36627a814b660462092aa9e8c",
+  "adapter": "kqueue",
+  "test": "test_upgrade_hub_snapshot_disconnect_ownership",
+  "requested_repeats": 30,
+  "runs": [
+    {
+      "repeat": 1,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 2,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 3,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 4,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 5,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 6,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 7,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 8,
+      "passed": true,
+      "fixture_log": "",
+      "errors": [],
+      "failures": []
+    },
+    {
+      "repeat": 9,
+      "passed": false,
+      "fixture_log": "info: experimental multiplexed reactor listening on port 62682\nwarning: refresh close token=4294967304 phase=closing failed=true closed=false task=false\nwarning: recv EOF token=8589934601 buffer=4096\nwarning: recv EOF token=4294967303 buffer=4096\nwarning: refresh close token=8589934601 phase=closing failed=true closed=false task=false\nwarning: refresh close token=4294967303 phase=closing failed=true closed=false task=false\nwarning: refresh close token=12884901897 phase=closing failed=true closed=false task=false\nwarning: recv EOF token=8589934599 buffer=4096\nwarning: recv EOF token=8589934600 buffer=4096\nwarning: refresh close token=8589934599 phase=closing failed=true closed=false task=false\nwarning: refresh close token=8589934600 phase=closing failed=true closed=false task=false\nwarning: refresh close token=12884901896 phase=closing failed=true closed=false task=false\nwarning: refresh close token=12884901895 phase=closing failed=true closed=false task=false\nwarning: refresh close token=17179869193 phase=closing failed=true closed=false task=false\nSESSION_STATS {\"created\":9,\"closed\":9,\"close_reasons\":[0,8,0,1,0]}\nBENCH_STATS {\"calls\":230,\"requested\":408682,\"live\":0,\"peak\":127562}\n",
+      "errors": [],
+      "failures": [
+        "Traceback (most recent call last):\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 567, in test_upgrade_hub_snapshot_disconnect_ownership\n    receive(peers[0])\n    ~~~~~~~^^^^^^^^^^\n  File \"/Users/mimoc/Akamata/tests/transport_contract.py\", line 556, in receive\n    self.assertTrue(data)\n    ~~~~~~~~~~~~~~~^^^^^^\nAssertionError: b'' is not true\n"
+      ]
+    }
+  ],
+  "failure_snapshots": [
+    {
+      "error": "AssertionError(\"b'' is not true\")",
+      "stats": "{\"live\":87910,\"peak\":127562,\"calls\":228,\"created\":9,\"closed\":7,\"mailbox_overflows\":0,\"close_reasons\":[0,7,0,0,0]}"
+    }
+  ]
+}

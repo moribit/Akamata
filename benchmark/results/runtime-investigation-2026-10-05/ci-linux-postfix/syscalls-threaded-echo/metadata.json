@@ -1,0 +1,33 @@
+{
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "binary_sha256": "303bb60861b5b6a3426a7c24f9344514b78aa8ee419cbb2d0aa4394989d7a80d",
+  "command": [
+    "strace",
+    "-f",
+    "-c",
+    "-o",
+    "certification/syscalls-threaded-echo/syscalls.txt",
+    "/home/runner/work/Akamata/Akamata/candidate/bin/bench"
+  ],
+  "limitation": "ptrace changes scheduling and throughput; syscall counts cover startup/shutdown too",
+  "load_command": [
+    "oha",
+    "--no-tui",
+    "--output-format",
+    "json",
+    "-c",
+    "32",
+    "-n",
+    "10000",
+    "-w",
+    "http://127.0.0.1:8080/echo",
+    "-m",
+    "POST",
+    "-H",
+    "content-type: application/json",
+    "-d",
+    "{\"name\":\"hello\",\"n\":42}"
+  ],
+  "load_exit_code": 0,
+  "exit_code": 0
+}

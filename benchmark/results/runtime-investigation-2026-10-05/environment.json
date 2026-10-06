@@ -1,0 +1,39 @@
+{
+  "collected_at": "2026-10-05T13:54:51.173060+00:00",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "source_sha": "f9546e80af75c94fdf69f0b8e0cc3320eeb84c76",
+  "zig": "0.17.0",
+  "oha": "oha 1.15.0",
+  "hardware": "hw.model: Mac14,2\nhw.memsize: 17179869184\nhw.ncpu: 8\nmachdep.cpu.brand_string: Apple M2",
+  "binaries": {
+    "threaded_before": {
+      "path": "/private/tmp/akamata-before/bin/bench",
+      "sha256": "0c854aaae95b335b5c998f1a4e6fd7f569440f7a3d33a329d5e8c4d9d14137c7"
+    },
+    "threaded_final": {
+      "path": "/private/tmp/akamata-final/bin/bench",
+      "sha256": "b86ec2d71b4cae1b00851d29cfd82145eb0779434d7f79052c01190ffc4016c4"
+    },
+    "reactor_before": {
+      "path": "/private/tmp/akamata-before/bin/runtime-reactor-bench",
+      "sha256": "954447adbd475785de66d070a572329ca2b24ae51b08b7380394c2879e503e35"
+    },
+    "eager": {
+      "path": "/private/tmp/akamata-eager/bin/runtime-reactor-bench",
+      "sha256": "233ad44456ed1fbbf9a0a0a79d9552b5b3eb690f413a7923ee8b410a18a35c35"
+    },
+    "borrowed": {
+      "path": "/private/tmp/akamata-borrow/bin/runtime-reactor-bench",
+      "sha256": "2051485a5ddb3ff96ecbc0b97d0014dad90a84d342861506800caa712f2f4635"
+    },
+    "separated": {
+      "path": "/private/tmp/akamata-separated/bin/runtime-reactor-bench",
+      "sha256": "c48da69856910f18f88430e43e67a5cd7a8c12021a5a037f2aaede14a074bca4"
+    }
+  },
+  "notes": [
+    "Before broad matrix overlapped initial builds/Contract; use targeted alternating matrices for optimization effects",
+    "Attribution timers and atomic counters perturb scheduling; compare uninstrumented runs for throughput",
+    "BENCH_STATS allocator counters enabled equally in paired measurements; not zero instrumentation"
+  ]
+}

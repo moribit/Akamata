@@ -1,0 +1,74 @@
+{
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "oha_version": "oha 1.15.0",
+  "command": [
+    "tools/bench/runtime_profile.py",
+    "threaded=candidate/bin/bench",
+    "reactor=candidate/bin/runtime-reactor-bench",
+    "--output-dir",
+    "certification/profile",
+    "--endpoint",
+    "hello",
+    "--connections",
+    "32",
+    "128"
+  ],
+  "runs": [
+    {
+      "label": "threaded",
+      "connections": 32,
+      "binary_sha256": "96ad17dd3397a750ff6ab254c9cd3137c7b83bb467ac953a41e31cfed0db9299",
+      "profile_command": [
+        "sample",
+        "33438",
+        "5",
+        "1",
+        "-file",
+        "certification/profile/threaded-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 32,
+      "binary_sha256": "9a1f81c082e8a4843bb9308f397a2b7de06286f66a0118c7cec1d6ebcb0d8def",
+      "profile_command": [
+        "sample",
+        "33734",
+        "5",
+        "1",
+        "-file",
+        "certification/profile/reactor-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "threaded",
+      "connections": 128,
+      "binary_sha256": "96ad17dd3397a750ff6ab254c9cd3137c7b83bb467ac953a41e31cfed0db9299",
+      "profile_command": [
+        "sample",
+        "34019",
+        "5",
+        "1",
+        "-file",
+        "certification/profile/threaded-c128.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 128,
+      "binary_sha256": "9a1f81c082e8a4843bb9308f397a2b7de06286f66a0118c7cec1d6ebcb0d8def",
+      "profile_command": [
+        "sample",
+        "34312",
+        "5",
+        "1",
+        "-file",
+        "certification/profile/reactor-c128.sample.txt"
+      ],
+      "profile_available": true
+    }
+  ]
+}

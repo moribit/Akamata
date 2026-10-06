@@ -1,0 +1,473 @@
+{
+  "source_sha": "f9546e80af75c94fdf69f0b8e0cc3320eeb84c76",
+  "working_tree_dirty": true,
+  "close_reason_order": [
+    "completed",
+    "disconnected",
+    "timeout",
+    "shutdown",
+    "application_error"
+  ],
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "zig_version": "0.17.0",
+  "binary_sha256": "eec4d9039245b41e69950919e6213775c568572ec1feb80b4a014b33e8761cea",
+  "command": [
+    "tools/bench/runtime_certify.py",
+    "fixture/bin/runtime-contract-server",
+    "--adapters",
+    "threaded",
+    "--output",
+    "certification/sessions-threaded.json",
+    "--idle-levels",
+    "1000",
+    "--mixed-idle",
+    "100",
+    "--soak-seconds",
+    "30"
+  ],
+  "thread_count_method": "proc-task",
+  "rlimit_nofile": [
+    65536,
+    65536
+  ],
+  "runs": [
+    {
+      "adapter": "threaded",
+      "scenario": "session-performance",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 50936,
+          "cpu_percent": 8.0,
+          "fds": 104,
+          "threads": 102,
+          "allocator": {
+            "live": 2066018,
+            "peak": 2076758,
+            "calls": 3845,
+            "created": 1700,
+            "closed": 1600,
+            "close_reasons": [
+              1600,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5340,
+        "cpu_percent": 0.0,
+        "fds": 4,
+        "threads": 2
+      },
+      "broadcast": {
+        "p50_ms": 100.112576000015,
+        "p95_ms": 100.12299200002417,
+        "p99_ms": 100.1309210000727,
+        "recipients": 100,
+        "rounds": 50,
+        "observed_frames_per_second": 998.8711669041263
+      },
+      "stream": {
+        "p50_ms": 2.19168500007072,
+        "p95_ms": 5.62987700004669,
+        "p99_ms": 7.270931999983077,
+        "requests": 1600,
+        "observed_requests_per_second": 5355.2864196154715
+      },
+      "shutdown_ms": 113.69786199998089,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 3845,
+        "requested": 5170901,
+        "live": 0,
+        "peak": 2076758
+      },
+      "sessions_final": {
+        "created": 1700,
+        "closed": 1700,
+        "close_reasons": [
+          1600,
+          0,
+          0,
+          100,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "disconnect-fd-reuse-races",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 5884,
+          "cpu_percent": 62.5,
+          "fds": 4,
+          "threads": 2,
+          "allocator": {
+            "live": 5646,
+            "peak": 227294,
+            "calls": 1487,
+            "created": 192,
+            "closed": 192,
+            "close_reasons": [
+              0,
+              192,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5344,
+        "cpu_percent": 0.0,
+        "fds": 4,
+        "threads": 2
+      },
+      "iterations": 256,
+      "recovered_http_ms": 0.1352589999896736,
+      "shutdown_ms": 1.102255999967383,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 1489,
+        "requested": 4370191,
+        "live": 0,
+        "peak": 227294
+      },
+      "sessions_final": {
+        "created": 192,
+        "closed": 192,
+        "close_reasons": [
+          0,
+          192,
+          0,
+          0,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "shutdown-disconnect-completion-race",
+      "samples": [],
+      "baseline": {
+        "rss_kib": 5344,
+        "cpu_percent": 0.0,
+        "fds": 4,
+        "threads": 2
+      },
+      "shutdown_requested": true,
+      "connections": 64,
+      "shutdown_ms": 714.4655119998333,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 527,
+        "requested": 1338945,
+        "live": 0,
+        "peak": 1324436
+      },
+      "sessions_final": {
+        "created": 64,
+        "closed": 64,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          64,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "idle",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 457600,
+          "cpu_percent": 82.1,
+          "fds": 1004,
+          "threads": 1002,
+          "allocator": {
+            "live": 20608646,
+            "peak": 20608646,
+            "calls": 5143,
+            "created": 1000,
+            "closed": 0,
+            "close_reasons": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5344,
+        "cpu_percent": 0.0,
+        "fds": 4,
+        "threads": 2
+      },
+      "count": 1000,
+      "establishment_ms": 256.53716099986923,
+      "broadcast_ms": 100.22140699993543,
+      "http_probe_ms": 0.1544520000607008,
+      "shutdown_ms": 114.53935600002296,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 5147,
+        "requested": 20621135,
+        "live": 0,
+        "peak": 20608718
+      },
+      "sessions_final": {
+        "created": 1000,
+        "closed": 1000,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          1000,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "mixed-soak-races",
+      "samples": [
+        {
+          "elapsed_s": 0.10295820999999705,
+          "rss_kib": 58820,
+          "cpu_percent": 18.7,
+          "fds": 122,
+          "threads": 120,
+          "allocator": {
+            "live": 2407354,
+            "peak": 2426087,
+            "calls": 947,
+            "created": 124,
+            "closed": 6,
+            "close_reasons": [
+              0,
+              6,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 6.420166174000087,
+          "rss_kib": 58640,
+          "cpu_percent": 2.3,
+          "fds": 121,
+          "threads": 119,
+          "allocator": {
+            "live": 2405432,
+            "peak": 2426091,
+            "calls": 1273,
+            "created": 148,
+            "closed": 31,
+            "close_reasons": [
+              0,
+              31,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 12.737354937000191,
+          "rss_kib": 58640,
+          "cpu_percent": 1.9,
+          "fds": 121,
+          "threads": 119,
+          "allocator": {
+            "live": 2405444,
+            "peak": 2426107,
+            "calls": 1599,
+            "created": 172,
+            "closed": 55,
+            "close_reasons": [
+              0,
+              55,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 19.053920899000104,
+          "rss_kib": 58964,
+          "cpu_percent": 1.9,
+          "fds": 122,
+          "threads": 120,
+          "allocator": {
+            "live": 2407390,
+            "peak": 2426123,
+            "calls": 1925,
+            "created": 196,
+            "closed": 78,
+            "close_reasons": [
+              0,
+              78,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 25.37085656100021,
+          "rss_kib": 58648,
+          "cpu_percent": 1.8,
+          "fds": 121,
+          "threads": 119,
+          "allocator": {
+            "live": 2405468,
+            "peak": 2426131,
+            "calls": 2251,
+            "created": 220,
+            "closed": 103,
+            "close_reasons": [
+              0,
+              103,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 5336,
+        "cpu_percent": 0.0,
+        "fds": 4,
+        "threads": 2
+      },
+      "requested_soak_s": 30,
+      "mixed_results": [
+        {
+          "http_p50_ms": 0.37135249999664666,
+          "http_max_ms": 3.0763469999328663,
+          "broadcast_ms": 91.66263199995228
+        },
+        {
+          "http_p50_ms": 0.5104895000158649,
+          "http_max_ms": 1.4196480001373857,
+          "broadcast_ms": 93.63777899989145
+        },
+        {
+          "http_p50_ms": 0.749072000076012,
+          "http_max_ms": 2.6248240001223166,
+          "broadcast_ms": 97.98514400017666
+        },
+        {
+          "http_p50_ms": 0.41865899993354105,
+          "http_max_ms": 1.4555059999565856,
+          "broadcast_ms": 98.64216800019676
+        },
+        {
+          "http_p50_ms": 0.5976674999601528,
+          "http_max_ms": 3.3777090000057797,
+          "broadcast_ms": 98.59872899983202
+        },
+        {
+          "http_p50_ms": 0.37226450001526246,
+          "http_max_ms": 1.588535999871965,
+          "broadcast_ms": 98.83073700007117
+        },
+        {
+          "http_p50_ms": 0.7420409999667754,
+          "http_max_ms": 2.854868999975224,
+          "broadcast_ms": 98.77740500019172
+        },
+        {
+          "http_p50_ms": 0.43671900004937925,
+          "http_max_ms": 1.4341940000122122,
+          "broadcast_ms": 98.55439800003296
+        },
+        {
+          "http_p50_ms": 0.5109679998440697,
+          "http_max_ms": 2.3054030000366765,
+          "broadcast_ms": 98.63076800002091
+        },
+        {
+          "http_p50_ms": 0.7003375001204404,
+          "http_max_ms": 3.6277550000249903,
+          "broadcast_ms": 98.51486200000181
+        },
+        {
+          "http_p50_ms": 0.8130559999699472,
+          "http_max_ms": 3.1716240000605467,
+          "broadcast_ms": 98.48912600000403
+        },
+        {
+          "http_p50_ms": 0.601065499949982,
+          "http_max_ms": 2.0393139998304832,
+          "broadcast_ms": 98.74083299996528
+        },
+        {
+          "http_p50_ms": 0.621033500010526,
+          "http_max_ms": 1.768896000157838,
+          "broadcast_ms": 98.68752499983202
+        },
+        {
+          "http_p50_ms": 0.6327634999934162,
+          "http_max_ms": 2.01482199986458,
+          "broadcast_ms": 98.74327200009247
+        },
+        {
+          "http_p50_ms": 0.5407695000485546,
+          "http_max_ms": 2.231593000033172,
+          "broadcast_ms": 98.57715999987704
+        }
+      ],
+      "elapsed_s": 30.00009622100015,
+      "iterations": 15,
+      "http_isolated": true,
+      "shutdown_ms": 113.64562599987948,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 2467,
+        "requested": 4710101,
+        "live": 0,
+        "peak": 2426143
+      },
+      "sessions_final": {
+        "created": 236,
+        "closed": 236,
+        "close_reasons": [
+          0,
+          120,
+          0,
+          116,
+          0
+        ]
+      },
+      "clean": true
+    }
+  ],
+  "limitations": [
+    "Python load generator is not a peak throughput benchmark",
+    "allocator counters exclude libc/SQLite and thread stacks",
+    "application callbacks remain cooperatively bounded"
+  ],
+  "passed": true,
+  "long_soak_completed": false
+}

@@ -1,0 +1,1825 @@
+{
+  "source_sha": "44eeb29ba8497ea3e6602f1084d23347ecdb4feb",
+  "working_tree_dirty": true,
+  "close_reason_order": [
+    "completed",
+    "disconnected",
+    "timeout",
+    "shutdown",
+    "application_error"
+  ],
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "zig_version": "0.17.0",
+  "binary_sha256": "05248df6e4897e83c30b3ce885a5cc3470ec7cd0a4b17bd3da282655829bd0cb",
+  "command": [
+    "tools/bench/runtime_certify.py",
+    "fixture/bin/runtime-contract-server",
+    "--adapters",
+    "epoll",
+    "--output",
+    "certification/sessions-reactor.json",
+    "--idle-levels",
+    "1000",
+    "5000",
+    "--mixed-idle",
+    "1000",
+    "--soak-seconds",
+    "240"
+  ],
+  "thread_count_method": "proc-task",
+  "rlimit_nofile": [
+    65536,
+    65536
+  ],
+  "runs": [
+    {
+      "adapter": "epoll",
+      "scenario": "session-performance",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 12232,
+          "cpu_percent": 94.9,
+          "fds": 107,
+          "threads": 5,
+          "allocator": {
+            "live": 5151442,
+            "peak": 5521822,
+            "calls": 7156,
+            "created": 1700,
+            "closed": 1600,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              1600,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 6944,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "broadcast": {
+        "p50_ms": 1.9173985000406901,
+        "p95_ms": 2.16064300002472,
+        "p99_ms": 2.2458119999555493,
+        "recipients": 100,
+        "rounds": 50,
+        "observed_frames_per_second": 52427.527698125996
+      },
+      "stream": {
+        "p50_ms": 3.7486459999627186,
+        "p95_ms": 8.053729999801362,
+        "p99_ms": 10.760464999975738,
+        "requests": 1600,
+        "observed_requests_per_second": 3627.393989630487
+      },
+      "shutdown_ms": 163.80885400008083,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 7156,
+        "requested": 43064509,
+        "live": 0,
+        "peak": 5521822
+      },
+      "sessions_final": {
+        "created": 1700,
+        "closed": 1700,
+        "close_reasons": [
+          1600,
+          0,
+          0,
+          100,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "disconnect-fd-reuse-races",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 7692,
+          "cpu_percent": 60.0,
+          "fds": 7,
+          "threads": 5,
+          "allocator": {
+            "live": 1321374,
+            "peak": 1700071,
+            "calls": 1945,
+            "created": 192,
+            "closed": 192,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              192,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 6940,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "iterations": 256,
+      "recovered_http_ms": 0.15884600020399375,
+      "shutdown_ms": 1.1224949998904776,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 1948,
+        "requested": 10191247,
+        "live": 0,
+        "peak": 1700071
+      },
+      "sessions_final": {
+        "created": 192,
+        "closed": 192,
+        "close_reasons": [
+          0,
+          192,
+          0,
+          0,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "shutdown-disconnect-completion-race",
+      "samples": [],
+      "baseline": {
+        "rss_kib": 6944,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "shutdown_requested": true,
+      "connections": 64,
+      "shutdown_ms": 715.0679599999421,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 601,
+        "requested": 4047561,
+        "live": 0,
+        "peak": 3782238
+      },
+      "sessions_final": {
+        "created": 64,
+        "closed": 64,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          64,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "idle",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 53284,
+          "cpu_percent": 54.8,
+          "fds": 1007,
+          "threads": 5,
+          "allocator": {
+            "live": 39580374,
+            "peak": 39580374,
+            "calls": 6153,
+            "created": 1000,
+            "closed": 0,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 6944,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "count": 1000,
+      "establishment_ms": 269.98136300016995,
+      "broadcast_ms": 23.568367000052604,
+      "http_probe_ms": 0.12632600009965245,
+      "shutdown_ms": 215.04101400000764,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 6159,
+        "requested": 39606927,
+        "live": 0,
+        "peak": 39584542
+      },
+      "sessions_final": {
+        "created": 1000,
+        "closed": 1000,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          1000,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "idle",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 237460,
+          "cpu_percent": 65.8,
+          "fds": 5007,
+          "threads": 5,
+          "allocator": {
+            "live": 192616374,
+            "peak": 192616374,
+            "calls": 30153,
+            "created": 5000,
+            "closed": 0,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 6948,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "count": 5000,
+      "establishment_ms": 1254.9628720000783,
+      "broadcast_ms": 109.7291179999047,
+      "http_probe_ms": 0.13430100011646573,
+      "shutdown_ms": 369.7428729999501,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 30159,
+        "requested": 192642927,
+        "live": 0,
+        "peak": 192620542
+      },
+      "sessions_final": {
+        "created": 5000,
+        "closed": 5000,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          5000,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "epoll",
+      "scenario": "mixed-soak-races",
+      "samples": [
+        {
+          "elapsed_s": 0.06804595000016889,
+          "rss_kib": 58796,
+          "cpu_percent": 61.1,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423146,
+            "peak": 44566340,
+            "calls": 8437,
+            "created": 1024,
+            "closed": 8,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              8,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 6.222737409000047,
+          "rss_kib": 58868,
+          "cpu_percent": 5.8,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423158,
+            "peak": 44732360,
+            "calls": 8908,
+            "created": 1048,
+            "closed": 32,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              32,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 12.364723272999981,
+          "rss_kib": 58868,
+          "cpu_percent": 4.1,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423170,
+            "peak": 44732396,
+            "calls": 9379,
+            "created": 1072,
+            "closed": 56,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              56,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 18.514396468000086,
+          "rss_kib": 58872,
+          "cpu_percent": 3.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423182,
+            "peak": 44732400,
+            "calls": 9850,
+            "created": 1096,
+            "closed": 80,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              80,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 24.657929980000063,
+          "rss_kib": 58872,
+          "cpu_percent": 3.3,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423194,
+            "peak": 44732416,
+            "calls": 10321,
+            "created": 1120,
+            "closed": 104,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              104,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 30.803048638000064,
+          "rss_kib": 58876,
+          "cpu_percent": 3.1,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423206,
+            "peak": 44732416,
+            "calls": 10792,
+            "created": 1144,
+            "closed": 128,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              128,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 36.953944741999976,
+          "rss_kib": 58876,
+          "cpu_percent": 3.0,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423218,
+            "peak": 44732444,
+            "calls": 11263,
+            "created": 1168,
+            "closed": 152,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              152,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 43.10582670100007,
+          "rss_kib": 58880,
+          "cpu_percent": 3.0,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423230,
+            "peak": 44732448,
+            "calls": 11734,
+            "created": 1192,
+            "closed": 176,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              176,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 49.252636295,
+          "rss_kib": 58880,
+          "cpu_percent": 2.9,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423242,
+            "peak": 44732464,
+            "calls": 12205,
+            "created": 1216,
+            "closed": 200,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              200,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 55.39227698400009,
+          "rss_kib": 58880,
+          "cpu_percent": 2.8,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423254,
+            "peak": 44732472,
+            "calls": 12676,
+            "created": 1240,
+            "closed": 224,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              224,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 61.54388890900009,
+          "rss_kib": 58880,
+          "cpu_percent": 2.8,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423266,
+            "peak": 44732492,
+            "calls": 13147,
+            "created": 1264,
+            "closed": 248,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              248,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 67.69942869900001,
+          "rss_kib": 58888,
+          "cpu_percent": 2.8,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423278,
+            "peak": 44732504,
+            "calls": 13618,
+            "created": 1288,
+            "closed": 272,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              272,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 73.84010010099996,
+          "rss_kib": 59184,
+          "cpu_percent": 2.8,
+          "fds": 1024,
+          "threads": 5,
+          "allocator": {
+            "live": 44446976,
+            "peak": 44732516,
+            "calls": 14089,
+            "created": 1312,
+            "closed": 295,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              295,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 79.98531268400006,
+          "rss_kib": 58888,
+          "cpu_percent": 2.7,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423302,
+            "peak": 44732524,
+            "calls": 14560,
+            "created": 1336,
+            "closed": 320,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              320,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 86.12447963099999,
+          "rss_kib": 58888,
+          "cpu_percent": 2.7,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423314,
+            "peak": 44732524,
+            "calls": 15031,
+            "created": 1360,
+            "closed": 344,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              344,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 92.26911687000006,
+          "rss_kib": 58892,
+          "cpu_percent": 2.7,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423326,
+            "peak": 44732544,
+            "calls": 15502,
+            "created": 1384,
+            "closed": 368,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              368,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 98.40644283899996,
+          "rss_kib": 59192,
+          "cpu_percent": 2.7,
+          "fds": 1024,
+          "threads": 5,
+          "allocator": {
+            "live": 44447024,
+            "peak": 44732556,
+            "calls": 15973,
+            "created": 1408,
+            "closed": 391,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              391,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 104.54612716600013,
+          "rss_kib": 58896,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423350,
+            "peak": 44732556,
+            "calls": 16444,
+            "created": 1432,
+            "closed": 416,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              416,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 110.68634200200017,
+          "rss_kib": 58896,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423362,
+            "peak": 44732556,
+            "calls": 16915,
+            "created": 1456,
+            "closed": 440,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              440,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 116.8266498590001,
+          "rss_kib": 58900,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423374,
+            "peak": 44732556,
+            "calls": 17386,
+            "created": 1480,
+            "closed": 464,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              464,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 122.9770950510001,
+          "rss_kib": 59200,
+          "cpu_percent": 2.6,
+          "fds": 1024,
+          "threads": 5,
+          "allocator": {
+            "live": 44447072,
+            "peak": 44732632,
+            "calls": 17857,
+            "created": 1504,
+            "closed": 487,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              487,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 129.1246663280001,
+          "rss_kib": 58908,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423398,
+            "peak": 44732632,
+            "calls": 18328,
+            "created": 1528,
+            "closed": 512,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              512,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 135.259242846,
+          "rss_kib": 58912,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423410,
+            "peak": 44732632,
+            "calls": 18799,
+            "created": 1552,
+            "closed": 536,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              536,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 141.40545485100006,
+          "rss_kib": 58912,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423422,
+            "peak": 44732632,
+            "calls": 19270,
+            "created": 1576,
+            "closed": 560,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              560,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 147.55421311200007,
+          "rss_kib": 64720,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423434,
+            "peak": 44732636,
+            "calls": 19741,
+            "created": 1600,
+            "closed": 584,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              584,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 153.690794051,
+          "rss_kib": 73324,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423446,
+            "peak": 44732636,
+            "calls": 20212,
+            "created": 1624,
+            "closed": 608,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              608,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 159.83256552900002,
+          "rss_kib": 73328,
+          "cpu_percent": 2.6,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423458,
+            "peak": 44732680,
+            "calls": 20683,
+            "created": 1648,
+            "closed": 632,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              632,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 165.97967378199996,
+          "rss_kib": 82040,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423470,
+            "peak": 44732680,
+            "calls": 21154,
+            "created": 1672,
+            "closed": 656,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              656,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 172.1197718850001,
+          "rss_kib": 82040,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423482,
+            "peak": 44732680,
+            "calls": 21625,
+            "created": 1696,
+            "closed": 680,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              680,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 178.26799813800017,
+          "rss_kib": 90696,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423494,
+            "peak": 44732712,
+            "calls": 22096,
+            "created": 1720,
+            "closed": 704,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              704,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 184.40310586200007,
+          "rss_kib": 99304,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423506,
+            "peak": 44732712,
+            "calls": 22567,
+            "created": 1744,
+            "closed": 728,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              728,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 190.547381525,
+          "rss_kib": 99304,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423518,
+            "peak": 44732740,
+            "calls": 23038,
+            "created": 1768,
+            "closed": 752,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              752,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 196.689766384,
+          "rss_kib": 108312,
+          "cpu_percent": 2.5,
+          "fds": 1024,
+          "threads": 5,
+          "allocator": {
+            "live": 44447216,
+            "peak": 44732740,
+            "calls": 23509,
+            "created": 1792,
+            "closed": 775,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              775,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 202.83159093200015,
+          "rss_kib": 108016,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423542,
+            "peak": 44732764,
+            "calls": 23980,
+            "created": 1816,
+            "closed": 800,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              800,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 208.973203431,
+          "rss_kib": 111360,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423554,
+            "peak": 44732776,
+            "calls": 24451,
+            "created": 1840,
+            "closed": 824,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              824,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 215.11857583100004,
+          "rss_kib": 111360,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423566,
+            "peak": 44732792,
+            "calls": 24922,
+            "created": 1864,
+            "closed": 848,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              848,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 221.26700422099998,
+          "rss_kib": 111360,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423578,
+            "peak": 44732800,
+            "calls": 25393,
+            "created": 1888,
+            "closed": 872,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              872,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 227.40952440800015,
+          "rss_kib": 111364,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423590,
+            "peak": 44732816,
+            "calls": 25864,
+            "created": 1912,
+            "closed": 896,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              896,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 233.55548911300002,
+          "rss_kib": 111368,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423602,
+            "peak": 44732820,
+            "calls": 26335,
+            "created": 1936,
+            "closed": 920,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              920,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 239.70270624800014,
+          "rss_kib": 111368,
+          "cpu_percent": 2.5,
+          "fds": 1023,
+          "threads": 5,
+          "allocator": {
+            "live": 44423614,
+            "peak": 44732840,
+            "calls": 26806,
+            "created": 1960,
+            "closed": 944,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              944,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 6948,
+        "cpu_percent": 0.0,
+        "fds": 7,
+        "threads": 5
+      },
+      "requested_soak_s": 240,
+      "mixed_results": [
+        {
+          "http_p50_ms": 0.9388835001118423,
+          "http_max_ms": 12.150955999914004,
+          "broadcast_ms": 24.655934000065827
+        },
+        {
+          "http_p50_ms": 1.0551970000278743,
+          "http_max_ms": 11.542875000031927,
+          "broadcast_ms": 24.137538999866592
+        },
+        {
+          "http_p50_ms": 7.2658190000538525,
+          "http_max_ms": 14.632364000135567,
+          "broadcast_ms": 19.589805999885357
+        },
+        {
+          "http_p50_ms": 13.121107999950254,
+          "http_max_ms": 17.17664599982527,
+          "broadcast_ms": 24.117079000006925
+        },
+        {
+          "http_p50_ms": 17.128263000017796,
+          "http_max_ms": 19.112684999981866,
+          "broadcast_ms": 26.278754000031768
+        },
+        {
+          "http_p50_ms": 13.811716999953205,
+          "http_max_ms": 17.727953000076013,
+          "broadcast_ms": 24.208270000144694
+        },
+        {
+          "http_p50_ms": 17.376359500076433,
+          "http_max_ms": 19.671811000080197,
+          "broadcast_ms": 27.786380000179633
+        },
+        {
+          "http_p50_ms": 15.104789499901017,
+          "http_max_ms": 18.68151400003626,
+          "broadcast_ms": 26.797592000093573
+        },
+        {
+          "http_p50_ms": 15.576421999980994,
+          "http_max_ms": 19.79609300019547,
+          "broadcast_ms": 26.471792000165806
+        },
+        {
+          "http_p50_ms": 17.93614550001621,
+          "http_max_ms": 19.829695999987962,
+          "broadcast_ms": 25.659411999868098
+        },
+        {
+          "http_p50_ms": 16.367047500011722,
+          "http_max_ms": 18.020638000052713,
+          "broadcast_ms": 24.68213899987859
+        },
+        {
+          "http_p50_ms": 16.753151499983687,
+          "http_max_ms": 18.723831999977847,
+          "broadcast_ms": 26.823920000197177
+        },
+        {
+          "http_p50_ms": 18.40767850001157,
+          "http_max_ms": 22.275039000078323,
+          "broadcast_ms": 29.625793999912275
+        },
+        {
+          "http_p50_ms": 18.5441680000622,
+          "http_max_ms": 20.779380000021774,
+          "broadcast_ms": 27.081781999868326
+        },
+        {
+          "http_p50_ms": 14.537590999793792,
+          "http_max_ms": 17.672306999884313,
+          "broadcast_ms": 24.603226999943217
+        },
+        {
+          "http_p50_ms": 17.533688499952405,
+          "http_max_ms": 19.43197299988242,
+          "broadcast_ms": 25.864167999998244
+        },
+        {
+          "http_p50_ms": 17.086920000110695,
+          "http_max_ms": 20.500858999866978,
+          "broadcast_ms": 27.460321999797088
+        },
+        {
+          "http_p50_ms": 18.042140000034124,
+          "http_max_ms": 19.934583999884126,
+          "broadcast_ms": 26.41320500015354
+        },
+        {
+          "http_p50_ms": 17.991885000014918,
+          "http_max_ms": 21.15959799994016,
+          "broadcast_ms": 29.103797000061604
+        },
+        {
+          "http_p50_ms": 14.416106499993475,
+          "http_max_ms": 16.223872999944433,
+          "broadcast_ms": 24.077031999922838
+        },
+        {
+          "http_p50_ms": 19.228197999836993,
+          "http_max_ms": 22.511137000037706,
+          "broadcast_ms": 28.74390399983895
+        },
+        {
+          "http_p50_ms": 19.322688499983087,
+          "http_max_ms": 21.938364000106958,
+          "broadcast_ms": 27.743564000047627
+        },
+        {
+          "http_p50_ms": 15.387200499958453,
+          "http_max_ms": 16.92843199998606,
+          "broadcast_ms": 23.195753999971203
+        },
+        {
+          "http_p50_ms": 16.45323900004314,
+          "http_max_ms": 20.19370799985154,
+          "broadcast_ms": 27.710411000043678
+        },
+        {
+          "http_p50_ms": 17.90736200007359,
+          "http_max_ms": 19.349108999904274,
+          "broadcast_ms": 25.973423999857914
+        },
+        {
+          "http_p50_ms": 17.061396500025694,
+          "http_max_ms": 19.359753999879104,
+          "broadcast_ms": 26.43199299996013
+        },
+        {
+          "http_p50_ms": 16.53220399998645,
+          "http_max_ms": 18.622499999992215,
+          "broadcast_ms": 24.890173000130744
+        },
+        {
+          "http_p50_ms": 15.91604550003467,
+          "http_max_ms": 19.2192540000633,
+          "broadcast_ms": 25.568346999989444
+        },
+        {
+          "http_p50_ms": 18.112059999907615,
+          "http_max_ms": 20.398811999939426,
+          "broadcast_ms": 27.745012999957908
+        },
+        {
+          "http_p50_ms": 18.85090749988194,
+          "http_max_ms": 20.78036000011707,
+          "broadcast_ms": 27.57108899982086
+        },
+        {
+          "http_p50_ms": 14.939251999976477,
+          "http_max_ms": 17.561181000019133,
+          "broadcast_ms": 24.85938199993143
+        },
+        {
+          "http_p50_ms": 19.304286999954456,
+          "http_max_ms": 21.624739000117188,
+          "broadcast_ms": 28.17257900005643
+        },
+        {
+          "http_p50_ms": 16.710964500020964,
+          "http_max_ms": 18.845686000076967,
+          "broadcast_ms": 25.36633499994423
+        },
+        {
+          "http_p50_ms": 13.430894499947499,
+          "http_max_ms": 17.864381999970647,
+          "broadcast_ms": 28.94278700000541
+        },
+        {
+          "http_p50_ms": 15.999491000002308,
+          "http_max_ms": 18.404745999987426,
+          "broadcast_ms": 26.833850999992137
+        },
+        {
+          "http_p50_ms": 15.202911500068694,
+          "http_max_ms": 17.258967999850938,
+          "broadcast_ms": 24.083810000092853
+        },
+        {
+          "http_p50_ms": 17.164796999963983,
+          "http_max_ms": 19.589134999932867,
+          "broadcast_ms": 26.22087100007775
+        },
+        {
+          "http_p50_ms": 15.857558499988045,
+          "http_max_ms": 18.21388999996998,
+          "broadcast_ms": 23.030289999951492
+        },
+        {
+          "http_p50_ms": 16.912199499984126,
+          "http_max_ms": 19.44016099992041,
+          "broadcast_ms": 26.360574999898745
+        },
+        {
+          "http_p50_ms": 13.460137000151917,
+          "http_max_ms": 15.81302800013873,
+          "broadcast_ms": 24.012772999867593
+        },
+        {
+          "http_p50_ms": 16.395053499991263,
+          "http_max_ms": 18.83391199999096,
+          "broadcast_ms": 26.354463999950895
+        },
+        {
+          "http_p50_ms": 15.449959999955354,
+          "http_max_ms": 17.618878000121185,
+          "broadcast_ms": 23.31890100003875
+        },
+        {
+          "http_p50_ms": 14.1024124999376,
+          "http_max_ms": 16.34488600006989,
+          "broadcast_ms": 22.448694000104297
+        },
+        {
+          "http_p50_ms": 13.292638999928386,
+          "http_max_ms": 16.594746999999188,
+          "broadcast_ms": 23.735880000003817
+        },
+        {
+          "http_p50_ms": 19.104858999980934,
+          "http_max_ms": 21.082576000026165,
+          "broadcast_ms": 27.301874999920983
+        },
+        {
+          "http_p50_ms": 17.994795999925373,
+          "http_max_ms": 20.24434999998448,
+          "broadcast_ms": 26.40233400006764
+        },
+        {
+          "http_p50_ms": 13.414716999932352,
+          "http_max_ms": 16.700831000207472,
+          "broadcast_ms": 24.806176000083724
+        },
+        {
+          "http_p50_ms": 15.243785000052412,
+          "http_max_ms": 17.568396999877223,
+          "broadcast_ms": 22.798255999987305
+        },
+        {
+          "http_p50_ms": 17.60917450008037,
+          "http_max_ms": 19.49630000012803,
+          "broadcast_ms": 26.570747000050687
+        },
+        {
+          "http_p50_ms": 15.128221999930247,
+          "http_max_ms": 17.39879000001565,
+          "broadcast_ms": 25.238231000002997
+        },
+        {
+          "http_p50_ms": 17.158977000008235,
+          "http_max_ms": 19.988691999969888,
+          "broadcast_ms": 26.484648999939964
+        },
+        {
+          "http_p50_ms": 14.391068000009,
+          "http_max_ms": 17.158318999918265,
+          "broadcast_ms": 23.85468900001797
+        },
+        {
+          "http_p50_ms": 13.076575499894716,
+          "http_max_ms": 15.468555000097695,
+          "broadcast_ms": 22.361854000109815
+        },
+        {
+          "http_p50_ms": 17.045425499986777,
+          "http_max_ms": 20.974469000066165,
+          "broadcast_ms": 28.619033000040872
+        },
+        {
+          "http_p50_ms": 14.539004999960525,
+          "http_max_ms": 16.130656000086674,
+          "broadcast_ms": 22.36582999989878
+        },
+        {
+          "http_p50_ms": 17.914023999992423,
+          "http_max_ms": 20.332904000042618,
+          "broadcast_ms": 26.99357799997415
+        },
+        {
+          "http_p50_ms": 17.7241960000174,
+          "http_max_ms": 20.114532999969015,
+          "broadcast_ms": 27.31971799994426
+        },
+        {
+          "http_p50_ms": 14.993486999969718,
+          "http_max_ms": 16.851257000098485,
+          "broadcast_ms": 23.372942000150942
+        },
+        {
+          "http_p50_ms": 15.989446499929727,
+          "http_max_ms": 20.038325999848894,
+          "broadcast_ms": 27.33598300005724
+        },
+        {
+          "http_p50_ms": 17.05606899997747,
+          "http_max_ms": 18.544130999998742,
+          "broadcast_ms": 29.024141000036252
+        },
+        {
+          "http_p50_ms": 18.56379199989533,
+          "http_max_ms": 20.365727000125844,
+          "broadcast_ms": 26.82409500016547
+        },
+        {
+          "http_p50_ms": 17.055411999876924,
+          "http_max_ms": 19.19129500015515,
+          "broadcast_ms": 25.708460000032574
+        },
+        {
+          "http_p50_ms": 17.45053000001917,
+          "http_max_ms": 18.78380199991625,
+          "broadcast_ms": 25.65916000003199
+        },
+        {
+          "http_p50_ms": 15.608748500085312,
+          "http_max_ms": 17.84415999986777,
+          "broadcast_ms": 24.32872199983649
+        },
+        {
+          "http_p50_ms": 14.72107350002716,
+          "http_max_ms": 16.891936000092755,
+          "broadcast_ms": 23.795876999884058
+        },
+        {
+          "http_p50_ms": 14.850212500050475,
+          "http_max_ms": 16.32932899997286,
+          "broadcast_ms": 22.48939999981303
+        },
+        {
+          "http_p50_ms": 16.582115000005615,
+          "http_max_ms": 18.53989599999295,
+          "broadcast_ms": 25.259512000047835
+        },
+        {
+          "http_p50_ms": 17.060285999946245,
+          "http_max_ms": 19.4125380000969,
+          "broadcast_ms": 26.438561000077243
+        },
+        {
+          "http_p50_ms": 16.03882999995676,
+          "http_max_ms": 18.285678999973243,
+          "broadcast_ms": 26.093563000131326
+        },
+        {
+          "http_p50_ms": 16.738503499936996,
+          "http_max_ms": 18.85370399986641,
+          "broadcast_ms": 25.804928000070504
+        },
+        {
+          "http_p50_ms": 16.887444000076357,
+          "http_max_ms": 18.62751900011972,
+          "broadcast_ms": 25.74459300012677
+        },
+        {
+          "http_p50_ms": 14.165309999953024,
+          "http_max_ms": 16.13144399993871,
+          "broadcast_ms": 23.919897999803652
+        },
+        {
+          "http_p50_ms": 19.805708999911076,
+          "http_max_ms": 22.159876999921835,
+          "broadcast_ms": 28.156960999922376
+        },
+        {
+          "http_p50_ms": 13.623557500068273,
+          "http_max_ms": 15.432618999966508,
+          "broadcast_ms": 22.32832300001064
+        },
+        {
+          "http_p50_ms": 13.945624000143653,
+          "http_max_ms": 16.873306999968918,
+          "broadcast_ms": 21.942665000096895
+        },
+        {
+          "http_p50_ms": 17.03248349997466,
+          "http_max_ms": 19.003333000000566,
+          "broadcast_ms": 25.151047000008475
+        },
+        {
+          "http_p50_ms": 17.728619499962406,
+          "http_max_ms": 20.39782900010323,
+          "broadcast_ms": 27.239939000082813
+        },
+        {
+          "http_p50_ms": 12.766183000053388,
+          "http_max_ms": 15.44098399995164,
+          "broadcast_ms": 24.258275999955003
+        },
+        {
+          "http_p50_ms": 17.939481999974305,
+          "http_max_ms": 19.666419000031965,
+          "broadcast_ms": 26.51044900017041
+        },
+        {
+          "http_p50_ms": 15.611632999934955,
+          "http_max_ms": 18.120053999837182,
+          "broadcast_ms": 24.769006999804333
+        },
+        {
+          "http_p50_ms": 16.326228999901105,
+          "http_max_ms": 17.760746000021754,
+          "broadcast_ms": 24.637721999852147
+        },
+        {
+          "http_p50_ms": 18.352783999944222,
+          "http_max_ms": 20.640352000100393,
+          "broadcast_ms": 27.050052000049618
+        },
+        {
+          "http_p50_ms": 16.23425499997211,
+          "http_max_ms": 18.612664000102086,
+          "broadcast_ms": 25.504200999876048
+        },
+        {
+          "http_p50_ms": 15.296296499968776,
+          "http_max_ms": 18.01133000003574,
+          "broadcast_ms": 24.63534499997877
+        },
+        {
+          "http_p50_ms": 18.504351499927907,
+          "http_max_ms": 20.532350000166844,
+          "broadcast_ms": 27.024434999930236
+        },
+        {
+          "http_p50_ms": 14.462489000038659,
+          "http_max_ms": 17.490684999984296,
+          "broadcast_ms": 24.392358999875796
+        },
+        {
+          "http_p50_ms": 16.51766999998472,
+          "http_max_ms": 19.86900999986574,
+          "broadcast_ms": 26.28348400003233
+        },
+        {
+          "http_p50_ms": 16.271333000076993,
+          "http_max_ms": 18.352916999901936,
+          "broadcast_ms": 25.242549000040526
+        },
+        {
+          "http_p50_ms": 16.06001599998308,
+          "http_max_ms": 18.347151000170925,
+          "broadcast_ms": 24.988547000020844
+        },
+        {
+          "http_p50_ms": 16.216913999983262,
+          "http_max_ms": 18.28277100003106,
+          "broadcast_ms": 25.12677699996857
+        },
+        {
+          "http_p50_ms": 14.337157499994646,
+          "http_max_ms": 16.42009700003655,
+          "broadcast_ms": 22.3331690001487
+        },
+        {
+          "http_p50_ms": 16.901480499882382,
+          "http_max_ms": 18.595405000041865,
+          "broadcast_ms": 25.437918000079662
+        },
+        {
+          "http_p50_ms": 13.505151999993359,
+          "http_max_ms": 15.80798899999536,
+          "broadcast_ms": 27.165664999984074
+        },
+        {
+          "http_p50_ms": 16.257266500019796,
+          "http_max_ms": 18.10178599998835,
+          "broadcast_ms": 24.752030000172454
+        },
+        {
+          "http_p50_ms": 18.14647849994344,
+          "http_max_ms": 19.704414999978326,
+          "broadcast_ms": 25.569421999989572
+        },
+        {
+          "http_p50_ms": 18.2377234998512,
+          "http_max_ms": 21.044678999942334,
+          "broadcast_ms": 28.579889999946317
+        },
+        {
+          "http_p50_ms": 15.64734750002117,
+          "http_max_ms": 17.66993499995806,
+          "broadcast_ms": 24.75758500008851
+        },
+        {
+          "http_p50_ms": 15.160076499910247,
+          "http_max_ms": 19.361630000048535,
+          "broadcast_ms": 27.307289999953355
+        },
+        {
+          "http_p50_ms": 15.588695500014182,
+          "http_max_ms": 17.817680000007385,
+          "broadcast_ms": 24.660323000034623
+        },
+        {
+          "http_p50_ms": 17.51971349995074,
+          "http_max_ms": 19.645235999860233,
+          "broadcast_ms": 25.32195599997067
+        },
+        {
+          "http_p50_ms": 16.833737499950985,
+          "http_max_ms": 19.059603000187053,
+          "broadcast_ms": 26.770785000053365
+        },
+        {
+          "http_p50_ms": 15.39571800003614,
+          "http_max_ms": 17.89475600003243,
+          "broadcast_ms": 25.899294000055306
+        },
+        {
+          "http_p50_ms": 15.977084000041941,
+          "http_max_ms": 18.492740000056074,
+          "broadcast_ms": 26.0681500001283
+        },
+        {
+          "http_p50_ms": 18.884178999996948,
+          "http_max_ms": 22.83247300010771,
+          "broadcast_ms": 27.388167000026442
+        },
+        {
+          "http_p50_ms": 16.019885499872544,
+          "http_max_ms": 18.94429100002526,
+          "broadcast_ms": 26.257899000029283
+        },
+        {
+          "http_p50_ms": 17.436638000049243,
+          "http_max_ms": 20.676868000009563,
+          "broadcast_ms": 28.38298999995459
+        },
+        {
+          "http_p50_ms": 16.51590100004796,
+          "http_max_ms": 19.026394000093205,
+          "broadcast_ms": 26.275839000163614
+        },
+        {
+          "http_p50_ms": 15.10651700004928,
+          "http_max_ms": 18.503760999919905,
+          "broadcast_ms": 25.81841500000337
+        },
+        {
+          "http_p50_ms": 15.601022499936334,
+          "http_max_ms": 17.63353899991671,
+          "broadcast_ms": 25.20640500006266
+        },
+        {
+          "http_p50_ms": 14.254149000066718,
+          "http_max_ms": 15.821073000097385,
+          "broadcast_ms": 22.940518000041266
+        },
+        {
+          "http_p50_ms": 14.34176550014854,
+          "http_max_ms": 16.79317599996466,
+          "broadcast_ms": 23.419802999796957
+        },
+        {
+          "http_p50_ms": 14.306320999935451,
+          "http_max_ms": 16.055247999929634,
+          "broadcast_ms": 23.830208999925162
+        },
+        {
+          "http_p50_ms": 17.25633299997753,
+          "http_max_ms": 20.222876999923756,
+          "broadcast_ms": 27.786127999888777
+        },
+        {
+          "http_p50_ms": 15.383197500000279,
+          "http_max_ms": 17.908360000092216,
+          "broadcast_ms": 25.371620999976585
+        },
+        {
+          "http_p50_ms": 16.528137500017692,
+          "http_max_ms": 18.12608599993837,
+          "broadcast_ms": 25.342085999909614
+        },
+        {
+          "http_p50_ms": 19.63141499993526,
+          "http_max_ms": 21.676936999938334,
+          "broadcast_ms": 28.96799299992381
+        },
+        {
+          "http_p50_ms": 15.763625000090542,
+          "http_max_ms": 17.802783999968597,
+          "broadcast_ms": 25.604116000067734
+        },
+        {
+          "http_p50_ms": 13.705724999908853,
+          "http_max_ms": 15.57838000007905,
+          "broadcast_ms": 22.85086400002001
+        }
+      ],
+      "elapsed_s": 240.00012212800016,
+      "iterations": 118,
+      "http_isolated": true,
+      "shutdown_ms": 215.18393099995592,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 26806,
+        "requested": 102063963,
+        "live": 0,
+        "peak": 44732840
+      },
+      "sessions_final": {
+        "created": 1960,
+        "closed": 1960,
+        "close_reasons": [
+          0,
+          944,
+          0,
+          1016,
+          0
+        ]
+      },
+      "clean": true
+    }
+  ],
+  "limitations": [
+    "Python load generator is not a peak throughput benchmark",
+    "allocator counters exclude libc/SQLite and thread stacks",
+    "application callbacks remain cooperatively bounded"
+  ],
+  "passed": true,
+  "long_soak_completed": false
+}

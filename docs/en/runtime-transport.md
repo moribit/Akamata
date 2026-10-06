@@ -1,5 +1,7 @@
 # Native HTTP runtime and Transport Contract (Zig 0.17)
 
+The current [CPU / memory investigation](native-reactor-performance-memory.md) adopts borrowed finite output, lazy protocol-error fallback, gpa-owned internal Sessions and one completion snapshot per refresh. Shared HTTP, deadline and admission contracts below remain unchanged.
+
 Threaded remains the production default. Public Reactor entrypoints fail closed before opening sockets. See [application execution](reactor-application-execution.md), [Phase 7 evidence](../../benchmark/results/runtime-phase7-2026-10-05/README.md) and historical [Phases 2–5](native-runtime-phases.md).
 
 ```text

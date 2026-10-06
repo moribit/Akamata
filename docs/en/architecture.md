@@ -1,5 +1,7 @@
 # Akamata architecture
 
+See the [Reactor CPU / memory investigation](native-reactor-performance-memory.md) for current Native ownership, cost and memory evidence. Threaded stays default; the public Reactor gate stays closed.
+
 Akamata runs the same Zig application on Native/VPS/Containers and Cloudflare Workers. Its application-facing HTTP path is `App → Context → endpoint/middleware → runtime`.
 
 ## Application and adapters

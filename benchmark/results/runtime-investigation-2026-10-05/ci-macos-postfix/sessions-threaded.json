@@ -1,0 +1,476 @@
+{
+  "source_sha": "44eeb29ba8497ea3e6602f1084d23347ecdb4feb",
+  "working_tree_dirty": true,
+  "close_reason_order": [
+    "completed",
+    "disconnected",
+    "timeout",
+    "shutdown",
+    "application_error"
+  ],
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "zig_version": "0.17.0",
+  "binary_sha256": "8857be8655652a2b716f7c06a82c3a4ffb8db9b099488d4263a50f75426d437e",
+  "command": [
+    "tools/bench/runtime_certify.py",
+    "fixture/bin/runtime-contract-server",
+    "--adapters",
+    "threaded",
+    "--output",
+    "certification/sessions-threaded.json",
+    "--idle-levels",
+    "1000",
+    "--mixed-idle",
+    "100",
+    "--soak-seconds",
+    "30"
+  ],
+  "thread_count_method": "ps-M-minus-header",
+  "rlimit_nofile": [
+    16384,
+    9223372036854775807
+  ],
+  "runs": [
+    {
+      "adapter": "threaded",
+      "scenario": "session-performance",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 16336,
+          "cpu_percent": 14.8,
+          "fds": 104,
+          "threads": 102,
+          "allocator": {
+            "live": 2066018,
+            "peak": 2077138,
+            "calls": 3845,
+            "created": 1700,
+            "closed": 1600,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              1600,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 0.0,
+        "fds": 4,
+        "threads": 2
+      },
+      "broadcast": {
+        "p50_ms": 103.90322950001973,
+        "p95_ms": 109.91166600001634,
+        "p99_ms": 110.35891700021239,
+        "recipients": 100,
+        "rounds": 50,
+        "observed_frames_per_second": 957.778520347138
+      },
+      "stream": {
+        "p50_ms": 0.8992709999802173,
+        "p95_ms": 3.915125000048647,
+        "p99_ms": 21.77312499998152,
+        "requests": 1600,
+        "observed_requests_per_second": 6254.702216716777
+      },
+      "shutdown_ms": 229.66104199986148,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 3845,
+        "requested": 5170901,
+        "live": 0,
+        "peak": 2077138
+      },
+      "sessions_final": {
+        "created": 1700,
+        "closed": 1700,
+        "close_reasons": [
+          1600,
+          0,
+          0,
+          100,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "disconnect-fd-reuse-races",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 3984,
+          "cpu_percent": 2.8,
+          "fds": 4,
+          "threads": 2,
+          "allocator": {
+            "live": 5646,
+            "peak": 232031,
+            "calls": 1487,
+            "created": 192,
+            "closed": 192,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              192,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 2.8,
+        "fds": 4,
+        "threads": 2
+      },
+      "iterations": 256,
+      "recovered_http_ms": 0.26795799999490555,
+      "shutdown_ms": 123.08629199992538,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 1489,
+        "requested": 4370191,
+        "live": 0,
+        "peak": 232031
+      },
+      "sessions_final": {
+        "created": 192,
+        "closed": 192,
+        "close_reasons": [
+          0,
+          192,
+          0,
+          0,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "shutdown-disconnect-completion-race",
+      "samples": [],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 0.6,
+        "fds": 4,
+        "threads": 2
+      },
+      "shutdown_requested": true,
+      "connections": 64,
+      "shutdown_ms": 811.9507910000721,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 518,
+        "requested": 1338351,
+        "live": 0,
+        "peak": 1324502
+      },
+      "sessions_final": {
+        "created": 64,
+        "closed": 64,
+        "close_reasons": [
+          0,
+          1,
+          0,
+          63,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "idle",
+      "samples": [
+        {
+          "elapsed_s": 0,
+          "rss_kib": 126640,
+          "cpu_percent": 23.1,
+          "fds": 1004,
+          "threads": 1002,
+          "allocator": {
+            "live": 20608646,
+            "peak": 20608646,
+            "calls": 5143,
+            "created": 1000,
+            "closed": 0,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 0.9,
+        "fds": 4,
+        "threads": 2
+      },
+      "count": 1000,
+      "establishment_ms": 317.88354199989044,
+      "broadcast_ms": 102.55358399990655,
+      "http_probe_ms": 0.2922080000189453,
+      "shutdown_ms": 255.74870900004498,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 5147,
+        "requested": 20621135,
+        "live": 0,
+        "peak": 20608718
+      },
+      "sessions_final": {
+        "created": 1000,
+        "closed": 1000,
+        "close_reasons": [
+          0,
+          0,
+          0,
+          1000,
+          0
+        ]
+      },
+      "clean": true
+    },
+    {
+      "adapter": "threaded",
+      "scenario": "mixed-soak-races",
+      "samples": [
+        {
+          "elapsed_s": 0.11186854199991103,
+          "rss_kib": 18160,
+          "cpu_percent": 4.0,
+          "fds": 120,
+          "threads": 118,
+          "allocator": {
+            "live": 2403486,
+            "peak": 2422219,
+            "calls": 947,
+            "created": 124,
+            "closed": 8,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              8,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 6.897100749999936,
+          "rss_kib": 18624,
+          "cpu_percent": 0.5,
+          "fds": 120,
+          "threads": 118,
+          "allocator": {
+            "live": 2403498,
+            "peak": 2422231,
+            "calls": 1273,
+            "created": 148,
+            "closed": 32,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              32,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 13.468458207999902,
+          "rss_kib": 18976,
+          "cpu_percent": 1.1,
+          "fds": 120,
+          "threads": 118,
+          "allocator": {
+            "live": 2403510,
+            "peak": 2422390,
+            "calls": 1599,
+            "created": 172,
+            "closed": 56,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              56,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 20.05666374999987,
+          "rss_kib": 19264,
+          "cpu_percent": 1.2,
+          "fds": 120,
+          "threads": 118,
+          "allocator": {
+            "live": 2403522,
+            "peak": 2422390,
+            "calls": 1925,
+            "created": 196,
+            "closed": 80,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              80,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "elapsed_s": 26.780606457999966,
+          "rss_kib": 19552,
+          "cpu_percent": 1.1,
+          "fds": 120,
+          "threads": 118,
+          "allocator": {
+            "live": 2403534,
+            "peak": 2422904,
+            "calls": 2251,
+            "created": 220,
+            "closed": 104,
+            "mailbox_overflows": 0,
+            "close_reasons": [
+              0,
+              104,
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "baseline": {
+        "rss_kib": 3488,
+        "cpu_percent": 2.2,
+        "fds": 4,
+        "threads": 2
+      },
+      "requested_soak_s": 30,
+      "mixed_results": [
+        {
+          "http_p50_ms": 0.7159169999795267,
+          "http_max_ms": 1.9635419998849102,
+          "broadcast_ms": 97.42595900002016
+        },
+        {
+          "http_p50_ms": 1.2957289999349086,
+          "http_max_ms": 2.790166000067984,
+          "broadcast_ms": 97.55791599991426
+        },
+        {
+          "http_p50_ms": 1.2276040000642752,
+          "http_max_ms": 6.837833000190585,
+          "broadcast_ms": 95.637207999971
+        },
+        {
+          "http_p50_ms": 1.2889995001614807,
+          "http_max_ms": 6.563625000126194,
+          "broadcast_ms": 95.22275000017544
+        },
+        {
+          "http_p50_ms": 1.6530204999298803,
+          "http_max_ms": 4.145166999933281,
+          "broadcast_ms": 93.94399999996494
+        },
+        {
+          "http_p50_ms": 2.0674794999422375,
+          "http_max_ms": 8.87204099990413,
+          "broadcast_ms": 91.61387500012097
+        },
+        {
+          "http_p50_ms": 2.4259369999981573,
+          "http_max_ms": 6.479791999936424,
+          "broadcast_ms": 98.34599999999227
+        },
+        {
+          "http_p50_ms": 1.7155209999373255,
+          "http_max_ms": 7.019791999937297,
+          "broadcast_ms": 99.1762920000383
+        },
+        {
+          "http_p50_ms": 1.5362080000613787,
+          "http_max_ms": 5.232750000004671,
+          "broadcast_ms": 100.19120800006931
+        },
+        {
+          "http_p50_ms": 1.7991669999446458,
+          "http_max_ms": 5.225166000172976,
+          "broadcast_ms": 97.03674999991563
+        },
+        {
+          "http_p50_ms": 2.312687000085134,
+          "http_max_ms": 9.08962500011512,
+          "broadcast_ms": 97.72908300010386
+        },
+        {
+          "http_p50_ms": 1.4058119999162955,
+          "http_max_ms": 5.493333000003986,
+          "broadcast_ms": 98.74341699992328
+        },
+        {
+          "http_p50_ms": 1.6847289999759596,
+          "http_max_ms": 5.633208999825001,
+          "broadcast_ms": 96.91483300002801
+        },
+        {
+          "http_p50_ms": 1.9176045000222075,
+          "http_max_ms": 7.489709000083167,
+          "broadcast_ms": 95.3658749999704
+        }
+      ],
+      "elapsed_s": 30.01969112500001,
+      "iterations": 14,
+      "http_isolated": true,
+      "shutdown_ms": 115.5482500000744,
+      "exit_code": 0,
+      "allocator_final": {
+        "calls": 2359,
+        "requested": 4557541,
+        "live": 0,
+        "peak": 2422904
+      },
+      "sessions_final": {
+        "created": 228,
+        "closed": 228,
+        "close_reasons": [
+          0,
+          112,
+          0,
+          116,
+          0
+        ]
+      },
+      "clean": true
+    }
+  ],
+  "limitations": [
+    "Python load generator is not a peak throughput benchmark",
+    "allocator counters exclude libc/SQLite and thread stacks",
+    "application callbacks remain cooperatively bounded"
+  ],
+  "passed": true,
+  "long_soak_completed": false
+}

@@ -1,5 +1,7 @@
 # Reactor設計: private multiplexed evaluation
 
+[CPU / memory調査](native-reactor-performance-memory.md)に最新の測定・Park判断を記録しました。finite outputはconnection/session storageをdrainまで借用し、内部Sessionはrequest arenaと別にgpaが所有します。
+
 `App.serve(.runtime = .reactor)` and both direct `serve` entrypoints remain
 fail-closed. Threaded is the production default.
 
