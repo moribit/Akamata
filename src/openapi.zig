@@ -573,15 +573,15 @@ fn writeTypeSchema(comptime T: type, ctx: *SpecBuilder, w: *std.Io.Writer) anyer
     };
     if (can_have_decls and @hasDecl(T, "contract_kind") and @hasDecl(T, "max_len")) {
         const kind = @tagName(T.contract_kind);
-        if (std.mem.eql(u8, kind, "bounded_string")) {
+        if (comptime std.mem.eql(u8, kind, "bounded_string")) {
             try w.print("{{\"type\":\"string\",\"maxLength\":{d}}}", .{T.max_len});
             return;
         }
-        if (std.mem.eql(u8, kind, "fixed_bytes")) {
+        if (comptime std.mem.eql(u8, kind, "fixed_bytes")) {
             try w.print("{{\"type\":\"string\",\"contentEncoding\":\"base64\",\"minLength\":{d},\"maxLength\":{d}}}", .{ T.max_len, T.max_len });
             return;
         }
-        if (std.mem.eql(u8, kind, "bounded_slice")) {
+        if (comptime std.mem.eql(u8, kind, "bounded_slice")) {
             try w.print("{{\"type\":\"array\",\"maxItems\":{d},\"items\":", .{T.max_len});
             try writeTypeSchema(T.Element, ctx, w);
             try w.writeAll("}");
@@ -778,4 +778,19 @@ test "toOpenApiPath rewrites :param to {param}" {
     const got = try toOpenApiPath(std.testing.allocator, "/users/:id/posts/:post_id");
     defer std.testing.allocator.free(got);
     try std.testing.expectEqualStrings("/users/{id}/posts/{post_id}", got);
+}
+
+test "bounded wire schemas select only their own comptime branch" {
+    const bounded = @import("contract/bounded.zig");
+    var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+    defer arena.deinit();
+    var ctx: SpecBuilder = .init(arena.allocator());
+    defer ctx.schemas.deinit();
+    inline for (.{ bounded.BoundedString(64), bounded.BoundedSlice(u8, 8), bounded.FixedBytes(4) }, .{ "\"maxLength\":64", "\"maxItems\":8", "\"contentEncoding\":\"base64\"" }) |T, expected| {
+        var out: std.Io.Writer.Allocating = .init(arena.allocator());
+        try writeTypeSchema(T, &ctx, &out.writer);
+        var parsed = try std.json.parseFromSlice(std.json.Value, arena.allocator(), out.written(), .{});
+        defer parsed.deinit();
+        try std.testing.expect(std.mem.indexOf(u8, out.written(), expected) != null);
+    }
 }
