@@ -94,6 +94,9 @@ pub fn appendValue(comptime T: type, value: T, w: *std.Io.Writer) !void {
             try w.writeByte(']');
         },
         .@"struct" => |s| {
+            // Preserve ordinary Zig custom wire representations (for example
+            // BoundedString), rather than exposing their storage fields.
+            if (comptime @hasDecl(T, "jsonStringify")) return std.json.Stringify.value(value, .{}, w);
             try w.writeByte('{');
             comptime var first = true;
             inline for (reflection.fields(s)) |f| {
@@ -158,4 +161,13 @@ pub fn allocStringify(arena: std.mem.Allocator, value: anytype) ![]u8 {
     try std.json.Stringify.value(value, .{}, &aw.writer);
     const list = aw.toArrayList();
     return list.items;
+}
+
+test "fast JSON preserves custom bounded wire representation" {
+    const BoundedString = @import("contract/bounded.zig").BoundedString;
+    const value = .{ .text = try BoundedString(64).init("hello") };
+    var output: std.Io.Writer.Allocating = .init(std.testing.allocator);
+    defer output.deinit();
+    try stringify(value, &output.writer);
+    try std.testing.expectEqualStrings("{\"text\":\"hello\"}", output.written());
 }
