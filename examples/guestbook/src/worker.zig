@@ -1,7 +1,7 @@
 // Workers entry. Same setup.zig as native; only DATABASE_URL changes.
 //
-// Default URL on Workers is `d1:DB` (the D1 binding named "DB"). Set
-// DATABASE_URL=libsql://… in wrangler.toml `[vars]` if you want Turso instead.
+// The D1 URL must agree with contract.zig. Selecting Turso also requires
+// selecting that provider explicitly in the application contract.
 
 const std = @import("std");
 const am = @import("akamata");

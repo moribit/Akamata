@@ -1,58 +1,104 @@
-# examples/tasks
+# Tasks — application effects and testing
 
-Akamata の代表的な機能を 1 アプリにまとめたタスク管理 REST API です。新しいアプリを書き始めるときの叩き台、または「あの機能、どう書くんだっけ?」を探すためのリファレンスとして使ってください。
+## What you will learn
 
-詳しい解説は [`docs/ja/example-tasks.md`](../../docs/ja/example-tasks.md) を参照してください。
+Follow a typed HTTP operation into a portable queue, a finite consumer, a DB
+side effect and Native SSE. Use the **same Application graph** with real owners
+or a bounded `QueueRecorder`, without sockets or a background test thread.
 
-## クイックスタート
+## Why this example exists
+
+Start with [guestbook](../guestbook/) for DTOs, validation and DB basics. Tasks
+adds effects and delivery semantics; it is not the default template for every app.
+
+## Run Native
+
+From the repository root, using Zig 0.17:
 
 ```sh
-# サーバ起動 (SQLite ファイル: ./tasks.db, ポート 8080)
 zig build -Dexample=tasks
 ./zig-out/bin/tasks
-
-# 別terminalでTUI client（examples/tasksから実行するとsource routeを自動検出）
-cd examples/tasks
-akamata client
-
-# テスト
-zig build tasks-test
 ```
 
-`examples/tasks` directory内で単に`zig build run`を実行すると、親repositoryの
-default exampleである`chat`が起動します。tasks serverには上記の
-`zig build -Dexample=tasks`と`./zig-out/bin/tasks`を使用してください。
-
-## 動かしてみる
+`DATABASE_URL` defaults to `file:tasks.db`; `PORT` defaults to `8080`.
+Native tutorial startup applies the model schema. This development convenience
+is **not a production migration strategy**. A production application applies
+versioned migrations before admitting traffic.
 
 ```sh
-# 作成 (バリデーション通過 → 201)
-curl -X POST -H 'content-type: application/json' \
-     -d '{"title":"buy milk","description":"2L"}' \
-     http://localhost:8080/tasks
-
-# 一覧 + ETag
-curl -i http://localhost:8080/tasks
-curl -i -H 'if-none-match: "<paste-etag-here>"' http://localhost:8080/tasks  # → 304
-
-# バリデーションエラー
-curl -X POST -H 'content-type: application/json' -d '{"title":""}' \
-     http://localhost:8080/tasks   # → 422
-
-# SSE
+curl -H 'content-type: application/json' -d '{"title":"buy milk"}' http://localhost:8080/tasks
 curl -N http://localhost:8080/events
-
-# 自動生成された仕様 / クライアント
-curl http://localhost:8080/openapi.json
-curl http://localhost:8080/client.ts
 ```
 
-## このサンプルで学べること
+## Run / Build Workers
 
-- Model (`src/models.zig`) — 構造体 = DB スキーマ + バリデーション
-- ミドルウェアスタック (`src/setup.zig`) — recover / logger / requestId / cors / secureHeaders / compress / etag
-- バリデーション付き入力パース (`src/handlers.zig`) — `c.input(T)` で 400/422 を自動化
-- SSE ストリーミング (`src/handlers.zig` の `streamEvents`)
-- 永続ジョブキュー (`src/handlers.zig` の `notifyJob`)
-- OpenAPI 3.1 と TS クライアントの自動生成
-- `am.testing.Client` を使った E2E テスト (`src/integration_test.zig`)
+```sh
+zig build -Dexample=tasks
+./zig-out/bin/tasks --print-schema > /tmp/tasks.sql
+zig build -Dexample=tasks -Dbackend=workers
+```
+
+The shared graph selects D1 `DB` and Workers Queue `EVENTS`. Apply the emitted
+schema to the selected test/deployment D1 resource **before deployment**, and
+configure producer **and consumer** bindings in your environment. Use the
+[current managed Workers glue](../../docs/en/portable-production-contract.md),
+including its queue dispatch exports; a WASM build alone does not create a queue
+or prove a live deployment. `/events` explicitly returns `501` on Workers:
+this example's local SSE channel is not a Durable Object subscription.
+
+## Test
+
+```sh
+zig build tasks-test
+zig build tasks-test -Doptimize=ReleaseSafe
+```
+
+Tests construct `setup.Application` with SQLite and `QueueRecorder`, exercise
+validation/CRUD, assert `TaskCreatedDescriptor` publication, then invoke the
+same `Consumer` twice to verify the DB's event-ID guard. The recorder proves
+admission metadata, not durability, retry scheduling or live Workers behavior.
+
+## Architecture
+
+```text
+contract.routes → setup.Application → Context borrows DB + Producer
+                                      │
+                                  TaskCreated
+                                      │
+                 Native jobs.Provider / Workers QueueOwner
+                                      │
+                            explicit Effects context
+                                      │
+                          task_deliveries + Native SSE
+```
+
+`main.zig` owns DB, channel and queue. It stops/joins the worker **before**
+application/queue/channel/DB cleanup. Workers initializes stable isolate-owned
+state once, unwinds partial startup failures, and explicitly registers its
+consumer only after success. Context destroys none of these owners.
+
+Delivery is **at-least-once**. The descriptor supplies name/version; event ID,
+idempotency key, correlation ID, attempt and max attempts travel in the envelope.
+Native retries use the jobs engine; Workers retry/dead-letter policy belongs to
+deployment configuration. The DB primary key guards duplicate notification rows;
+SSE may repeat and is intentionally a lossy UI hint, not durable delivery.
+
+The task INSERT and queue publish are **not atomic across providers**. A publish
+failure returns 500 after the task exists. Production requiring reliable paired
+effects should use a transactional outbox and reconciliation; this example does
+not claim exactly-once delivery. Tests preserve that failure boundary.
+
+SSE snapshots copy bytes while locked, retain at most 64 × 4 KiB, reject oversized
+notifications, and cap each connection to 60 seconds of monotonic elapsed time.
+Slow/disconnected clients use the existing Threaded write/deadline contract.
+
+Metadata is declared once in `contract.zig`. `/openapi.json` and `/client.ts`
+use the same graph; offline `akamata-openapi`, `akamata-client` and
+`akamata-capabilities native|workers` do not initialize DB/queue owners.
+
+## Next
+
+Continue to [chat](../chat/) for explicit realtime transport ownership, then
+[device_messaging](../device_messaging/) for multiple production providers.
+See [Testing](../../docs/en/guides/testing.md) and
+[Background jobs / Queue](../../docs/en/handbook.md).

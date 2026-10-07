@@ -49,7 +49,7 @@ pub const Task = struct {
         // in the handler.
         .validates = .{
             .title = .{ am.model.rule.required, am.model.rule.min_len(1), am.model.rule.max_len(120) },
-            .description = .{ am.model.rule.max_len(2000) },
+            .description = .{am.model.rule.max_len(2000)},
         },
     };
 };

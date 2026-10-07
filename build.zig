@@ -98,14 +98,14 @@ pub fn build(b: *std.Build) void {
             .workers => "examples/guestbook/src/worker.zig",
         },
         .bench => "examples/bench/src/main.zig",
-        .tasks => "examples/tasks/src/main.zig",
+        .tasks => if (backend == .workers) "examples/tasks/src/worker.zig" else "examples/tasks/src/main.zig",
         .device_messaging => if (backend == .workers) "examples/device_messaging/src/worker.zig" else "examples/device_messaging/src/main.zig",
     };
     const example_name = switch (example) {
         .chat => if (backend == .workers) "chat_worker" else "chat",
         .guestbook => if (backend == .workers) "guestbook_worker" else "guestbook",
         .bench => "bench",
-        .tasks => "tasks",
+        .tasks => if (backend == .workers) "tasks_worker" else "tasks",
         .device_messaging => if (backend == .workers) "device_messaging_worker" else "device_messaging",
     };
 

@@ -1,10 +1,4 @@
-//! Request handlers.
-//!
-//! Each handler takes a `*Ctx` and writes the response via the helpers on
-//! it. Errors that bubble up land in the `recover` middleware (which logs
-//! them and returns 500); we use that escape hatch for unexpected DB
-//! failures and validate user input manually where a graceful 4xx makes
-//! more sense.
+//! Typed HTTP work produces queue effects; the consumer owns delivery work.
 
 const std = @import("std");
 const am = @import("akamata");
@@ -19,8 +13,7 @@ const Ctx = am.Context(App);
 const Tasks = am.model.repo(Task);
 
 // =========================================================================
-// Documented endpoints — registered with `app.endpoint(...)` so OpenAPI
-// and the TS client generator pick them up automatically.
+// Endpoint descriptors carry handler-derived metadata for both generators.
 // =========================================================================
 
 /// Wire-format wrappers that name the request/response shapes. We *could*
@@ -36,12 +29,7 @@ pub const CreateTaskInput = struct {
     // checks them on the way in. We mirror the model's constraints rather
     // than relying on the Repo to fail at INSERT time — failing at the
     // boundary gives a 422 with field-level errors instead of a 500.
-    pub const __schema = .{
-        .validates = .{
-            .title = .{ am.model.rule.required, am.model.rule.min_len(1), am.model.rule.max_len(120) },
-            .description = .{ am.model.rule.max_len(2000) },
-        },
-    };
+    pub const validation = Task.__schema.validates;
 };
 
 pub const UpdateTaskInput = struct {
@@ -57,7 +45,7 @@ pub const UpdateTaskInput = struct {
     pub const __schema = .{
         .validates = .{
             .title = .{ am.model.rule.min_len(1), am.model.rule.max_len(120) },
-            .description = .{ am.model.rule.max_len(2000) },
+            .description = .{am.model.rule.max_len(2000)},
         },
     };
 };
@@ -72,73 +60,43 @@ pub const ListQuery = struct {
     done: ?[]const u8 = null,
 };
 
-pub fn listTasks(c: *Ctx) !void {
-    // `c.db()` is sugar for `c.state().db`. `c.arena` is the per-request
-    // arena — anything allocated here lives until the response is flushed.
+pub fn health() []const u8 {
+    return "ok";
+}
+
+pub fn listTasks(c: *Ctx, done: am.Query(?bool, "done")) !TaskList {
     const tasks = try Tasks.all(c.db(), c.arena);
-    // Apply query filter if present.
-    if (c.req.query("done")) |dq| {
-        const want_done = std.mem.eql(u8, dq, "true") or std.mem.eql(u8, dq, "1");
+    if (done.value) |want_done| {
         var filtered: std.ArrayList(Task) = .empty;
         for (tasks) |t| if (t.done == want_done) try filtered.append(c.arena, t);
-        try c.json(.{ .tasks = filtered.items }, 200);
-        return;
+        return .{ .tasks = filtered.items };
     }
-    try c.json(.{ .tasks = tasks }, 200);
+    return .{ .tasks = tasks };
 }
-
-pub fn createTask(c: *Ctx) !void {
-    // `c.input(T)` parses JSON + runs the model's `__schema.validates`.
-    // On parse failure it writes 400; on validation failure it writes 422
-    // with an `{errors:[{field, rule, message}, ...]}` envelope. In both
-    // cases it returns `null` so we can early-return.
-    const input = (try c.input(CreateTaskInput)) orelse return;
-
-    // Map input → model. We only fill the user-controlled fields; `id`,
-    // `created_at`, and `done` stay at their defaults.
-    const created = try Tasks.create(c.db(), c.arena, .{
-        .title = input.title,
-        .description = input.description,
-    });
-
-    // Side effects: SSE broadcast + enqueue a "notify" job.
-    try emitEvent(c, "task.created", created);
-    _ = try c.state().jobs.enqueue("notify", try std.fmt.allocPrint(
-        c.arena,
-        "{{\"task_id\":{?d}}}",
-        .{created.id},
-    ), .{});
-
-    try c.json(created, 201);
+pub fn createTask(c: *Ctx, body: am.Json(CreateTaskInput)) !am.Result(Task, 201) {
+    const created = try Tasks.create(c.db(), c.arena, .{ .title = body.value.title, .description = body.value.description });
+    // DB commit and external queue admission are distinct effects. See README.
+    const id = try std.fmt.allocPrint(c.arena, "task:{d}", .{created.id.?});
+    try c.queue().dispatchDescriptor(c.arena, @import("contract.zig").TaskCreatedDescriptor, .{ .task_id = created.id.? }, .{ .event_id = id, .idempotency_key = id, .correlation_id = c.requestId() });
+    return am.created(created);
 }
-
-pub fn showTask(c: *Ctx) !void {
-    const id = c.req.paramAs(i64, "id") catch return c.badRequest("invalid id");
-    const task = (try Tasks.find(c.db(), c.arena, id)) orelse return c.notFound();
-    try c.json(task, 200);
+pub fn showTask(c: *Ctx, id: am.Path(i64, "id")) !Task {
+    return (try Tasks.find(c.db(), c.arena, id.value)) orelse error.NotFound;
 }
-
-pub fn updateTask(c: *Ctx) !void {
-    const id = c.req.paramAs(i64, "id") catch return c.badRequest("invalid id");
-    const input = (try c.input(UpdateTaskInput)) orelse return;
-
-    // Load → mutate → save. The Repo's `save` issues an UPDATE keyed on
-    // the primary key, sending only the columns it knows about.
-    var task = (try Tasks.find(c.db(), c.arena, id)) orelse return c.notFound();
-    if (input.title) |t| task.title = t;
-    if (input.description) |d| task.description = d;
-    if (input.done) |d| task.done = d;
+pub fn updateTask(c: *Ctx, id: am.Path(i64, "id"), body: am.Json(UpdateTaskInput)) !Task {
+    var task = (try Tasks.find(c.db(), c.arena, id.value)) orelse return error.NotFound;
+    if (body.value.title) |t| task.title = t;
+    if (body.value.description) |d| task.description = d;
+    if (body.value.done) |d| task.done = d;
     try Tasks.save(c.db(), c.arena, &task);
-
     try emitEvent(c, "task.updated", task);
-    try c.json(task, 200);
+    return task;
 }
-
-pub fn deleteTask(c: *Ctx) !void {
-    const id = c.req.paramAs(i64, "id") catch return c.badRequest("invalid id");
-    try Tasks.delete(c.db(), id);
-    try emitEvent(c, "task.deleted", .{ .id = id });
-    try c.json(.{ .deleted = id }, 200);
+pub fn deleteTask(c: *Ctx, id: am.Path(i64, "id")) !struct { deleted: i64 } {
+    _ = (try Tasks.find(c.db(), c.arena, id.value)) orelse return error.NotFound;
+    try Tasks.delete(c.db(), id.value);
+    try emitEvent(c, "task.deleted", .{ .id = id.value });
+    return .{ .deleted = id.value };
 }
 
 // =========================================================================
@@ -150,6 +108,8 @@ pub fn deleteTask(c: *Ctx) !void {
 /// touched. A periodic heartbeat keeps the connection alive through
 /// proxies that drop idle streams.
 pub fn streamEvents(c: *Ctx) !void {
+    if (comptime am.backend == .workers) return c.json(.{ .error_kind = "NativeSseOnly" }, 501);
+    const channel = c.state().events orelse return c.json(.{ .error_kind = "NativeSseOnly" }, 501);
     // Pick up the client's Last-Event-ID if it reconnected; we'll skip
     // events with seq <= that.
     var since: u64 = 0;
@@ -162,28 +122,25 @@ pub fn streamEvents(c: *Ctx) !void {
     // a `.send(...) / .heartbeat()` API on top of chunked transfer encoding.
     var sse = try am.sse.open(c);
 
-    const channel = c.state().events;
-
     // Cap the stream lifetime: the request thread is otherwise pinned
     // forever, and load tests would happily DoS us. 60 s + a JS-side
     // reconnect on close is the standard SSE pattern.
     const deadline_ms = 60_000;
     const poll_ms: u32 = 50;
-    var waited_ms: u32 = 0;
+    const start = am.observability.clock.monotonicNs();
     var beat_ms: u32 = 0;
 
-    while (waited_ms < deadline_ms) {
+    while (am.observability.clock.elapsedNs(start) / std.time.ns_per_ms < deadline_ms) {
         if (channel.pollAfter(since)) |slot| {
             // Convert the seq to a string id so the client can resume.
             var id_buf: [24]u8 = undefined;
             const id_str = try std.fmt.bufPrint(&id_buf, "{d}", .{slot.seq});
-            try sse.send(.{ .id = id_str, .event = "task", .data = slot.bytes });
+            try sse.send(.{ .id = id_str, .event = "task", .data = slot.bytes[0..slot.len] });
             since = slot.seq;
             beat_ms = 0;
             continue;
         }
         sleepMs(poll_ms);
-        waited_ms +|= poll_ms;
         beat_ms +|= poll_ms;
         if (beat_ms >= 15_000) {
             try sse.heartbeat();
@@ -198,31 +155,27 @@ pub fn streamEvents(c: *Ctx) !void {
 // Background job handler
 // =========================================================================
 
-/// Registered via `queue.handler("notify", ...)` in main.zig. The Worker
-/// thread calls this with the JSON payload we enqueued from `createTask`.
-///
-/// In a real app this is where you'd hit Slack, send a push, write to a
-/// log shipping service, etc. We just log it — but the retry/backoff
-/// machinery is real: if this fn returns an error, the job is re-scheduled
-/// according to `EnqueueOptions.max_attempts` + exponential backoff.
-pub fn notifyJob(_: std.mem.Allocator, payload: []const u8) !void {
-    std.log.info("[job:notify] {s}", .{payload});
+/// Explicit consumer context borrowed by either queue owner. Duplicate delivery
+/// uses a primary-key guard; an event is not an exactly-once guarantee.
+pub const Effects = struct { db: am.db.Db, events: ?*@import("app.zig").EventChannel = null };
+pub fn consumeCreated(raw: *anyopaque, payload: @import("contract.zig").TaskCreated, delivery: am.queue.Delivery) !void {
+    const effects: *Effects = @ptrCast(@alignCast(raw));
+    var stmt = try effects.db.prepare("INSERT INTO task_deliveries(event_id, task_id, attempt) VALUES (?, ?, ?) ON CONFLICT(event_id) DO NOTHING");
+    defer stmt.deinit();
+    try stmt.bindAll(.{ delivery.event_id, payload.task_id, delivery.attempt });
+    _ = try stmt.step();
+    if (effects.events) |channel| {
+        var buffer: [256]u8 = undefined;
+        const bytes = try std.fmt.bufPrint(&buffer, "{{\"kind\":\"task.notified\",\"task_id\":{d}}}", .{payload.task_id});
+        try channel.publish(bytes);
+    }
 }
 
-// =========================================================================
-// Documentation endpoints
-// =========================================================================
-
-/// `GET /openapi.json` — serves the generated spec.
-///
-/// We generate it on every request for simplicity. For a hot path you'd
-/// build it once at startup, cache the bytes, and serve from memory; the
-/// `etag` middleware would then turn most requests into a 304.
-pub fn openapiSpec(c: *Ctx) !void {
-    // `c.app()` is the framework's typed back-pointer to the App(State)
-    // that's serving this request. We hand it to the OpenAPI generator
-    // so it can walk the route table.
-    const fw = c.app().?;
+// The metadata view needs no live providers. Explicit anyerror breaks the
+// normal Zig inference cycle: Application → handler → Application.Metadata.
+pub fn openapiSpec(c: *Ctx) anyerror!void {
+    var metadata: @import("setup.zig").Application.Metadata = .{};
+    const fw = &metadata;
     const spec = try am.openapi.generate(@TypeOf(fw.*), fw, c.arena, .{
         .title = "Akamata Tasks API",
         .version = "1.0.0",
@@ -232,12 +185,9 @@ pub fn openapiSpec(c: *Ctx) !void {
     try c.res.writeAll(spec);
 }
 
-/// `GET /client.ts` — emits a TypeScript client built from the live route
-/// table. The frontend can `curl -O http://localhost:8080/client.ts` and
-/// drop it straight into a project; types stay in lock-step with the
-/// server because both come from the same source-of-truth structs.
-pub fn typescriptClient(c: *Ctx) !void {
-    const fw = c.app().?;
+pub fn typescriptClient(c: *Ctx) anyerror!void {
+    var metadata: @import("setup.zig").Application.Metadata = .{};
+    const fw = &metadata;
     const ts = try am.client_gen.generate(@TypeOf(fw.*), fw, c.arena, .{
         .target = .typescript,
         .base_url = "http://localhost:8080",
@@ -255,7 +205,7 @@ pub fn typescriptClient(c: *Ctx) !void {
 fn emitEvent(c: *Ctx, kind: []const u8, payload: anytype) !void {
     var aw: std.Io.Writer.Allocating = .init(c.arena);
     try std.json.Stringify.value(.{ .kind = kind, .payload = payload }, .{}, &aw.writer);
-    try c.state().events.publish(aw.written());
+    if (c.state().events) |channel| try channel.publish(aw.written());
 }
 
 extern "c" fn usleep(usecs: c_uint) c_int;
