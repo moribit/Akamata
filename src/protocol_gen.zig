@@ -32,7 +32,7 @@ fn emitTypescript(comptime U: type, w: *std.Io.Writer, options: Options) !void {
     }
     try w.print("export type {s} =\n", .{options.name});
     inline for (reflection.fields(@typeInfo(U).@"union"), 0..) |field, i| {
-        try w.print("  {s} {{ event_type: \"{s}\"; payload: {s}Payload }}\n", .{ if (i == 0) "=" else "|", field.name, title(field.name) });
+        try w.print("  {s} {{ event_type: \"{s}\"; payload: {s}Payload }}\n", .{ if (i == 0) " " else "|", field.name, title(field.name) });
     }
     // events.Protocol uses a flat wire envelope: the discriminator and payload
     // are siblings of the version/correlation metadata, not nested in `event`.
@@ -167,6 +167,7 @@ test "generate TypeScript and C realtime clients" {
     try std.testing.expect(std.mem.indexOf(u8, ts, "event_type: \"created\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, ts, "AkamataEnvelopeMeta & AkamataEvent") != null);
     try std.testing.expect(std.mem.indexOf(u8, ts, "event: T") == null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "=\n  =") == null);
     const c = try generate(E, std.testing.allocator, .{ .target = .c, .version = 2 });
     defer std.testing.allocator.free(c);
     try std.testing.expect(std.mem.indexOf(u8, c, "AKAMATA_PROTOCOL_VERSION 2") != null);
