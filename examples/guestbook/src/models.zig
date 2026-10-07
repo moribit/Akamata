@@ -20,8 +20,8 @@ pub const Entry = struct {
             .created_at = "unixepoch()",
         },
         .validates = .{
-            .name = .{ am.model.rule.required, am.model.rule.max_len(80) },
-            .message = .{ am.model.rule.required, am.model.rule.max_len(500) },
+            .name = .{ am.model.rule.required, am.model.rule.min_len(1), am.model.rule.max_len(80) },
+            .message = .{ am.model.rule.required, am.model.rule.min_len(1), am.model.rule.max_len(500) },
         },
     };
 };

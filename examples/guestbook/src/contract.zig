@@ -15,15 +15,20 @@ pub fn For(comptime target: am.capability.Target) type {
     return C;
 }
 
-fn DatabaseEndpoint(comptime method: am.Method, comptime path: []const u8, comptime handler: anytype, comptime operation: []const u8) type {
-    return am.capability.Uses(am.contract.Endpoint(method, path, handler, .{ .operation_id = operation }), &.{.database});
-}
-
-pub const endpoints = .{
-    am.contract.Endpoint(.GET, "/", h.index, .{ .operation_id = "index" }),
-    DatabaseEndpoint(.GET, "/health", h.health, "health"),
-    DatabaseEndpoint(.GET, "/entries", h.listEntries, "listEntries"),
-    DatabaseEndpoint(.POST, "/entries", h.createEntry, "createEntry"),
-    DatabaseEndpoint(.GET, "/entries/:id", h.showEntry, "showEntry"),
-    DatabaseEndpoint(.DELETE, "/entries/:id", h.deleteEntry, "deleteEntry"),
+// One declaration feeds static routing, capability diagnostics and generators.
+pub const routes = .{
+    am.endpoint(.{ .method = .GET, .path = "/", .handler = h.index, .operation_id = "index", .fallback = .internal_server_error }),
+    am.endpoint(.{ .method = .GET, .path = "/health", .handler = h.health, .operation_id = "health", .capabilities = &.{.database}, .errors = .{ .DatabaseUnavailable = .service_unavailable } }),
+    am.endpoint(.{ .method = .GET, .path = "/entries", .handler = h.listEntries, .operation_id = "listEntries", .capabilities = &.{.database}, .errors = .{ .InvalidLimit = .bad_request }, .fallback = .internal_server_error }),
+    am.endpoint(.{ .method = .POST, .path = "/entries", .handler = h.createEntry, .operation_id = "createEntry", .capabilities = &.{.database}, .fallback = .internal_server_error }),
+    am.endpoint(.{ .method = .GET, .path = "/entries/:id", .handler = h.showEntry, .operation_id = "showEntry", .capabilities = &.{.database}, .errors = .{ .InvalidId = .bad_request, .NotFound = .not_found }, .fallback = .internal_server_error }),
+    am.endpoint(.{ .method = .DELETE, .path = "/entries/:id", .handler = h.deleteEntry, .operation_id = "deleteEntry", .capabilities = &.{.database}, .errors = .{ .InvalidId = .bad_request, .NotFound = .not_found }, .fallback = .internal_server_error }),
+    am.endpoint(.{ .method = .GET, .path = "/openapi.json", .handler = h.openapi, .fallback = .internal_server_error }),
+    am.endpoint(.{ .method = .GET, .path = "/client.ts", .handler = h.client, .fallback = .internal_server_error }),
+};
+pub const endpoints = blk: {
+    @setEvalBranchQuota(50_000);
+    var result: [routes.len]type = undefined;
+    for (routes, 0..) |R, i| result[i] = R.For(@import("app.zig").App);
+    break :blk result;
 };

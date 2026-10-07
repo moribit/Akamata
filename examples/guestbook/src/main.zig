@@ -40,8 +40,19 @@ pub fn main(init: std.process.Init) !void {
             } else return error.InvalidTarget;
             return stdout.interface.flush();
         }
+        if (std.mem.eql(u8, arg, "akamata-openapi") or std.mem.eql(u8, arg, "akamata-client")) {
+            var metadata: setup.Application.Metadata = .{};
+            const bytes = if (std.mem.eql(u8, arg, "akamata-openapi"))
+                try am.openapi.generate(@TypeOf(metadata), &metadata, arena_state.allocator(), .{ .title = "Guestbook", .version = "1" })
+            else
+                try am.client_gen.generate(@TypeOf(metadata), &metadata, arena_state.allocator(), .{ .target = .typescript });
+            var buffer: [4096]u8 = undefined;
+            var stdout = std.Io.File.stdout().writer(init.io, &buffer);
+            try stdout.interface.writeAll(bytes);
+            return stdout.interface.flush();
+        }
         if (std.mem.eql(u8, arg, "--print-schema")) {
-            return printSchema(alloc);
+            return printSchema(alloc, init.io);
         }
         if (std.mem.eql(u8, arg, "migrate-up")) {
             return migrateUp(alloc, args[2..]);
@@ -50,9 +61,8 @@ pub fn main(init: std.process.Init) !void {
 
     const state = try setup.buildState(alloc);
     defer state.db.close();
-    var app = am.App(App).init(alloc, state);
+    var app = try setup.Application.initWithState(alloc, state);
     defer app.deinit();
-    try setup.registerRoutes(&app);
 
     const port_env = am.env.get(alloc, "PORT");
     defer if (port_env) |p| alloc.free(p);
@@ -71,7 +81,7 @@ fn migrateUp(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
         const a = std.mem.sliceTo(raw, 0);
         if (std.mem.startsWith(u8, a, "--dir=")) dir = a[6..];
     }
-    am.env.loadDotEnv(alloc, ".env") catch {};
+    try am.env.loadDotEnv(alloc, ".env");
     const url = am.env.get(alloc, "DATABASE_URL") orelse try alloc.dupe(u8, "file:guestbook.db");
     defer alloc.free(url);
 
@@ -79,7 +89,7 @@ fn migrateUp(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     defer arena_state.deinit();
     const arena = arena_state.allocator();
 
-    const database = try am.db.open(alloc, url);
+    const database = try am.db.openForContract(alloc, App.application_contract, url);
     defer database.close();
 
     const all = try am.model.migrate.loadMigrationsFromDir(arena, dir);
@@ -94,18 +104,14 @@ fn migrateUp(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     std.log.info("applied {d} migration(s)", .{pending.len});
 }
 
-extern "c" fn write(fd: c_int, buf: [*]const u8, count: usize) isize;
-
-fn printSchema(alloc: std.mem.Allocator) !void {
-    var arena_state: std.heap.ArenaAllocator = .init(alloc);
+fn printSchema(alloc: std.mem.Allocator, io: std.Io) !void {
+    var arena_state = std.heap.ArenaAllocator.init(alloc);
     defer arena_state.deinit();
-    const arena = arena_state.allocator();
-
-    // Raw write(2) on fd=1 (stdout). Simpler than wiring a full `std.Io`
-    // dispatcher for a one-shot print.
+    var buffer: [4096]u8 = undefined;
+    var stdout = std.Io.File.stdout().writer(io, &buffer);
     for (models.all_models) |td| {
-        const sql = try am.model.ddl.fullSchema(arena, td, .{});
-        _ = write(1, sql.ptr, sql.len);
-        _ = write(1, "\n".ptr, 1);
+        try stdout.interface.writeAll(try am.model.ddl.fullSchema(arena_state.allocator(), td, .{}));
+        try stdout.interface.writeAll("\n");
     }
+    try stdout.interface.flush();
 }

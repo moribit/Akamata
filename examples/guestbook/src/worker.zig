@@ -13,16 +13,15 @@ fn noopLog(comptime _: std.log.Level, comptime _: @TypeOf(.enum_literal), compti
 
 const wasm_gpa = std.heap.wasm_allocator;
 
-var app_storage: am.App(App) = undefined;
+var app_storage: setup.Application = undefined;
 var initialized: bool = false;
 
 fn ensureInit() !void {
     if (initialized) return;
     const state = try setup.buildState(wasm_gpa);
     errdefer state.db.close();
-    app_storage = am.App(App).init(wasm_gpa, state);
+    app_storage = try setup.Application.initWithState(wasm_gpa, state);
     errdefer app_storage.deinit();
-    try setup.registerRoutes(&app_storage);
     // Successful owners live with the Workers isolate, not individual requests.
     initialized = true;
 }

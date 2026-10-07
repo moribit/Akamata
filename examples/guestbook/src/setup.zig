@@ -1,76 +1,31 @@
-// Shared wiring used by both main.zig (native) and worker.zig (Workers).
-// The DB backend is selected from DATABASE_URL; the schema is provisioned
-// from the model definitions via am.model.migrate.
-
+//! Shared application graph; owners stay with the caller.
 const std = @import("std");
 const am = @import("akamata");
-const App = @import("app.zig").App;
+const State = @import("app.zig").App;
 const models = @import("models.zig");
-
+pub const Application = blk: {
+    @setEvalBranchQuota(50_000);
+    break :blk am.App(.{ .State = State, .routes = @import("contract.zig").routes, .configure = configure });
+};
 pub const default_native_url = "file:guestbook.db";
-pub const default_workers_url = if (@import("contract.zig").For(.workers).resolve(.database).binding) |name| "d1:" ++ name else "";
-
-/// Process-wide one-shot guard used by the deferred-migrate middleware on
-/// Workers. Native builds run migrate from `buildState` so this stays at
-/// "done" without ever firing.
-var migrate_once: am.model.migrate.Once = .{};
-
-fn ensureSchema(c: *am.Context(App), next: am.Next(App)) anyerror!void {
-    if (am.backend == .workers) {
-        migrate_once.run(c.arena, c.state().db, &models.all_models) catch |e| {
-            std.log.warn("deferred migrate failed: {t}", .{e});
-        };
-    }
-    return next.run(c);
+pub const default_workers_url = "d1:" ++ @import("contract.zig").For(.workers).resolve(.database).binding.?;
+fn configure(app: *am.App(State)) !void {
+    _ = try app.useAll(am.mw.recover(State));
+    _ = try app.useAll(am.mw.logger(State));
 }
-
-pub fn registerRoutes(app: *am.App(App)) !void {
-    _ = try app.useAll(am.mw.recover(App));
-    _ = try app.useAll(am.mw.logger(App));
-    // On Workers, first request triggers schema migration through JSPI.
-    _ = try app.useAll(am.Middleware(App){ .name = "ensureSchema", .call = ensureSchema });
-
-    inline for (@import("contract.zig").endpoints) |Endpoint| try Endpoint.register(app);
+pub fn migrateDevelopment(allocator: std.mem.Allocator, database: am.db.Db) !void {
+    var arena = std.heap.ArenaAllocator.init(allocator);
+    defer arena.deinit();
+    const plan = try am.model.migrate.diff(arena.allocator(), database, &models.all_models);
+    try am.model.migrate.apply(arena.allocator(), database, plan);
 }
-
-pub fn buildState(alloc: std.mem.Allocator) !App {
-    if (am.backend == .native) am.env.loadDotEnv(alloc, ".env") catch {};
-
-    const url = am.env.get(alloc, "DATABASE_URL") orelse blk: {
-        const target: am.capability.Target = if (am.backend == .native) .native else .workers;
-        if (comptime @import("contract.zig").For(target).resolve(.database).provider == .turso) return error.MissingDatabaseUrl;
-        const def = if (am.backend == .native) default_native_url else default_workers_url;
-        break :blk try alloc.dupe(u8, def);
-    };
-    defer alloc.free(url);
-
-    const target: am.capability.Target = if (am.backend == .native) .native else .workers;
-    const database = try am.db.openForContract(alloc, @import("contract.zig").For(target), url);
-
-    // Auto-migrate against the live DB. Only run during `buildState` on the
-    // native side — Workers' `akamata_init` is called from the JS host's
-    // `instantiate()` step where `WebAssembly.promising` isn't active yet,
-    // so any D1 (JSPI) call would throw `SuspendError`. On Workers we either
-    //   1. apply the schema out-of-band before deploy:
-    //        ./guestbook --print-schema > /tmp/guestbook.sql
-    //        akamata deploy --workers --migrate=/tmp/guestbook.sql
-    //   2. or let the framework run migrate from the first `fetch()` (TODO,
-    //      tracked separately) when the wasm stack is already inside a
-    //      promising-wrapped call.
-    // For Turso on native this works the same way as SQLite: HTTP DDL is
-    // synchronous through our std.net path, no JSPI involvement.
-    if (am.backend == .native) {
-        var arena_state: std.heap.ArenaAllocator = .init(alloc);
-        defer arena_state.deinit();
-        const arena = arena_state.allocator();
-        const plan = am.model.migrate.diff(arena, database, &models.all_models) catch |e| {
-            std.log.warn("migrate.diff failed (skipping): {t}", .{e});
-            return .{ .db = database };
-        };
-        am.model.migrate.apply(arena, database, plan) catch |e| {
-            std.log.warn("migrate.apply failed: {t}", .{e});
-        };
-    }
-
+pub fn buildState(allocator: std.mem.Allocator) !State {
+    if (am.backend == .native) try am.env.loadDotEnv(allocator, ".env");
+    const url = am.env.get(allocator, "DATABASE_URL") orelse try allocator.dupe(u8, if (am.backend == .native) default_native_url else default_workers_url);
+    defer allocator.free(url);
+    const database = try am.db.openForContract(allocator, State.application_contract, url);
+    errdefer database.close();
+    // Tutorial convenience only. Workers schema is applied before deployment.
+    if (am.backend == .native) try migrateDevelopment(allocator, database);
     return .{ .db = database };
 }
