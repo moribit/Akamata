@@ -227,3 +227,36 @@ test "client derives scalar responses and typed path and required query from end
     try std.testing.expect(std.mem.indexOf(u8, ts, "getUsersByIdError = { status: 404; body: { error_kind: \"NotFound\" } }") != null);
     try std.testing.expect(std.mem.indexOf(u8, ts, "throw new HttpError(res.status, body, detail);") != null);
 }
+
+test "ordinary multi-route typed application needs no caller branch quota" {
+    const Handler = struct {
+        const GraphInput = struct {
+            title: []const u8,
+            description: []const u8 = "",
+            pub const validation = .{
+                .title = .{ ak.model.rule.required, ak.model.rule.min_len(1), ak.model.rule.max_len(120) },
+                .description = .{ak.model.rule.max_len(2000)},
+            };
+        };
+        fn create(body: ak.Json(GraphInput)) !ak.Result(GraphInput, 201) {
+            return ak.created(body.value);
+        }
+    };
+    const Decl = ak.App(.{ .routes = .{
+        ak.endpoint(.{ .method = .POST, .path = "/one", .handler = Handler.create, .fallback = .internal_server_error }),
+        ak.endpoint(.{ .method = .POST, .path = "/two", .handler = Handler.create, .fallback = .internal_server_error }),
+        ak.endpoint(.{ .method = .POST, .path = "/three", .handler = Handler.create, .fallback = .internal_server_error }),
+        ak.endpoint(.{ .method = .POST, .path = "/four", .handler = Handler.create, .fallback = .internal_server_error }),
+        ak.endpoint(.{ .method = .POST, .path = "/five", .handler = Handler.create, .fallback = .internal_server_error }),
+        ak.endpoint(.{ .method = .POST, .path = "/six", .handler = Handler.create, .fallback = .internal_server_error }),
+        ak.endpoint(.{ .method = .POST, .path = "/seven", .handler = Handler.create, .fallback = .internal_server_error }),
+        ak.endpoint(.{ .method = .POST, .path = "/eight", .handler = Handler.create, .fallback = .internal_server_error }),
+    } });
+    var app = try Decl.init(std.testing.allocator);
+    defer app.deinit();
+    var client = app.client(std.testing.allocator);
+    defer client.deinit();
+    var response = try client.post("/eight").json(.{ .title = "typed graph" }).send();
+    defer response.deinit();
+    try response.expectStatus(.created);
+}

@@ -4,6 +4,9 @@ const core = @import("app.zig");
 const typed = @import("contract/handler.zig");
 
 pub fn App(comptime declaration: anytype) type {
+    // A modest typed graph can exceed Zig's default quota during DTO/rule
+    // reflection. Keep that compiler bookkeeping inside the framework.
+    @setEvalBranchQuota(50_000);
     if (@TypeOf(declaration) == type) return core.App(declaration);
     if (!@hasField(@TypeOf(declaration), "routes")) @compileError("Akamata App requires .routes or an explicit State type");
     const State = if (@hasField(@TypeOf(declaration), "State")) declaration.State else struct {};
@@ -78,6 +81,7 @@ pub fn App(comptime declaration: anytype) type {
 pub fn endpoint(comptime options: anytype) type {
     return struct {
         pub fn For(comptime State: type) type {
+            @setEvalBranchQuota(50_000);
             return typed.Endpoint(State, options);
         }
     };
