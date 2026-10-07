@@ -13,13 +13,13 @@ pub const State = struct {
     login_secret: []const u8,
     realtime: am.realtime.Service,
     test_deployment: ?[]const u8 = null,
-    schema_ready: bool = false,
+    native_transport_gate: ?*am.sync.Mutex = null,
 };
 const Ctx = am.Context(State);
 
 pub fn register(app: *am.App(State)) !void {
     _ = try app.useAll(am.mw.recover(State));
-    _ = try app.useAll(.{ .name = "portable-schema", .call = ensureSchemaMiddleware });
+    _ = try app.useAll(.{ .name = "principal", .call = authenticate });
     inline for (endpoints) |E| {
         if (comptime std.mem.eql(u8, E.route_path, "/realtime/:resource")) {
             comptime am.contract.validateApplication(.{E}, State.application_contract, if (am.backend == .native) .native else .workers);
@@ -29,7 +29,10 @@ pub fn register(app: *am.App(State)) !void {
 }
 
 fn Endpoint(comptime method: am.Method, comptime path: []const u8, comptime handler: anytype, comptime operation: []const u8, comptime requires: []const am.capability.Application) type {
-    return am.capability.Uses(am.contract.Endpoint(method, path, handler, .{ .operation_id = operation }), requires);
+    return am.capability.Uses(am.contract.Endpoint(method, path, handler, .{
+        .operation_id = operation,
+        .security = if (std.mem.eql(u8, path, "/health") or std.mem.eql(u8, path, "/login") or std.mem.eql(u8, path, "/realtime/message")) &.{} else &.{"bearerAuth"},
+    }), requires);
 }
 pub const endpoints = .{
     Endpoint(.GET, "/health", health, "health", &.{}),
@@ -37,7 +40,7 @@ pub const endpoints = .{
     Endpoint(.POST, "/__akamata/realtime/authorize", authorizeRealtime, "authorizeRealtime", &.{.realtime}),
     Endpoint(.POST, "/realtime/message", realtimeMessage, "realtimeMessage", &.{.realtime}),
     Endpoint(.GET, "/realtime/:resource", nativeRealtime, "connectRealtime", &.{.realtime}),
-    Endpoint(.POST, "/records", createRecord, "createRecord", &.{.database}),
+    am.endpoint(.{ .method = .POST, .path = "/records", .handler = createRecord, .capabilities = &.{.database}, .security = &.{"bearerAuth"}, .fallback = .internal_server_error }).For(State),
     Endpoint(.GET, "/records", listRecords, "listRecords", &.{.database}),
     Endpoint(.DELETE, "/records/:id", deleteRecord, "deleteRecord", &.{.database}),
     Endpoint(.POST, "/reports", submitReport, "submitReport", &.{ .database, .queue }),
@@ -49,24 +52,37 @@ pub const endpoints = .{
     Endpoint(.DELETE, "/objects/*key", deleteObject, "deleteObject", &.{.object_storage}),
 };
 
-fn ensureSchemaMiddleware(c: *Ctx, next: am.Next(State)) anyerror!void {
-    // Realtime control-plane handlers run through a named service entrypoint
-    // and do not touch the application database. Avoid introducing D1 I/O
-    // into the Durable Object message path (and a self-service dependency).
-    if (std.mem.eql(u8, c.req.path(), "/realtime/message") or
-        std.mem.eql(u8, c.req.path(), "/__akamata/realtime/authorize"))
+/// Credential verification happens once, before handlers. Test Client.as uses
+/// the same request-local Principal attachment path; it does not disable this middleware.
+pub const Authenticated = struct { subject: []const u8 };
+fn authenticate(c: *Ctx, next: am.Next(State)) anyerror!void {
+    const path = c.req.path();
+    if (std.mem.eql(u8, path, "/health") or std.mem.eql(u8, path, "/login")) return next.run(c);
+    // Only the named Workers service entrypoint admits trusted DO messages.
+    if (std.mem.eql(u8, path, "/realtime/message")) {
+        if (comptime am.backend == .native) return c.notFound();
         return next.run(c);
-    if (!c.state().schema_ready) {
-        try ensureSchema(c.state().db);
-        c.state().schema_ready = true;
+    }
+    if (c.principal(Authenticated) == null) {
+        const credential = am.identity.bearer(c.req.header("authorization")) catch return c.unauthorized("invalid credential");
+        const token = switch (credential) {
+            .bearer => |value| value,
+            else => unreachable,
+        };
+        const claims = am.auth.jwt.verifyWithOptions(c.arena, c.state().jwt_secret, token, .{
+            .now_unix = am.observability.clock.unixSeconds(),
+            .require_exp = true,
+        }) catch return c.unauthorized("invalid credential");
+        const subject = claims.sub orelse return c.unauthorized("missing subject");
+        if (subject.len == 0 or subject.len > 128) return c.unauthorized("invalid subject");
+        try c.setPrincipal(Authenticated{ .subject = subject });
     }
     return next.run(c);
 }
-
+/// Application schema is applied explicitly, never on request/queue delivery.
+pub const schema_sql = @embedFile("schema.sql");
 pub fn ensureSchema(db: am.db.Db) !void {
-    try db.exec("CREATE TABLE IF NOT EXISTS portable_records (id INTEGER PRIMARY KEY, principal TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL)");
-    try db.exec("CREATE TABLE IF NOT EXISTS device_reports (id INTEGER PRIMARY KEY, principal TEXT NOT NULL, firmware_version TEXT NOT NULL, hardware_revision TEXT, uptime_seconds INTEGER NOT NULL, error_code INTEGER, created_at INTEGER NOT NULL)");
-    try db.exec("CREATE TABLE IF NOT EXISTS report_deliveries (event_id TEXT PRIMARY KEY, report_id INTEGER NOT NULL, attempt INTEGER NOT NULL)");
+    try db.execAll(schema_sql);
 }
 
 fn health(c: *Ctx) !void {
@@ -84,16 +100,7 @@ fn login(c: *Ctx) !void {
 }
 
 fn authenticatedSubject(c: *Ctx) ![]const u8 {
-    const credential = am.identity.bearer(c.req.header("authorization")) catch return error.Unauthorized;
-    const token = switch (credential) {
-        .bearer => |value| value,
-        else => unreachable,
-    };
-    const claims = am.auth.jwt.verifyWithOptions(c.arena, c.state().jwt_secret, token, .{
-        .now_unix = am.observability.clock.unixSeconds(),
-        .require_exp = true,
-    }) catch return error.Unauthorized;
-    return claims.sub orelse error.Unauthorized;
+    return (try c.requirePrincipal(Authenticated)).subject;
 }
 
 /// The requested resource is an input to authorization only. This reference
@@ -153,7 +160,10 @@ fn nativeRealtime(c: *Ctx) !void {
     const principal: contracts.Principal = .{ .client = principal_name };
     const service = c.realtime();
     var connection = try am.ws.upgrade(Ctx, c, .{ .max_message_bytes = 64 * 1024 });
-    defer connection.deinit();
+    const gate = c.state().native_transport_gate orelse {
+        connection.deinit();
+        return error.MissingTransportOwner;
+    };
     const connection_id = next_connection_id.fetchAdd(1, .monotonic);
     const Transport = struct {
         fn send(raw: ?*anyopaque, bytes: []const u8) am.realtime.Error!void {
@@ -166,8 +176,15 @@ fn nativeRealtime(c: *Ctx) !void {
         }
     };
     const native: *am.realtime.Native = @ptrCast(@alignCast(service.backend.ptr));
+    var attached = false;
+    defer {
+        gate.lock();
+        if (attached) native.detach(connection_id);
+        connection.deinit();
+        gate.unlock();
+    }
     try native.connectTransport(room_id, connection_id, identity, &connection, Transport.send, Transport.close);
-    defer native.detach(connection_id);
+    attached = true;
     var message_arena = am.realtime.MessageArena.init(c.app().?.gpa);
     defer message_arena.deinit();
     while (true) {
@@ -189,6 +206,8 @@ fn nativeRealtime(c: *Ctx) !void {
             connection.close(1003, "text protocol required");
             return;
         }
+        gate.lock();
+        defer gate.unlock();
         am.realtime.handleInbound(contracts.Protocol, contracts.Principal, message_allocator, service, .{
             .connection_id = connection_id,
             .principal = principal,
@@ -211,18 +230,19 @@ fn handleNativeEvent(_: am.realtime.InboundContext(contracts.Principal), event: 
     }
 }
 
-const RecordInput = struct { body: []const u8 };
-fn createRecord(c: *Ctx) !void {
-    const subject = authenticatedSubject(c) catch return c.unauthorized("invalid credential");
-    const input = c.req.json(RecordInput) catch return c.badRequest("invalid record");
-    if (input.body.len == 0 or input.body.len > 1024) return c.badRequest("body exceeds 1024 bytes");
+const RecordInput = struct {
+    body: []const u8,
+    pub const validation = .{ .body = .{ am.model.rule.required, am.model.rule.min_len(1), am.model.rule.max_len(1024) } };
+};
+const RecordCreated = struct { stored: bool = true, id: i64 };
+fn createRecord(c: *Ctx, principal: am.Principal(Authenticated), body: am.Json(RecordInput)) !am.Result(RecordCreated, 201) {
     var stmt = try c.db().prepare("INSERT INTO portable_records(principal,body,created_at) VALUES(?,?,?) RETURNING id");
     defer stmt.deinit();
-    try stmt.bindAll(.{ subject, input.body, am.observability.clock.unixSeconds() });
+    try stmt.bindAll(.{ principal.value.subject, body.value.body, am.observability.clock.unixSeconds() });
     if (try stmt.step() != .row) return error.RecordInsertFailed;
     const id = try stmt.columnInt(0);
     _ = try stmt.step();
-    try c.json(.{ .stored = true, .id = id }, 201);
+    return am.created(RecordCreated{ .id = id });
 }
 
 fn listRecords(c: *Ctx) !void {
@@ -266,7 +286,6 @@ fn submitReport(c: *Ctx) !void {
 pub const ReportEffects = struct { db: am.db.Db };
 pub fn consumeReport(raw: *anyopaque, event: contracts.ReportCreated, delivery: am.queue.Delivery) !void {
     const effects: *ReportEffects = @ptrCast(@alignCast(raw));
-    try ensureSchema(effects.db);
     var stmt = try effects.db.prepare("INSERT INTO report_deliveries(event_id,report_id,attempt) SELECT ?,id,? FROM device_reports WHERE id=? ON CONFLICT(event_id) DO UPDATE SET attempt=excluded.attempt");
     defer stmt.deinit();
     try stmt.bindAll(.{ delivery.event_id, delivery.attempt, event.id });
