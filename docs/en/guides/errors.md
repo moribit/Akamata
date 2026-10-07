@@ -32,3 +32,7 @@ try {
 Unknown gateway/network/framework failures are not forced into that known-error union. Typed input binding contributes `400/bad_request`, and JSON body binding contributes `422/validation`, to the same metadata and generated known-error union. Existing validation envelopes retain their field error details. Required Principal binding is checked before input decoding, regardless of parameter order; authentication middleware still runs first.
 
 See [the shared source](../../../tests/dx_application_fixture.zig) and [DX tests](../../../tests/dx_test.zig). Documentation CI runs TypeScript strict static checking separately from the Node syntax-transform and mocked HTTP tests.
+
+## Living reference
+
+The current main [guestbook](../../../examples/guestbook/README.md) demonstrates these APIs in one compiled application graph. Continue to [tasks](../../../examples/tasks/README.md) for queue effects and testing. Platform ownership belongs in entrypoints, not Context.

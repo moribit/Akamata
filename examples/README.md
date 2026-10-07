@@ -26,6 +26,15 @@ Their paths remain stable for existing scripts and historical evidence. See
 [current Native measurements](../docs/en/public-performance.md) before using
 historical numbers. Benchmark-specific fast paths are not application advice.
 
+## Reproduce the living reference
+
+`python3 tests/living_examples.py` builds Native Debug/ReleaseSafe and Workers,
+runs shared application tests, a Native WebSocket wire fixture and actual WASM
+through managed JSPI glue with isolated offline providers. Node 24 is required;
+set `AKAMATA_DX_TSC` to TypeScript 5.9.3 `tsc.js` for strict generated-client checks.
+CI requires that check on Linux and macOS. Evidence is written under `.zig-cache`.
+This runner does not deploy or contact Cloudflare.
+
 ## Next
 
 [Getting Started](../docs/en/quickstart.md) ·

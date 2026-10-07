@@ -127,13 +127,13 @@ See the [v0.2 Phase 1 changes](docs/en/v0.2-phase1.md) for removed APIs.
 
 ## Examples
 
-- [Executable minimal](tests/docs/minimal.zig) — the first ordinary-function API
-- [`examples/guestbook/`](examples/guestbook/) — typed HTTP, validation and DB
-- [`examples/device_messaging/`](examples/device_messaging/) — portable provider ownership
-- [`examples/chat/`](examples/chat/) — realtime and native WebSocket, with an explicit Workers gateway path
-- [`examples/tasks/`](examples/tasks/) — reference REST API covering validation,
-  OpenAPI, SSE, sessions, security middleware, jobs, and testing
-- [`examples/bench/`](examples/bench/) — reproducible framework benchmarks
+[Follow the learning path](examples/README.md): canonical minimal scaffold →
+guestbook (typed HTTP / validation / DB / OpenAPI) → tasks (queue effects /
+testing) → chat (portable protocol / explicit transports) → device_messaging
+(production providers / Principal / migration).
+
+Benchmark fixtures remain under `examples/bench` and `examples/router_bench`
+for historical scripts; they are measurements, not application architecture.
 
 ## License
 

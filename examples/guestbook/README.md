@@ -37,7 +37,7 @@ Apply reviewed schema to your configured D1 resource **before deployment**.
 `deploy/guestbook/wrangler.toml` and its managed glue select D1 binding `DB`.
 No request or isolate initialization performs DDL. Workers compilation is offline
 coverage, not proof of remote resource readiness. Follow the
-[Workers deployment guide](../../docs/en/guides/workers-deployment.md).
+[Workers deployment guide](../../docs/en/cloudflare.md).
 
 ## Test
 

@@ -102,3 +102,8 @@ Workers entryは同じapplicationをimportします。HelloはD1/R2不要です�
 ## Next steps
 
 [Documentation home](README.md) · [Tutorial](tutorial.md) · [Handbook](handbook.md)
+
+## 次へ: living applications
+
+[guestbook](../../examples/guestbook/README.md) → [tasks](../../examples/tasks/README.md) → [chat](../../examples/chat/README.md) → [device messaging](../../examples/device_messaging/README.md)。
+最小applicationはscaffoldを正準とし、各exampleで必要になったserviceだけを明示的に加えます。

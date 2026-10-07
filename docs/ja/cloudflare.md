@@ -46,7 +46,7 @@ D1が必要なappでは専用resourceを別途明示作成/選択し、binding�
 
 ### Durable Object: WebSocket
 
-WS 接続 (`/rooms/:id/ws`) は JS 側で `request.headers.get("Upgrade")` を検知して直接 `CHAT_ROOM` DO にルーティング。DO 内で WS セッションを保持 + DO 内蔵 SQLite に永続化する。Zig 側の WS ハンドラは Workers モードでは呼ばれない。
+現在のchat referenceは`/realtime/:resource`、共有typed Protocol、managed `AkamataRealtimeRoom` adapterを使います。匿名nickname policyはtutorial限定です。検証済みcredentialの例はdevice_messagingを参照してください。
 
 portable Realtimeでは`/realtime/:resource`を使います。`:resource`は信頼済みroom ID
 ではありません。WorkerはAuthorization headerを必須とし、共通Zig handler
@@ -79,7 +79,7 @@ optional live testはD1 write/read、R2 put/Range 206、認証済み2接続DO We
 ```toml
 name = "akamata-chat"
 main = "worker/index.mjs"
-compatibility_date = "2026-01-15"
+compatibility_date = "2026-08-17"
 
 [[d1_databases]]
 binding = "DB"
@@ -87,10 +87,12 @@ database_name = "akamata"
 database_id = "<your-d1-id>"
 
 [[durable_objects.bindings]]
-name = "CHAT_ROOM"
-class_name = "ChatRoom"
+name = "AKAMATA_REALTIME"
+class_name = "AkamataRealtimeRoom"
 
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = ["ChatRoom"]
+new_sqlite_classes = ["AkamataRealtimeRoom"]
 ```
+
+[Chat reference](../../examples/chat/README.md) uses a named self-service binding `AKAMATA_REALTIME_HANDLER` for its shared Zig inbound handler; copy the complete configuration, not only the simplified DO excerpt above. Existing ChatRoom deployments need an explicit migration plan.

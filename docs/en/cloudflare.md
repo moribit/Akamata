@@ -51,7 +51,7 @@ the model-backed example; do not apply its schema to the minimal Hello project.
 
 ### Durable Object: WebSocket
 
-WS connection (`/rooms/:id/ws`) detects `request.headers.get("Upgrade")` on JS side and routes directly to `CHAT_ROOM` DO. Retain WS session within DO + persist to DO built-in SQLite. The Zig side WS handler is not called in Workers mode.
+The current chat reference uses `/realtime/:resource`, a shared typed Protocol and the managed `AkamataRealtimeRoom` adapter. Its anonymous nickname policy is intentionally tutorial-only; verified credentials are demonstrated by device_messaging.
 
 For the portable realtime API use `/realtime/:resource`. `:resource` is not a
 trusted room id. The Worker requires an `Authorization` header and calls the
@@ -109,7 +109,7 @@ each handled frame so decoded message allocations do not live with the socket.
 ```toml
 name = "akamata-chat"
 main = "worker/index.mjs"
-compatibility_date = "2026-01-15"
+compatibility_date = "2026-08-17"
 
 [[d1_databases]]
 binding = "DB"
@@ -117,10 +117,12 @@ database_name = "akamata"
 database_id = "<your-d1-id>"
 
 [[durable_objects.bindings]]
-name = "CHAT_ROOM"
-class_name = "ChatRoom"
+name = "AKAMATA_REALTIME"
+class_name = "AkamataRealtimeRoom"
 
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = ["ChatRoom"]
+new_sqlite_classes = ["AkamataRealtimeRoom"]
 ```
+
+[Chat reference](../../examples/chat/README.md) uses a named self-service binding `AKAMATA_REALTIME_HANDLER` for its shared Zig inbound handler; copy the complete configuration, not only the simplified DO excerpt above. Existing ChatRoom deployments need an explicit migration plan.

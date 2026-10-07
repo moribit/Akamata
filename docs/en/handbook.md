@@ -245,15 +245,18 @@ There are two flavours, pick what fits:
 
 ### A. Auto-diff (good for early dev)
 
-The scaffold runs this on every native startup:
+The optional notes template and Native tutorial examples use this during development; the default minimal scaffold has no DB or migration:
 
 ```zig
 const plan = try am.model.migrate.diff(arena, db, &all_models);
 try am.model.migrate.apply(arena, db, plan);
 ```
 
-For Workers, use the `migrate_once.run` middleware (the scaffold wires it
-on first request — JSPI isn't available during `akamata_init`).
+Apply Workers schemas before deployment. Do not put production migration on
+first-request or queue-delivery paths. The optional notes template retains a
+development-only deferred migration pattern; it is not the production reference.
+See [device messaging](../../examples/device_messaging/README.md) for explicit
+versioned migration and checked owner acquisition.
 
 ### B. Versioned SQL files
 

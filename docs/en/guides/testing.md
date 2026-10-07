@@ -6,6 +6,7 @@ Initialize the same application with your test allocator and provider state. `ap
 var app = try Application.init(std.testing.allocator);
 defer app.deinit();
 var client = app.client(std.testing.allocator);
+defer client.deinit();
 var response = try client.post("/users").json(.{ .name = "Alice" }).send();
 defer response.deinit();
 try response.expectStatus(.created);
@@ -24,3 +25,9 @@ The existing bounded owners provide effect assertions:
 Provider owners still belong to the test/application state. Context borrows their production facades. MemoryStore is bounded to 16 objects; QueueRecorder defaults to 64 events. Use the existing adapter/integration suites for backend lifecycle and delivery behavior.
 
 [DX tests](../../../tests/dx_test.zig) include denied injected principals and allocation-failure cleanup. The [shared fixture](../../../tests/dx_application_fixture.zig) runs typed requests and principal injection on both Native and Workers WASM; [provider fixture](../../../tests/portable_application_fixture.zig) checks queue effects.
+
+## Living references
+
+[guestbook](../../../examples/guestbook/src/integration_test.zig): typed CRUD/validation/generators.
+[tasks](../../../examples/tasks/src/integration_test.zig): the production graph with QueueRecorder, duplicate delivery, queue rejection and actual Native owner.
+[device messaging](../../../examples/device_messaging/src/integration_test.zig): real providers, JWT middleware and request-local Principal injection.

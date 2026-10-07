@@ -105,3 +105,8 @@ in the same change. Detailed provider references may be English-only and are
 labelled explicitly in navigation. Executable source fixtures are the authority
 for code examples; Native/Workers documentation-test builds them in CI. Release
 and main API availability are distinguished rather than silently backporting docs.
+
+## Living examples (main)
+
+[Minimal scaffold → guestbook → tasks → chat → device messaging](../../examples/README.md).
+These references track main; v0.2.0 users should read the example compatibility notes before copying newer code.

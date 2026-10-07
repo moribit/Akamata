@@ -19,3 +19,7 @@ For custom checks, use the existing `model.rule.custom` or `customInt` with an o
 Length rules count bytes, not Unicode code points. Do not interpret them as OpenAPI `minLength`/`maxLength`. Existing format checks are simple framework checks rather than complete standards validators. Integer min/max/range rules whose entire field domain fits i64 now emit matching OpenAPI minimum/maximum constraints. Optional fields remain nullable. Float truncation, wider integers, byte-length and heuristic format rules are not projected as stronger JSON Schema guarantees. A DTO-level validation hook remains subsequent work; custom rules already accept ordinary Zig functions.
 
 The [shared fixture](../../../tests/dx_application_fixture.zig) executes DTO validation on Native and Workers WASM. Old model projection behavior is retained; strict unknown-field metadata diagnostics apply to the new typed handler adapter.
+
+## Living reference
+
+The current main [guestbook](../../../examples/guestbook/README.md) demonstrates these APIs in one compiled application graph. Continue to [tasks](../../../examples/tasks/README.md) for queue effects and testing. Platform ownership belongs in entrypoints, not Context.

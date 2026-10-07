@@ -102,3 +102,8 @@ The Workers entry imports the same application. Hello needs no D1/R2 resource. C
 ## Next steps
 
 [Documentation home](README.md) · [Tutorial](tutorial.md) · [Handbook](handbook.md)
+
+## Next: living applications
+
+[guestbook](../../examples/guestbook/README.md) → [tasks](../../examples/tasks/README.md) → [chat](../../examples/chat/README.md) → [device messaging](../../examples/device_messaging/README.md).
+The scaffold remains the canonical minimal application; these examples add explicit services only when needed.

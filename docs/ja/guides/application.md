@@ -9,3 +9,7 @@ provider ownerはContextの外で明示作成し、安定したaddressを維持�
 Endpoint metadataは既存route graph、capability検証、OpenAPI、clientへ接続します。Capabilityはrequirement、Provisionはprovider選択、Bindingはplatform resourceです。validationはprovisioningではなく、offline証拠はlive readinessではありません。Helloには不要です。stateful applicationでは[Portable Application Contract](../portable-application-contract.md)、[Provider lifecycle (English)](../../en/provider-lifecycle.md)を参照します。
 
 platform extensionは明示的に維持します。Native production defaultはThreaded、ReactorはPark/fail-closedです。新scheduler、DI container、service locatorは導入しません。
+
+## Living reference
+
+最新mainの[guestbook](../../../examples/guestbook/README.md)で、これらのAPIを一つのコンパイル可能なapplication graphとして確認できます。[tasks](../../../examples/tasks/README.md)ではQueue effectsとtestingへ進みます。providerのownerはContextではなくentrypointが持ちます。

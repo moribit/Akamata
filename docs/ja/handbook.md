@@ -242,16 +242,17 @@ Workers の場合は `deploy/wrangler.toml` の `[vars]` ブロックで `DATABA
 
 ### A. 自動 diff (初期開発に向く)
 
-雛形では native 起動時に毎回これが走るようになっています:
+任意のnotes templateやNative tutorialは開発時にこれを使います。default minimal scaffoldにはDBもmigrationもありません:
 
 ```zig
 const plan = try am.model.migrate.diff(arena, db, &all_models);
 try am.model.migrate.apply(arena, db, plan);
 ```
 
-Workers では `migrate_once.run` ミドルウェアを使います (雛形が最初の
-HTTP リクエスト時に走るよう自動で組み込みます。`akamata_init` 時点では
-JSPI がまだ有効でないため、初回リクエストで実行するのがポイント)。
+Workersのschemaはdeploy前に明示適用します。本番のfirst-requestやQueue配送に
+migrationを入れないでください。notes templateのdeferred migrationは開発利便性の
+patternです。[device messaging](../../examples/device_messaging/README.md)の明示
+versioned migrationとchecked owner acquisitionをproduction referenceとして使います。
 
 ### B. version付きSQL file
 

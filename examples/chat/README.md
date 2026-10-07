@@ -66,6 +66,7 @@ See [Workers deployment](../../docs/en/cloudflare.md).
 ```sh
 zig build chat-test
 zig build chat-test -Doptimize=ReleaseSafe
+python3 tests/living_chat.py
 zig build workers-realtime-test workers-wasm-dispatch-test
 ```
 

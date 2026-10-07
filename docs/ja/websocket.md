@@ -11,8 +11,11 @@ fn wsRoom(ctx: *Ctx) !void {
     var conn = try am.ws.upgrade(Ctx, ctx, .{ .max_message_bytes = 64 * 1024 });
     defer conn.deinit();
 
+    var message_arena = am.realtime.MessageArena.init(ctx.app().?.gpa);
+    defer message_arena.deinit();
     while (true) {
-        const msg = conn.readMessage(ctx.arena) catch |e| switch (e) {
+        message_arena.reset();
+        const msg = conn.readMessage(message_arena.allocator()) catch |e| switch (e) {
             error.ClosedByPeer => return,
             else => return e,
         };
@@ -23,9 +26,13 @@ fn wsRoom(ctx: *Ctx) !void {
 
 ルートは `app.ws("/path", handler)` で宣言する。内部的には `GET` メソッドの `RouteKind.ws` だが、ハンドラ側で `am.ws.upgrade()` を呼び、明示的に接続をアップグレードする。
 
-## ブロードキャスト (例: チャット)
+## Portable broadcastとownership
 
-複数 WS への配信は `examples/chat/src/ws_hub.zig` を参照。ルーム ID → `*Conn` の配列を `std.AutoHashMap` で持ち、`std.Thread.Mutex` で保護。
+`realtime.Service.room(Protocol, room_id)`でtyped effectを送ります。
+[chat reference](../../examples/chat/README.md)はNative backendを安定したaddressに
+置き、borrowしたtransport callbackとconnection teardownを明示gateで直列化します。
+frameごとのallocationをconnection全期間のrequest arenaへ積み上げず、
+MessageArenaを毎frame resetします。
 
 ## 制御フレーム
 
@@ -36,6 +43,11 @@ fn wsRoom(ctx: *Ctx) !void {
 
 明示的にクローズしたい場合: `conn.close(1000, "bye")`。
 
-## Workers 環境
+## Workers transport
 
-Workers では WS upgrade を JS 側 (`deploy/worker/index.mjs`) が検知して Durable Object (`ChatRoom`) に直接ルーティングする。Zig 側の WS ハンドラは Workers モードでは呼ばれず、DO 側 (`deploy/worker/chat_room.mjs`) が JavaScript で WS セッションを処理する。
+managed gatewayはapplication authorization後に`/realtime/:resource`を
+`AkamataRealtimeRoom`へ渡します。DOがsocket/attachmentを所有し、named service
+bindingのZig handlerが共通domainを呼び、bounded effectを返します。Nativeのstack
+ConnをDOへ移植する設計ではありません。[chat](../../examples/chat/README.md)と
+[検証済みPrincipalのproduction wiring](../../examples/device_messaging/README.md)を参照してください。
+旧chat専用Hub/ChatRoom経路はcanonicalではありません。

@@ -125,11 +125,13 @@ HTTP APIは`App → Context → endpoint/middleware → runtime`の単一系統�
 
 ## Examples
 
-- [`examples/chat/`](examples/chat/) — SQLiteを使うREST + native WebSocket chat
-- [`examples/guestbook/`](examples/guestbook/) — SQLite、D1、Turso向けmodel/repository guestbook
-- [`examples/tasks/`](examples/tasks/) — validation、OpenAPI、SSE、session、security middleware、
-  job、testを扱うreference REST API
-- [`examples/bench/`](examples/bench/) — 再現可能なframework benchmark
+[学習経路](examples/README.md): 正準minimal scaffold → guestbook（typed HTTP /
+validation / DB / OpenAPI）→ tasks（Queue effects / testing）→ chat（portable
+protocol / 明示transport）→ device_messaging（production providers / Principal /
+migration）。
+
+`examples/bench`と`examples/router_bench`は歴史的scriptとの互換性のため位置を
+維持するbenchmark fixtureで、application設計の教材とは区別します。
 
 ## ライセンス
 

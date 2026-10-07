@@ -6,4 +6,8 @@ Use an HTTP handshake route with existing authentication middleware. Derive room
 
 A universal `ak.channel` shorthand is deliberately deferred: Native App.ws socket ownership and Workers Durable Object gateway identity/authorization are not interchangeable route registration operations. A shorthand that hid that distinction would claim semantics it could not enforce. Keep portable protocol/room effects shared and transport entrypoints explicit. See [Realtime provider wiring](../realtime-providers.md), [WebSocket](../websocket.md) and [device_messaging reference](../../../examples/device_messaging/README.md).
 
-The [chat example](../../../examples/chat/README.md) demonstrates the older explicit HTTP/WS hub API; it is not a certified drop-in DO provider owner. Production readiness requires live adapter evidence; WASM host simulation alone does not establish it. Threaded is Native default and Reactor remains parked.
+The [chat example](../../../examples/chat/README.md) uses a shared typed Protocol
+and domain function with explicit Native socket / Workers DO owners. Its anonymous
+nickname policy is tutorial-only. [Device messaging](../../../examples/device_messaging/README.md)
+shows verified Principal and production provider wiring. Native Threaded remains
+default; Reactor is parked. Offline contracts do not establish live readiness.

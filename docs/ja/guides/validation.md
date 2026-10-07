@@ -11,3 +11,7 @@ length ruleはUnicode文字数ではなくbyte数です。OpenAPI minLength/maxL
 [共通fixture](../../../tests/dx_application_fixture.zig)でNative/Workers WASM双方を検証します。[英語Guide](../../en/guides/validation.md)も参照してください。旧model projectionの挙動は維持し、strict metadata診断は新typed handlerに適用します。
 
 field全体がi64へ安全に収まるintegerのmin/max/rangeは、OpenAPI minimum/maximumへ投影します。optional fieldのnullを維持します。floatの切り捨て、広いinteger、byte length、heuristic formatを、より強いschema保証として推論しません。DTO全体のvalidate hookは未追加ですが、既存custom ruleで普通のZig functionを使用できます。
+
+## Living reference
+
+最新mainの[guestbook](../../../examples/guestbook/README.md)で、これらのAPIを一つのコンパイル可能なapplication graphとして確認できます。[tasks](../../../examples/tasks/README.md)ではQueue effectsとtestingへ進みます。providerのownerはContextではなくentrypointが持ちます。

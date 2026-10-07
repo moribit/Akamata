@@ -66,3 +66,7 @@ AKAMATA_DX_TSC=/tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js zig build d
 
 This is test tooling, not a framework runtime dependency. Syntax transformation
 and mocked-fetch checks remain separate from static type checking.
+
+## Living reference
+
+The current main [guestbook](../../../examples/guestbook/README.md) demonstrates these APIs in one compiled application graph. Continue to [tasks](../../../examples/tasks/README.md) for queue effects and testing. Platform ownership belongs in entrypoints, not Context.

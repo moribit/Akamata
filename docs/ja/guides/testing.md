@@ -9,3 +9,9 @@ responseはarena・headers・requestの確保済みdataを所有するため、`
 既存test ownerの `MemoryStore.expectExists(key)` と `QueueRecorder.expectPublished(Descriptor)` で副作用を確認できます。Queue assertionはevent名・version・payload decodeを検証し、delivery/retry/durabilityを保証しません。MemoryStoreは16object、QueueRecorderはdefault64eventにboundedです。ownerはtest/application stateが保持し、Contextはproduction facadeをborrowします。
 
 [DX tests](../../../tests/dx_test.zig)で注入済みPrincipalの拒否とOOM cleanupを検証し、[共通fixture](../../../tests/dx_application_fixture.zig)でNative/Workers双方を実行します。[英語Guide](../../en/guides/testing.md)も参照してください。
+
+## Living references
+
+[guestbook](../../../examples/guestbook/src/integration_test.zig): typed CRUD/validation/generators.
+[tasks](../../../examples/tasks/src/integration_test.zig): the production graph with QueueRecorder, duplicate delivery, queue rejection and actual Native owner.
+[device messaging](../../../examples/device_messaging/src/integration_test.zig): real providers, JWT middleware and request-local Principal injection.

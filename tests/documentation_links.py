@@ -8,6 +8,7 @@ for language in ("en", "ja"):
     base = root / "docs" / language
     documents += [base / name for name in ("README.md", "quickstart.md", "tutorial.md", "handbook.md", "handler-api.md", "public-performance.md")]
     documents += list((base / "guides").glob("*.md"))
+documents.append(root / "examples" / "README.md")
 documents += list((root / "examples").glob("*/README.md"))
 missing = []
 for document in documents:

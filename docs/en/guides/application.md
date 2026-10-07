@@ -9,3 +9,7 @@ Provider owners are created explicitly outside Context. Keep owners at stable ad
 Endpoint metadata drives the existing route graph, capability validation, OpenAPI and HTTP clients. Capability is a requirement, Provision selects a provider, and Binding identifies a platform resource. Validation is not provisioning and offline evidence is not live readiness. Beginners need none of these for Hello; stateful applications should read [Portable Application Contract](../portable-application-contract.md) and [Provider lifecycle](../provider-lifecycle.md).
 
 Platform extensions remain explicit. Threaded is Native production default; Reactor remains parked/fail-closed. No new scheduler, DI container or service locator is involved.
+
+## Living reference
+
+The current main [guestbook](../../../examples/guestbook/README.md) demonstrates these APIs in one compiled application graph. Continue to [tasks](../../../examples/tasks/README.md) for queue effects and testing. Platform ownership belongs in entrypoints, not Context.
