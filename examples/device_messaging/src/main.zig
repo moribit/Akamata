@@ -24,6 +24,7 @@ pub fn main(init: std.process.Init) !void {
         return stdout.interface.flush();
     }
     if (args.len >= 2 and std.mem.eql(u8, std.mem.sliceTo(args[1], 0), "migrate-up")) {
+        if (args.len > 3) return error.InvalidArguments;
         var dir: []const u8 = "examples/device_messaging/migrations";
         if (args.len == 3) dir = std.mem.sliceTo(args[2], 0);
         const url = am.env.get(allocator, "DATABASE_URL") orelse try allocator.dupe(u8, "file:device_messaging.db");
@@ -32,7 +33,7 @@ pub fn main(init: std.process.Init) !void {
         defer db.close();
         const migrations = try am.model.migrate.loadMigrationsFromDir(arena.allocator(), dir);
         const migrator: am.model.migrate.Migrator = .{ .arena = arena.allocator(), .db = db };
-        try migrator.applyAll(migrations);
+        try migrator.applyAll(try migrator.pending(migrations));
         return;
     }
     if (args.len == 2 and (std.mem.eql(u8, std.mem.sliceTo(args[1], 0), "akamata-protocol-ts") or std.mem.eql(u8, std.mem.sliceTo(args[1], 0), "akamata-protocol-c"))) {

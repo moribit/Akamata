@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import platform
 import subprocess
+import sqlite3
 import tempfile
 import time
 
@@ -49,6 +50,19 @@ def main():
                 run(ZIG, "build", f"-Dexample={example}", f"-Doptimize={mode}")
                 binary = ROOT / "zig-out/bin" / example
                 evidence["artifacts"].append({"example": example, "target": "native", "mode": mode, "sha256": sha(binary)})
+        migration_db = output / "migration.sqlite"
+        environment = dict(os.environ, DATABASE_URL="file:" + str(migration_db))
+        binary = str(ROOT / "zig-out/bin/device_messaging")
+        run(binary, "migrate-up", env=environment)
+        run(binary, "migrate-up", env=environment)
+        with sqlite3.connect(migration_db) as connection:
+            assert connection.execute("SELECT count(*) FROM schema_migrations").fetchone()[0] == 1
+            assert connection.execute("SELECT count(*) FROM portable_records").fetchone()[0] == 0
+        evidence["versioned_migration"] = "two invocations; one history entry"
+        for example in EXAMPLES:
+            readme = (ROOT / "examples" / example / "README.md").read_text()
+            for section in ("What you will learn", "Why this example exists", "Run Native", "Test", "Architecture", "Next"):
+                assert "## " + section in readme, (example, section)
         evidence["native_wire"] = json.loads(run("python3", "tests/living_chat.py"))
         for example in EXAMPLES:
             binary = str(ROOT / "zig-out/bin" / example)
