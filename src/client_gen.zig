@@ -282,7 +282,7 @@ fn writeOperationFnName(w: *std.Io.Writer, method: @import("http/request.zig").M
     try w.writeAll(lowerMethod(method));
     var capitalize = true;
     for (path) |c| {
-        if (c == '/' or c == '-' or c == '_') {
+        if (!std.ascii.isAlphanumeric(c) and c != ':') {
             capitalize = true;
             continue;
         }
@@ -581,3 +581,13 @@ const JsonStringFormatter = struct {
         try w.writeByte('"');
     }
 };
+
+test "operation names remain identifiers for artifact and wildcard routes" {
+    var writer: std.Io.Writer.Allocating = .init(std.testing.allocator);
+    defer writer.deinit();
+    try writeOperationFnName(&writer.writer, .GET, "/openapi.json");
+    try std.testing.expectEqualStrings("getOpenapiJson", writer.written());
+    writer.clearRetainingCapacity();
+    try writeOperationFnName(&writer.writer, .GET, "/users/:id/files/*key");
+    try std.testing.expectEqualStrings("getUsersByIdFilesKey", writer.written());
+}
