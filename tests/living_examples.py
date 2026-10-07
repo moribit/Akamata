@@ -69,7 +69,7 @@ def main():
                 typecheck(protocol)
                 header = output / f"{example}-protocol.c"
                 header.write_text(run(binary, "akamata-protocol-c"))
-                run(ZIG, "cc", "-fsyntax-only", str(header))
+                run(ZIG, "cc", "-c", str(header), "-o", str(output / f"{example}-protocol.o"))
             run(ZIG, "build", f"-Dexample={example}", "-Dbackend=workers", "-Doptimize=ReleaseSafe")
             artifact = ROOT / "zig-out/bin" / f"{example}_worker.wasm"
             host = json.loads(run("node", "--experimental-wasm-jspi", "tests/living_workers.mjs", example, str(artifact), str(schema)))
