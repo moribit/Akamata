@@ -27,7 +27,6 @@ pub const routes = .{
     am.endpoint(.{ .method = .GET, .path = "/client.ts", .handler = h.client, .fallback = .internal_server_error }),
 };
 pub const endpoints = blk: {
-    @setEvalBranchQuota(50_000);
     var result: [routes.len]type = undefined;
     for (routes, 0..) |R, i| result[i] = R.For(@import("app.zig").App);
     break :blk result;

@@ -34,7 +34,6 @@ pub fn main(init: std.process.Init) !void {
             return stdout.interface.flush();
         }
         if (std.mem.eql(u8, command, "akamata-capabilities")) {
-            @setEvalBranchQuota(50_000);
             const endpoints = comptime blk: {
                 var result: [contracts.routes.len]type = undefined;
                 for (contracts.routes, 0..) |R, i| result[i] = R.For(State);

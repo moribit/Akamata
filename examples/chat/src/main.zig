@@ -37,8 +37,17 @@ pub fn main(init: std.process.Init) !void {
             if (std.mem.eql(u8, target, "workers")) try contracts.For(.workers).writeManifest(.workers, &stdout.interface, endpoints) else if (std.mem.eql(u8, target, "native")) try C.writeManifest(.native, &stdout.interface, endpoints) else return error.InvalidTarget;
             return stdout.interface.flush();
         }
-        return error.UnknownCommand;
     }
+    if (args.len == 2 and (std.mem.eql(u8, std.mem.sliceTo(args[1], 0), "akamata-protocol-ts") or std.mem.eql(u8, std.mem.sliceTo(args[1], 0), "akamata-protocol-c"))) {
+        const target: am.protocol_gen.Target = if (std.mem.eql(u8, std.mem.sliceTo(args[1], 0), "akamata-protocol-ts")) .typescript else .c;
+        const bytes = try am.protocol_gen.generateProtocol(@import("contract.zig").Protocol, alloc, .{ .target = target });
+        defer alloc.free(bytes);
+        var buffer: [4096]u8 = undefined;
+        var stdout = std.Io.File.stdout().writer(init.io, &buffer);
+        try stdout.interface.writeAll(bytes);
+        return stdout.interface.flush();
+    }
+    if (args.len > 1) return error.UnknownCommand;
     try am.env.loadDotEnv(alloc, ".env");
     const url = am.env.get(alloc, "DATABASE_URL") orelse try alloc.dupe(u8, "file:chat.db");
     defer alloc.free(url);

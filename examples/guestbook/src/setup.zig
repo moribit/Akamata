@@ -3,10 +3,7 @@ const std = @import("std");
 const am = @import("akamata");
 const State = @import("app.zig").App;
 const models = @import("models.zig");
-pub const Application = blk: {
-    @setEvalBranchQuota(50_000);
-    break :blk am.App(.{ .State = State, .routes = @import("contract.zig").routes, .configure = configure });
-};
+pub const Application = am.App(.{ .State = State, .routes = @import("contract.zig").routes, .configure = configure });
 pub const default_native_url = "file:guestbook.db";
 pub const default_workers_url = "d1:" ++ @import("contract.zig").For(.workers).resolve(.database).binding.?;
 fn configure(app: *am.App(State)) !void {

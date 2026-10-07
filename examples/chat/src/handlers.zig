@@ -6,14 +6,14 @@ const Ctx = am.Context(State);
 const contracts = @import("contract.zig");
 pub const CreateRoom = struct {
     name: []const u8,
-    pub const validation = .{ .name = .{ am.model.rule.min_len(1), am.model.rule.max_len(100) } };
+    pub const validation = .{ .name = .{ am.model.rule.required, am.model.rule.min_len(1), am.model.rule.max_len(100) } };
 };
 pub const PostMessage = struct {
     user: []const u8,
     text: []const u8,
     pub const validation = .{
-        .user = .{ am.model.rule.min_len(1), am.model.rule.max_len(64) },
-        .text = .{ am.model.rule.min_len(1), am.model.rule.max_len(1024) },
+        .user = .{ am.model.rule.required, am.model.rule.min_len(1), am.model.rule.max_len(64) },
+        .text = .{ am.model.rule.required, am.model.rule.min_len(1), am.model.rule.max_len(1024) },
     };
 };
 pub const Room = struct { id: i64, name: []const u8, created_at: i64 };
