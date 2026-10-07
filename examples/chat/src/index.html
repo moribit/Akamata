@@ -28,7 +28,7 @@
     function append(line) {
       const div = document.createElement('div');
       div.className = 'msg';
-      div.innerHTML = line;
+      div.textContent = line;
       log.appendChild(div);
       log.scrollTop = log.scrollHeight;
     }
@@ -36,11 +36,13 @@
       const room = document.getElementById('room').value;
       if (ws) ws.close();
       const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-      ws = new WebSocket(`${proto}://${location.host}/rooms/${room}/ws`);
+      ws = new WebSocket(`${proto}://${location.host}/realtime/${room}?user=${encodeURIComponent(document.getElementById("user").value)}`);
       ws.onmessage = e => {
         try {
-          const m = JSON.parse(e.data);
-          append(`<span class="u">${m.user}</span>: ${m.text}`);
+          const envelope = JSON.parse(e.data);
+          if (envelope.event_type !== "message") return;
+          const m = envelope.payload;
+          append(`${m.user}: ${m.text}`);
         } catch {
           append(e.data);
         }

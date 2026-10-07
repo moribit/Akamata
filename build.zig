@@ -299,6 +299,7 @@ pub fn build(b: *std.Build) void {
     // Kept separate from the main suite so we don't pollute it with example-
     // specific paths, and so the example can be removed cleanly if needed.
     const tasks_test_step = b.step("tasks-test", "run tests for examples/tasks");
+    const chat_test_step = b.step("chat-test", "run the portable chat application and protocol contracts");
     const guestbook_test_step = b.step("guestbook-test", "run the canonical typed HTTP example contracts");
 
     if (backend == .native) {
@@ -415,6 +416,14 @@ pub fn build(b: *std.Build) void {
             const t = b.addTest(.{ .root_module = t_mod });
             integration_step.dependOn(&b.addRunArtifact(t).step);
         }
+
+        const chat_test_mod = b.createModule(.{
+            .root_source_file = b.path("examples/chat/src/integration_test.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{.{ .name = "akamata", .module = am_mod }},
+        });
+        chat_test_step.dependOn(&b.addRunArtifact(b.addTest(.{ .root_module = chat_test_mod })).step);
 
         const guestbook_test_mod = b.createModule(.{
             .root_source_file = b.path("examples/guestbook/src/integration_test.zig"),

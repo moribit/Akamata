@@ -509,13 +509,6 @@ export default {
     // service binding below.
     const rejected = rejectPublicInternalRoute(request);
     if (rejected) return rejected;
-    // Route WebSocket upgrades directly to the ChatRoom DO.
-    const wsMatch = url.pathname.match(/^\/rooms\/(\d+)\/ws$/);
-    if (wsMatch && request.headers.get("Upgrade") === "websocket") {
-      const id = env.CHAT_ROOM.idFromName(wsMatch[1]);
-      const obj = env.CHAT_ROOM.get(id);
-      return obj.fetch(request);
-    }
     const realtimeMatch = url.pathname.match(/^\/realtime\/([^/]+)$/);
     if (realtimeMatch && request.headers.get("Upgrade")?.toLowerCase() === "websocket") {
       // The requested resource is only an authorization input. The client
@@ -675,5 +668,4 @@ function findHeaderEnd(bytes) {
   return -1;
 }
 
-export { ChatRoom } from "./chat_room.mjs";
 export { AkamataRealtimeRoom } from "./realtime_object.mjs";
