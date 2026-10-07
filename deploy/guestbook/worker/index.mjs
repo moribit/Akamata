@@ -283,7 +283,7 @@ async function dispatchWasm(request) {
       respHeaders.set(lines[i].slice(0, ci).trim(), lines[i].slice(ci + 1).trim());
     }
     if (!Number.isInteger(status) || status < 200 || status > 599) return new Response("invalid wasm response status", { status: 502 });
-    return new Response(respBody, { status, headers: respHeaders });
+    return new Response([204, 205, 304].includes(status) ? null : respBody, { status, headers: respHeaders });
 }
 
 function findHeaderEnd(bytes) {

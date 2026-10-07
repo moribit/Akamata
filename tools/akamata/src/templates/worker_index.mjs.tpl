@@ -658,7 +658,7 @@ function parseHttpResponse(bytes) {
   if (!Number.isInteger(status) || status < 200 || status > 599) {
     return new Response("invalid wasm response status", { status: 502 });
   }
-  return new Response(body, { status, headers });
+  return new Response([204, 205, 304].includes(status) ? null : body, { status, headers });
 }
 
 function findHeaderEnd(bytes) {

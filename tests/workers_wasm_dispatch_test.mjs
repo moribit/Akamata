@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { WasmDispatchQueue } from "../deploy/worker/wasm_dispatch.mjs";
@@ -49,3 +50,18 @@ test("a rejected dispatch releases the isolate queue", async () => {
   await assert.rejects(queue.run(async () => { throw new Error("boom"); }), /boom/);
   assert.equal(await queue.run(async () => 200), 200);
 });
+
+for (const source of ["../deploy/worker/index.mjs", "../tools/akamata/src/templates/worker_index.mjs.tpl"]) {
+  test(`${source}: bodyless HTTP statuses produce a valid Fetch response`, async () => {
+    const text = readFileSync(new URL(source, import.meta.url), "utf8");
+    const start = text.indexOf("function parseHttpResponse(bytes)");
+    const parser = new Function(text.slice(start, text.indexOf("export {", start)) + "; return parseHttpResponse;")();
+    for (const status of [204, 205, 304]) {
+      const response = parser(new TextEncoder().encode(`HTTP/1.1 ${status} Test\r\nx-test: preserved\r\n\r\n`));
+      assert.equal(response.status, status);
+      assert.equal(response.body, null);
+      assert.equal(response.headers.get("x-test"), "preserved");
+    }
+    assert.equal(await parser(new TextEncoder().encode("HTTP/1.1 200 OK\r\n\r\nhello")).text(), "hello");
+  });
+}
