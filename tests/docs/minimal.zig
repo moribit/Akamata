@@ -23,6 +23,7 @@ pub fn contract(allocator: std.mem.Allocator) !void {
     var app = try Application.init(allocator);
     defer app.deinit();
     var client = app.client(allocator);
+    defer client.deinit();
     var response = try client.get("/").send();
     defer response.deinit();
     if (response.status != 200 or !std.mem.eql(u8, response.body, "Hello, Akamata!")) return error.DocumentationContractFailed;
