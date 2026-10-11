@@ -347,6 +347,15 @@ pub fn build(b: *std.Build) void {
         pool_test_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
         pool_test_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
         b.step("db-pool-test", "run deadline/release/close races with optional TSan").dependOn(&b.addRunArtifact(b.addTest(.{ .root_module = pool_test_mod })).step);
+        const pool_bench_mod = b.createModule(.{ .root_source_file = b.path("src/db_pool_bench.zig"), .target = native_target, .optimize = optimize });
+        pool_bench_mod.link_libc = true;
+        pool_bench_mod.addOptions("build_options", opts);
+        pool_bench_mod.addImport("sqlite3", am_mod.import_table.get("sqlite3").?);
+        pool_bench_mod.addIncludePath(b.path("third_party/sqlite"));
+        pool_bench_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
+        pool_bench_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
+        const pool_bench = b.addExecutable(.{ .name = "db-pool-profile", .root_module = pool_bench_mod });
+        b.step("db-pool-profile", "measure bounded native pool saturation (after-only diagnostic)").dependOn(&b.addRunArtifact(pool_bench).step);
         const contract_server = b.addExecutable(.{ .name = "runtime-contract-server", .root_module = contract_mod });
         b.step("runtime-certify-fixture", "build private incremental session certification fixture").dependOn(&b.addInstallArtifact(contract_server, .{}).step);
         const contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });

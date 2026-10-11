@@ -27,6 +27,7 @@ p.add_argument("--connections", type=int, nargs="+", default=[4, 32, 128])
 p.add_argument("--idle", type=int, nargs="+", default=[64, 256])
 p.add_argument("--rounds", type=int, default=2)
 p.add_argument("--duration", default="2s")
+p.add_argument("--request-timeout", default="10s")
 p.add_argument("--stats", action="store_true")
 p.add_argument("--observability", choices=["disabled", "metrics", "full"], default="disabled")
 p.add_argument("--echo-bytes", type=int, default=1)
@@ -133,7 +134,7 @@ for round_no in range(a.rounds):
                 for label, binary in (bins if round_no % 2 == 0 else list(reversed(bins))):
                     run = {"label": label, "round": round_no + 1, "kind": kind, "connections": connections, "endpoint": endpoint}
                     with server(binary, run) as proc:
-                        command = ["oha", "--no-tui", "--output-format", "json", "-c", str(connections), "-z", a.duration, "-w", *extra]
+                        command = ["oha", "--no-tui", "--output-format", "json", "-c", str(connections), "-z", a.duration, "-w", "-t", a.request_timeout, *extra]
                         if kind == "short_lived":
                             # Keep the host's TIME_WAIT/source-port usage safe.
                             # This measures latency/resources at a fixed rate,
@@ -143,14 +144,25 @@ for round_no in range(a.rounds):
                         run["command"] = command
                         before = sample(proc.pid)
                         started = time.monotonic()
-                        client = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        samples = []
-                        while client.poll() is None:
-                            samples.append(sample(proc.pid))
-                            time.sleep(.25)
-                        stdout, stderr = client.communicate()
-                        if client.returncode:
-                            raise RuntimeError(stderr.decode())
+                        # File-backed capture cannot deadlock when oha emits more
+                        # than the pipe capacity. Bound the load tool independently
+                        # of request timeout, including its in-flight drain (-w).
+                        with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
+                            client = subprocess.Popen(command, stdout=out, stderr=err)
+                            samples = []
+                            duration_seconds = float(a.duration.removesuffix("s"))
+                            while client.poll() is None:
+                                if time.monotonic() - started > duration_seconds + 60:
+                                    client.kill()
+                                    client.wait()
+                                    raise RuntimeError("load tool exceeded duration plus 60s drain budget")
+                                samples.append(sample(proc.pid))
+                                time.sleep(.25)
+                            out.seek(0)
+                            err.seek(0)
+                            stdout, stderr = out.read(), err.read()
+                            if client.returncode:
+                                raise RuntimeError(stderr.decode())
                         run["oha"] = json.loads(stdout)
                         after = sample(proc.pid)
                         run["cpu_percent"] = 100 * (after["cpu_seconds"] - before["cpu_seconds"]) / (time.monotonic() - started)
