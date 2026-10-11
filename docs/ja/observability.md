@@ -153,3 +153,5 @@ streamingのdurationは、現在はclientが最後のbyteを読み終えるま�
 metrics labelに適しているのは固定enumと登録済みroute templateだけです。raw path、SQL、URL、error text、request ID、任意のspan名をlabelへ使用しないでください。
 
 span recordは小さなrequest-local structureにname、parent、durationを保持します。将来はhandler側のspan APIを変えずにtrace／span IDや`Observer.onRequestEnd`／`onDbEnd` hookを追加し、OTLPやCloudflare Analytics Engineへ拡張できます。完全なOpenTelemetry SDK／OTLP exporterは現在のscope外です。
+
+See [Pool and Native runtime metrics](db-pool.md) for opt-in lifecycle gauges and HTTP phase summaries, including units and measurement overlap.

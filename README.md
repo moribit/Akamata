@@ -138,3 +138,5 @@ for historical scripts; they are measurements, not application architecture.
 ## License
 
 MIT
+
+[Performance & Reliability (v0.2.1 preparation)](docs/en/performance-reliability.md): Pool deadlines, runtime metrics, measured allocation behavior and Native/Workers limits.

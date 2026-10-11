@@ -136,3 +136,5 @@ migration）。
 ## ライセンス
 
 MIT
+
+[Performance & Reliability (v0.2.1 preparation)](docs/ja/performance-reliability.md): Pool deadlines, runtime metrics, measured allocation behavior and Native/Workers limits.

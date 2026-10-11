@@ -2,6 +2,29 @@
 
 ## [Unreleased]
 
+### v0.2.1 Performance & Reliability preparation
+
+- Add compatible `Pool.tryAcquire`, monotonic `acquireWithDeadline`, explicit
+  `close`, and cooperative deinit joining outstanding borrowers/acquisitions.
+  Preserve ownership on allocation failure and defend against stale double release.
+- Extend existing Prometheus counters with Pool wait/timeout gauges and summaries,
+  Threaded connection/rejection/thread/lifetime/drain metrics and fixed-label HTTP
+  phase summaries. All runtime instrumentation is opt-in through borrowed owners.
+- Close an accepted socket when transport initialization fails. Preserve existing
+  admission limits, absolute write budgets and cooperative shutdown behavior.
+- Preserve enum literals and tagged-union JSON wire schemas through typed handlers,
+  OpenAPI and TypeScript; verify mapped error discriminators against actual responses.
+  Required DTO validation precedes projection lifting without manufacturing zero values.
+- Add Native/Workers shared complex-schema fixtures, allocation attribution,
+  deadline/close/release races, opt-in Pool TSan coverage and reproducible benchmark
+  JSON payload/observability modes. Keep retained arenas and owned response bodies.
+- Document provider timeout/retry differences and unsupported Workers synchronous
+  HTTP streaming. No live Cloudflare certification, Reactor activation, release tag
+  or GitHub Release is implied by this preparation.
+
+See [performance/reliability guide](docs/en/performance-reliability.md) and
+[DB Pool migration/lifetime notes](docs/en/db-pool.md).
+
 ## [0.2.0] - 2026-10-07
 
 ### Highlights

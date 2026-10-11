@@ -193,3 +193,5 @@ span names. Span records already preserve name, parent, and duration in a small
 request structure; trace/span IDs and an `Observer.onRequestEnd/onDbEnd` hook
 can be added later for OTLP or Analytics Engine without changing handler span
 usage. A complete OpenTelemetry SDK/OTLP exporter is intentionally out of scope.
+
+See [Pool and Native runtime metrics](db-pool.md) for opt-in lifecycle gauges and HTTP phase summaries, including units and measurement overlap.

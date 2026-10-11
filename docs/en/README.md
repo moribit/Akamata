@@ -110,3 +110,6 @@ and main API availability are distinguished rather than silently backporting doc
 
 [Minimal scaffold → guestbook → tasks → chat → device messaging](../../examples/README.md).
 These references track main; v0.2.0 users should read the example compatibility notes before copying newer code.
+
+- [Performance & Reliability / v0.2.1 preparation](performance-reliability.md)
+- [DB Pool deadlines / ownership / runtime metrics](db-pool.md)

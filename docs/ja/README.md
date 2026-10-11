@@ -110,3 +110,6 @@ and main API availability are distinguished rather than silently backporting doc
 
 [Minimal scaffold → guestbook → tasks → chat → device messaging](../../examples/README.md)。
 examplesはmainを追跡します。v0.2.0利用者は新しいコードをコピーする前に各exampleのcompatibility noteを確認してください。
+
+- [Performance & Reliability / v0.2.1 preparation](performance-reliability.md)
+- [DB Pool deadlines / ownership / runtime metrics](db-pool.md)
