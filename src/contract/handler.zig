@@ -51,6 +51,10 @@ fn validateValue(comptime T: type) void {
             validateValue(v.child);
         },
         .@"struct" => |v| inline for (reflection.fields(v)) |field| validateValue(field.type),
+        .@"union" => |v| {
+            if (v.tag_type == null) @compileError("Akamata JSON response requires a tagged union; untagged unions have no wire discriminator");
+            inline for (reflection.fields(v)) |field| validateValue(field.type);
+        },
         else => @compileError("unsupported Akamata handler return type; return a JSON value, []const u8, void, or a status helper"),
     }
 }

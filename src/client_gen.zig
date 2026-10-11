@@ -356,6 +356,20 @@ fn writeTsTypeFromJsonSchema(w: *std.Io.Writer, schema: []const u8) std.Io.Write
     if (findField(schema, "\"type\":")) |t_start| {
         const type_str = parseString(schema[t_start..]) orelse "any";
         if (std.mem.eql(u8, type_str, "string")) {
+            if (findField(schema, "\"enum\":")) |start| {
+                if (parseArray(schema[start..])) |items| {
+                    var remaining = items[1 .. items.len - 1];
+                    var first = true;
+                    while (parseString(remaining)) |literal| {
+                        if (!first) try w.writeAll(" | ");
+                        first = false;
+                        try w.print("\"{s}\"", .{literal});
+                        const end = @intFromPtr(literal.ptr) + literal.len + 1 - @intFromPtr(remaining.ptr);
+                        remaining = remaining[end..];
+                    }
+                    if (!first) return;
+                }
+            }
             try w.writeAll("string");
             return;
         }
@@ -386,21 +400,29 @@ fn writeTsTypeFromJsonSchema(w: *std.Io.Writer, schema: []const u8) std.Io.Write
             return;
         }
     }
-    // Akamata emits optionals as oneOf(null, T). Preserve that contract
-    // instead of widening the generated client field to `any`.
+    // Preserve both nullable schemas and tagged-union branches. Keep null
+    // last for compatibility with the existing optional field spelling.
     if (findField(schema, "\"oneOf\":")) |union_start| {
         if (parseArray(schema[union_start..])) |items| {
-            const first = parseObject(items[1..]) orelse {
-                try w.writeAll("unknown");
-                return;
-            };
-            const rest = items[1 + first.len ..];
-            const second = parseObject(rest) orelse {
-                try w.writeAll("unknown");
-                return;
-            };
-            try writeTsTypeFromJsonSchema(w, second);
-            try w.writeAll(" | null");
+            var remaining = items[1 .. items.len - 1];
+            var first = true;
+            var nullable = false;
+            while (parseObject(remaining)) |branch| {
+                const end = @intFromPtr(branch.ptr) + branch.len - @intFromPtr(remaining.ptr);
+                remaining = remaining[end..];
+                const kind = if (findField(branch, "\"type\":")) |t| parseString(branch[t..]) else null;
+                if (kind != null and std.mem.eql(u8, kind.?, "null")) {
+                    nullable = true;
+                    continue;
+                }
+                if (!first) try w.writeAll(" | ");
+                first = false;
+                try writeTsTypeFromJsonSchema(w, branch);
+            }
+            if (nullable) {
+                if (!first) try w.writeAll(" | ");
+                try w.writeAll("null");
+            } else if (first) try w.writeAll("unknown");
             return;
         }
     }

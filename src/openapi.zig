@@ -656,6 +656,26 @@ fn writeTypeSchema(comptime T: type, ctx: *SpecBuilder, w: *std.Io.Writer) anyer
             }
             try w.writeAll("]}");
         },
+        .@"union" => |u| {
+            // Match std.json's tagged-union wire representation. Custom
+            // serializers require explicit schema metadata; never infer it.
+            if (u.tag_type == null or std.meta.hasFn(T, "jsonStringify")) {
+                try w.writeAll("{}");
+                return;
+            }
+            try w.writeAll("{\"oneOf\":[");
+            inline for (reflection.fields(u), 0..) |f, i| {
+                if (i > 0) try w.writeAll(",");
+                try w.writeAll("{\"type\":\"object\",\"properties\":{");
+                try writeJsonString(w, f.name);
+                try w.writeAll(":");
+                if (f.type == void) try w.writeAll("{\"type\":\"object\",\"additionalProperties\":false}") else try writeTypeSchema(f.type, ctx, w);
+                try w.writeAll("},\"required\":[");
+                try writeJsonString(w, f.name);
+                try w.writeAll("],\"additionalProperties\":false}");
+            }
+            try w.writeAll("]}");
+        },
         .@"enum" => |e| {
             try w.writeAll("{\"type\":\"string\",\"enum\":[");
             inline for (reflection.fields(e), 0..) |f, i| {

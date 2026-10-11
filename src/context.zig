@@ -43,12 +43,8 @@ fn projectionOf(comptime T: type) type {
 /// Lift a projection back into `T`. For each T field:
 ///   - if the projection has a non-null value → use it
 ///   - else if T has a default value → use that
-///   - else → leave the field at its zero / undefined state. This branch
-///     is reachable only when the validator was already supposed to fire
-///     a 422 (i.e. you've called `c.input(T)` without listing `required`
-///     for a non-optional, no-default field); the resulting struct is
-///     never observed by the caller because `c.input` already early-
-///     returned.
+/// Required fields have already been checked by input(), independently of
+/// user validation rules. Missing non-default fields cannot reach this helper.
 fn liftProjection(comptime T: type, proj: anytype) T {
     const info = @typeInfo(T);
     if (info != .@"struct") return proj;
@@ -64,7 +60,7 @@ fn liftProjection(comptime T: type, proj: anytype) T {
             } else if (f.defaultValue()) |dv| {
                 @field(out, f.name) = dv;
             } else {
-                @field(out, f.name) = std.mem.zeroes(f.type);
+                unreachable;
             }
         }
     }
@@ -421,8 +417,7 @@ pub fn Context(comptime State: type) type {
             // become the projection's null; we use T's struct-level
             // defaults for those. If a non-optional T field is null in
             // the projection AND has no default, that's a 422 the
-            // validator should have already raised (via `required`) —
-            // we fall through with a zero-value to keep this fn total.
+            // required-field check above has already returned 422.
             return liftProjection(T, proj);
         }
 

@@ -260,3 +260,61 @@ test "ordinary multi-route typed application needs no caller branch quota" {
     defer response.deinit();
     try response.expectStatus(.created);
 }
+
+test "one endpoint error contract agrees across HTTP OpenAPI and TypeScript" {
+    var app = try Application.init(std.testing.allocator);
+    defer app.deinit();
+    var client = app.client(std.testing.allocator);
+    var response = try client.get("/users/0").send();
+    defer response.deinit();
+    try response.expectStatus(404);
+    const actual = try response.json(struct { error_kind: []const u8 });
+    try std.testing.expectEqualStrings("NotFound", actual.error_kind);
+    const doc = try ak.openapi.generate(Application.Core, &app.core, std.testing.allocator, .{});
+    defer std.testing.allocator.free(doc);
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, doc, .{});
+    defer parsed.deinit();
+    const schema = parsed.value.object.get("paths").?.object.get("/users/{id}").?.object.get("get").?.object.get("responses").?.object.get("404").?.object.get("content").?.object.get("application/json").?.object.get("schema").?;
+    const declared = schema.object.get("properties").?.object.get("error_kind").?.object.get("enum").?.array.items[0].string;
+    try std.testing.expectEqualStrings(actual.error_kind, declared);
+    const ts = try ak.client_gen.generate(Application.Core, &app.core, std.testing.allocator, .{ .target = .typescript });
+    defer std.testing.allocator.free(ts);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "NotFound") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "404") != null);
+}
+
+const SchemaValue = union(enum) { count: u32, label: []const u8, empty: void };
+const SchemaDto = struct {
+    mode: enum { active, paused },
+    optional: ?u32 = null,
+    defaulted: u32 = 7,
+    items: []const struct { id: u64 },
+    choice: SchemaValue,
+};
+fn schemaEcho(body: ak.Json(SchemaDto)) SchemaDto {
+    return body.value;
+}
+test "DTO defaults nullable enums arrays nested structs and tagged union keep wire schemas" {
+    const SchemaApp = ak.App(.{ .routes = .{ak.post("/schema", schemaEcho)} });
+    var app = try SchemaApp.init(std.testing.allocator);
+    defer app.deinit();
+    var client = app.client(std.testing.allocator);
+    var response = try client.post("/schema").json(.{ .mode = "active", .items = .{.{ .id = 42 }}, .choice = .{ .count = 3 } }).send();
+    defer response.deinit();
+    try response.expectStatus(200);
+    const dto = try response.json(SchemaDto);
+    try std.testing.expectEqual(@as(u32, 7), dto.defaulted);
+    try std.testing.expect(dto.optional == null);
+    try std.testing.expectEqual(@as(u32, 3), dto.choice.count);
+    const doc = try ak.openapi.generate(SchemaApp.Core, &app.core, std.testing.allocator, .{});
+    defer std.testing.allocator.free(doc);
+    try std.testing.expect(std.mem.indexOf(u8, doc, "\"required\":[\"count\"]") != null);
+    try std.testing.expect(std.mem.indexOf(u8, doc, "\"required\":[\"label\"]") != null);
+    const ts = try ak.client_gen.generate(SchemaApp.Core, &app.core, std.testing.allocator, .{ .target = .typescript });
+    defer std.testing.allocator.free(ts);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "\"active\" | \"paused\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "optional?: number | null") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "defaulted?: number") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "count: number") != null);
+    try std.testing.expect(std.mem.indexOf(u8, ts, "label: string") != null);
+}
