@@ -283,38 +283,6 @@ test "one endpoint error contract agrees across HTTP OpenAPI and TypeScript" {
     try std.testing.expect(std.mem.indexOf(u8, ts, "404") != null);
 }
 
-const SchemaValue = union(enum) { count: u32, label: []const u8, empty: void };
-const SchemaDto = struct {
-    mode: enum { active, paused },
-    optional: ?u32 = null,
-    defaulted: u32 = 7,
-    items: []const struct { id: u64 },
-    choice: SchemaValue,
-};
-fn schemaEcho(body: ak.Json(SchemaDto)) SchemaDto {
-    return body.value;
-}
-test "DTO defaults nullable enums arrays nested structs and tagged union keep wire schemas" {
-    const SchemaApp = ak.App(.{ .routes = .{ak.post("/schema", schemaEcho)} });
-    var app = try SchemaApp.init(std.testing.allocator);
-    defer app.deinit();
-    var client = app.client(std.testing.allocator);
-    var response = try client.post("/schema").json(.{ .mode = "active", .items = .{.{ .id = 42 }}, .choice = .{ .count = 3 } }).send();
-    defer response.deinit();
-    try response.expectStatus(200);
-    const dto = try response.json(SchemaDto);
-    try std.testing.expectEqual(@as(u32, 7), dto.defaulted);
-    try std.testing.expect(dto.optional == null);
-    try std.testing.expectEqual(@as(u32, 3), dto.choice.count);
-    const doc = try ak.openapi.generate(SchemaApp.Core, &app.core, std.testing.allocator, .{});
-    defer std.testing.allocator.free(doc);
-    try std.testing.expect(std.mem.indexOf(u8, doc, "\"required\":[\"count\"]") != null);
-    try std.testing.expect(std.mem.indexOf(u8, doc, "\"required\":[\"label\"]") != null);
-    const ts = try ak.client_gen.generate(SchemaApp.Core, &app.core, std.testing.allocator, .{ .target = .typescript });
-    defer std.testing.allocator.free(ts);
-    try std.testing.expect(std.mem.indexOf(u8, ts, "\"active\" | \"paused\"") != null);
-    try std.testing.expect(std.mem.indexOf(u8, ts, "optional?: number | null") != null);
-    try std.testing.expect(std.mem.indexOf(u8, ts, "defaulted?: number") != null);
-    try std.testing.expect(std.mem.indexOf(u8, ts, "count: number") != null);
-    try std.testing.expect(std.mem.indexOf(u8, ts, "label: string") != null);
+test "complex DTO wire contracts share Native and Workers fixture" {
+    try @import("portable_application_fixture.zig").schemaContract(std.testing.allocator);
 }

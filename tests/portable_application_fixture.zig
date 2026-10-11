@@ -158,6 +158,7 @@ pub fn paginationContract(allocator: std.mem.Allocator, store: am.storage.Store)
 }
 
 pub fn run(allocator: std.mem.Allocator) !void {
+    try schemaContract(allocator);
     var db: DatabaseEffect = .{};
     var store = am.testing.MemoryStore.init(allocator);
     try storageContract(allocator, store.store());
@@ -225,4 +226,40 @@ pub fn run(allocator: std.mem.Allocator) !void {
     defer manifest.deinit();
     try C.writeManifest(target, &manifest.writer, .{Endpoint});
     try expect(std.mem.indexOf(u8, manifest.written(), "createMessage") != null and std.mem.indexOf(u8, manifest.written(), "/messages") != null);
+}
+
+const SchemaValue = union(enum) { count: u32, label: []const u8, empty: void };
+const SchemaDto = struct {
+    mode: enum { active, paused },
+    optional: ?u32 = null,
+    defaulted: u32 = 7,
+    items: []const struct { id: u64 },
+    choice: SchemaValue,
+};
+fn schemaEcho(body: am.Json(SchemaDto)) SchemaDto {
+    return body.value;
+}
+pub fn schemaContract(allocator: std.mem.Allocator) !void {
+    const SchemaApp = am.App(.{ .routes = .{am.post("/schema", schemaEcho)} });
+    var app = try SchemaApp.init(allocator);
+    defer app.deinit();
+    var client = app.client(allocator);
+    var response = try client.post("/schema").json(.{ .mode = "active", .items = .{.{ .id = 42 }}, .choice = .{ .count = 3 } }).send();
+    defer response.deinit();
+    try response.expectStatus(200);
+    const dto = try response.json(SchemaDto);
+    try expect(dto.defaulted == 7);
+    try expect(dto.optional == null);
+    try expect(dto.choice.count == 3);
+    const doc = try am.openapi.generate(SchemaApp.Core, &app.core, allocator, .{});
+    defer allocator.free(doc);
+    try expect(std.mem.indexOf(u8, doc, "\"required\":[\"count\"]") != null);
+    try expect(std.mem.indexOf(u8, doc, "\"required\":[\"label\"]") != null);
+    const ts = try am.client_gen.generate(SchemaApp.Core, &app.core, allocator, .{ .target = .typescript });
+    defer allocator.free(ts);
+    try expect(std.mem.indexOf(u8, ts, "\"active\" | \"paused\"") != null);
+    try expect(std.mem.indexOf(u8, ts, "optional?: number | null") != null);
+    try expect(std.mem.indexOf(u8, ts, "defaulted?: number") != null);
+    try expect(std.mem.indexOf(u8, ts, "count: number") != null);
+    try expect(std.mem.indexOf(u8, ts, "label: string") != null);
 }
