@@ -465,19 +465,33 @@ class Contract(unittest.TestCase):
 
     def test_max_connections_overload_and_recovery(self):
         with self.server("overload") as (_, connect):
-            first, second = connect(), connect()
-            # A completed response is the admission barrier for each occupied
-            # slot; avoid guessing whether an accept thread ran after connect.
-            for occupied in (first, second):
-                occupied.send(request())
-                self.assertEqual(occupied.response()[0], 200)
+            def admit(close=False):
+                # EOF on the startup probe precedes the thread's final slot
+                # release. Wait for actual admission, not a guessed sleep.
+                deadline = time.monotonic() + 1
+                while True:
+                    candidate = connect()
+                    try:
+                        candidate.send(request(close=close))
+                        self.assertEqual(candidate.response()[0], 200)
+                        return candidate
+                    except (OSError, AssertionError):
+                        candidate.close()
+                        if time.monotonic() >= deadline:
+                            raise
+                        time.sleep(.01)
+            first, second = admit(), admit()
             excess = connect()
+            # Send a valid request so acceptance cannot masquerade as an idle
+            # timeout. Any HTTP response here violates the connection limit.
+            try:
+                excess.send(request())
+            except OSError:
+                pass  # Already rejected/reset before send.
             excess.eof()
             first.close()
-            time.sleep(.08)
-            normal = connect()
-            normal.send(request(close=True))
-            self.assertEqual(normal.response()[0], 200)
+            recovered = admit(close=True)
+            recovered.eof()
 
     def test_backpressure_does_not_starve_other_connections(self):
         with self.server() as (_, connect):
