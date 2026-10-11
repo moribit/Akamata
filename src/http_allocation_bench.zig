@@ -2,6 +2,25 @@
 const std = @import("std");
 const am = @import("akamata");
 const Stats = @import("runtime_bench_stats.zig").Stats;
+const State = struct {};
+fn empty(c: *am.Context(State)) !void {
+    c.status(204);
+}
+fn pass(c: *am.Context(State), next: am.Next(State)) !void {
+    try next.run(c);
+}
+fn dispatchProfile(backing: std.mem.Allocator, with_middleware: bool) !void {
+    var app = am.App(State).init(std.heap.page_allocator, .{});
+    defer app.deinit();
+    _ = try app.get("/hello", empty);
+    if (with_middleware) _ = try app.useAll(.{ .call = pass });
+    try app.prepare();
+    var stats: Stats = .{ .backing = backing };
+    var request: am.Request = .{ .method = .GET, .raw_method = "GET", .path = "/hello", .query = "", .version = "HTTP/1.1", .headers = &.{}, .body = "", .keep_alive = false };
+    var response = am.Response.init(stats.allocator());
+    try app.dispatch(stats.allocator(), &request, &response, null, null);
+    emit(if (with_middleware) "route_with_passthrough_middleware" else "route_and_empty_handler", &stats);
+}
 fn emit(name: []const u8, stats: *Stats) void {
     std.debug.print("ALLOCATION_PHASE {{\"phase\":\"{s}\",\"calls\":{d},\"requested\":{d}}}\n", .{ name, stats.calls.load(.monotonic), stats.requested.load(.monotonic) });
 }
@@ -12,6 +31,8 @@ pub fn main() !void {
     var parse: Stats = .{ .backing = arena.allocator() };
     _ = try am.http.parser.parseRequest(parse.allocator(), "GET /hello HTTP/1.1\r\nHost: a\r\n\r\n", .{});
     emit("parse", &parse);
+    try dispatchProfile(arena.allocator(), false);
+    try dispatchProfile(arena.allocator(), true);
     var headers: Stats = .{ .backing = arena.allocator() };
     var response = am.Response.init(headers.allocator());
     try response.header("content-type", "text/plain");

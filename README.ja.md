@@ -137,4 +137,4 @@ migration）。
 
 MIT
 
-[Performance & Reliability (v0.2.1 preparation)](docs/ja/performance-reliability.md): Pool deadlines, runtime metrics, measured allocation behavior and Native/Workers limits.
+[Performance & Reliability（v0.2.1準備）](docs/ja/performance-reliability.md)：Pool deadline、runtime metrics、allocation計測とNative/Workersの対応差。

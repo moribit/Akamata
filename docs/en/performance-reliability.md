@@ -94,3 +94,5 @@ TSan is opt-in in the existing Linux/macOS sanitizer workflow. Offline adapter
 contracts and WASM host simulation do not certify live Cloudflare resources.
 Live validation requires explicitly isolated resources and credentials; normal
 CI never provisions resources automatically.
+
+The prepared static route + empty handler and the same route with a passthrough middleware both make zero logical arena allocation requests in the diagnostic fixture. This excludes route registration/preparation and response payload generation.

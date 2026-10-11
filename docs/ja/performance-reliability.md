@@ -78,3 +78,5 @@ zig build db-pool-test -Druntime-tsan=true -Doptimize=ReleaseSafe
 既存Linux/macOS TSan workflowにPool raceを追加します。offline adapter Contractと
 WASM host simulationはlive Cloudflareの保証ではありません。live testには専用resourceと
 credentialsが必要で、通常CIからresourceを自動作成しません。
+
+The prepared static route + empty handler and the same route with a passthrough middleware both make zero logical arena allocation requests in the diagnostic fixture. This excludes route registration/preparation and response payload generation.
