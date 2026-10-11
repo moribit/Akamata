@@ -92,6 +92,12 @@ fn methodFromString(s: []const u8) Method {
 }
 
 pub const Counters = struct {
+    db_pool_active_connections: Counter(i64) = .init(0),
+    db_pool_idle_connections: Counter(i64) = .init(0),
+    db_pool_waiters: Counter(i64) = .init(0),
+    db_pool_acquire_wait_ns: Counter(u64) = .init(0),
+    db_pool_acquire_wait_count: Counter(u64) = .init(0),
+    db_pool_acquire_timeouts_total: Counter(u64) = .init(0),
     /// Total successful + failed requests served.
     requests_total: Counter(u64) = .init(0),
     /// In-flight requests right now (incremented on entry, decremented on exit).
@@ -124,6 +130,10 @@ pub const Counters = struct {
     /// Unix seconds at which the first request landed. `0` until then.
     start_time_unix: Counter(i64) = .init(0),
 
+    pub fn recordPoolWait(self: *Counters, ns: u64) void {
+        _ = self.db_pool_acquire_wait_ns.fetchAdd(ns, .monotonic);
+        _ = self.db_pool_acquire_wait_count.fetchAdd(1, .monotonic);
+    }
     pub fn record(self: *Counters, method: Method, status_code: u16, elapsed_us: u64) void {
         // Stamp the start time lazily on the first observation. CAS so
         // concurrent first-callers don't overwrite each other.
@@ -249,6 +259,25 @@ pub fn metricsHandler(comptime State: type, c_ptr: *Counters) app_mod.Handler(St
                 }
             };
 
+            try w.append(c.arena, &buf, "# TYPE akamata_db_pool_active_connections gauge\n" ++
+                "akamata_db_pool_active_connections {d}\n" ++
+                "# TYPE akamata_db_pool_idle_connections gauge\n" ++
+                "akamata_db_pool_idle_connections {d}\n" ++
+                "# TYPE akamata_db_pool_waiters gauge\n" ++
+                "akamata_db_pool_waiters {d}\n" ++
+                "# TYPE akamata_db_pool_acquire_wait_seconds summary\n" ++
+                "akamata_db_pool_acquire_wait_seconds_count {d}\n" ++
+                "akamata_db_pool_acquire_wait_seconds_sum {d}.{d:0>9}\n" ++
+                "# TYPE akamata_db_pool_acquire_timeouts_total counter\n" ++
+                "akamata_db_pool_acquire_timeouts_total {d}\n", .{
+                counters_ref.db_pool_active_connections.load(.monotonic),
+                counters_ref.db_pool_idle_connections.load(.monotonic),
+                counters_ref.db_pool_waiters.load(.monotonic),
+                counters_ref.db_pool_acquire_wait_count.load(.monotonic),
+                counters_ref.db_pool_acquire_wait_ns.load(.monotonic) / std.time.ns_per_s,
+                counters_ref.db_pool_acquire_wait_ns.load(.monotonic) % std.time.ns_per_s,
+                counters_ref.db_pool_acquire_timeouts_total.load(.monotonic),
+            });
             // === request counters ===
             try w.append(c.arena, &buf, "# HELP akamata_requests_total Total HTTP requests served.\n" ++
                 "# TYPE akamata_requests_total counter\n" ++

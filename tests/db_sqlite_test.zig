@@ -159,3 +159,148 @@ test "byte arrays, pointers, and slices bind their complete value" {
         try std.testing.expectEqualStrings(bytes, try rows.columnText(1));
     }
 }
+
+test "pool exhaustion, absolute expiry, and stale release" {
+    const db = try am.db.openSqlite(std.testing.allocator, ":memory:");
+    var pool = try am.db.Pool.init(std.testing.allocator, &.{db});
+    defer pool.deinit();
+    var a = try pool.acquire();
+    var stale = a;
+    try std.testing.expect((try pool.tryAcquire()) == null);
+    try std.testing.expectError(error.Timeout, pool.acquireWithDeadline(pool.deadlineAfter(5)));
+    a.deinit();
+    a.deinit();
+    var b = try pool.acquireWithDeadline(pool.deadlineAfter(1000));
+    stale.deinit();
+    try std.testing.expect((try pool.tryAcquire()) == null);
+    b.deinit();
+    try std.testing.expectError(error.Timeout, pool.acquireWithDeadline(pool.deadlineAfter(0)));
+    pool.close();
+    pool.close();
+    try std.testing.expectError(error.PoolClosed, pool.tryAcquire());
+    try std.testing.expectError(error.PoolClosed, pool.acquire());
+}
+
+const PoolWait = struct {
+    pool: *am.db.Pool,
+    result: ?anyerror = null,
+    acquired: bool = false,
+    fn run(self: *PoolWait) void {
+        var lease = self.pool.acquireWithDeadline(self.pool.deadlineAfter(2000)) catch |err| {
+            self.result = err;
+            return;
+        };
+        self.acquired = true;
+        lease.deinit();
+    }
+};
+fn waitForPoolWaiter(pool: *am.db.Pool) !void {
+    const deadline = pool.deadlineAfter(1000);
+    while (pool.snapshot().waiters == 0) {
+        if (deadline.untilNow(pool.io).raw.toNanoseconds() >= 0) return error.WaiterDidNotStart;
+        try std.Io.sleep(pool.io, .fromMilliseconds(1), .awake);
+    }
+}
+
+test "pool release wakes acquisition and close wakes blocked borrowers" {
+    const db = try am.db.openSqlite(std.testing.allocator, ":memory:");
+    var pool = try am.db.Pool.init(std.testing.allocator, &.{db});
+    defer pool.deinit();
+    var held = try pool.acquire();
+    var waiter: PoolWait = .{ .pool = &pool };
+    const thread = try std.Thread.spawn(.{}, PoolWait.run, .{&waiter});
+    var joined = false;
+    errdefer if (!joined) {
+        pool.close();
+        held.deinit();
+        thread.join();
+    };
+    try waitForPoolWaiter(&pool);
+    held.deinit();
+    thread.join();
+    joined = true;
+    try std.testing.expect(waiter.acquired);
+    held = try pool.acquire();
+    var closing: PoolWait = .{ .pool = &pool };
+    const close_thread = try std.Thread.spawn(.{}, PoolWait.run, .{&closing});
+    var close_joined = false;
+    errdefer if (!close_joined) {
+        pool.close();
+        close_thread.join();
+    };
+    defer held.deinit();
+    defer pool.close();
+    try waitForPoolWaiter(&pool);
+    pool.close();
+    close_thread.join();
+    close_joined = true;
+    try std.testing.expectEqual(error.PoolClosed, closing.result.?);
+}
+
+const PoolContention = struct {
+    pool: *am.db.Pool,
+    inside: std.atomic.Value(u32) = .init(0),
+    violations: std.atomic.Value(u32) = .init(0),
+    fn run(self: *PoolContention) void {
+        for (0..100) |_| {
+            var lease = self.pool.acquire() catch {
+                _ = self.violations.fetchAdd(1, .monotonic);
+                return;
+            };
+            if (self.inside.fetchAdd(1, .seq_cst) != 0) _ = self.violations.fetchAdd(1, .monotonic);
+            _ = self.inside.fetchSub(1, .seq_cst);
+            lease.deinit();
+        }
+    }
+};
+test "pool serializes concurrent borrowers without double lending" {
+    const db = try am.db.openSqlite(std.testing.allocator, ":memory:");
+    var pool = try am.db.Pool.init(std.testing.allocator, &.{db});
+    defer pool.deinit();
+    var contention: PoolContention = .{ .pool = &pool };
+    var threads: [8]std.Thread = undefined;
+    var started: usize = 0;
+    defer for (threads[0..started]) |thread| thread.join();
+    for (&threads) |*thread| {
+        thread.* = try std.Thread.spawn(.{}, PoolContention.run, .{&contention});
+        started += 1;
+    }
+    for (threads) |thread| thread.join();
+    started = 0;
+    try std.testing.expectEqual(@as(u32, 0), contention.violations.load(.acquire));
+    try std.testing.expectEqual(@as(usize, 1), pool.snapshot().idle);
+}
+const PoolDestroy = struct {
+    pool: *am.db.Pool,
+    done: std.atomic.Value(bool) = .init(false),
+    fn run(self: *PoolDestroy) void {
+        self.pool.deinit();
+        self.done.store(true, .release);
+    }
+};
+test "pool deinit joins waiters and outstanding leases before freeing handles" {
+    const db = try am.db.openSqlite(std.testing.allocator, ":memory:");
+    var pool = try am.db.Pool.init(std.testing.allocator, &.{db});
+    var held = try pool.acquire();
+    var waiter: PoolWait = .{ .pool = &pool };
+    const blocked = try std.Thread.spawn(.{}, PoolWait.run, .{&waiter});
+    var observed = false;
+    errdefer if (!observed) {
+        pool.close();
+        held.deinit();
+        blocked.join();
+        pool.deinit();
+    };
+    try waitForPoolWaiter(&pool);
+    pool.close();
+    blocked.join();
+    observed = true;
+    try std.testing.expectEqual(error.PoolClosed, waiter.result.?);
+    var destroy: PoolDestroy = .{ .pool = &pool };
+    const shutdown = try std.Thread.spawn(.{}, PoolDestroy.run, .{&destroy});
+    defer shutdown.join();
+    defer held.deinit();
+    try std.testing.expect(!destroy.done.load(.acquire));
+    // Db remains usable until the last lease is released.
+    try held.db.exec("CREATE TABLE shutdown_safe (id INTEGER)");
+}
