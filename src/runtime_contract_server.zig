@@ -28,6 +28,7 @@ test {
     _ = @import("runtime/application_admission.zig");
     _ = @import("runtime/reactor_output.zig");
     _ = @import("http/session.zig");
+    _ = @import("runtime/socket_transport.zig");
     _ = @import("ws/conn.zig");
     _ = @import("ws/message_state.zig");
     _ = @import("http/response_cursor.zig");

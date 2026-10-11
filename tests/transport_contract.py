@@ -276,6 +276,19 @@ class Contract(unittest.TestCase):
             normal.send(request(close=True))
             self.assertEqual(normal.response()[0], 200)
 
+    def test_large_keep_alive_body_does_not_wait_for_next_request(self):
+        # A destination larger than Reader's buffered tail must not cause a
+        # second blocking read before the completed request is dispatched.
+        with self.server("certify") as (_, connect):
+            client = connect()
+            for size in (16385, 65536, 65537, 131073) * 3:
+                body = b"x" * size
+                client.send(b"POST /echo HTTP/1.1\r\nHost: a\r\nContent-Length: " +
+                            str(size).encode() + b"\r\n\r\n" + body)
+                status, _, received = client.response()
+                self.assertEqual((status, received), (200, body))
+            client.close()
+
     def test_malformed_and_transfer_encoding(self):
         cases = [
             (b"GET / HTTP/2.0\r\nHost: a\r\n\r\n", 400),

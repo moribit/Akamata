@@ -30,6 +30,23 @@ pub fn Transport(comptime Readiness: type) type {
             if (self.reader_state == null) self.reader_state = self.stream.reader(self.io, &self.reader_buf);
             const reader = &self.reader_state.?.interface;
             if (timeout_ms == 0) return error.Timeout;
+            // Reader.readVec copies buffered bytes and then invokes its backing
+            // reader when the destination still has room. On a blocking socket
+            // that can wait for the next request before returning this request's
+            // final body bytes. Return existing bytes alone; the driver parses
+            // them before deciding whether another readiness wait is needed.
+            if (reader.buffered().len != 0) {
+                var copied: usize = 0;
+                for (vec) |destination| {
+                    const available = reader.buffered();
+                    const n = @min(destination.len, available.len);
+                    @memcpy(destination[0..n], available[0..n]);
+                    reader.toss(n);
+                    copied += n;
+                    if (reader.buffered().len == 0) break;
+                }
+                return copied;
+            }
             // std.Io.Reader can retain bytes from an earlier read. Read those before
             // waiting for new kernel readiness (pipelining/partial next request).
             if (reader.buffered().len == 0) {
@@ -101,6 +118,35 @@ pub fn Transport(comptime Readiness: type) type {
             return formatPeerIp(arena, self.stream.socket.address);
         }
     };
+}
+
+test "buffered body tail returns without another socket read or readiness wait" {
+    const NeverReady = struct {
+        fn wait(_: *@This(), _: c_int, _: u32) !bool {
+            return error.UnexpectedReadinessWait;
+        }
+        fn deinit(_: *@This()) void {}
+    };
+    const FailRead = struct {
+        fn read(_: *Io.Reader, _: [][]u8) Io.Reader.Error!usize {
+            return error.ReadFailed;
+        }
+    };
+    var shutdown: std.atomic.Value(bool) = .init(false);
+    const io = Io.Threaded.global_single_threaded.io();
+    var transport: Transport(NeverReady) = .{ .readiness = .{}, .io = io, .stream = undefined, .shutdown = &shutdown };
+    var buffered = [_]u8{ 't', 'a', 'i', 'l' };
+    var state: net.Stream.Reader = undefined;
+    state.interface = .fixed(&buffered);
+    state.interface.vtable = &.{ .stream = Io.Reader.ending.vtable.stream, .readVec = FailRead.read };
+    transport.reader_state = state;
+    var first: [1]u8 = undefined;
+    var rest: [8]u8 = undefined;
+    var vec = [_][]u8{ &first, &rest };
+    try std.testing.expectEqual(@as(usize, 4), try transport.read(&vec, 100, false));
+    try std.testing.expectEqual(@as(u8, 't'), first[0]);
+    try std.testing.expectEqualStrings("ail", rest[0..3]);
+    try std.testing.expectEqual(@as(usize, 0), transport.bufferedInput().len);
 }
 pub fn formatPeerIp(arena: std.mem.Allocator, address: net.IpAddress) ![]const u8 {
     var writer: Io.Writer.Allocating = .init(arena);
