@@ -303,6 +303,9 @@ pub fn build(b: *std.Build) void {
     const guestbook_test_step = b.step("guestbook-test", "run the canonical typed HTTP example contracts");
 
     if (backend == .native) {
+        const allocation_mod = b.createModule(.{ .root_source_file = b.path("src/http_allocation_bench.zig"), .target = native_target, .optimize = optimize, .imports = &.{.{ .name = "akamata", .module = am_mod }} });
+        const allocation_exe = b.addExecutable(.{ .name = "http-allocation-profile", .root_module = allocation_mod });
+        b.step("http-allocation-profile", "measure logical arena and backing heap allocation separately").dependOn(&b.addRunArtifact(allocation_exe).step);
         for ([_]bool{ false, true }) |reactor_bench| {
             const group_bench_mod = b.createModule(.{
                 .root_source_file = b.path("src/runtime_group_bench.zig"),
@@ -336,6 +339,14 @@ pub fn build(b: *std.Build) void {
         contract_mod.addIncludePath(b.path("third_party/sqlite"));
         contract_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
         contract_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
+        const pool_test_mod = b.createModule(.{ .root_source_file = b.path("src/db_pool_test.zig"), .target = native_target, .optimize = optimize, .sanitize_thread = runtime_tsan });
+        pool_test_mod.link_libc = true;
+        pool_test_mod.addOptions("build_options", opts);
+        pool_test_mod.addImport("sqlite3", am_mod.import_table.get("sqlite3").?);
+        pool_test_mod.addIncludePath(b.path("third_party/sqlite"));
+        pool_test_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
+        pool_test_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
+        b.step("db-pool-test", "run deadline/release/close races with optional TSan").dependOn(&b.addRunArtifact(b.addTest(.{ .root_module = pool_test_mod })).step);
         const contract_server = b.addExecutable(.{ .name = "runtime-contract-server", .root_module = contract_mod });
         b.step("runtime-certify-fixture", "build private incremental session certification fixture").dependOn(&b.addInstallArtifact(contract_server, .{}).step);
         const contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });

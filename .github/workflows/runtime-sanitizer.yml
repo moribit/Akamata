@@ -24,7 +24,7 @@ jobs:
           uname -a > sanitizer/environment.txt
           zig version >> sanitizer/environment.txt
           set -o pipefail
-          zig build transport-contract-test runtime-isolation-test runtime-session-test -Druntime-tsan=true -Doptimize=ReleaseSafe 2>&1 | tee sanitizer/validation.log
+          zig build db-pool-test transport-contract-test runtime-isolation-test runtime-session-test -Druntime-tsan=true -Doptimize=ReleaseSafe 2>&1 | tee sanitizer/validation.log
       - name: Repeat upgrade completion and disconnect publication race
         shell: bash
         run: |

@@ -13,7 +13,7 @@ jobs:
       matrix:
         job:
           - name: native-test
-            cmd: zig build test
+            cmd: zig build test db-pool-test
           - name: native-release-safe
             cmd: zig build test documentation-test -Doptimize=ReleaseSafe
           - name: native-openssl

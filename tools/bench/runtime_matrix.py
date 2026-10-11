@@ -28,6 +28,8 @@ p.add_argument("--idle", type=int, nargs="+", default=[64, 256])
 p.add_argument("--rounds", type=int, default=2)
 p.add_argument("--duration", default="2s")
 p.add_argument("--stats", action="store_true")
+p.add_argument("--observability", choices=["disabled", "metrics", "full"], default="disabled")
+p.add_argument("--echo-bytes", type=int, default=1)
 p.add_argument("--short-qps", type=int, default=500)
 p.add_argument("--endpoints", nargs="+", default=["hello", "echo", "db/1"])
 p.add_argument("--modes", nargs="+", choices=["keep_alive", "short_lived"], default=["keep_alive", "short_lived"])
@@ -38,6 +40,8 @@ bins = [s.split("=", 1) for s in a.binaries]
 soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (max(soft, min(2048, hard)), hard))
 result = {"platform": platform.platform(), "stats_enabled": a.stats,
+          "command": __import__("sys").argv, "cpu_count": os.cpu_count(),
+          "observability": a.observability, "echo_bytes": a.echo_bytes,
           "binaries": {n: {"path": path, "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()} for n, path in bins},
           "oha_version": subprocess.check_output(["oha", "--version"], text=True).strip(), "runs": []}
 
@@ -70,6 +74,8 @@ def server(binary, run):
         env.pop(key, None)
     if a.stats:
         env["BENCH_STATS"] = "1"
+    if a.observability != "disabled":
+        env["BENCH_OBSERVABILITY"] = a.observability
     with tempfile.TemporaryFile() as log:
         proc = subprocess.Popen([str(Path(binary).resolve())], env=env, stdout=subprocess.DEVNULL, stderr=log)
         try:
@@ -120,7 +126,7 @@ def save(run):
 for round_no in range(a.rounds):
     for connections in a.connections:
         for kind in a.modes:
-            for endpoint, extra in [("hello", []), ("echo", ["-m", "POST", "-T", "application/json", "-d", '{"name":"x","n":42}']), ("db/1", [])]:
+            for endpoint, extra in [("hello", []), ("echo", ["-m", "POST", "-T", "application/json", "-d", json.dumps({"name": "x" * a.echo_bytes, "n": 42})]), ("db/1", [])]:
                 if endpoint not in a.endpoints:
                     continue
                 # Alternate order to reduce time/temperature bias.
