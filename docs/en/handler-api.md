@@ -377,8 +377,10 @@ Typed parse with `resp.json(T)`, get header with `resp.header(name)`. See `examp
 
 ## v0.2.1 wire schema contract
 
-Ordinary tagged unions use the Zig 0.17 standard JSON representation: `{\"count\":3}`, `{\"label\":\"value\"}` or `{\"empty\":{}}` for a void branch. OpenAPI emits oneOf objects with the active tag required and additionalProperties false. TypeScript preserves the object union and enum string literals. Untagged handler responses fail at compile time. Custom jsonStringify functions remain an explicit schema escape hatch; their wire representation is not inferred.
+Ordinary tagged unions use the Zig 0.17 standard JSON representation: `{"count":3}`, `{"label":"value"}` or `{"empty":{}}` for a void branch. OpenAPI emits oneOf objects with the active tag required and additionalProperties false. TypeScript preserves the object union and enum string literals. Untagged handler responses fail at compile time. A tagged union with custom `jsonStringify` has an unspecified generated schema: its wire representation is not inferred. Use existing explicit endpoint metadata for a custom wire contract.
 
 Optional fields admit null; defaulted fields can be omitted. OpenAPI required metadata and generated TypeScript optional fields describe omission separately from nullability. Defaults are applied by the Zig JSON input binder; arbitrary defaults are not synthesized into client-side behavior. Tagged-union DTOs also pass the same required-field check before projection lifting.
 
 The regression fixture in `tests/dx_test.zig` checks a real mapped NotFound response against the 404 OpenAPI discriminator and generated client. It also covers defaults, null, enum, arrays, nested structs and union payloads from one Endpoint graph. Existing schema-aware API diff and explicit custom response APIs remain available.
+
+Void payloads are generated as `Record<string, never>`: unlike TypeScript `{}`, this rejects primitives and extra properties. This intentional type narrowing may require updating previously permissive client values.

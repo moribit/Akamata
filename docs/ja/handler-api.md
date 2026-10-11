@@ -358,8 +358,10 @@ defer del.deinit();
 
 ## v0.2.1 wire schema contract
 
-Ordinary tagged unions use the Zig 0.17 standard JSON representation: `{\"count\":3}`, `{\"label\":\"value\"}` or `{\"empty\":{}}` for a void branch. OpenAPI emits oneOf objects with the active tag required and additionalProperties false. TypeScript preserves the object union and enum string literals. Untagged handler responses fail at compile time. Custom jsonStringify functions remain an explicit schema escape hatch; their wire representation is not inferred.
+通常のtagged unionはZig 0.17標準JSONの形式で、`{"count":3}`、`{"label":"value"}`、void branchでは`{"empty":{}}`となります。OpenAPIはactive tagをrequiredとするoneOf objectを生成し、additionalPropertiesをfalseにします。TypeScriptはobject unionとenumのstring literalを保持します。untagged handler responseはcompile-time errorです。custom `jsonStringify`を持つtagged unionの生成schemaは未指定とし、wire形式を推測しません。custom wire contractには既存の明示Endpoint metadataを使ってください。
 
-Optional fields admit null; defaulted fields can be omitted. OpenAPI required metadata and generated TypeScript optional fields describe omission separately from nullability. Defaults are applied by the Zig JSON input binder; arbitrary defaults are not synthesized into client-side behavior. Tagged-union DTOs also pass the same required-field check before projection lifting.
+optional fieldはnullを許可し、default付きfieldは省略できます。OpenAPIのrequiredとTypeScriptのoptional fieldは、省略とnullを区別します。defaultはZig JSON input binderが適用し、client側で任意のdefaultを自動適用しません。tagged unionを含むDTOもprojection lifting前に同じrequired-field検査を受けます。
 
-The regression fixture in `tests/dx_test.zig` checks a real mapped NotFound response against the 404 OpenAPI discriminator and generated client. It also covers defaults, null, enum, arrays, nested structs and union payloads from one Endpoint graph. Existing schema-aware API diff and explicit custom response APIs remain available.
+`tests/dx_test.zig`では実際のNotFound responseと404のOpenAPI discriminator、生成clientを照合します。同じEndpoint graphからdefault、null、enum、array、nested struct、union payloadを検証します。共有fixtureはNativeとWorkers WASM hostでも実行します。既存のschema-aware API diffと明示custom response APIは引き続き利用できます。
+
+void payloadは`Record<string, never>`として生成します。TypeScriptの`{}`とは異なり、primitiveや余分なpropertyを拒否します。この意図的な型の厳格化により、従来の曖昧なclient値は修正が必要になる場合があります。

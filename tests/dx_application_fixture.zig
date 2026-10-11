@@ -36,6 +36,7 @@ pub const Application = ak.App(.{ .State = State, .middleware = .{.{ .call = aut
     ak.get("/", hello),
     ak.endpoint(.{ .method = .GET, .path = "/users/:id", .handler = user, .errors = .{ .NotFound = .not_found } }),
     ak.post("/users", create),
+    ak.post("/schema", @import("portable_application_fixture.zig").schemaEcho),
     ak.get("/profile", profile),
     ak.post("/secure", secureCreate),
 } });

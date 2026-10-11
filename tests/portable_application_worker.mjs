@@ -138,6 +138,13 @@ const api = createClient({ baseUrl: "https://fixture.test" });
 const user: Promise<{ id: number; name: string }> = api.getUsersById(42, { name: "Bob" });
 const hello: Promise<string> = api.get();
 api.postUsers({ name: "Alice" });
+api.postSchema({ mode: "active", items: [{ id: 42 }], choice: { empty: {} } });
+// @ts-expect-error: enum literals follow the Endpoint DTO
+api.postSchema({ mode: "invalid", items: [], choice: { count: 3 } });
+// @ts-expect-error: void union payload is an empty object, not a primitive
+api.postSchema({ mode: "active", items: [], choice: { empty: 3 } });
+// @ts-expect-error: void union payload cannot have properties
+api.postSchema({ mode: "active", items: [], choice: { empty: { extra: 1 } } });
 // @ts-expect-error: path id is numeric
 api.getUsersById("bad", {});
 // @ts-expect-error: request body requires name

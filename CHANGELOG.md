@@ -19,7 +19,9 @@
   OpenAPI and TypeScript; verify mapped error discriminators against actual responses.
   Required DTO validation precedes projection lifting without manufacturing zero values.
   Generated enum parameters now require valid enum literals rather than arbitrary
-  strings; callers may need to narrow their TypeScript values.
+  strings; callers may need to narrow their TypeScript values. Void tagged-union
+  payloads use closed empty-object types instead of TypeScript `{}`, which accepts
+  primitives; Native/Workers wire and strict TypeScript tests cover this contract.
 - Add Native/Workers shared complex-schema fixtures, allocation attribution,
   deadline/close/release races, opt-in Pool TSan coverage and reproducible benchmark
   JSON payload/observability modes. Keep retained arenas and owned response bodies.

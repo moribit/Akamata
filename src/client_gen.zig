@@ -396,6 +396,16 @@ fn writeTsTypeFromJsonSchema(w: *std.Io.Writer, schema: []const u8) std.Io.Write
             return;
         }
         if (std.mem.eql(u8, type_str, "object")) {
+            // Zig's void union payload is exactly {}. TypeScript {} also
+            // admits primitives; preserve the schema's closed empty object.
+            if (findField(schema, "\"properties\":") == null) {
+                if (findField(schema, "\"additionalProperties\":")) |start| {
+                    if (std.mem.startsWith(u8, std.mem.trimStart(u8, schema[start..], " \t\r\n"), "false")) {
+                        try w.writeAll("Record<string, never>");
+                        return;
+                    }
+                }
+            }
             try writeTsInterfaceFromJsonSchema(w, schema);
             return;
         }

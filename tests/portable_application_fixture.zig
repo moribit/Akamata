@@ -229,14 +229,14 @@ pub fn run(allocator: std.mem.Allocator) !void {
 }
 
 const SchemaValue = union(enum) { count: u32, label: []const u8, empty: void };
-const SchemaDto = struct {
+pub const SchemaDto = struct {
     mode: enum { active, paused },
     optional: ?u32 = null,
     defaulted: u32 = 7,
     items: []const struct { id: u64 },
     choice: SchemaValue,
 };
-fn schemaEcho(body: am.Json(SchemaDto)) SchemaDto {
+pub fn schemaEcho(body: am.Json(SchemaDto)) SchemaDto {
     return body.value;
 }
 pub fn schemaContract(allocator: std.mem.Allocator) !void {
@@ -262,4 +262,10 @@ pub fn schemaContract(allocator: std.mem.Allocator) !void {
     try expect(std.mem.indexOf(u8, ts, "defaulted?: number") != null);
     try expect(std.mem.indexOf(u8, ts, "count: number") != null);
     try expect(std.mem.indexOf(u8, ts, "label: string") != null);
+    try expect(std.mem.indexOf(u8, ts, "empty: Record<string, never>") != null);
+    var empty_response = try client.post("/schema").json(.{ .mode = "paused", .items = @as(@FieldType(SchemaDto, "items"), &.{}), .choice = .{ .empty = @as(struct {}, .{}) } }).send();
+    defer empty_response.deinit();
+    try empty_response.expectStatus(200);
+    const empty_dto = try empty_response.json(SchemaDto);
+    try expect(empty_dto.choice == .empty);
 }
