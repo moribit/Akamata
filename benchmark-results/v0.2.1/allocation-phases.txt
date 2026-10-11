@@ -1,0 +1,8 @@
+ALLOCATION_PHASE {"phase":"parse","calls":1,"requested":896}
+ALLOCATION_PHASE {"phase":"route_and_empty_handler","calls":0,"requested":0}
+ALLOCATION_PHASE {"phase":"route_with_passthrough_middleware","calls":0,"requested":0}
+ALLOCATION_PHASE {"phase":"header","calls":1,"requested":160}
+ALLOCATION_PHASE {"phase":"static_body_copy","calls":1,"requested":150}
+ALLOCATION_PHASE {"phase":"json_header_and_body","calls":2,"requested":291}
+ALLOCATION_PHASE {"phase":"cursor_and_write","heap_calls":0}
+ALLOCATION_PHASE {"phase":"warm_json_1000","heap_calls":0}

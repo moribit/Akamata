@@ -1,0 +1,30 @@
+{
+  "baseline_source": "f0eb0b63b1eb5885542c1fc43d35c7e284b7db64",
+  "source": "f5c4b6b",
+  "zig": "0.17.0",
+  "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "cpu": "Apple M2",
+  "build_mode": "ReleaseFast",
+  "allocator": "std.heap.DebugAllocator fixture",
+  "tool": "oha 1.15.0",
+  "transport": "Native Threaded TCP loopback",
+  "duration": "3s per round; 3 rounds; every round retained; medians",
+  "connection_request_limit": 100,
+  "measurements": "CPU-time delta/wall, sampled RSS and threads; allocation instrumentation separate",
+  "comparison": "historical figures not directly compared",
+  "live_cloudflare": "not run; isolated live test resource/credentials not established",
+  "large_json_issue": "Before concurrent 64KiB keep-alive echo stalls and hits the explicit client timeout; after buffered-tail fix all three rounds complete with zero transport errors. Treat as correctness recovery, not a normal throughput speedup.",
+  "measurement_failures": [
+    "initial 64KiB oha load did not complete; now bounded by client timeout and runner drain budget",
+    "local final ReleaseSafe retry initially failed due disk exhaustion, not assertion failure; cache cleared and rerun with -j2"
+  ],
+  "cpu_model": "Mac14,2 / Apple M2",
+  "physical_cpus": 8,
+  "logical_cpus": 8,
+  "memory_bytes": 17179869184,
+  "os_build": "26A428",
+  "measurement_policy": "No local builds or tests during final paired runs; workstation background activity not controlled; every round retained",
+  "request_timeout": "10s load-tool budget; runner hard budget duration+60s",
+  "binary_source": "Measured f5c4b6b; final follow-up benchmark machine-code/constants sections are identical (binary-equivalence.json), full debug-bearing binary SHA differs.",
+  "published_release": "v0.2.0; prepared package/CLI version 0.2.1; no new tag or GitHub Release"
+}

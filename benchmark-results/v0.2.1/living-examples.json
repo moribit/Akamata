@@ -1,0 +1,554 @@
+{
+  "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "zig": "0.17.0",
+  "node": "v24.19.0",
+  "commit": "ce0bd64beb3042bf5bab20e731e3707da2413ff5",
+  "evidence": "Native application + actual WASM/managed JSPI/offline host; not live Cloudflare",
+  "artifacts": [
+    {
+      "example": "guestbook",
+      "target": "native",
+      "mode": "Debug",
+      "sha256": "05f03dd304527d2e353cdcf92f234133a6f484c4db89590d708f0aa4eebad2d5"
+    },
+    {
+      "example": "tasks",
+      "target": "native",
+      "mode": "Debug",
+      "sha256": "60b3a42025620e2a4dc01638f83d8105290d8fe80f4fa6834f8c53e98bf1a7df"
+    },
+    {
+      "example": "chat",
+      "target": "native",
+      "mode": "Debug",
+      "sha256": "d5a0c907113f8f87552f3d509490e53de15d98f310d47f5a27942b72f0a15245"
+    },
+    {
+      "example": "device_messaging",
+      "target": "native",
+      "mode": "Debug",
+      "sha256": "c8d7f4ced5cf1296dad97b170a459ee6386d9cf5438d1b25bbfff9fa9c031483"
+    },
+    {
+      "example": "guestbook",
+      "target": "native",
+      "mode": "ReleaseSafe",
+      "sha256": "ff1f16ee65f439d2f7c1ded9bde6e86119ead4fcdac79be59641a26194b6dd76"
+    },
+    {
+      "example": "tasks",
+      "target": "native",
+      "mode": "ReleaseSafe",
+      "sha256": "71c9384ee9d3fcf182a58f34a275219818604b3d316c47e035ba0296a57dba9d"
+    },
+    {
+      "example": "chat",
+      "target": "native",
+      "mode": "ReleaseSafe",
+      "sha256": "0fcfcdd402240be68fe7e91d57ba946581f89f8669b71cd595cd39a4d7c373d2"
+    },
+    {
+      "example": "device_messaging",
+      "target": "native",
+      "mode": "ReleaseSafe",
+      "sha256": "d25f4302b50dc9b0ded72bc5519df775561ec1aca3ecb12fcb663c8ac3374757"
+    },
+    {
+      "example": "guestbook",
+      "target": "workers",
+      "sha256": "dca4523b2e70cd75c35918e594dd089b20b9572ddffbaa12c194eba5925e834f",
+      "host": {
+        "example": "guestbook",
+        "evidence": "actual WASM + managed JSPI + offline host",
+        "checks": 7,
+        "queue_messages": 0,
+        "remote_requests": 0
+      }
+    },
+    {
+      "example": "tasks",
+      "target": "workers",
+      "sha256": "2e189e6039322bf417f77be9ab556d4274930cb91ee3dbfc8b77f95394a9135c",
+      "host": {
+        "example": "tasks",
+        "evidence": "actual WASM + managed JSPI + offline host",
+        "checks": 8,
+        "queue_messages": 1,
+        "remote_requests": 0
+      }
+    },
+    {
+      "example": "chat",
+      "target": "workers",
+      "sha256": "b6471b33a4300c9ed0140d7e5a4d57837736d9731c533e8232566c5a71e8887e",
+      "host": {
+        "example": "chat",
+        "evidence": "actual WASM + managed JSPI + offline host",
+        "checks": 6,
+        "queue_messages": 0,
+        "remote_requests": 0
+      }
+    },
+    {
+      "example": "device_messaging",
+      "target": "workers",
+      "sha256": "4228aa06722e1153efdba187aa1c9fa3d5233b6d27261faa4fc5c55dc2a22b96",
+      "host": {
+        "example": "device_messaging",
+        "evidence": "actual WASM + managed JSPI + offline host",
+        "checks": 14,
+        "queue_messages": 1,
+        "remote_requests": 0
+      }
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "version"
+      ],
+      "seconds": 0.032
+    },
+    {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "seconds": 0.021
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "seconds": 0.016
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "guestbook-test",
+        "tasks-test",
+        "chat-test",
+        "-Doptimize=Debug"
+      ],
+      "seconds": 8.438
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=guestbook",
+        "-Doptimize=Debug"
+      ],
+      "seconds": 9.763
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=tasks",
+        "-Doptimize=Debug"
+      ],
+      "seconds": 8.884
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=chat",
+        "-Doptimize=Debug"
+      ],
+      "seconds": 8.602
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=device_messaging",
+        "-Doptimize=Debug"
+      ],
+      "seconds": 8.546
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "guestbook-test",
+        "tasks-test",
+        "chat-test",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 18.312
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=guestbook",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 36.394
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=tasks",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 36.48
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=chat",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 36.492
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=device_messaging",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 37.385
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/device_messaging",
+        "migrate-up"
+      ],
+      "seconds": 0.374
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/device_messaging",
+        "migrate-up"
+      ],
+      "seconds": 0.008
+    },
+    {
+      "command": [
+        "python3",
+        "tests/living_chat.py"
+      ],
+      "seconds": 0.535
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/guestbook",
+        "--print-schema"
+      ],
+      "seconds": 0.264
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/guestbook",
+        "akamata-capabilities",
+        "native"
+      ],
+      "seconds": 0.005
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/guestbook",
+        "akamata-capabilities",
+        "workers"
+      ],
+      "seconds": 0.004
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/guestbook",
+        "akamata-openapi"
+      ],
+      "seconds": 0.004
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/guestbook",
+        "akamata-client"
+      ],
+      "seconds": 0.004
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=guestbook",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 2.146
+    },
+    {
+      "command": [
+        "node",
+        "--experimental-wasm-jspi",
+        "tests/living_workers.mjs",
+        "guestbook",
+        "/Users/mimoc/Akamata/zig-out/bin/guestbook_worker.wasm",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-living-9htnu2ag/guestbook.sql"
+      ],
+      "seconds": 0.356
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/tasks",
+        "--print-schema"
+      ],
+      "seconds": 0.269
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/tasks",
+        "akamata-capabilities",
+        "native"
+      ],
+      "seconds": 0.007
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/tasks",
+        "akamata-capabilities",
+        "workers"
+      ],
+      "seconds": 0.006
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/tasks",
+        "akamata-openapi"
+      ],
+      "seconds": 0.006
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/tasks",
+        "akamata-client"
+      ],
+      "seconds": 0.005
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=tasks",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 1.98
+    },
+    {
+      "command": [
+        "node",
+        "--experimental-wasm-jspi",
+        "tests/living_workers.mjs",
+        "tasks",
+        "/Users/mimoc/Akamata/zig-out/bin/tasks_worker.wasm",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-living-9htnu2ag/tasks.sql"
+      ],
+      "seconds": 0.315
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/chat",
+        "--print-schema"
+      ],
+      "seconds": 0.004
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/chat",
+        "akamata-capabilities",
+        "native"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/chat",
+        "akamata-capabilities",
+        "workers"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/chat",
+        "akamata-openapi"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/chat",
+        "akamata-client"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/chat",
+        "akamata-protocol-ts"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/chat",
+        "akamata-protocol-c"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "cc",
+        "-c",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-living-9htnu2ag/chat-protocol.c",
+        "-o",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-living-9htnu2ag/chat-protocol.o"
+      ],
+      "seconds": 0.081
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=chat",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 1.741
+    },
+    {
+      "command": [
+        "node",
+        "--experimental-wasm-jspi",
+        "tests/living_workers.mjs",
+        "chat",
+        "/Users/mimoc/Akamata/zig-out/bin/chat_worker.wasm",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-living-9htnu2ag/chat.sql"
+      ],
+      "seconds": 0.257
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/device_messaging",
+        "--print-schema"
+      ],
+      "seconds": 0.004
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/device_messaging",
+        "akamata-capabilities",
+        "native"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/device_messaging",
+        "akamata-capabilities",
+        "workers"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/device_messaging",
+        "akamata-protocol-ts"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/Akamata/zig-out/bin/device_messaging",
+        "akamata-protocol-c"
+      ],
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "cc",
+        "-c",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-living-9htnu2ag/device_messaging-protocol.c",
+        "-o",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-living-9htnu2ag/device_messaging-protocol.o"
+      ],
+      "seconds": 0.075
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "-Dexample=device_messaging",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 1.943
+    },
+    {
+      "command": [
+        "node",
+        "--experimental-wasm-jspi",
+        "tests/living_workers.mjs",
+        "device_messaging",
+        "/Users/mimoc/Akamata/zig-out/bin/device_messaging_worker.wasm",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-living-9htnu2ag/device_messaging.sql"
+      ],
+      "seconds": 0.304
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "build",
+        "documentation-test",
+        "-Doptimize=ReleaseSafe"
+      ],
+      "seconds": 0.198
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "tests/workers_wasm_dispatch_test.mjs"
+      ],
+      "seconds": 1.061
+    },
+    {
+      "command": [
+        "python3",
+        "tests/documentation_links.py"
+      ],
+      "seconds": 0.038
+    },
+    {
+      "command": [
+        "/Users/mimoc/.zvm/0.17.0/zig",
+        "fmt",
+        "--check",
+        "examples",
+        "tests/docs/minimal.zig"
+      ],
+      "seconds": 0.036
+    }
+  ],
+  "versioned_migration": "two invocations; one history entry",
+  "native_wire": {
+    "example": "chat",
+    "evidence": "Native loopback HTTP + masked WebSocket frames",
+    "clients": 2,
+    "persisted_messages": 2,
+    "shutdown_seconds": 0.128
+  }
+}

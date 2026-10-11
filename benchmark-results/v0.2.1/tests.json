@@ -1,0 +1,68 @@
+{
+  "scope": "Local regression and current CI evidence; cached Zig summaries count executed tests rather than a universal suite total",
+  "local": [
+    {
+      "suite": "Native Debug, ReleaseSafe, ReleaseFast",
+      "result": "All three modes passed during phase validation; final ReleaseSafe rerun passed after the closed-empty-object fixture fix. Final follow-up runs are reported with head CI at completion.",
+      "expected_skip": "OpenSSL-dependent JWT in non-OpenSSL build"
+    },
+    {
+      "suite": "Shared Transport Contract",
+      "passed": 102,
+      "failed": 0
+    },
+    {
+      "suite": "Stress/fault scenarios",
+      "passed": 16,
+      "failed": 0,
+      "tracked_allocator_live_final": 0
+    },
+    {
+      "suite": "Compile-fail diagnostic cases",
+      "passed": 33,
+      "failed": 0
+    },
+    {
+      "suite": "Living examples",
+      "commands_passed": 52,
+      "commands_failed": 0
+    },
+    {
+      "suite": "Workers WASM shared application",
+      "repetitions_passed": 10,
+      "failed": 0
+    },
+    {
+      "suite": "Generated TypeScript strict positive/negative checks",
+      "result": "passed with TypeScript 5.9.3"
+    },
+    {
+      "suite": "Maintained documentation links",
+      "documents_passed": 37,
+      "failed": 0
+    },
+    {
+      "suite": "Runtime lifecycle/fault unit",
+      "passed": 68,
+      "failed": 0
+    },
+    {
+      "suite": "Pool deadline/close/release exclusive ownership race",
+      "repetitions_passed": 20,
+      "workers_per_repetition": 8,
+      "failed": 0
+    }
+  ],
+  "historical_failures": [
+    "translate-c dependency DNS on earlier CI",
+    "admission probe/connection-slot cleanup test race fixed in 2052bc3",
+    "local Safe build cache exhaustion, retry passed",
+    "new empty-union test used Zig empty tuple (JSON array), corrected to explicit empty struct (JSON object) and revalidated"
+  ],
+  "not_run": [
+    "credentialed live Cloudflare/Turso provider validation",
+    "Linux performance measurement",
+    "new optional real-application performance fixture"
+  ],
+  "ci": "ci.json records Linux/macOS CI and TSan; final head run is separately checked before completion"
+}

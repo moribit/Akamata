@@ -1,0 +1,61 @@
+{
+  "command": [
+    "/Users/mimoc/.zvm/0.17.0/zig",
+    "build",
+    "db-pool-profile",
+    "-Doptimize=ReleaseFast"
+  ],
+  "binary_sha256": "75f209c9c1e570f0dc6d3f5a2d43d789302293345140adc9df15964a450f6a4e",
+  "core_source": "278e2c5",
+  "kind": "after-only saturation diagnostic; 3 rounds; no before throughput claim",
+  "rounds": [
+    {
+      "round": 1,
+      "handles": 4,
+      "workers": 16,
+      "attempts": 3200,
+      "deadline_ms": 2,
+      "hold_ms": 1,
+      "elapsed_ns": 407286000,
+      "acquired": 1286,
+      "timeouts": 1914,
+      "p50_wait_ns": 2041000,
+      "p95_wait_ns": 2256000,
+      "p99_wait_ns": 2263000,
+      "active_final": 0,
+      "waiters_final": 0
+    },
+    {
+      "round": 2,
+      "handles": 4,
+      "workers": 16,
+      "attempts": 3200,
+      "deadline_ms": 2,
+      "hold_ms": 1,
+      "elapsed_ns": 395300000,
+      "acquired": 1270,
+      "timeouts": 1930,
+      "p50_wait_ns": 2041000,
+      "p95_wait_ns": 2255000,
+      "p99_wait_ns": 2265000,
+      "active_final": 0,
+      "waiters_final": 0
+    },
+    {
+      "round": 3,
+      "handles": 4,
+      "workers": 16,
+      "attempts": 3200,
+      "deadline_ms": 2,
+      "hold_ms": 1,
+      "elapsed_ns": 393142000,
+      "acquired": 1255,
+      "timeouts": 1945,
+      "p50_wait_ns": 2043000,
+      "p95_wait_ns": 2258000,
+      "p99_wait_ns": 2267000,
+      "active_final": 0,
+      "waiters_final": 0
+    }
+  ]
+}

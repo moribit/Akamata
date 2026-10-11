@@ -23,9 +23,13 @@ cases = [
     ("final-paired", ["--connections", "32", "128", "512", "1024", "--idle", "32", "128", "512", "1024", "--modes", "keep_alive"]),
     ("paired-allocations", ["--connections", "32", "--idle", "32", "--stats", "--modes", "keep_alive"]),
     ("paired-observability", ["--connections", "32", "--idle", "32", "--observability", "metrics", "--modes", "keep_alive"]),
+    ("paired-metrics-allocations", ["--connections", "32", "--idle", "32", "--observability", "metrics", "--stats", "--modes", "keep_alive"]),
+    ("paired-high-observability", ["--connections", "1024", "--idle", "1024", "--observability", "metrics", "--modes", "keep_alive"]),
     ("paired-large-json", ["--connections", "32", "--idle", "32", "--endpoints", "echo", "--echo-bytes", "65536", "--stats", "--modes", "keep_alive"]),
     ("paired-short-lived", ["--connections", "32", "128", "512", "1024", "--skip-idle", "--modes", "short_lived", "--short-qps", "500"]),
     ("db-contention-repeat", ["--connections", "512", "--idle", "32", "--endpoints", "db/1", "--duration", "10s", "--modes", "keep_alive"]),
+    ("tail-repeat", ["--connections", "1024", "--skip-idle", "--endpoints", "hello", "echo", "--duration", "10s", "--modes", "keep_alive"]),
+    ("capacity-headroom", ["--connections", "1000", "--skip-idle", "--endpoints", "db/1", "--duration", "10s", "--observability", "metrics", "--modes", "keep_alive"]),
 ]
 if a.only and set(a.only) - {name for name, _ in cases}:
     p.error("unknown case")

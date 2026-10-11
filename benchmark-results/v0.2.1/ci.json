@@ -1,0 +1,262 @@
+{
+  "evidence_scope": "Runtime core at 2052bc3; final documentation/contract follow-up head is verified separately before completion",
+  "runs": [
+    {
+      "conclusion": "success",
+      "databaseId": 38128263681,
+      "headSha": "2052bc369f1f83f38d4757e11376153b5f8b43ba",
+      "jobs": [
+        {
+          "name": "adversarial HTTP smoke",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437049973"
+        },
+        {
+          "name": "macos native + kqueue contract",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050099"
+        },
+        {
+          "name": "native-release-safe",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050121"
+        },
+        {
+          "name": "public documentation and PDF contract",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050136"
+        },
+        {
+          "name": "generated DX client strict typecheck",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050141"
+        },
+        {
+          "name": "living examples (macos-latest)",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050186"
+        },
+        {
+          "name": "living examples (ubuntu-latest)",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050219"
+        },
+        {
+          "name": "device-messaging-workers",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050264"
+        },
+        {
+          "name": "tasks-test",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050278"
+        },
+        {
+          "name": "chat-native",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050300"
+        },
+        {
+          "name": "native-test",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050355"
+        },
+        {
+          "name": "device-messaging-native",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050362"
+        },
+        {
+          "name": "linux threaded + epoll contract",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050388"
+        },
+        {
+          "name": "package-archive",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050389"
+        },
+        {
+          "name": "cli-build",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050391"
+        },
+        {
+          "name": "portable-application-workers",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050398"
+        },
+        {
+          "name": "chat-workers",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050403"
+        },
+        {
+          "name": "native-openssl",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050435"
+        },
+        {
+          "name": "native-integration",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050456"
+        },
+        {
+          "name": "guestbook-workers",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114437050525"
+        },
+        {
+          "name": "docker-build (chat container)",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114438702007"
+        },
+        {
+          "name": "cli init smoke test",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128263681/job/114438702055"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/moribit/Akamata/actions/runs/38128263681"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 38128348222,
+      "headSha": "2052bc369f1f83f38d4757e11376153b5f8b43ba",
+      "jobs": [
+        {
+          "name": "sanitizer (macos-latest)",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128348222/job/114437310918"
+        },
+        {
+          "name": "sanitizer (ubuntu-latest)",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38128348222/job/114437311065"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/moribit/Akamata/actions/runs/38128348222"
+    },
+    {
+      "conclusion": "failure",
+      "databaseId": 38127098085,
+      "headSha": "b58272abb45ebe057dd35eb6fab61562cd690a0a",
+      "jobs": [
+        {
+          "name": "macos native + kqueue contract",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623538"
+        },
+        {
+          "name": "native-integration",
+          "conclusion": "failure",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623557"
+        },
+        {
+          "name": "adversarial HTTP smoke",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623559"
+        },
+        {
+          "name": "living examples (ubuntu-latest)",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623580"
+        },
+        {
+          "name": "living examples (macos-latest)",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623604"
+        },
+        {
+          "name": "tasks-test",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623637"
+        },
+        {
+          "name": "native-test",
+          "conclusion": "failure",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623669"
+        },
+        {
+          "name": "linux threaded + epoll contract",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623696"
+        },
+        {
+          "name": "cli-build",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623701"
+        },
+        {
+          "name": "chat-native",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623736"
+        },
+        {
+          "name": "public documentation and PDF contract",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623752"
+        },
+        {
+          "name": "chat-workers",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623755"
+        },
+        {
+          "name": "device-messaging-workers",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623759"
+        },
+        {
+          "name": "native-openssl",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623760"
+        },
+        {
+          "name": "device-messaging-native",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623762"
+        },
+        {
+          "name": "guestbook-workers",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623767"
+        },
+        {
+          "name": "native-release-safe",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623801"
+        },
+        {
+          "name": "package-archive",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623805"
+        },
+        {
+          "name": "portable-application-workers",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433623882"
+        },
+        {
+          "name": "generated DX client strict typecheck",
+          "conclusion": "success",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114433624243"
+        },
+        {
+          "name": "cli init smoke test",
+          "conclusion": "skipped",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114434829395"
+        },
+        {
+          "name": "docker-build (chat container)",
+          "conclusion": "skipped",
+          "url": "https://github.com/moribit/Akamata/actions/runs/38127098085/job/114434829591"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/moribit/Akamata/actions/runs/38127098085"
+    }
+  ]
+}

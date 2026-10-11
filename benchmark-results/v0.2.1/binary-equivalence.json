@@ -1,0 +1,73 @@
+{
+  "comparison": "Mach-O __TEXT sections byte-identical; full binary differs after contract source change, not a claim of full binary identity",
+  "binaries": [
+    {
+      "path": "zig-out/bin/bench",
+      "binary_sha256": "266fdc0c426ff1c4aea2a6e3118bc8cc60ce8c294da4803f29e79470b878fe76",
+      "text_sections": {
+        "__text": {
+          "bytes": 1338820,
+          "sha256": "d52ec1c3d9d167693a400a79ae95fd49f56f7cb8c403fe6604c1075cbb3e97f8"
+        },
+        "__stubs": {
+          "bytes": 1704,
+          "sha256": "80ec5ff24faf2f0e96defe4d80b3dd5b417f789db8ca3f8fa5d1e1a1b1cb8e32"
+        },
+        "__stub_helper": {
+          "bytes": 1728,
+          "sha256": "8fe03506fa5e49503aaf0013513285ff83615937044ad4b1aa4ae83e8b16d323"
+        },
+        "__const": {
+          "bytes": 57812,
+          "sha256": "5e199861ef7f4b6a278ac5d65fc71fbfc22ee505ec298a85c477a892a31bae24"
+        },
+        "__cstring": {
+          "bytes": 38238,
+          "sha256": "4f46a1306ec315a55adf18d284ce2f79aa134ff9c4cacf3f9f2f820b4f8b52e0"
+        },
+        "__unwind_info": {
+          "bytes": 13744,
+          "sha256": "2508de824842931940ea3ccce8dcf428db372abcf306b2a9ea903d3bc77bbbbf"
+        },
+        "__eh_frame": {
+          "bytes": 113120,
+          "sha256": "d74d492c25bcfeb7f71908cf4b276a56b91aa4a2624378b8404d70764c7e8422"
+        }
+      }
+    },
+    {
+      "path": ".zig-cache/v021/final-fixed",
+      "binary_sha256": "d3027f6dfaba48bd3a3490561e7f2ea5aebb792637798cf53bfb802852c18650",
+      "text_sections": {
+        "__text": {
+          "bytes": 1338820,
+          "sha256": "d52ec1c3d9d167693a400a79ae95fd49f56f7cb8c403fe6604c1075cbb3e97f8"
+        },
+        "__stubs": {
+          "bytes": 1704,
+          "sha256": "80ec5ff24faf2f0e96defe4d80b3dd5b417f789db8ca3f8fa5d1e1a1b1cb8e32"
+        },
+        "__stub_helper": {
+          "bytes": 1728,
+          "sha256": "8fe03506fa5e49503aaf0013513285ff83615937044ad4b1aa4ae83e8b16d323"
+        },
+        "__const": {
+          "bytes": 57812,
+          "sha256": "5e199861ef7f4b6a278ac5d65fc71fbfc22ee505ec298a85c477a892a31bae24"
+        },
+        "__cstring": {
+          "bytes": 38238,
+          "sha256": "4f46a1306ec315a55adf18d284ce2f79aa134ff9c4cacf3f9f2f820b4f8b52e0"
+        },
+        "__unwind_info": {
+          "bytes": 13744,
+          "sha256": "2508de824842931940ea3ccce8dcf428db372abcf306b2a9ea903d3bc77bbbbf"
+        },
+        "__eh_frame": {
+          "bytes": 113120,
+          "sha256": "d74d492c25bcfeb7f71908cf4b276a56b91aa4a2624378b8404d70764c7e8422"
+        }
+      }
+    }
+  ]
+}
