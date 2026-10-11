@@ -113,6 +113,8 @@ def server(binary, run):
                     run["runtime_cost"] = json.loads(row.split(" ", 1)[1])
                 elif row.startswith("BENCH_TASKS "):
                     run["tasks"] = json.loads(row.split(" ", 1)[1])
+                elif row.startswith("BENCH_PHASES "):
+                    run["phases"] = json.loads(row.split(" ", 1)[1])
             if proc.returncode:
                 raise RuntimeError(f"server exited {proc.returncode}")
 

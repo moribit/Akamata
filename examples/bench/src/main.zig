@@ -67,6 +67,28 @@ pub fn main() !void {
     };
     std.log.info("bench runtime: {s}", .{@tagName(rt)});
     try app.serve(.{ .port = 8080, .accept_thread_count = 8, .runtime = rt, .metrics = runtime_metrics });
+    if (runtime_metrics) |counters| {
+        // Report only after serve/drain: no formatting or allocation on the hot
+        // path. Counts are session steps and inclusive wall durations, not CPU.
+        var counts: [6]u64 = undefined;
+        var durations: [6]u64 = undefined;
+        for (&counts, &durations, 0..) |*count, *duration, i| {
+            count.* = counters.phase_count[i].load(.monotonic);
+            duration.* = counters.phase_ns[i].load(.monotonic);
+        }
+        var output: [1024]u8 = undefined;
+        var writer = std.Io.Writer.fixed(&output);
+        try std.json.Stringify.value(.{
+            .count = counts,
+            .ns = durations,
+            .active_final = counters.http_connections_active.load(.monotonic),
+            .idle_final = counters.http_connections_idle.load(.monotonic),
+            .rejected = counters.http_connections_rejected_total.load(.monotonic),
+            .threads_created = counters.http_connection_threads_created_total.load(.monotonic),
+            .drain_ns = counters.http_shutdown_drain_ns.load(.monotonic),
+        }, .{}, &writer);
+        std.debug.print("BENCH_PHASES {s}\n", .{writer.buffered()});
+    }
 }
 
 fn hello(c: *am.Context(State)) !void {
