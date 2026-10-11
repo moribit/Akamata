@@ -12,9 +12,14 @@
   phase summaries. All runtime instrumentation is opt-in through borrowed owners.
 - Close an accepted socket when transport initialization fails. Preserve existing
   admission limits, absolute write budgets and cooperative shutdown behavior.
+- Return buffered request tails before another blocking socket read. This fixes
+  large keep-alive bodies waiting for subsequent client input; add unit and shared
+  Transport Contract regressions without changing HTTP semantics.
 - Preserve enum literals and tagged-union JSON wire schemas through typed handlers,
   OpenAPI and TypeScript; verify mapped error discriminators against actual responses.
   Required DTO validation precedes projection lifting without manufacturing zero values.
+  Generated enum parameters now require valid enum literals rather than arbitrary
+  strings; callers may need to narrow their TypeScript values.
 - Add Native/Workers shared complex-schema fixtures, allocation attribution,
   deadline/close/release races, opt-in Pool TSan coverage and reproducible benchmark
   JSON payload/observability modes. Keep retained arenas and owned response bodies.
