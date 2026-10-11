@@ -68,6 +68,12 @@ pub fn Next(comptime State: type) type {
                     return entry.mw.call(c, next);
                 }
             }
+            const started = if (c.res.metrics != null) clock.monotonicNs() else 0;
+            defer if (c.res.metrics) |m| {
+                const ns = clock.elapsedNs(started);
+                c.res.handler_elapsed_ns +|= ns;
+                m.recordPhase(.handler, ns);
+            };
             return self.terminal(c);
         }
     };
@@ -180,6 +186,8 @@ pub const ServeOptions = struct {
     address: ?[]const u8 = null,
     port: u16 = 8080,
     accept_thread_count: usize = 4,
+    /// Borrowed existing Prometheus counters; must outlive serve/drain. Native only.
+    metrics: ?*@import("mw/metrics.zig").Counters = null,
     /// HTTP parsing limits used by both Native and the Workers/WASM bridge. Increase
     /// `max_body_bytes` for endpoints that intentionally accept larger
     /// request bodies, such as image uploads.
@@ -228,6 +236,8 @@ pub fn App(comptime State: type) type {
         pub const Mw = Middleware(State);
 
         gpa: std.mem.Allocator,
+        /// Borrowed phase counters, optionally supplied by Native serve options.
+        metrics: ?*@import("mw/metrics.zig").Counters = null,
         state_value: State,
         base_prefix: []const u8 = "",
         routes: std.ArrayList(Route) = .empty,
@@ -772,6 +782,9 @@ pub fn App(comptime State: type) type {
             peer_ip: ?[]const u8,
             preparation: anytype,
         ) !void {
+            response.metrics = self.metrics;
+            const started = if (self.metrics != null) clock.monotonicNs() else 0;
+            defer if (self.metrics) |m| m.recordPhase(.route_middleware, clock.elapsedNs(started) -| response.handler_elapsed_ns);
             var name_buf: [16][]const u8 = undefined;
             var value_buf: [16][]const u8 = undefined;
 

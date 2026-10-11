@@ -95,6 +95,9 @@ pub const Response = struct {
     application_session_error: bool = false,
     synchronous_application_io: bool = true,
 
+    metrics: ?*@import("../mw/metrics.zig").Counters = null,
+    handler_elapsed_ns: u64 = 0,
+
     pub fn init(arena: std.mem.Allocator) Response {
         return .{ .arena = arena };
     }
@@ -219,6 +222,9 @@ pub const Response = struct {
     }
 
     pub fn json(self: *Response, value: anytype) !void {
+        const clock = @import("../observability/clock.zig");
+        const started = if (self.metrics != null) clock.monotonicNs() else 0;
+        defer if (self.metrics) |m| m.recordPhase(.serialize, clock.elapsedNs(started));
         try self.header("content-type", "application/json");
         var alloc_w: std.Io.Writer.Allocating = .fromArrayList(self.arena, &self.body);
         defer self.body = alloc_w.toArrayList();

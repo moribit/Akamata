@@ -13,6 +13,9 @@ pub fn serve(comptime State: type, app: *app_mod.App(State), opts: app_mod.Serve
 pub fn serveWithReadiness(comptime State: type, comptime Readiness: type, app: *app_mod.App(State), opts: app_mod.ServeOptions) !void {
     if (!is_native) return;
     defer @import("cost.zig").report();
+    const previous_metrics = app.metrics;
+    app.metrics = opts.metrics;
+    defer app.metrics = previous_metrics;
     app.trust_proxy_headers = opts.trust_proxy_headers;
     app.trusted_proxy_fn = opts.trusted_proxy_fn;
     try app.prepare();
@@ -73,6 +76,10 @@ fn drain(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(State, Re
     const clock = @import("../observability/clock.zig");
     const recorded = ctx.app.shutdown_started_ns.load(.acquire);
     const started = if (recorded == 0) clock.monotonicNs() else recorded;
+    defer if (ctx.opts.metrics) |m| {
+        _ = m.http_shutdown_drain_ns.fetchAdd(clock.elapsedNs(started), .monotonic);
+        _ = m.http_shutdown_drain_count.fetchAdd(1, .monotonic);
+    };
     var forced = false;
     while (ctx.active_connections.load(.acquire) != 0) {
         ctx.connections.expireWrites(clock.monotonicNs());
@@ -160,28 +167,43 @@ fn acceptLoop(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(Stat
         applyTcpNoDelay(stream) catch {};
         const previous = ctx.active_connections.fetchAdd(1, .acq_rel);
         if (previous >= ctx.opts.max_connections) {
+            if (ctx.opts.metrics) |m| _ = m.http_connections_rejected_total.fetchAdd(1, .monotonic);
             _ = ctx.active_connections.fetchSub(1, .acq_rel);
             stream.close(ctx.io);
             continue;
         }
+        if (ctx.opts.metrics) |m| _ = m.http_connections_active.fetchAdd(1, .monotonic);
         const thread = std.Thread.spawn(.{}, connectionThread, .{ State, Readiness, ctx, stream }) catch {
             _ = ctx.active_connections.fetchSub(1, .acq_rel);
+            if (ctx.opts.metrics) |m| {
+                _ = m.http_connections_active.fetchSub(1, .monotonic);
+                _ = m.http_connections_rejected_total.fetchAdd(1, .monotonic);
+            }
             stream.close(ctx.io);
             continue;
         };
+        if (ctx.opts.metrics) |m| _ = m.http_connection_threads_created_total.fetchAdd(1, .monotonic);
         thread.detach();
     }
 }
 
 fn connectionThread(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(State, Readiness), stream: net.Stream) void {
     defer _ = ctx.active_connections.fetchSub(1, .acq_rel);
+    const started = if (ctx.opts.metrics != null) @import("../observability/clock.zig").monotonicNs() else 0;
+    defer if (ctx.opts.metrics) |m| {
+        _ = m.http_connections_active.fetchSub(1, .monotonic);
+        _ = m.http_connection_lifetime_count.fetchAdd(1, .monotonic);
+        _ = m.http_connection_lifetime_ns.fetchAdd(@import("../observability/clock.zig").elapsedNs(started), .monotonic);
+    };
     var node: @import("drain.zig").Node = undefined;
     ctx.connections.attach(&node, stream.socket.handle);
     defer node.detach();
     var transport = @import("socket_transport.zig").Transport(Readiness).init(ctx.io, stream, &ctx.app.shutdown_flag) catch {
+        node.close();
         return;
     };
     transport.control = &node;
+    transport.metrics = ctx.opts.metrics;
     defer transport.deinit();
     @import("../http/connection.zig").run(State, ctx.app, &transport, ctx.opts) catch |err| switch (err) {
         error.Timeout, error.EndOfStream => {},

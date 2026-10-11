@@ -10,7 +10,7 @@ pub fn run(comptime State: type, app: *app_mod.App(State), transport: anytype, o
     defer if (owns_stream) transport.close();
     var session = try session_mod.Session.init(app.gpa, opts);
     defer session.deinit();
-    while (!app.shutdown_flag.load(.acquire)) switch (try session.next(opts)) {
+    while (!app.shutdown_flag.load(.acquire)) switch (try measuredNext(&session, opts)) {
         .input => |need| {
             var vec = [_][]u8{try session.writable(need.maximum)};
             const n = try transport.read(&vec, need.timeout_ms, need.shutdown_if_idle);
@@ -34,6 +34,13 @@ pub fn run(comptime State: type, app: *app_mod.App(State), transport: anytype, o
             },
         },
     };
+}
+
+fn measuredNext(session: *session_mod.Session, opts: *const app_mod.ServeOptions) !session_mod.Event {
+    const clock = @import("../observability/clock.zig");
+    const started = if (opts.metrics != null) clock.monotonicNs() else 0;
+    defer if (opts.metrics) |m| m.recordPhase(.parse, clock.elapsedNs(started));
+    return session.next(opts);
 }
 
 pub fn dispatchOne(comptime State: type, app: *app_mod.App(State), session: *session_mod.Session, parsed: session_mod.Parsed, transport: anytype, opts: *const app_mod.ServeOptions) !Outcome {
@@ -89,6 +96,9 @@ pub fn dispatchOne(comptime State: type, app: *app_mod.App(State), session: *ses
         try transport.deferResponse(&response);
         return .prepared;
     }
+    const clock = @import("../observability/clock.zig");
+    const started_write = if (opts.metrics != null) clock.monotonicNs() else 0;
+    defer if (opts.metrics) |m| m.recordPhase(.write, clock.elapsedNs(started_write));
     response.writeTo(writer) catch return .close;
     writer.flush() catch return .close;
     return if (response.keep_alive) .keep_alive else .close;

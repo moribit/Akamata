@@ -91,7 +91,18 @@ fn methodFromString(s: []const u8) Method {
     return .OTHER;
 }
 
+pub const Phase = enum { read, parse, route_middleware, handler, serialize, write };
 pub const Counters = struct {
+    phase_count: [6]Counter(u64) = @splat(.init(0)),
+    phase_ns: [6]Counter(u64) = @splat(.init(0)),
+    http_connections_active: Counter(i64) = .init(0),
+    http_connections_idle: Counter(i64) = .init(0),
+    http_connections_rejected_total: Counter(u64) = .init(0),
+    http_connection_threads_created_total: Counter(u64) = .init(0),
+    http_connection_lifetime_ns: Counter(u64) = .init(0),
+    http_connection_lifetime_count: Counter(u64) = .init(0),
+    http_shutdown_drain_ns: Counter(u64) = .init(0),
+    http_shutdown_drain_count: Counter(u64) = .init(0),
     db_pool_active_connections: Counter(i64) = .init(0),
     db_pool_idle_connections: Counter(i64) = .init(0),
     db_pool_waiters: Counter(i64) = .init(0),
@@ -130,6 +141,10 @@ pub const Counters = struct {
     /// Unix seconds at which the first request landed. `0` until then.
     start_time_unix: Counter(i64) = .init(0),
 
+    pub fn recordPhase(self: *Counters, phase: Phase, ns: u64) void {
+        _ = self.phase_count[@backingInt(phase)].fetchAdd(1, .monotonic);
+        _ = self.phase_ns[@backingInt(phase)].fetchAdd(ns, .monotonic);
+    }
     pub fn recordPoolWait(self: *Counters, ns: u64) void {
         _ = self.db_pool_acquire_wait_ns.fetchAdd(ns, .monotonic);
         _ = self.db_pool_acquire_wait_count.fetchAdd(1, .monotonic);
@@ -259,6 +274,17 @@ pub fn metricsHandler(comptime State: type, c_ptr: *Counters) app_mod.Handler(St
                 }
             };
 
+            try w.append(c.arena, &buf, "# TYPE akamata_http_phase_seconds summary\n", .{});
+            inline for (@typeInfo(Phase).@"enum".field_names, 0..) |name, i| {
+                const ns = counters_ref.phase_ns[i].load(.monotonic);
+                try w.append(c.arena, &buf, "akamata_http_phase_seconds_count{{phase=\"{s}\"}} {d}\nakamata_http_phase_seconds_sum{{phase=\"{s}\"}} {d}.{d:0>9}\n", .{ name, counters_ref.phase_count[i].load(.monotonic), name, ns / std.time.ns_per_s, ns % std.time.ns_per_s });
+            }
+            try w.append(c.arena, &buf, "# TYPE akamata_http_connections_active gauge\nakamata_http_connections_active {d}\n", .{counters_ref.http_connections_active.load(.monotonic)});
+            try w.append(c.arena, &buf, "# TYPE akamata_http_connections_idle gauge\nakamata_http_connections_idle {d}\n", .{counters_ref.http_connections_idle.load(.monotonic)});
+            try w.append(c.arena, &buf, "# TYPE akamata_http_connections_rejected_total counter\nakamata_http_connections_rejected_total {d}\n", .{counters_ref.http_connections_rejected_total.load(.monotonic)});
+            try w.append(c.arena, &buf, "# TYPE akamata_http_connection_threads_created_total counter\nakamata_http_connection_threads_created_total {d}\n", .{counters_ref.http_connection_threads_created_total.load(.monotonic)});
+            try w.append(c.arena, &buf, "# TYPE akamata_http_connection_lifetime_seconds summary\nakamata_http_connection_lifetime_seconds_count {d}\nakamata_http_connection_lifetime_seconds_sum {d}.{d:0>9}\n", .{ counters_ref.http_connection_lifetime_count.load(.monotonic), counters_ref.http_connection_lifetime_ns.load(.monotonic) / std.time.ns_per_s, counters_ref.http_connection_lifetime_ns.load(.monotonic) % std.time.ns_per_s });
+            try w.append(c.arena, &buf, "# TYPE akamata_http_shutdown_drain_seconds summary\nakamata_http_shutdown_drain_seconds_count {d}\nakamata_http_shutdown_drain_seconds_sum {d}.{d:0>9}\n", .{ counters_ref.http_shutdown_drain_count.load(.monotonic), counters_ref.http_shutdown_drain_ns.load(.monotonic) / std.time.ns_per_s, counters_ref.http_shutdown_drain_ns.load(.monotonic) % std.time.ns_per_s });
             try w.append(c.arena, &buf, "# TYPE akamata_db_pool_active_connections gauge\n" ++
                 "akamata_db_pool_active_connections {d}\n" ++
                 "# TYPE akamata_db_pool_idle_connections gauge\n" ++

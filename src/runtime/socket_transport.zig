@@ -15,6 +15,7 @@ pub fn Transport(comptime Readiness: type) type {
         writer_buf: [4096]u8 = undefined,
         reader_state: ?net.Stream.Reader = null,
         writer_state: ?@import("bounded_writer.zig").Writer = null,
+        metrics: ?*@import("../mw/metrics.zig").Counters = null,
         write_timeout_ms: u32 = 30_000,
         control: ?*@import("drain.zig").Node = null,
 
@@ -22,6 +23,8 @@ pub fn Transport(comptime Readiness: type) type {
             return .{ .io = io, .stream = stream, .shutdown = shutdown, .readiness = try Readiness.init(stream.socket.handle) };
         }
         pub fn read(self: *Self, vec: [][]u8, timeout_ms: u32, shutdown_if_idle: bool) !usize {
+            const started_read = if (self.metrics != null) clock.monotonicNs() else 0;
+            defer if (self.metrics) |m| m.recordPhase(.read, clock.elapsedNs(started_read));
             const measured = @import("cost.zig").begin();
             defer measured.end(.read);
             if (self.reader_state == null) self.reader_state = self.stream.reader(self.io, &self.reader_buf);
@@ -30,6 +33,12 @@ pub fn Transport(comptime Readiness: type) type {
             // std.Io.Reader can retain bytes from an earlier read. Read those before
             // waiting for new kernel readiness (pipelining/partial next request).
             if (reader.buffered().len == 0) {
+                if (shutdown_if_idle) {
+                    if (self.metrics) |m| _ = m.http_connections_idle.fetchAdd(1, .monotonic);
+                }
+                defer if (shutdown_if_idle) if (self.metrics) |m| {
+                    _ = m.http_connections_idle.fetchSub(1, .monotonic);
+                };
                 const started = clock.monotonicNs();
                 while (true) {
                     try self.io.checkCancel();

@@ -35,14 +35,17 @@ pub fn main() !void {
     // BENCH_OBSERVABILITY=metrics|request|full provides repeatable A/B modes.
     // Unset is the zero-observability baseline.
     var metrics_counters: am.mw.MetricsCounters = .{};
+    var runtime_metrics: ?*am.mw.MetricsCounters = null;
     if (am.env.get(alloc, "BENCH_OBSERVABILITY")) |mode| {
         defer alloc.free(mode);
         if (std.mem.eql(u8, mode, "metrics")) {
+            runtime_metrics = &metrics_counters;
             _ = try app.useAll(am.mw.metrics(State, &metrics_counters));
         } else if (std.mem.eql(u8, mode, "request")) {
             _ = try app.useAll(am.mw.requestId(State));
             _ = try app.useAll(am.mw.accessLog(State, .json));
         } else if (std.mem.eql(u8, mode, "full")) {
+            runtime_metrics = &metrics_counters;
             _ = try app.useAll(am.mw.requestId(State));
             _ = try app.useAll(am.mw.metrics(State, &metrics_counters));
             _ = try app.useAll(am.mw.serverTiming(State, .{ .enabled = true }));
@@ -63,7 +66,7 @@ pub fn main() !void {
         break :blk .threaded;
     };
     std.log.info("bench runtime: {s}", .{@tagName(rt)});
-    try app.serve(.{ .port = 8080, .accept_thread_count = 8, .runtime = rt });
+    try app.serve(.{ .port = 8080, .accept_thread_count = 8, .runtime = rt, .metrics = runtime_metrics });
 }
 
 fn hello(c: *am.Context(State)) !void {

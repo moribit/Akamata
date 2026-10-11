@@ -82,3 +82,27 @@ test "disabled Server-Timing emits no header" {
     app.dispatchWithPeer(arena, &req, &res, null, null, null) catch {};
     for (res.headers.items) |h| try std.testing.expect(!std.ascii.eqlIgnoreCase(h.name, "server-timing"));
 }
+
+const PhaseState = struct {};
+fn phaseJson(c: *am.Context(PhaseState)) !void {
+    try c.json(.{ .value = 42 }, 200);
+}
+test "phase counters share the existing exporter without request labels" {
+    var counters: am.mw.MetricsCounters = .{};
+    var app = am.App(PhaseState).init(std.testing.allocator, .{});
+    defer app.deinit();
+    app.metrics = &counters;
+    _ = try app.get("/json", phaseJson);
+    _ = try app.get("/metrics", am.mw.metricsHandler(PhaseState, &counters));
+    var client = am.testing.Client(@TypeOf(app)).init(std.testing.allocator, &app);
+    var response = try client.get("/json").send();
+    defer response.deinit();
+    try response.expectStatus(200);
+    try std.testing.expectEqual(@as(u64, 1), counters.phase_count[2].load(.monotonic));
+    try std.testing.expectEqual(@as(u64, 1), counters.phase_count[3].load(.monotonic));
+    try std.testing.expectEqual(@as(u64, 1), counters.phase_count[4].load(.monotonic));
+    var metrics = try client.get("/metrics").send();
+    defer metrics.deinit();
+    try std.testing.expect(std.mem.indexOf(u8, metrics.body, "akamata_http_phase_seconds_count{phase=\"serialize\"} 1") != null);
+    try std.testing.expect(std.mem.indexOf(u8, metrics.body, "akamata_db_pool_waiters 0") != null);
+}
