@@ -304,3 +304,33 @@ test "pool deinit joins waiters and outstanding leases before freeing handles" {
     // Db remains usable until the last lease is released.
     try held.db.exec("CREATE TABLE shutdown_safe (id INTEGER)");
 }
+
+fn poolAllocationFailure(allocator: std.mem.Allocator) !void {
+    const db = try am.db.openSqlite(allocator, ":memory:");
+    var transferred = false;
+    defer if (!transferred) db.close();
+    var pool = try am.db.Pool.init(allocator, &.{db});
+    transferred = true;
+    defer pool.deinit();
+    var lease = try pool.acquire();
+    lease.deinit();
+}
+test "pool initialization failure retains caller ownership without leaks" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, poolAllocationFailure, .{});
+}
+test "pool gauges and wait timeout counts balance through close" {
+    var counters: am.mw.MetricsCounters = .{};
+    const db = try am.db.openSqlite(std.testing.allocator, ":memory:");
+    var pool = try am.db.Pool.initWithOptions(std.testing.allocator, &.{db}, .{ .metrics = &counters });
+    defer pool.deinit();
+    var lease = try pool.acquire();
+    try std.testing.expectEqual(@as(i64, 1), counters.db_pool_active_connections.load(.monotonic));
+    try std.testing.expectError(error.Timeout, pool.acquireWithDeadline(pool.deadlineAfter(2)));
+    try std.testing.expectEqual(@as(u64, 1), counters.db_pool_acquire_timeouts_total.load(.monotonic));
+    try std.testing.expectEqual(@as(u64, 1), counters.db_pool_acquire_wait_count.load(.monotonic));
+    pool.close();
+    lease.deinit();
+    try std.testing.expectEqual(@as(i64, 0), counters.db_pool_active_connections.load(.monotonic));
+    try std.testing.expectEqual(@as(i64, 0), counters.db_pool_idle_connections.load(.monotonic));
+    try std.testing.expectEqual(@as(i64, 0), counters.db_pool_waiters.load(.monotonic));
+}

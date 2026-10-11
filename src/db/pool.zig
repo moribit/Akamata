@@ -57,7 +57,7 @@ pub const Pool = struct {
         self.mu.lockUncancelable(self.io);
         defer {
             _ = self.callers.fetchSub(1, .acq_rel);
-            self.changed.broadcast(self.io);
+            if (self.closed) self.changed.broadcast(self.io);
             self.mu.unlock(self.io);
         }
         var wait_started: ?std.Io.Timestamp = null;
@@ -142,7 +142,7 @@ pub const Pool = struct {
             _ = m.db_pool_active_connections.fetchSub(1, .monotonic);
             if (!self.closed) _ = m.db_pool_idle_connections.fetchAdd(1, .monotonic);
         }
-        self.changed.broadcast(self.io);
+        if (self.closed) self.changed.broadcast(self.io) else self.changed.signal(self.io);
     }
 };
 
