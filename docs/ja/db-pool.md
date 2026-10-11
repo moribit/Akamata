@@ -16,6 +16,7 @@ defer lease.deinit();
 受け取ります。spurious wakeupや進捗で期限を更新しません。mutex内の判定では
 closeをtimeoutより優先し、timeoutを空き接続より優先します。不正な時計は
 `InvalidDeadlineClock`、cancel可能なIo待機は`Canceled`を返し得ます。
+deadlineは取得可否の期限です。OSのschedulingやmutex再取得による復帰遅延までの厳密な上限ではありません。
 標準Conditionの待機数上限は`PoolOverloaded`で保護します。
 `initWithOptions`でIoと既存`am.mw.MetricsCounters`を明示できます。
 どちらのownerもPoolより長く生存させてください。
@@ -44,19 +45,19 @@ queryの強制preemptは行いません。leaseをコピーしたり返却後に
 
 既存metrics middleware/exporterと同じCounters ownerを`app.serve(.{ .metrics = &counters })`へ渡します。defaultのnullではruntime計測を無効にします。
 
-| Prometheus name | Type / unit | Meaning |
+| Prometheus名 | 型・単位 | 計測対象 |
 |---|---|---|
-| akamata_http_connections_active | gauge / connections | admitted connection threads, including idle and upgrades |
-| akamata_http_connections_idle | gauge / connections | HTTP idle readiness wait, including initial request; excludes upgraded sessions |
-| akamata_http_connections_rejected_total | counter / connections | connection-limit and thread-spawn rejection |
-| akamata_http_connection_threads_created_total | counter / threads | successful connection thread spawns |
-| akamata_http_connection_lifetime_seconds | summary / seconds | completed connection thread count and lifetime sum |
-| akamata_http_shutdown_drain_seconds | summary / seconds | shutdown-start to final connection exit, count and sum |
+| akamata_http_connections_active | gauge・接続 | idle / upgradeを含む、受け入れたconnection thread |
+| akamata_http_connections_idle | gauge・接続 | 最初のrequestを含むHTTP idle readiness待機。upgradeは対象外 |
+| akamata_http_connections_rejected_total | counter・接続 | 接続上限・thread spawn失敗による拒否 |
+| akamata_http_connection_threads_created_total | counter・thread | 成功したconnection thread生成 |
+| akamata_http_connection_lifetime_seconds | summary・秒 | 終了したconnection threadの回数と生存時間の合計 |
+| akamata_http_shutdown_drain_seconds | summary・秒 | shutdown開始から最後のconnection終了までの回数と時間の合計 |
 
-Native Threaded only, no labels. Gauges are concurrent snapshots rather than atomic multi-metric transactions. Lifetime begins at thread entry; drain includes acceptor shutdown. CPU-bound handlers remain cooperative and can exceed the I/O drain deadline.
+Native Threaded専用でlabelはありません。gaugeは並行処理のsnapshotであり、複数metricの一括transactionではありません。生存時間はthread開始時から、drainにはacceptor終了を含みます。CPU-bound handlerの終了は協調的で、I/O drain deadlineを超える場合があります。
 
-## Request phases
+## Requestの処理段階
 
-`akamata_http_phase_seconds` is a summary (count/sum, seconds) with one fixed `phase` label: `read`, `parse`, `route_middleware`, `handler`, `serialize`, `write`. No route values or identities are labels. `App.metrics` explicitly borrows the same Counters owner for application phases, including in-process tests. Native serve supplies it from ServeOptions and restores the previous pointer after drain.
+`akamata_http_phase_seconds`はcount / sumを持つ秒単位のsummaryです。固定label `phase`は`read`、`parse`、`route_middleware`、`handler`、`serialize`、`write`の6種類です。route値や利用者IDをlabelにしません。`App.metrics`はin-process testを含むapplication計測用に同じCounters ownerを明示borrowします。Native serveはServeOptionsから設定し、drain後に元のpointerへ戻します。
 
-Read includes readiness/idle wait; parse counts session steps, not only successful requests. Route/middleware is dispatch elapsed time minus terminal handler time. Handler includes binding and JSON serialization; serialize measures Response.json. Write covers buffered HTTP response serialization and flush; synchronous streaming and upgraded frame I/O are currently outside this phase metric. These inclusive measurements overlap: do not add them as a request total or treat wall time as CPU time. Workers can enable application handler/serialization phases with App.metrics, while native socket/read/parse/write metrics are unavailable there. Existing DB query spans, backend metrics and Server-Timing remain unchanged.
+readにはreadiness / idle待機を含みます。parseは成功requestだけでなくsession stepを数えます。route / middlewareはdispatch経過時間からterminal handler時間を引いた値です。handlerにはbindingとJSON serializationを含み、serializeはResponse.jsonを計測します。writeはbuffered HTTPのheader serializationとflushを含み、同期streamとupgrade frame I/Oは対象外です。これらは重複する計測なので、request totalとして加算したりCPU時間とみなしたりしないでください。WorkersではApp.metricsからapplicationのhandler / serializationを有効にできますが、Native socket / read / parse / writeのmetricは利用できません。既存DB query span、backend metric、Server-Timingは維持します。

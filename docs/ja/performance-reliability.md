@@ -79,4 +79,14 @@ zig build db-pool-test -Druntime-tsan=true -Doptimize=ReleaseSafe
 WASM host simulationはlive Cloudflareの保証ではありません。live testには専用resourceと
 credentialsが必要で、通常CIからresourceを自動作成しません。
 
-The prepared static route + empty handler and the same route with a passthrough middleware both make zero logical arena allocation requests in the diagnostic fixture. This excludes route registration/preparation and response payload generation.
+準備済みstatic routeと空handler、同じrouteとpassthrough middlewareは、診断fixtureではともにarenaへの論理allocationが0です。route登録・prepare・response payload生成は含みません。
+
+## 測定上の残課題
+
+32接続の最終paired中央値ではhello・echo・dbのthroughput差は1%以内です。
+接続上限である1,024接続の10秒echo再試験では、P99が28.834 → 37.758 msとなり、
+原因は未解明です。この境界でmetrics付きDB負荷には接続拒否とclient errorが
+記録されました。1,000接続の診断では全3 roundの拒否数は0ですが、少数のclient
+errorは残ります。短時間のローカル測定であり、zero-error capacityやP99の
+同等性を保証するものではありません。
+[全測定レポート](../../benchmark-results/v0.2.1/README.md)を参照してください。

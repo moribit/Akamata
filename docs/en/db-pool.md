@@ -15,6 +15,7 @@ defer lease.deinit();
 `acquireWithDeadline()` takes an absolute `std.Io.Clock.Timestamp` on the `.awake`
 monotonic clock. Spurious wakeups and progress do not renew the budget. Under the
 pool mutex, closure wins over timeout; timeout wins over an available connection.
+The deadline bounds eligibility, not OS scheduling or mutex reacquisition latency.
 Wrong clocks return `InvalidDeadlineClock`; cancelable timed Io waits may return
 `Canceled`. The bounded standard condition waiter representation is protected by
 `PoolOverloaded` rather than overflowing. `initWithOptions` accepts an explicit

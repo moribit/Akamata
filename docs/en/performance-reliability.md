@@ -96,3 +96,13 @@ Live validation requires explicitly isolated resources and credentials; normal
 CI never provisions resources automatically.
 
 The prepared static route + empty handler and the same route with a passthrough middleware both make zero logical arena allocation requests in the diagnostic fixture. This excludes route registration/preparation and response payload generation.
+
+## Measured limits
+
+The final 32-connection paired medians preserve throughput within 1% for hello, echo
+and db. At the 1,024-connection admission boundary, the 10-second echo repeat still
+shows P99 28.834 → 37.758 ms; the cause is unresolved. Metrics-enabled DB load at
+that boundary records rejection and client errors. At 1,000 connections rejection
+is zero in all three diagnostic rounds, but a small client error rate remains.
+These are short local snapshots, not zero-error capacity or P99 certification.
+See the [complete measurement report](../../benchmark-results/v0.2.1/README.md).
