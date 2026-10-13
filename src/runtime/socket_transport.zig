@@ -29,7 +29,10 @@ pub fn Transport(comptime Readiness: type) type {
             defer measured.end(.read);
             if (self.reader_state == null) self.reader_state = self.stream.reader(self.io, &self.reader_buf);
             const reader = &self.reader_state.?.interface;
-            if (timeout_ms == 0) return error.Timeout;
+            if (timeout_ms == 0) {
+                @import("cost.zig").add(.read_timeout, 1);
+                return error.Timeout;
+            }
             // Reader.readVec copies buffered bytes and then invokes its backing
             // reader when the destination still has room. On a blocking socket
             // that can wait for the next request before returning this request's
@@ -61,7 +64,10 @@ pub fn Transport(comptime Readiness: type) type {
                     try self.io.checkCancel();
                     if (shutdown_if_idle and self.shutdown.load(.acquire)) return error.EndOfStream;
                     const elapsed = clock.elapsedNs(started) / std.time.ns_per_ms;
-                    if (elapsed >= timeout_ms) return error.Timeout;
+                    if (elapsed >= timeout_ms) {
+                        @import("cost.zig").add(.read_timeout, 1);
+                        return error.Timeout;
+                    }
                     const remaining: u32 = @intCast(timeout_ms - elapsed);
                     // The raw readiness call is not an Io cancellation point.
                     // Bound it so the experimental Group scope can observe
@@ -149,6 +155,8 @@ test "buffered body tail returns without another socket read or readiness wait" 
     try std.testing.expectEqual(@as(usize, 0), transport.bufferedInput().len);
 }
 pub fn formatPeerIp(arena: std.mem.Allocator, address: net.IpAddress) ![]const u8 {
+    const measured = @import("cost.zig").begin();
+    defer measured.end(.peer_ip);
     var writer: Io.Writer.Allocating = .init(arena);
     switch (address) {
         .ip4 => |ip| try writer.writer.print("{d}.{d}.{d}.{d}", .{ ip.bytes[0], ip.bytes[1], ip.bytes[2], ip.bytes[3] }),

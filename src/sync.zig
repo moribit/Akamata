@@ -64,8 +64,9 @@ pub const Mutex = struct {
 
 // === Condition variable ===
 //
-// Used by db/pool.zig. No obsolete reactor queue dependency remains.
-// std.Io.Condition cannot replace this without threading Io through Db APIs.
+// Used by the private reactor's bounded worker queue. DB Pool already uses
+// std.Io.Condition with an explicit Io lifetime. Changing the reactor queue's
+// wait/cancellation model needs separate measurement and lifecycle validation.
 
 extern "c" fn pthread_cond_init(c: *PthreadCond, attr: ?*anyopaque) c_int;
 extern "c" fn pthread_cond_destroy(c: *PthreadCond) c_int;

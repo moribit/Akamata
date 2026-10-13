@@ -22,7 +22,10 @@ pub const Writer = struct {
         while (offset < bytes.len) {
             self.io.checkCancel() catch return error.WriteFailed;
             const elapsed = clock.elapsedNs(self.started.?) / std.time.ns_per_ms;
-            if (elapsed >= self.timeout_ms) return error.WriteFailed;
+            if (elapsed >= self.timeout_ms) {
+                cost.add(.write_timeout, 1);
+                return error.WriteFailed;
+            }
             const send_cost = cost.begin();
             cost.add(.send_call, 1);
             const n = std.c.send(self.fd, bytes[offset..].ptr, bytes.len - offset, std.c.MSG.DONTWAIT | std.c.MSG.NOSIGNAL);
@@ -35,12 +38,23 @@ pub const Writer = struct {
             switch (std.posix.errno(n)) {
                 .INTR => continue,
                 .AGAIN => {
+                    cost.add(.write_again, 1);
                     var p = [1]std.c.pollfd{.{ .fd = self.fd, .events = std.c.POLL.OUT, .revents = 0 }};
                     const remaining = self.timeout_ms - elapsed;
+                    const wait_cost = cost.begin();
+                    cost.add(.poll_call, 1);
                     const ready = std.c.poll(&p, 1, @intCast(@min(remaining, 100)));
+                    wait_cost.end(.write_wait);
                     if (ready < 0 and std.posix.errno(ready) != .INTR) return error.WriteFailed;
                 },
-                else => return error.WriteFailed,
+                else => |err| {
+                    if (comptime cost.enabled) switch (err) {
+                        .CONNRESET => cost.add(.write_reset, 1),
+                        .PIPE => cost.add(.write_pipe, 1),
+                        else => cost.add(.write_other_failure, 1),
+                    };
+                    return error.WriteFailed;
+                },
             }
         }
     }

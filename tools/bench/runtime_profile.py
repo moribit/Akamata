@@ -17,6 +17,9 @@ p.add_argument("binaries", nargs="+")
 p.add_argument("--output-dir", required=True)
 p.add_argument("--endpoint", default="db/1")
 p.add_argument("--connections", type=int, nargs="+", default=[32])
+p.add_argument("--port", type=int, default=8080)
+p.add_argument("--server-env", action="append", default=[], metavar="KEY=VALUE")
+p.add_argument("--server-logs", action="store_true", help="retain diagnostic counters emitted during shutdown")
 a = p.parse_args()
 directory = Path(a.output_dir)
 directory.mkdir(parents=True, exist_ok=True)
@@ -28,23 +31,30 @@ for connections in a.connections:
     stem = label if a.connections == [32] else label + "-c" + str(connections)
     with socket.socket() as probe:
         probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        probe.bind(("127.0.0.1", 8080))
+        probe.bind(("127.0.0.1", a.port))
         probe.listen(1)
     env = dict(os.environ)
     for key in ("BENCH_STATS", "BENCH_RUNTIME", "BENCH_OBSERVABILITY"):
         env.pop(key, None)
-    server = subprocess.Popen([str(Path(binary).resolve())], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    for item in a.server_env:
+        key, separator, value = item.partition("=")
+        if not separator or not key:
+            p.error("--server-env requires KEY=VALUE")
+        env[key] = value
+    run["server_environment_overrides"] = a.server_env
+    server_log = (directory / (stem + ".server.log")).open("w") if a.server_logs else None
+    server = subprocess.Popen([str(Path(binary).resolve())], env=env, stdout=server_log or subprocess.DEVNULL, stderr=server_log or subprocess.DEVNULL)
     client = None
     try:
         for _ in range(100):
             try:
-                with socket.create_connection(("127.0.0.1", 8080), .2):
+                with socket.create_connection(("127.0.0.1", a.port), .2):
                     break
             except OSError:
                 time.sleep(.02)
         else:
             raise RuntimeError("startup deadline")
-        client = subprocess.Popen(["oha", "--no-tui", "--output-format", "quiet", "-c", str(connections), "-z", "10s", "-w", "http://127.0.0.1:8080/" + a.endpoint])
+        client = subprocess.Popen(["oha", "--no-tui", "--output-format", "quiet", "-c", str(connections), "-z", "10s", "-w", "http://127.0.0.1:" + str(a.port) + "/" + a.endpoint])
         time.sleep(2)
         if platform.system() == "Darwin":
             command = ["sample", str(server.pid), "5", "1", "-file", str(directory / (stem + ".sample.txt"))]
@@ -74,6 +84,9 @@ for connections in a.connections:
             server.kill()
             server.wait()
             raise RuntimeError("profile server shutdown deadline")
+        finally:
+            if server_log is not None:
+                server_log.close()
 
     metadata["runs"].append(run)
     (directory / "profile-metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")

@@ -50,6 +50,8 @@ pub const Node = struct {
         return self.closed.load(.acquire);
     }
     pub fn clearWriteDeadline(self: *Node) void {
+        const measured = @import("cost.zig").begin();
+        defer measured.end(.deadline_clear);
         self.registry.mutex.lock();
         defer self.registry.mutex.unlock();
         self.write_deadline_ns.store(0, .release);

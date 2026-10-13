@@ -146,6 +146,11 @@ fn acceptLoop(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(Stat
             const e = errnoVal();
             if (e == EAGAIN or e == EWOULDBLOCK or e == ECONNABORTED or e == EINTR) continue;
             if (ctx.app.shutdown_flag.load(.seq_cst)) return;
+            @import("cost.zig").add(.accept_hard_failure, 1);
+            if (comptime @import("cost.zig").enabled) switch (std.posix.errno(accepted.fd)) {
+                .MFILE, .NFILE, .NOBUFS, .NOMEM => @import("cost.zig").add(.accept_resource_failure, 1),
+                else => {},
+            };
             std.log.warn("accept failed: errno {d} (backoff {d}us)", .{ e, backoff_us });
             var remaining_us = backoff_us;
             while (remaining_us > 0 and !ctx.app.shutdown_flag.load(.acquire)) {
@@ -167,13 +172,17 @@ fn acceptLoop(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(Stat
         applyTcpNoDelay(stream) catch {};
         const previous = ctx.active_connections.fetchAdd(1, .acq_rel);
         if (previous >= ctx.opts.max_connections) {
+            @import("cost.zig").add(.connection_limit_rejected, 1);
             if (ctx.opts.metrics) |m| _ = m.http_connections_rejected_total.fetchAdd(1, .monotonic);
             _ = ctx.active_connections.fetchSub(1, .acq_rel);
             stream.close(ctx.io);
             continue;
         }
         if (ctx.opts.metrics) |m| _ = m.http_connections_active.fetchAdd(1, .monotonic);
+        const spawn_cost = @import("cost.zig").begin();
         const thread = std.Thread.spawn(.{}, connectionThread, .{ State, Readiness, ctx, stream }) catch {
+            spawn_cost.end(.thread_spawn);
+            @import("cost.zig").add(.thread_spawn_failed, 1);
             _ = ctx.active_connections.fetchSub(1, .acq_rel);
             if (ctx.opts.metrics) |m| {
                 _ = m.http_connections_active.fetchSub(1, .monotonic);
@@ -182,6 +191,7 @@ fn acceptLoop(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(Stat
             stream.close(ctx.io);
             continue;
         };
+        spawn_cost.end(.thread_spawn);
         if (ctx.opts.metrics) |m| _ = m.http_connection_threads_created_total.fetchAdd(1, .monotonic);
         thread.detach();
     }
@@ -275,6 +285,8 @@ fn errnoVal() c_int {
 /// connection. Returns true if a connection is (probably) ready to accept,
 /// false on timeout/EINTR/error so the caller re-checks `shutdown_flag`.
 fn waitAcceptReady(fd: c_int, timeout_ms: c_int) bool {
+    const measured = @import("cost.zig").begin();
+    defer measured.end(.accept_wait);
     var pfd = [_]std.posix.pollfd{.{ .fd = fd, .events = std.posix.POLL.IN, .revents = 0 }};
     return (std.posix.poll(&pfd, timeout_ms) catch return false) > 0;
 }
