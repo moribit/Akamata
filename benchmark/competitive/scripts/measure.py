@@ -33,6 +33,16 @@ for size in (64, 1024, 65536):
 def cpu_time(value):
     return sum(float(part) * 60 ** i for i, part in enumerate(reversed(value.split(":"))))
 
+def runtime_reports(log):
+    reports = {}
+    for line in log.splitlines():
+        for marker, field in (("RUNTIME_COST ", "runtime_cost"), ("BENCH_STATS ", "allocator"), ("RUNTIME_MEMORY ", "runtime_memory")):
+            if line.startswith(marker):
+                if field in reports:
+                    raise ValueError(f"duplicate diagnostic report: {field}")
+                reports[field] = json.loads(line[len(marker):])
+    return reports
+
 def sample(pid):
     data = subprocess.check_output(["ps", "-o", "rss=,time=", "-p", str(pid)], text=True).split()
     if platform.system() == "Linux":
@@ -124,6 +134,7 @@ def main():
     result = {"schema": 1, "classification": "requested-duration" if certified else "exploratory",
               "source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
               "command": __import__("sys").argv, "os": platform.platform(), "cpu_count": os.cpu_count(),
+              "invocations": [__import__("sys").argv],
               "oha": subprocess.check_output(["oha", "--version"], text=True).strip(),
               "warmup_seconds": args.warmup, "duration_seconds": args.duration, "rounds": args.rounds,
               "binaries": binaries, "runs": []}
@@ -138,6 +149,9 @@ def main():
         revisions = previous.setdefault("harness_revisions", [previous["source_sha"]])
         if result["source_sha"] not in revisions:
             revisions.append(result["source_sha"])
+        invocations = previous.setdefault("invocations", [previous["command"]])
+        if result["command"] not in invocations:
+            invocations.append(result["command"])
         result = previous
     done = {(r["framework"], r["workload"], r["connections"], r["round"]) for r in result["runs"] if "oha" in r}
     def save():
@@ -197,6 +211,10 @@ def main():
                             row["shutdown_ms"] = (time.monotonic() - started) * 1000
                             row["server_exit"] = process.returncode
                             log.seek(0); row["server_log"] = log.read().decode(errors="replace")
+                            try:
+                                row.update(runtime_reports(row["server_log"]))
+                            except (ValueError, json.JSONDecodeError) as error:
+                                row["diagnostic_parse_failure"] = str(error)
                             result["runs"].append(row); save()
 
 if __name__ == "__main__":

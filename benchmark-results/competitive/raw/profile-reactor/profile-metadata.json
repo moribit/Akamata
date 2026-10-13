@@ -1,0 +1,56 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "oha_version": "oha 1.15.0",
+  "command": [
+    "tools/bench/runtime_profile.py",
+    "reactor=.zig-cache/competitive/baseline/akamata-reactor",
+    "--output-dir",
+    "benchmark-results/competitive/raw/profile-reactor",
+    "--endpoint",
+    "plaintext",
+    "--connections",
+    "32",
+    "1024",
+    "--port",
+    "8088",
+    "--server-logs",
+    "--server-env",
+    "COMPETITIVE_RUNTIME=reactor"
+  ],
+  "runs": [
+    {
+      "label": "reactor",
+      "connections": 32,
+      "binary_sha256": "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763",
+      "server_environment_overrides": [
+        "COMPETITIVE_RUNTIME=reactor"
+      ],
+      "profile_command": [
+        "sample",
+        "88939",
+        "5",
+        "1",
+        "-file",
+        "benchmark-results/competitive/raw/profile-reactor/reactor-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "reactor",
+      "connections": 1024,
+      "binary_sha256": "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763",
+      "server_environment_overrides": [
+        "COMPETITIVE_RUNTIME=reactor"
+      ],
+      "profile_command": [
+        "sample",
+        "89685",
+        "5",
+        "1",
+        "-file",
+        "benchmark-results/competitive/raw/profile-reactor/reactor-c1024.sample.txt"
+      ],
+      "profile_available": true
+    }
+  ]
+}

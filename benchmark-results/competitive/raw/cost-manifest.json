@@ -1,0 +1,29 @@
+{
+  "threaded": {
+    "command": [
+      ".zig-cache/competitive/competitive-akamata-cost"
+    ],
+    "source_sha": "289abf2",
+    "build": {
+      "optimize": "ReleaseFast",
+      "runtime_cost": true
+    },
+    "env": {
+      "BENCH_STATS": "1"
+    }
+  },
+  "reactor": {
+    "command": [
+      ".zig-cache/competitive/competitive-akamata-cost"
+    ],
+    "source_sha": "289abf2",
+    "build": {
+      "optimize": "ReleaseFast",
+      "runtime_cost": true
+    },
+    "env": {
+      "BENCH_STATS": "1",
+      "COMPETITIVE_RUNTIME": "reactor"
+    }
+  }
+}

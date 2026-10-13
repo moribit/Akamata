@@ -1,0 +1,29 @@
+{
+  "classification": "disabled-probe-codegen-check",
+  "source_sha": "289abf2",
+  "commands": [
+    [
+      "otool",
+      "-s",
+      "__TEXT",
+      "__text",
+      ".zig-cache/competitive/baseline/akamata-threaded"
+    ],
+    [
+      "otool",
+      "-s",
+      "__TEXT",
+      "__text",
+      "zig-out/bin/competitive-akamata"
+    ]
+  ],
+  "text_equal": true,
+  "text_sha256": [
+    "83bb1e85df330684d369c0344cc33f2babff906ff0a1ca1e78edd7cf7b43b7f4",
+    "83bb1e85df330684d369c0344cc33f2babff906ff0a1ca1e78edd7cf7b43b7f4"
+  ],
+  "binary_sha256": [
+    "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763",
+    "5a8dcda2abfdbe8a44c2e60ea7c072cad3fbe929be23d7bcdb965f15869ecdc7"
+  ]
+}

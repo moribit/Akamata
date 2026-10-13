@@ -5,9 +5,17 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from measure import runtime_reports
 
 
 class ReportingTests(unittest.TestCase):
+    def test_runtime_diagnostics_preserve_unknown_counters(self):
+        reports = runtime_reports('info: started\nRUNTIME_COST {"future_counter":{"count":7}}\nBENCH_STATS {"live":0}\n')
+        self.assertEqual(7, reports["runtime_cost"]["future_counter"]["count"])
+        self.assertEqual(0, reports["allocator"]["live"])
+        with self.assertRaisesRegex(ValueError, "duplicate"):
+            runtime_reports('RUNTIME_COST {}\nRUNTIME_COST {}\n')
+
     def test_all_rounds_and_failures_remain_visible(self):
         def row(rate, errors):
             return {"framework": "fixture", "workload": "plaintext", "connections": 32,

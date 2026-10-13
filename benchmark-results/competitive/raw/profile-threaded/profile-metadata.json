@@ -1,0 +1,50 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "oha_version": "oha 1.15.0",
+  "command": [
+    "tools/bench/runtime_profile.py",
+    "threaded=.zig-cache/competitive/baseline/akamata-threaded",
+    "--output-dir",
+    "benchmark-results/competitive/raw/profile-threaded",
+    "--endpoint",
+    "plaintext",
+    "--connections",
+    "32",
+    "1024",
+    "--port",
+    "8088",
+    "--server-logs"
+  ],
+  "runs": [
+    {
+      "label": "threaded",
+      "connections": 32,
+      "binary_sha256": "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763",
+      "server_environment_overrides": [],
+      "profile_command": [
+        "sample",
+        "84030",
+        "5",
+        "1",
+        "-file",
+        "benchmark-results/competitive/raw/profile-threaded/threaded-c32.sample.txt"
+      ],
+      "profile_available": true
+    },
+    {
+      "label": "threaded",
+      "connections": 1024,
+      "binary_sha256": "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763",
+      "server_environment_overrides": [],
+      "profile_command": [
+        "sample",
+        "84780",
+        "5",
+        "1",
+        "-file",
+        "benchmark-results/competitive/raw/profile-threaded/threaded-c1024.sample.txt"
+      ],
+      "profile_available": true
+    }
+  ]
+}
