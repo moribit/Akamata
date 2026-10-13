@@ -21,15 +21,19 @@ def main():
             groups[row["workload"], row["connections"], row["framework"]].append(row)
     print(f"Evidence: `{args.input}`; classification: {data['classification']}.")
     print("\nMedians of all completed rounds. Latency columns are medians of round percentiles, not pooled percentiles. CPU: one core = 100%. RSS: median of round sampled means. Errors are summed, never removed.\n")
-    print("| Workload | Connections | Framework | Rounds | req/s | P50 ms | P95 ms | P99 ms | P99.9 ms | CPU % | RSS KiB | Threads | Non-200 | Client errors |")
-    print("|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
+    print("| Workload | Connections | Framework | Rounds | HTTP 200/s | Attempts/s | P50 ms | P95 ms | P99 ms | P99.9 ms | CPU % | RSS KiB | Threads | Non-200 | Client errors | Error % |")
+    print("|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
     for (workload, connections, framework), rows in sorted(groups.items()):
         med = lambda fn: statistics.median(fn(row) for row in rows)
         latency = [med(lambda row: row["oha"]["latencyPercentiles"][key] * 1000) for key in ("p50", "p95", "p99", "p99.9")]
         errors = sum(sum(row["oha"]["errorDistribution"].values()) for row in rows)
         non200 = sum(sum(count for status, count in row["oha"]["statusCodeDistribution"].items() if status != "200") for row in rows)
-        print(f"| {workload} | {connections} | {framework} | {len(rows)} | {med(lambda row: row['oha']['summary']['requestsPerSec']):,.0f} | " + " | ".join(f"{value:.3f}" for value in latency) + f" | {med(lambda row: row['cpu_percent']):.1f} | {med(lambda row: row['rss_mean_kib']):,.0f} | {med(lambda row: row['threads_peak']):g} | {non200} | {errors} |")
+        attempts = errors + sum(sum(row["oha"]["statusCodeDistribution"].values()) for row in rows)
+        error_percent = 100 * (errors + non200) / attempts if attempts else 0
+        success_rate = med(lambda row: row["oha"]["statusCodeDistribution"].get("200", 0) / row["oha"]["summary"]["total"])
+        print(f"| {workload} | {connections} | {framework} | {len(rows)} | {success_rate:,.0f} | {med(lambda row: row['oha']['summary']['requestsPerSec']):,.0f} | " + " | ".join(f"{value:.3f}" for value in latency) + f" | {med(lambda row: row['cpu_percent']):.1f} | {med(lambda row: row['rss_mean_kib']):,.0f} | {med(lambda row: row['threads_peak']):g} | {non200} | {errors} | {error_percent:.4f} |")
     print(f"\nFailed cases: {len(failed)}. Full requested matrix completion is not implied by a subset table.")
+    print("HTTP 200/s counts expected completed responses over the observed oha interval. Attempts/s is oha's reported rate including client failures. Error % aggregates client failures and non-200 responses across recorded rounds; warmup remains separate in raw evidence.")
     for row in failed:
         print(f"- {row['framework']} / {row['workload']} / {row['connections']} / round {row['round']}: {row.get('failure', 'incomplete')}")
 

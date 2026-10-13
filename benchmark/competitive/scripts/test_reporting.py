@@ -20,17 +20,17 @@ class ReportingTests(unittest.TestCase):
         def row(rate, errors):
             return {"framework": "fixture", "workload": "plaintext", "connections": 32,
                     "round": 1, "cpu_percent": 100, "rss_mean_kib": 1000, "threads_peak": 8,
-                    "oha": {"summary": {"requestsPerSec": rate},
+                    "oha": {"summary": {"requestsPerSec": rate + errors + 2, "total": 1},
                             "latencyPercentiles": {k: .001 for k in ("p50", "p95", "p99", "p99.9")},
-                            "errorDistribution": {"timeout": errors}, "statusCodeDistribution": {"200": 10, "503": 2}}}
+                            "errorDistribution": {"timeout": errors}, "statusCodeDistribution": {"200": rate, "503": 2}}}
         data = {"classification": "exploratory", "runs": [row(100, 1), row(300, 2), row(2000, 3),
                 {"framework": "fixture", "workload": "plaintext", "connections": 32, "round": 4, "failure": "spawn failed"}]}
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "raw.json"
             path.write_text(json.dumps(data))
             text = subprocess.check_output([sys.executable, str(Path(__file__).with_name("summarize.py")), str(path)], text=True)
-        self.assertIn("| 3 | 300 |", text)  # median, not highest round
-        self.assertIn("| 6 | 6 |", text)  # non-200 and client errors retained
+        self.assertIn("| 3 | 300 | 304 |", text)  # successful rate distinct from attempts
+        self.assertIn("| 6 | 6 | 0.4975 |", text)  # non-200 and client errors retained
         self.assertIn("Failed cases: 1", text)
         self.assertIn("spawn failed", text)
         self.assertIn("not pooled percentiles", text)

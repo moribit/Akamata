@@ -97,6 +97,8 @@ jobs:
       - run: node tools/docgen/build_slides.mjs
       - run: git diff --exit-code -- tools/docgen/slides.html tools/docgen/slides.ja.html
       - run: python3 tests/documentation_links.py
+      - name: Competitive benchmark evidence reporting contract
+        run: python3 benchmark/competitive/scripts/test_reporting.py
       - run: python3 -m venv /tmp/akamata-pdfcheck
       - run: /tmp/akamata-pdfcheck/bin/pip install pypdf==6.19.0
       - run: /tmp/akamata-pdfcheck/bin/python tests/public_slides.py

@@ -42,6 +42,10 @@ threads, every status/error, transfer bytes and load generator resource samples.
 oha totalData describes application payload bytes, not TCP/IP overhead. Latency
 is closed-loop and conditional on completed requests; retain timeouts/rejections
 alongside percentiles. Process ps CPU resolution limits short-run attribution.
+oha's `requestsPerSec` includes failed client attempts. Report expected HTTP 200
+completions/second separately from that attempt rate, with client failures and
+non-200 responses retained. Aggregate error percentage includes both; warmup is
+not part of measurement medians or error rates.
 Thread count sampling excludes invisible child processes, so verify single-process
 fixtures; otherwise aggregate children or exclude the result.
 
