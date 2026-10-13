@@ -22,3 +22,17 @@ The architecture baseline and every future command/result live in
 Results without matching workload semantics are not ranked together. A short
 development smoke measurement must never be relabeled as the required five
 30-second rounds with ten-second warmup.
+
+Before interpreting local throughput as a server ceiling, calibrate the load
+generator at the same **total** connection count:
+
+```sh
+python3 benchmark/competitive/scripts/calibrate.py benchmark-results/competitive/raw/baseline-manifest.json --output benchmark-results/competitive/raw/generator-calibration-32.json
+python3 benchmark/competitive/scripts/summarize.py benchmark-results/competitive/raw/native-baseline.json
+python3 benchmark/competitive/scripts/test_reporting.py
+```
+
+Calibration retains each generator's distribution; it does not average latency
+percentiles. A frozen executable's source revision and digest identify the code
+being measured. Resume checks those identities and records harness revisions
+separately, allowing documentation/profiling work between checkpointed runs.

@@ -1,0 +1,45 @@
+{
+  "akamata-threaded": {
+    "command": [
+      ".zig-cache/competitive/baseline/akamata-threaded"
+    ],
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  },
+  "akamata-reactor": {
+    "command": [
+      ".zig-cache/competitive/baseline/akamata-reactor"
+    ],
+    "env": {
+      "COMPETITIVE_RUNTIME": "reactor"
+    },
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  },
+  "actix": {
+    "command": [
+      ".zig-cache/competitive/baseline/actix"
+    ],
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  },
+  "axum": {
+    "command": [
+      ".zig-cache/competitive/baseline/axum"
+    ],
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  },
+  "go": {
+    "command": [
+      ".zig-cache/competitive/baseline/go"
+    ],
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  },
+  "zap": {
+    "command": [
+      ".zig-cache/competitive/baseline/zap"
+    ],
+    "artifacts": [
+      "benchmark/competitive/zap/zig-out/lib/libfacil.dylib"
+    ],
+    "routing_classification": "manual extraction, not a generic parameter router",
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  }
+}

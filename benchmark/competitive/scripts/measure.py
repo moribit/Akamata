@@ -71,7 +71,15 @@ def load(command, server, seconds):
             if time.monotonic() - started > seconds + 60:
                 process.kill(); process.wait()
                 raise RuntimeError("load generator exceeded bounded drain")
-            samples.append({"server": sample(server.pid), "generator": sample(process.pid)})
+            try:
+                generator = sample(process.pid)
+            except (subprocess.CalledProcessError, IndexError, FileNotFoundError):
+                # The child may exit between poll() and ps. Preserve its exit
+                # status below; an absent final sample is not a load failure.
+                if process.poll() is None:
+                    raise
+                generator = None
+            samples.append({"server": sample(server.pid), "generator": generator})
             try:
                 process.wait(timeout=1)
             except subprocess.TimeoutExpired:
@@ -121,8 +129,15 @@ def main():
               "binaries": binaries, "runs": []}
     if args.resume and output.exists():
         previous = json.loads(output.read_text())
-        for key in ("binaries", "warmup_seconds", "duration_seconds", "rounds", "source_sha"):
+        # Fixture source identity belongs to each frozen binary. The harness
+        # may acquire a documentation/profiling commit while a long run is
+        # checkpointed; record that revision instead of conflating it with
+        # the executable being measured. Changing a binary still fails closed.
+        for key in ("binaries", "warmup_seconds", "duration_seconds", "rounds", "os", "cpu_count", "oha"):
             assert previous[key] == result[key], f"resume drift: {key}"
+        revisions = previous.setdefault("harness_revisions", [previous["source_sha"]])
+        if result["source_sha"] not in revisions:
+            revisions.append(result["source_sha"])
         result = previous
     done = {(r["framework"], r["workload"], r["connections"], r["round"]) for r in result["runs"] if "oha" in r}
     def save():

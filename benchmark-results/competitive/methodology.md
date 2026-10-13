@@ -62,5 +62,5 @@ python3 benchmark/competitive/scripts/measure.py benchmark/competitive/fixtures/
 
 The full matrix is deliberately long (hours). Never relabel reduced duration or
 fewer rounds as completing it. A resumed run rejects changed binary digests and
-source SHA. Live Workers runs are opt-in on isolated resources; host simulation
+per-binary source SHA, and records harness revisions separately. Live Workers runs are opt-in on isolated resources; host simulation
 never proves Cloudflare CPU time, cold-start performance or production superiority.

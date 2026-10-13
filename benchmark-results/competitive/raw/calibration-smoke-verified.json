@@ -1,0 +1,1289 @@
+{
+  "classification": "generator-calibration",
+  "command": [
+    "benchmark/competitive/scripts/calibrate.py",
+    "benchmark-results/competitive/raw/baseline-manifest.json",
+    "--output",
+    "benchmark-results/competitive/raw/calibration-smoke-verified.json",
+    "--frameworks",
+    "akamata-threaded",
+    "--rounds",
+    "1",
+    "--warmup",
+    "1",
+    "--duration",
+    "1"
+  ],
+  "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098",
+  "oha": "oha 1.15.0",
+  "binaries": {
+    "akamata-threaded": {
+      "command": [
+        ".zig-cache/competitive/baseline/akamata-threaded"
+      ],
+      "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098",
+      "sha256": "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763"
+    }
+  },
+  "runs": [
+    {
+      "framework": "akamata-threaded",
+      "round": 1,
+      "generators": 1,
+      "total_connections": 32,
+      "warmup_seconds": 1,
+      "duration_seconds": 1,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "warmup": {
+        "commands": [
+          [
+            "oha",
+            "--no-tui",
+            "--output-format",
+            "json",
+            "--http-version",
+            "1.1",
+            "-c",
+            "32",
+            "-z",
+            "1s",
+            "-t",
+            "10s",
+            "-w",
+            "http://127.0.0.1:8088/plaintext"
+          ]
+        ],
+        "individual_oha": [
+          {
+            "summary": {
+              "successRate": 1.0,
+              "total": 1.003772042,
+              "slowest": 0.019703292,
+              "fastest": 8.6291e-05,
+              "average": 0.00030087626975495253,
+              "requestsPerSec": 105335.66943080886,
+              "totalData": 1374529,
+              "sizePerRequest": 13,
+              "sizePerSec": 1369363.7026005152
+            },
+            "metrics": {
+              "success_rate": 1.0,
+              "requests_per_sec": 105335.66943080886,
+              "latency_ms": {
+                "min": 0.086,
+                "mean": 0.301,
+                "p50": 0.29,
+                "p95": 0.367,
+                "p99": 0.567,
+                "max": 19.703
+              }
+            },
+            "responseTimeHistogram": {
+              "0.000086291": 1,
+              "0.0020479911000000003": 105685,
+              "0.0040096912": 35,
+              "0.005971391300000001": 4,
+              "0.007933091400000002": 0,
+              "0.009894791500000001": 0,
+              "0.011856491600000003": 0,
+              "0.013818191700000003": 0,
+              "0.0157798918": 0,
+              "0.017741591900000003": 3,
+              "0.019703292": 5
+            },
+            "latencyPercentiles": {
+              "p10": 0.000250875,
+              "p25": 0.00027,
+              "p50": 0.000289958,
+              "p75": 0.000313083,
+              "p90": 0.0003415,
+              "p95": 0.000366791,
+              "p99": 0.000566875,
+              "p99.9": 0.001276584,
+              "p99.99": 0.0043655
+            },
+            "firstByteHistogram": {
+              "0.000086": 1,
+              "0.0020476875000000005": 105686,
+              "0.004009375000000001": 35,
+              "0.0059710625000000015": 4,
+              "0.00793275": 0,
+              "0.0098944375": 0,
+              "0.011856125000000002": 0,
+              "0.013817812500000002": 0,
+              "0.015779500000000002": 0,
+              "0.017741187500000002": 2,
+              "0.019702875": 5
+            },
+            "firstBytePercentiles": {
+              "p10": 0.00025075,
+              "p25": 0.000269875,
+              "p50": 0.000289792,
+              "p75": 0.000312875,
+              "p90": 0.000341291,
+              "p95": 0.0003665,
+              "p99": 0.000566459,
+              "p99.9": 0.0012765,
+              "p99.99": 0.004127209
+            },
+            "rps": {
+              "mean": 105222.3557610532,
+              "stddev": 14149.57956685226,
+              "max": 114932.65527071436,
+              "min": 16434.415844338142,
+              "percentiles": {
+                "p10": 101717.849117455,
+                "p25": 106234.52622102185,
+                "p50": 108170.36833011993,
+                "p75": 109807.52352703828,
+                "p90": 110937.90748298752,
+                "p95": 111450.62087199993,
+                "p99": 113054.63930717717,
+                "p99.9": 114932.65527071436,
+                "p99.99": 114932.65527071436
+              }
+            },
+            "details": {
+              "DNSDialup": {
+                "average": 0.0012852683437499998,
+                "fastest": 0.001046167,
+                "slowest": 0.001569417
+              },
+              "DNSLookup": {
+                "average": 5.455346875000001e-05,
+                "fastest": 7.5e-07,
+                "slowest": 0.000225209
+              },
+              "firstByte": {
+                "average": 0.000300559358913491,
+                "fastest": 8.6e-05,
+                "slowest": 0.019702875
+              }
+            },
+            "statusCodeDistribution": {
+              "200": 105733
+            },
+            "errorDistribution": {}
+          }
+        ],
+        "wall_seconds": 1.1543563339510001,
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 4064,
+              "cpu_seconds": 0.0,
+              "threads": 8
+            },
+            "generators": [
+              {
+                "rss_kib": 1568,
+                "cpu_seconds": 0.0,
+                "threads": 9
+              }
+            ]
+          },
+          {
+            "server": {
+              "rss_kib": 7728,
+              "cpu_seconds": 1.9,
+              "threads": 40
+            },
+            "generators": [
+              {
+                "rss_kib": 43632,
+                "cpu_seconds": 2.61,
+                "threads": 19
+              }
+            ]
+          }
+        ],
+        "server_cpu_percent": 184.51841405934658,
+        "server_rss_mean_kib": 5896
+      },
+      "measurement": {
+        "commands": [
+          [
+            "oha",
+            "--no-tui",
+            "--output-format",
+            "json",
+            "--http-version",
+            "1.1",
+            "-c",
+            "32",
+            "-z",
+            "1s",
+            "-t",
+            "10s",
+            "-w",
+            "http://127.0.0.1:8088/plaintext"
+          ]
+        ],
+        "individual_oha": [
+          {
+            "summary": {
+              "successRate": 1.0,
+              "total": 1.002443125,
+              "slowest": 0.016369167,
+              "fastest": 3.1625e-05,
+              "average": 0.0002930084297167734,
+              "requestsPerSec": 108374.2282136954,
+              "totalData": 1412307,
+              "sizePerRequest": 13,
+              "sizePerSec": 1408864.9667780402
+            },
+            "metrics": {
+              "success_rate": 1.0,
+              "requests_per_sec": 108374.2282136954,
+              "latency_ms": {
+                "min": 0.032,
+                "mean": 0.293,
+                "p50": 0.288,
+                "p95": 0.38,
+                "p99": 0.506,
+                "max": 16.369
+              }
+            },
+            "responseTimeHistogram": {
+              "0.000031625": 1,
+              "0.0016653791999999999": 108514,
+              "0.0032991334": 48,
+              "0.0049328876": 20,
+              "0.0065666418": 12,
+              "0.008200396": 20,
+              "0.009834150199999999": 9,
+              "0.0114679044": 7,
+              "0.0131016586": 4,
+              "0.0147354128": 0,
+              "0.016369167": 4
+            },
+            "latencyPercentiles": {
+              "p10": 0.000223292,
+              "p25": 0.00026175,
+              "p50": 0.000287958,
+              "p75": 0.000315666,
+              "p90": 0.000348541,
+              "p95": 0.000379583,
+              "p99": 0.000506083,
+              "p99.9": 0.002107834,
+              "p99.99": 0.0102585
+            },
+            "firstByteHistogram": {
+              "0.000031584": 1,
+              "0.0016651631": 108514,
+              "0.0032987421999999995": 48,
+              "0.0049323213": 20,
+              "0.0065659004": 12,
+              "0.008199479499999999": 20,
+              "0.009833058599999998": 9,
+              "0.011466637699999999": 7,
+              "0.013100216799999998": 4,
+              "0.014733795899999997": 0,
+              "0.016367375": 4
+            },
+            "firstBytePercentiles": {
+              "p10": 0.000223167,
+              "p25": 0.000261625,
+              "p50": 0.000287791,
+              "p75": 0.000315458,
+              "p90": 0.00034825,
+              "p95": 0.000379375,
+              "p99": 0.000505916,
+              "p99.9": 0.002107334,
+              "p99.99": 0.01025825
+            },
+            "rps": {
+              "mean": 108118.16769128694,
+              "stddev": 9251.929376226959,
+              "max": 148708.04510523996,
+              "min": 68639.89084962435,
+              "percentiles": {
+                "p10": 101553.74224039343,
+                "p25": 104905.43631593788,
+                "p50": 107752.07657861075,
+                "p75": 110402.30740822505,
+                "p90": 112709.8621129349,
+                "p95": 117693.71208071317,
+                "p99": 143138.76197674344,
+                "p99.9": 148708.04510523996,
+                "p99.99": 148708.04510523996
+              }
+            },
+            "details": {
+              "DNSDialup": {
+                "average": 0.00045161578125000007,
+                "fastest": 0.000146125,
+                "slowest": 0.000666458
+              },
+              "DNSLookup": {
+                "average": 6.968718750000001e-06,
+                "fastest": 7.5e-07,
+                "slowest": 3.1792e-05
+              },
+              "firstByte": {
+                "average": 0.000292832562210625,
+                "fastest": 3.1584e-05,
+                "slowest": 0.016367375
+              }
+            },
+            "statusCodeDistribution": {
+              "200": 108639
+            },
+            "errorDistribution": {}
+          }
+        ],
+        "wall_seconds": 1.1535349590121768,
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 5680,
+              "cpu_seconds": 2.13,
+              "threads": 8
+            },
+            "generators": [
+              {
+                "rss_kib": 992,
+                "cpu_seconds": 0.0,
+                "threads": 9
+              }
+            ]
+          },
+          {
+            "server": {
+              "rss_kib": 8608,
+              "cpu_seconds": 4.09,
+              "threads": 40
+            },
+            "generators": [
+              {
+                "rss_kib": 44288,
+                "cpu_seconds": 2.65,
+                "threads": 19
+              }
+            ]
+          }
+        ],
+        "server_cpu_percent": 187.25050187032943,
+        "server_rss_mean_kib": 7144
+      },
+      "shutdown_ms": 128.99733398808166,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    },
+    {
+      "framework": "akamata-threaded",
+      "round": 1,
+      "generators": 2,
+      "total_connections": 32,
+      "warmup_seconds": 1,
+      "duration_seconds": 1,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "warmup": {
+        "commands": [
+          [
+            "oha",
+            "--no-tui",
+            "--output-format",
+            "json",
+            "--http-version",
+            "1.1",
+            "-c",
+            "16",
+            "-z",
+            "1s",
+            "-t",
+            "10s",
+            "-w",
+            "http://127.0.0.1:8088/plaintext"
+          ],
+          [
+            "oha",
+            "--no-tui",
+            "--output-format",
+            "json",
+            "--http-version",
+            "1.1",
+            "-c",
+            "16",
+            "-z",
+            "1s",
+            "-t",
+            "10s",
+            "-w",
+            "http://127.0.0.1:8088/plaintext"
+          ]
+        ],
+        "individual_oha": [
+          {
+            "summary": {
+              "successRate": 1.0,
+              "total": 1.002021708,
+              "slowest": 0.0867265,
+              "fastest": 2.5584e-05,
+              "average": 0.0002968706460598604,
+              "requestsPerSec": 53418.004393174284,
+              "totalData": 695838,
+              "sizePerRequest": 13,
+              "sizePerSec": 694434.0571112657
+            },
+            "metrics": {
+              "success_rate": 1.0,
+              "requests_per_sec": 53418.004393174284,
+              "latency_ms": {
+                "min": 0.026,
+                "mean": 0.297,
+                "p50": 0.27,
+                "p95": 0.433,
+                "p99": 0.982,
+                "max": 86.727
+              }
+            },
+            "responseTimeHistogram": {
+              "0.000025584": 1,
+              "0.008695675600000001": 53453,
+              "0.0173657672": 50,
+              "0.026035858800000002": 9,
+              "0.034705950400000005": 5,
+              "0.043376042000000004": 2,
+              "0.05204613360000001": 0,
+              "0.06071622520000001": 2,
+              "0.0693863168": 0,
+              "0.0780564084": 2,
+              "0.0867265": 2
+            },
+            "latencyPercentiles": {
+              "p10": 9.75e-05,
+              "p25": 0.00017575,
+              "p50": 0.000269625,
+              "p75": 0.00030925,
+              "p90": 0.00035125,
+              "p95": 0.000432917,
+              "p99": 0.000981833,
+              "p99.9": 0.010832041,
+              "p99.99": 0.052211583
+            },
+            "firstByteHistogram": {
+              "0.000025542": 1,
+              "0.0086956336": 53453,
+              "0.0173657252": 50,
+              "0.026035816800000004": 9,
+              "0.034705908400000006": 5,
+              "0.043376000000000005": 2,
+              "0.05204609160000001": 0,
+              "0.06071618320000001": 2,
+              "0.06938627480000001": 0,
+              "0.07805636640000001": 2,
+              "0.086726458": 2
+            },
+            "firstBytePercentiles": {
+              "p10": 9.7334e-05,
+              "p25": 0.000175584,
+              "p50": 0.000269458,
+              "p75": 0.000309042,
+              "p90": 0.000351083,
+              "p95": 0.000432625,
+              "p99": 0.000980875,
+              "p99.9": 0.010832,
+              "p99.99": 0.052211542
+            },
+            "rps": {
+              "mean": 53362.41999853451,
+              "stddev": 11578.760751243446,
+              "max": 93997.65296788843,
+              "min": 14669.005937732281,
+              "percentiles": {
+                "p10": 42701.601310049315,
+                "p25": 50835.58490943674,
+                "p50": 53545.687105476536,
+                "p75": 58414.60365091277,
+                "p90": 62931.46573286589,
+                "p95": 69312.12962268406,
+                "p99": 87032.27156629662,
+                "p99.9": 93997.65296788843,
+                "p99.99": 93997.65296788843
+              }
+            },
+            "details": {
+              "DNSDialup": {
+                "average": 0.00043564824999999994,
+                "fastest": 0.000311166,
+                "slowest": 0.000535041
+              },
+              "DNSLookup": {
+                "average": 1.9020687499999998e-05,
+                "fastest": 9.17e-07,
+                "slowest": 8.3e-05
+              },
+              "firstByte": {
+                "average": 0.00029668166750737893,
+                "fastest": 2.5542e-05,
+                "slowest": 0.086726458
+              }
+            },
+            "statusCodeDistribution": {
+              "200": 53526
+            },
+            "errorDistribution": {}
+          },
+          {
+            "summary": {
+              "successRate": 1.0,
+              "total": 1.002190375,
+              "slowest": 0.084002209,
+              "fastest": 2.6708e-05,
+              "average": 0.00031206356734453296,
+              "requestsPerSec": 50783.76451180744,
+              "totalData": 661635,
+              "sizePerRequest": 13,
+              "sizePerSec": 660188.9386534968
+            },
+            "metrics": {
+              "success_rate": 1.0,
+              "requests_per_sec": 50783.76451180744,
+              "latency_ms": {
+                "min": 0.027,
+                "mean": 0.312,
+                "p50": 0.276,
+                "p95": 0.464,
+                "p99": 1.248,
+                "max": 84.002
+              }
+            },
+            "responseTimeHistogram": {
+              "0.000026708": 1,
+              "0.0084242581": 50811,
+              "0.0168218082": 63,
+              "0.0252193583": 9,
+              "0.0336169084": 9,
+              "0.0420144585": 0,
+              "0.0504120086": 0,
+              "0.0588095587": 0,
+              "0.0672071088": 0,
+              "0.0756046589": 0,
+              "0.084002209": 2
+            },
+            "latencyPercentiles": {
+              "p10": 0.000110166,
+              "p25": 0.000194875,
+              "p50": 0.000276333,
+              "p75": 0.000314833,
+              "p90": 0.000364334,
+              "p95": 0.000464125,
+              "p99": 0.001248083,
+              "p99.9": 0.010774416,
+              "p99.99": 0.028843041
+            },
+            "firstByteHistogram": {
+              "0.000026666": 1,
+              "0.008424203600000001": 50811,
+              "0.016821741200000004": 63,
+              "0.025219278800000005": 9,
+              "0.033616816400000006": 9,
+              "0.04201435400000001": 0,
+              "0.05041189160000001": 0,
+              "0.058809429200000006": 0,
+              "0.0672069668": 0,
+              "0.07560450440000001": 0,
+              "0.08400204200000001": 2
+            },
+            "firstBytePercentiles": {
+              "p10": 0.000110083,
+              "p25": 0.000194709,
+              "p50": 0.000276125,
+              "p75": 0.000314625,
+              "p90": 0.000364083,
+              "p95": 0.00046325,
+              "p99": 0.001248042,
+              "p99.9": 0.010774333,
+              "p99.99": 0.028843
+            },
+            "rps": {
+              "mean": 50892.35860779749,
+              "stddev": 9392.302320925932,
+              "max": 72030.00770120847,
+              "min": 13630.099348391053,
+              "percentiles": {
+                "p10": 41348.41071927008,
+                "p25": 48135.09529798181,
+                "p50": 52697.928560644286,
+                "p75": 55699.79732687054,
+                "p90": 58591.15363874641,
+                "p95": 62681.485931710726,
+                "p99": 69205.7603439891,
+                "p99.9": 72030.00770120847,
+                "p99.99": 72030.00770120847
+              }
+            },
+            "details": {
+              "DNSDialup": {
+                "average": 0.0008047761875,
+                "fastest": 0.000569417,
+                "slowest": 0.000935
+              },
+              "DNSLookup": {
+                "average": 7.63025e-06,
+                "fastest": 9.17e-07,
+                "slowest": 2.0291e-05
+              },
+              "firstByte": {
+                "average": 0.0003117914901267329,
+                "fastest": 2.6666e-05,
+                "slowest": 0.084002042
+              }
+            },
+            "statusCodeDistribution": {
+              "200": 50895
+            },
+            "errorDistribution": {}
+          }
+        ],
+        "wall_seconds": 1.1744000830221921,
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 4048,
+              "cpu_seconds": 0.0,
+              "threads": 8
+            },
+            "generators": [
+              {
+                "rss_kib": 6352,
+                "cpu_seconds": 0.0,
+                "threads": 11
+              },
+              {
+                "rss_kib": 13776,
+                "cpu_seconds": 0.01,
+                "threads": 11
+              }
+            ]
+          },
+          {
+            "server": {
+              "rss_kib": 7712,
+              "cpu_seconds": 1.76,
+              "threads": 40
+            },
+            "generators": [
+              {
+                "rss_kib": 33488,
+                "cpu_seconds": 1.33,
+                "threads": 19
+              },
+              {
+                "rss_kib": 33376,
+                "cpu_seconds": 1.3,
+                "threads": 19
+              }
+            ]
+          }
+        ],
+        "server_cpu_percent": 171.15121405879682,
+        "server_rss_mean_kib": 5880
+      },
+      "measurement": {
+        "commands": [
+          [
+            "oha",
+            "--no-tui",
+            "--output-format",
+            "json",
+            "--http-version",
+            "1.1",
+            "-c",
+            "16",
+            "-z",
+            "1s",
+            "-t",
+            "10s",
+            "-w",
+            "http://127.0.0.1:8088/plaintext"
+          ],
+          [
+            "oha",
+            "--no-tui",
+            "--output-format",
+            "json",
+            "--http-version",
+            "1.1",
+            "-c",
+            "16",
+            "-z",
+            "1s",
+            "-t",
+            "10s",
+            "-w",
+            "http://127.0.0.1:8088/plaintext"
+          ]
+        ],
+        "individual_oha": [
+          {
+            "summary": {
+              "successRate": 1.0,
+              "total": 1.001713625,
+              "slowest": 0.068680208,
+              "fastest": 2.2209e-05,
+              "average": 0.0003059744785173208,
+              "requestsPerSec": 51790.25093124794,
+              "totalData": 674427,
+              "sizePerRequest": 13,
+              "sizePerSec": 673273.2621062231
+            },
+            "metrics": {
+              "success_rate": 1.0,
+              "requests_per_sec": 51790.25093124794,
+              "latency_ms": {
+                "min": 0.022,
+                "mean": 0.306,
+                "p50": 0.286,
+                "p95": 0.416,
+                "p99": 1.17,
+                "max": 68.68
+              }
+            },
+            "responseTimeHistogram": {
+              "0.000022209": 1,
+              "0.006888008900000001": 51793,
+              "0.013753808800000003": 58,
+              "0.020619608700000003": 10,
+              "0.027485408600000004": 4,
+              "0.03435120850000001": 2,
+              "0.04121700840000001": 1,
+              "0.04808280830000001": 2,
+              "0.05494860820000001": 3,
+              "0.061814408100000016": 2,
+              "0.068680208": 3
+            },
+            "latencyPercentiles": {
+              "p10": 9.9834e-05,
+              "p25": 0.000173833,
+              "p50": 0.000285833,
+              "p75": 0.00032,
+              "p90": 0.000357625,
+              "p95": 0.000416375,
+              "p99": 0.001170458,
+              "p99.9": 0.01018125,
+              "p99.99": 0.051468875
+            },
+            "firstByteHistogram": {
+              "0.000022167": 1,
+              "0.0068879503": 51793,
+              "0.0137537336": 58,
+              "0.0206195169": 10,
+              "0.0274853002": 4,
+              "0.0343510835": 2,
+              "0.041216866799999995": 1,
+              "0.0480826501": 2,
+              "0.054948433399999996": 3,
+              "0.061814216699999994": 2,
+              "0.06868": 3
+            },
+            "firstBytePercentiles": {
+              "p10": 9.9667e-05,
+              "p25": 0.000173708,
+              "p50": 0.000285584,
+              "p75": 0.000319709,
+              "p90": 0.000357292,
+              "p95": 0.00041575,
+              "p99": 0.001170375,
+              "p99.9": 0.010181125,
+              "p99.99": 0.051468708
+            },
+            "rps": {
+              "mean": 51770.26720605459,
+              "stddev": 6359.766457593318,
+              "max": 75961.08790689497,
+              "min": 38667.02154844993,
+              "percentiles": {
+                "p10": 45724.26275417375,
+                "p25": 49024.71335800376,
+                "p50": 50813.765449060156,
+                "p75": 53066.109759538056,
+                "p90": 59278.29477173404,
+                "p95": 66220.30242341265,
+                "p99": 70279.06394694037,
+                "p99.9": 75961.08790689497,
+                "p99.99": 75961.08790689497
+              }
+            },
+            "details": {
+              "DNSDialup": {
+                "average": 0.000298922,
+                "fastest": 8.4416e-05,
+                "slowest": 0.000514959
+              },
+              "DNSLookup": {
+                "average": 1.4976562499999997e-05,
+                "fastest": 9.59e-07,
+                "slowest": 4.6875e-05
+              },
+              "firstByte": {
+                "average": 0.0003057152924111871,
+                "fastest": 2.2167e-05,
+                "slowest": 0.06868
+              }
+            },
+            "statusCodeDistribution": {
+              "200": 51879
+            },
+            "errorDistribution": {}
+          },
+          {
+            "summary": {
+              "successRate": 1.0,
+              "total": 1.002356041,
+              "slowest": 0.078757125,
+              "fastest": 2.6208e-05,
+              "average": 0.00031240328509757315,
+              "requestsPerSec": 50610.75897680951,
+              "totalData": 659490,
+              "sizePerRequest": 13,
+              "sizePerSec": 657939.8666985236
+            },
+            "metrics": {
+              "success_rate": 1.0,
+              "requests_per_sec": 50610.75897680951,
+              "latency_ms": {
+                "min": 0.026,
+                "mean": 0.312,
+                "p50": 0.285,
+                "p95": 0.402,
+                "p99": 1.129,
+                "max": 78.757
+              }
+            },
+            "responseTimeHistogram": {
+              "0.000026208": 1,
+              "0.0078992997": 50652,
+              "0.0157723914": 50,
+              "0.023645483099999996": 7,
+              "0.0315185748": 3,
+              "0.0393916665": 3,
+              "0.04726475819999999": 1,
+              "0.055137849899999994": 4,
+              "0.0630109416": 6,
+              "0.0708840333": 1,
+              "0.078757125": 2
+            },
+            "latencyPercentiles": {
+              "p10": 0.000108708,
+              "p25": 0.000188792,
+              "p50": 0.00028475,
+              "p75": 0.000317708,
+              "p90": 0.000353,
+              "p95": 0.000401708,
+              "p99": 0.001129042,
+              "p99.9": 0.009092459,
+              "p99.99": 0.059321
+            },
+            "firstByteHistogram": {
+              "0.000026166": 1,
+              "0.0078992411": 50652,
+              "0.0157723162": 50,
+              "0.0236453913": 7,
+              "0.0315184664": 3,
+              "0.0393915415": 3,
+              "0.047264616599999996": 1,
+              "0.0551376917": 4,
+              "0.06301076679999999": 6,
+              "0.0708838419": 1,
+              "0.078756917": 2
+            },
+            "firstBytePercentiles": {
+              "p10": 0.000108583,
+              "p25": 0.000188625,
+              "p50": 0.0002845,
+              "p75": 0.0003175,
+              "p90": 0.000352667,
+              "p95": 0.000401333,
+              "p99": 0.001128959,
+              "p99.9": 0.009092417,
+              "p99.99": 0.059320791
+            },
+            "rps": {
+              "mean": 50669.127848861914,
+              "stddev": 9909.191077812406,
+              "max": 74129.96333117867,
+              "min": 16849.072924893677,
+              "percentiles": {
+                "p10": 34795.2520023566,
+                "p25": 50131.12140016522,
+                "p50": 51627.532963329424,
+                "p75": 54670.38812471064,
+                "p90": 59901.74314072526,
+                "p95": 64120.30048713452,
+                "p99": 68442.87450051999,
+                "p99.9": 74129.96333117867,
+                "p99.99": 74129.96333117867
+              }
+            },
+            "details": {
+              "DNSDialup": {
+                "average": 0.00025067975000000006,
+                "fastest": 0.000102708,
+                "slowest": 0.000434542
+              },
+              "DNSLookup": {
+                "average": 1.5601687500000003e-05,
+                "fastest": 1.042e-06,
+                "slowest": 3.6958e-05
+              },
+              "firstByte": {
+                "average": 0.00031216146432091124,
+                "fastest": 2.6166e-05,
+                "slowest": 0.078756917
+              }
+            },
+            "statusCodeDistribution": {
+              "200": 50730
+            },
+            "errorDistribution": {}
+          }
+        ],
+        "wall_seconds": 1.1720654999953695,
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 5664,
+              "cpu_seconds": 2.01,
+              "threads": 8
+            },
+            "generators": [
+              {
+                "rss_kib": 5312,
+                "cpu_seconds": 0.0,
+                "threads": 10
+              },
+              {
+                "rss_kib": 13808,
+                "cpu_seconds": 0.01,
+                "threads": 11
+              }
+            ]
+          },
+          {
+            "server": {
+              "rss_kib": 8624,
+              "cpu_seconds": 3.81,
+              "threads": 40
+            },
+            "generators": [
+              {
+                "rss_kib": 33392,
+                "cpu_seconds": 1.41,
+                "threads": 19
+              },
+              {
+                "rss_kib": 33344,
+                "cpu_seconds": 1.41,
+                "threads": 19
+              }
+            ]
+          }
+        ],
+        "server_cpu_percent": 174.90490079335146,
+        "server_rss_mean_kib": 7144
+      },
+      "shutdown_ms": 126.57529197167605,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    }
+  ]
+}
