@@ -1,0 +1,12 @@
+[package]
+name = "competitive-axum"
+version = "0.1.0"
+edition = "2024"
+build = "../fixtures/build.rs"
+[dependencies]
+axum = { version = "=0.8.9", default-features = false, features = ["http1", "json", "tokio"] }
+tokio = { version = "=1.53.2", features = ["rt-multi-thread", "macros", "net", "signal"] }
+serde = { version = "=1.0.228", features = ["derive"] }
+[profile.release]
+lto = "thin"
+codegen-units = 1

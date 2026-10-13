@@ -1,0 +1,7 @@
+{
+  "name": "akamata-competitive-workers",
+  "private": true,
+  "type": "module",
+  "dependencies": { "hono": "4.13.13" },
+  "scripts": { "test": "node host-test.mjs" }
+}

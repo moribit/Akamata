@@ -1,0 +1,39 @@
+{
+  "akamata-threaded": {
+    "command": [
+      "zig-out/bin/competitive-akamata"
+    ]
+  },
+  "akamata-reactor": {
+    "command": [
+      "zig-out/bin/competitive-akamata"
+    ],
+    "env": {
+      "COMPETITIVE_RUNTIME": "reactor"
+    }
+  },
+  "actix": {
+    "command": [
+      "benchmark/competitive/actix/target/release/competitive-actix"
+    ]
+  },
+  "axum": {
+    "command": [
+      "benchmark/competitive/axum/target/release/competitive-axum"
+    ]
+  },
+  "go": {
+    "command": [
+      "benchmark/competitive/go/competitive-go"
+    ]
+  },
+  "zap": {
+    "command": [
+      "benchmark/competitive/zap/zig-out/bin/competitive-zap"
+    ],
+    "artifacts": [
+      "benchmark/competitive/zap/zig-out/lib/libfacil.dylib"
+    ],
+    "routing_classification": "manual extraction, not a generic parameter router"
+  }
+}

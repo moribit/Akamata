@@ -1,0 +1,1650 @@
+{
+  "schema": 1,
+  "classification": "exploratory",
+  "source_sha": "e04dbebb505205a061c21b04ba2dfa4f062c837d",
+  "command": [
+    "benchmark/competitive/scripts/measure.py",
+    "benchmark/competitive/fixtures/native.json",
+    "--output",
+    "benchmark-results/competitive/raw/fixture-validation.json",
+    "--frameworks",
+    "akamata-threaded",
+    "actix",
+    "axum",
+    "go",
+    "akamata-reactor",
+    "--connections",
+    "32",
+    "--duration",
+    "1",
+    "--warmup",
+    "0",
+    "--rounds",
+    "1",
+    "--workloads",
+    "plaintext"
+  ],
+  "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "oha": "oha 1.15.0",
+  "warmup_seconds": 0,
+  "duration_seconds": 1,
+  "rounds": 1,
+  "binaries": {
+    "akamata-threaded": {
+      "command": [
+        "zig-out/bin/competitive-akamata"
+      ],
+      "sha256": "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763"
+    },
+    "actix": {
+      "command": [
+        "benchmark/competitive/actix/target/release/competitive-actix"
+      ],
+      "sha256": "11417ab55ff6face41f60c79cb8a0c48d7d372f299235d44e11b00945dea9fae"
+    },
+    "axum": {
+      "command": [
+        "benchmark/competitive/axum/target/release/competitive-axum"
+      ],
+      "sha256": "3adf5cd98ae3768db2bcc8b9c5ce5a7c7b1340ac2d6ad1e1d1a9650f2ba97a34"
+    },
+    "go": {
+      "command": [
+        "benchmark/competitive/go/competitive-go"
+      ],
+      "sha256": "6ff006fd2c51750a3da5bd002eb2c6697bbaa391842de10f175f0b41193000ad"
+    },
+    "akamata-reactor": {
+      "command": [
+        "zig-out/bin/competitive-akamata"
+      ],
+      "env": {
+        "COMPETITIVE_RUNTIME": "reactor"
+      },
+      "sha256": "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763"
+    }
+  },
+  "runs": [
+    {
+      "framework": "akamata-reactor",
+      "workload": "plaintext",
+      "connections": 32,
+      "round": 1,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "1s",
+        "-t",
+        "10s",
+        "-w",
+        "http://127.0.0.1:8088/plaintext"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 1.002549,
+          "slowest": 0.002513041,
+          "fastest": 0.000130292,
+          "average": 0.0003761401370789452,
+          "requestsPerSec": 84363.95627545388,
+          "totalData": 1099527,
+          "sizePerRequest": 13,
+          "sizePerSec": 1096731.4315809004
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 84363.95627545388,
+          "latency_ms": {
+            "min": 0.13,
+            "mean": 0.376,
+            "p50": 0.352,
+            "p95": 0.559,
+            "p99": 0.856,
+            "max": 2.513
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000130292": 1,
+          "0.0003685669": 51735,
+          "0.0006068418": 29710,
+          "0.0008451166999999999": 2226,
+          "0.0010833916": 551,
+          "0.0013216665": 183,
+          "0.0015599414": 48,
+          "0.0017982163": 93,
+          "0.0020364912": 0,
+          "0.0022747661": 19,
+          "0.002513041": 13
+        },
+        "latencyPercentiles": {
+          "p10": 0.000285958,
+          "p25": 0.000317375,
+          "p50": 0.000351875,
+          "p75": 0.00039725,
+          "p90": 0.000477666,
+          "p95": 0.000559083,
+          "p99": 0.000856458,
+          "p99.9": 0.0017085,
+          "p99.99": 0.002311416
+        },
+        "firstByteHistogram": {
+          "0.000130125": 1,
+          "0.0003684125": 51744,
+          "0.0006067000000000001": 29698,
+          "0.0008449875000000001": 2228,
+          "0.001083275": 552,
+          "0.0013215625": 183,
+          "0.0015598500000000002": 48,
+          "0.0017981375000000002": 93,
+          "0.002036425": 0,
+          "0.0022747125": 19,
+          "0.002513": 13
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000285834,
+          "p25": 0.000317208,
+          "p50": 0.000351708,
+          "p75": 0.000397042,
+          "p90": 0.000477459,
+          "p95": 0.000558792,
+          "p99": 0.000856416,
+          "p99.9": 0.001708458,
+          "p99.99": 0.00231125
+        },
+        "rps": {
+          "mean": 84300.11032651245,
+          "stddev": 15333.855140292566,
+          "max": 97040.02901196729,
+          "min": 17420.03303799369,
+          "percentiles": {
+            "p10": 62906.02639732878,
+            "p25": 76666.10036776657,
+            "p50": 91627.87319902715,
+            "p75": 94011.35657187356,
+            "p90": 95369.93477316907,
+            "p95": 96074.36718799079,
+            "p99": 96546.42230406636,
+            "p99.9": 97040.02901196729,
+            "p99.99": 97040.02901196729
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.0011801563437499997,
+            "fastest": 0.000964917,
+            "slowest": 0.001486375
+          },
+          "DNSLookup": {
+            "average": 5.9847656250000005e-05,
+            "fastest": 7.92e-07,
+            "slowest": 0.000243458
+          },
+          "firstByte": {
+            "average": 0.00037597379251351227,
+            "fastest": 0.000130125,
+            "slowest": 0.002513
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 84579
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 4560,
+            "cpu_seconds": 0.01,
+            "threads": 9
+          },
+          "generator": {
+            "rss_kib": 13872,
+            "cpu_seconds": 0.01,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 5376,
+            "cpu_seconds": 1.46,
+            "threads": 9
+          },
+          "generator": {
+            "rss_kib": 42432,
+            "cpu_seconds": 2.22,
+            "threads": 19
+          }
+        }
+      ],
+      "cpu_percent": 79.65339533725341,
+      "rss_mean_kib": 4968,
+      "threads_peak": 9,
+      "measurement_wall_seconds": 2.0463659999659285,
+      "stderr": "",
+      "shutdown_ms": 1.380832982249558,
+      "server_exit": 0,
+      "server_log": "info: experimental multiplexed reactor listening on port 8088\n"
+    },
+    {
+      "framework": "go",
+      "workload": "plaintext",
+      "connections": 32,
+      "round": 1,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "Content-Type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "Date",
+              "Tue, 13 Oct 2026 12:17:15 GMT"
+            ],
+            [
+              "Content-Length",
+              "13"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "Content-Type",
+              "application/json"
+            ],
+            [
+              "Date",
+              "Tue, 13 Oct 2026 12:17:15 GMT"
+            ],
+            [
+              "Content-Length",
+              "27"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "Content-Type",
+              "application/json"
+            ],
+            [
+              "Date",
+              "Tue, 13 Oct 2026 12:17:15 GMT"
+            ],
+            [
+              "Content-Length",
+              "23"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "Content-Type",
+              "application/json"
+            ],
+            [
+              "Date",
+              "Tue, 13 Oct 2026 12:17:15 GMT"
+            ],
+            [
+              "Content-Length",
+              "36"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "Content-Type",
+              "application/octet-stream"
+            ],
+            [
+              "Date",
+              "Tue, 13 Oct 2026 12:17:15 GMT"
+            ],
+            [
+              "Content-Length",
+              "64"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "Content-Type",
+              "application/octet-stream"
+            ],
+            [
+              "Date",
+              "Tue, 13 Oct 2026 12:17:15 GMT"
+            ],
+            [
+              "Content-Length",
+              "1024"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "Content-Type",
+              "application/octet-stream"
+            ],
+            [
+              "Date",
+              "Tue, 13 Oct 2026 12:17:15 GMT"
+            ],
+            [
+              "Transfer-Encoding",
+              "chunked"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "1s",
+        "-t",
+        "10s",
+        "-w",
+        "http://127.0.0.1:8088/plaintext"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 1.002008875,
+          "slowest": 0.011321666,
+          "fastest": 3.0042e-05,
+          "average": 0.0003245038012499516,
+          "requestsPerSec": 98047.03576103554,
+          "totalData": 1277172,
+          "sizePerRequest": 13,
+          "sizePerSec": 1274611.4648934621
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 98047.03576103554,
+          "latency_ms": {
+            "min": 0.03,
+            "mean": 0.325,
+            "p50": 0.3,
+            "p95": 0.533,
+            "p99": 0.966,
+            "max": 11.322
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000030042": 1,
+          "0.0011592044000000002": 97697,
+          "0.0022883668000000003": 441,
+          "0.0034175292000000004": 54,
+          "0.0045466916000000005": 21,
+          "0.005675854": 12,
+          "0.006805016400000001": 3,
+          "0.0079341788": 9,
+          "0.0090633412": 0,
+          "0.0101925036": 2,
+          "0.011321666": 4
+        },
+        "latencyPercentiles": {
+          "p10": 0.000204666,
+          "p25": 0.000257625,
+          "p50": 0.00030025,
+          "p75": 0.000344958,
+          "p90": 0.000420042,
+          "p95": 0.000533375,
+          "p99": 0.000965958,
+          "p99.9": 0.002309708,
+          "p99.99": 0.007299875
+        },
+        "firstByteHistogram": {
+          "0.00003": 1,
+          "0.0011591625": 97698,
+          "0.002288325": 440,
+          "0.0034174874999999996": 54,
+          "0.004546649999999999": 21,
+          "0.0056758124999999994": 12,
+          "0.006804974999999999": 3,
+          "0.0079341375": 9,
+          "0.0090633": 0,
+          "0.010192462499999999": 2,
+          "0.011321625": 4
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000204541,
+          "p25": 0.0002575,
+          "p50": 0.000300125,
+          "p75": 0.000344791,
+          "p90": 0.000419875,
+          "p95": 0.000533209,
+          "p99": 0.000965875,
+          "p99.9": 0.002309666,
+          "p99.99": 0.007299542
+        },
+        "rps": {
+          "mean": 98017.83887723568,
+          "stddev": 11390.462312427633,
+          "max": 108748.93702165954,
+          "min": 27106.662817720597,
+          "percentiles": {
+            "p10": 90608.34946429014,
+            "p25": 97332.04170812957,
+            "p50": 99925.32634430098,
+            "p75": 103572.18876382026,
+            "p90": 106264.79936640749,
+            "p95": 106950.80163077457,
+            "p99": 107812.58172828771,
+            "p99.9": 108748.93702165954,
+            "p99.99": 108748.93702165954
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.000707386625,
+            "fastest": 0.000444625,
+            "slowest": 0.000872125
+          },
+          "DNSLookup": {
+            "average": 4.0415e-06,
+            "fastest": 7.5e-07,
+            "slowest": 2.2458e-05
+          },
+          "firstByte": {
+            "average": 0.0003243509451773078,
+            "fastest": 3e-05,
+            "slowest": 0.011321625
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 98244
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 13232,
+            "cpu_seconds": 0.01,
+            "threads": 6
+          },
+          "generator": {
+            "rss_kib": 15056,
+            "cpu_seconds": 0.02,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 22128,
+            "cpu_seconds": 3.08,
+            "threads": 14
+          },
+          "generator": {
+            "rss_kib": 43296,
+            "cpu_seconds": 2.45,
+            "threads": 19
+          }
+        }
+      ],
+      "cpu_percent": 168.37472453979976,
+      "rss_mean_kib": 17680,
+      "threads_peak": 14,
+      "measurement_wall_seconds": 2.049001124978531,
+      "stderr": "",
+      "shutdown_ms": 3.840917022898793,
+      "server_exit": -2,
+      "server_log": ""
+    },
+    {
+      "framework": "axum",
+      "workload": "plaintext",
+      "connections": 32,
+      "round": 1,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:17 GMT"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:17 GMT"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:17 GMT"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:17 GMT"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:17 GMT"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:17 GMT"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:17 GMT"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "1s",
+        "-t",
+        "10s",
+        "-w",
+        "http://127.0.0.1:8088/plaintext"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 1.001787125,
+          "slowest": 0.014629209,
+          "fastest": 3.8042e-05,
+          "average": 0.00028678638214070496,
+          "requestsPerSec": 110802.98122218331,
+          "totalData": 1443013,
+          "sizePerRequest": 13,
+          "sizePerSec": 1440438.7558883831
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 110802.98122218331,
+          "latency_ms": {
+            "min": 0.038,
+            "mean": 0.287,
+            "p50": 0.272,
+            "p95": 0.384,
+            "p99": 0.694,
+            "max": 14.629
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000038042": 1,
+          "0.0014971587000000002": 110772,
+          "0.0029562754": 187,
+          "0.0044153921": 23,
+          "0.005874508800000001": 8,
+          "0.007333625500000001": 2,
+          "0.0087927422": 0,
+          "0.0102518589": 0,
+          "0.011710975600000001": 1,
+          "0.013170092300000002": 3,
+          "0.014629209000000002": 4
+        },
+        "latencyPercentiles": {
+          "p10": 0.000215417,
+          "p25": 0.000243375,
+          "p50": 0.000272291,
+          "p75": 0.000304292,
+          "p90": 0.000344709,
+          "p95": 0.000383958,
+          "p99": 0.000694042,
+          "p99.9": 0.00174875,
+          "p99.99": 0.005571709
+        },
+        "firstByteHistogram": {
+          "0.000038": 1,
+          "0.0014971125": 110772,
+          "0.002956225": 187,
+          "0.0044153375": 23,
+          "0.00587445": 8,
+          "0.0073335625": 2,
+          "0.008792675": 0,
+          "0.0102517875": 0,
+          "0.0117109": 1,
+          "0.0131700125": 3,
+          "0.014629125": 4
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000215291,
+          "p25": 0.00024325,
+          "p50": 0.000272125,
+          "p75": 0.000304125,
+          "p90": 0.000344542,
+          "p95": 0.00038375,
+          "p99": 0.000693208,
+          "p99.9": 0.001748375,
+          "p99.99": 0.005571417
+        },
+        "rps": {
+          "mean": 110814.07606792095,
+          "stddev": 14685.936103509779,
+          "max": 126399.53963746427,
+          "min": 17702.378163633744,
+          "percentiles": {
+            "p10": 104114.7530605092,
+            "p25": 110217.44858652158,
+            "p50": 114254.73944566867,
+            "p75": 116842.35535381574,
+            "p90": 118442.93556414198,
+            "p95": 119425.37789280168,
+            "p99": 121518.72603568125,
+            "p99.9": 126399.53963746427,
+            "p99.99": 126399.53963746427
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.0006873919687499999,
+            "fastest": 0.000484083,
+            "slowest": 0.000838834
+          },
+          "DNSLookup": {
+            "average": 7.640687499999999e-06,
+            "fastest": 7.08e-07,
+            "slowest": 5.2208e-05
+          },
+          "firstByte": {
+            "average": 0.00028661670778641537,
+            "fastest": 3.8e-05,
+            "slowest": 0.014629125
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 111001
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 4640,
+            "cpu_seconds": 0.01,
+            "threads": 9
+          },
+          "generator": {
+            "rss_kib": 14768,
+            "cpu_seconds": 0.02,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 6944,
+            "cpu_seconds": 2.05,
+            "threads": 9
+          },
+          "generator": {
+            "rss_kib": 44208,
+            "cpu_seconds": 2.76,
+            "threads": 19
+          }
+        }
+      ],
+      "cpu_percent": 111.41949508238761,
+      "rss_mean_kib": 5792,
+      "threads_peak": 9,
+      "measurement_wall_seconds": 2.0642707080114633,
+      "stderr": "",
+      "shutdown_ms": 1.3302090228535235,
+      "server_exit": 0,
+      "server_log": ""
+    },
+    {
+      "framework": "actix",
+      "workload": "plaintext",
+      "connections": 32,
+      "round": 1,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:20 GMT"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:20 GMT"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:20 GMT"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:20 GMT"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:20 GMT"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:20 GMT"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:17:20 GMT"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "1s",
+        "-t",
+        "10s",
+        "-w",
+        "http://127.0.0.1:8088/plaintext"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 1.00113125,
+          "slowest": 0.023891875,
+          "fastest": 2.3625e-05,
+          "average": 0.0003087552167981409,
+          "requestsPerSec": 102942.54624456084,
+          "totalData": 1339767,
+          "sizePerRequest": 13,
+          "sizePerSec": 1338253.1011792908
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 102942.54624456084,
+          "latency_ms": {
+            "min": 0.024,
+            "mean": 0.309,
+            "p50": 0.295,
+            "p95": 0.385,
+            "p99": 0.824,
+            "max": 23.892
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000023625": 1,
+          "0.00241045": 102965,
+          "0.004797275": 62,
+          "0.0071841": 15,
+          "0.009570925": 8,
+          "0.01195775": 0,
+          "0.014344574999999998": 0,
+          "0.0167314": 0,
+          "0.019118225": 7,
+          "0.021505049999999998": 0,
+          "0.023891875": 1
+        },
+        "latencyPercentiles": {
+          "p10": 0.00024325,
+          "p25": 0.000271167,
+          "p50": 0.000295375,
+          "p75": 0.000322042,
+          "p90": 0.0003545,
+          "p95": 0.000385334,
+          "p99": 0.00082375,
+          "p99.9": 0.002221458,
+          "p99.99": 0.007654917
+        },
+        "firstByteHistogram": {
+          "0.000023583": 1,
+          "0.0024103789000000002": 102966,
+          "0.0047971748": 61,
+          "0.007183970699999999": 15,
+          "0.0095707666": 8,
+          "0.011957562500000001": 0,
+          "0.0143443584": 0,
+          "0.016731154300000002": 0,
+          "0.0191179502": 7,
+          "0.0215047461": 0,
+          "0.023891542": 1
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000243166,
+          "p25": 0.000271,
+          "p50": 0.000295209,
+          "p75": 0.000321833,
+          "p90": 0.000354333,
+          "p95": 0.000385084,
+          "p99": 0.000823667,
+          "p99.9": 0.002206708,
+          "p99.99": 0.007654792
+        },
+        "rps": {
+          "mean": 102920.99821992549,
+          "stddev": 13049.170175402262,
+          "max": 115504.15709688299,
+          "min": 19323.671497584543,
+          "percentiles": {
+            "p10": 100950.47523761849,
+            "p25": 103670.62110821978,
+            "p50": 105329.83994365603,
+            "p75": 107026.75668917237,
+            "p90": 108204.95578697535,
+            "p95": 109199.64467576714,
+            "p99": 112144.38589684218,
+            "p99.9": 115504.15709688299,
+            "p99.99": 115504.15709688299
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.0007633671562499998,
+            "fastest": 0.000437167,
+            "slowest": 0.000915041
+          },
+          "DNSLookup": {
+            "average": 8.339781250000001e-06,
+            "fastest": 7.91e-07,
+            "slowest": 7.2333e-05
+          },
+          "firstByte": {
+            "average": 0.0003085737251089161,
+            "fastest": 2.3583e-05,
+            "slowest": 0.023891542
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 103059
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 5744,
+            "cpu_seconds": 0.02,
+            "threads": 10
+          },
+          "generator": {
+            "rss_kib": 14800,
+            "cpu_seconds": 0.03,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 6896,
+            "cpu_seconds": 2.1,
+            "threads": 10
+          },
+          "generator": {
+            "rss_kib": 43856,
+            "cpu_seconds": 2.64,
+            "threads": 19
+          }
+        }
+      ],
+      "cpu_percent": 110.74841585360053,
+      "rss_mean_kib": 6320,
+      "threads_peak": 10,
+      "measurement_wall_seconds": 2.067749666981399,
+      "stderr": "",
+      "shutdown_ms": 343.6510830069892,
+      "server_exit": 0,
+      "server_log": ""
+    },
+    {
+      "framework": "akamata-threaded",
+      "workload": "plaintext",
+      "connections": 32,
+      "round": 1,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "1s",
+        "-t",
+        "10s",
+        "-w",
+        "http://127.0.0.1:8088/plaintext"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 1.001930583,
+          "slowest": 0.014398542,
+          "fastest": 3.7291e-05,
+          "average": 0.00029954236460233815,
+          "requestsPerSec": 106141.08582410644,
+          "totalData": 1382498,
+          "sizePerRequest": 13,
+          "sizePerSec": 1379834.1157133835
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 106141.08582410644,
+          "latency_ms": {
+            "min": 0.037,
+            "mean": 0.3,
+            "p50": 0.288,
+            "p95": 0.358,
+            "p99": 0.559,
+            "max": 14.399
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000037291": 1,
+          "0.0014734161": 106164,
+          "0.0029095412": 125,
+          "0.0043456663": 13,
+          "0.0057817914": 15,
+          "0.007217916499999999": 8,
+          "0.0086540416": 1,
+          "0.0100901667": 3,
+          "0.0115262918": 4,
+          "0.012962416899999999": 8,
+          "0.014398541999999999": 4
+        },
+        "latencyPercentiles": {
+          "p10": 0.000248791,
+          "p25": 0.000268792,
+          "p50": 0.000288166,
+          "p75": 0.000309917,
+          "p90": 0.000335792,
+          "p95": 0.000358417,
+          "p99": 0.000558875,
+          "p99.9": 0.00188775,
+          "p99.99": 0.01165375
+        },
+        "firstByteHistogram": {
+          "0.00003725": 1,
+          "0.0014733707999999997": 106164,
+          "0.0029094915999999995": 125,
+          "0.0043456124": 13,
+          "0.005781733199999999": 15,
+          "0.007217853999999998": 8,
+          "0.0086539748": 1,
+          "0.0100900956": 3,
+          "0.011526216399999999": 4,
+          "0.012962337199999998": 8,
+          "0.014398457999999998": 4
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000248666,
+          "p25": 0.000268666,
+          "p50": 0.000287959,
+          "p75": 0.00030975,
+          "p90": 0.000335625,
+          "p95": 0.000358166,
+          "p99": 0.000557666,
+          "p99.9": 0.001887459,
+          "p99.99": 0.011653542
+        },
+        "rps": {
+          "mean": 106047.45507019252,
+          "stddev": 12582.932055117339,
+          "max": 116085.61313968949,
+          "min": 19429.839456903606,
+          "percentiles": {
+            "p10": 103383.3170070075,
+            "p25": 106690.70964348764,
+            "p50": 108781.13985221554,
+            "p75": 110033.92345860296,
+            "p90": 111105.55527776333,
+            "p95": 112005.12983494675,
+            "p99": 113942.48424331023,
+            "p99.9": 116085.61313968949,
+            "p99.99": 116085.61313968949
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.0007858058750000001,
+            "fastest": 0.000473333,
+            "slowest": 0.000999625
+          },
+          "DNSLookup": {
+            "average": 9.1158125e-06,
+            "fastest": 6.67e-07,
+            "slowest": 6.0917e-05
+          },
+          "firstByte": {
+            "average": 0.0002993685852406222,
+            "fastest": 3.725e-05,
+            "slowest": 0.014398458
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 106346
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 4080,
+            "cpu_seconds": 0.01,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 14928,
+            "cpu_seconds": 0.02,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 7744,
+            "cpu_seconds": 1.9,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 43088,
+            "cpu_seconds": 2.72,
+            "threads": 19
+          }
+        }
+      ],
+      "cpu_percent": 102.88344606022264,
+      "rss_mean_kib": 5912,
+      "threads_peak": 40,
+      "measurement_wall_seconds": 2.0605841670185328,
+      "stderr": "",
+      "shutdown_ms": 125.18570898100734,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    }
+  ]
+}

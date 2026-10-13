@@ -1,0 +1,32 @@
+{
+  "baseline_main": "8a521fb16e2a6dbffb92627b73350cdb8c551925",
+  "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "tools": {
+    "zig": "0.17.0",
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28) (Homebrew)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27) (Homebrew)",
+    "go": "go version go1.27.2 darwin/arm64",
+    "oha": "oha 1.15.0",
+    "CPU": "Apple M2",
+    "OS_build": "26A428"
+  },
+  "sqlite_source_sha256": "9ac97192c93a6d9671d2ea667ba14e3c8fe3719a171afc5827c9d86d0278fc14",
+  "classification": "fixture validation, not primary performance certification",
+  "fixture_validation": {
+    "native_implementations": 6,
+    "wire_checks_per_implementation": 7,
+    "Hono_host_checks": 7,
+    "Native_ReleaseFast": "built",
+    "Native_ReleaseSafe": "built",
+    "runtime_contract_unit": "passed",
+    "Workers_shared_contract": "10 repetitions passed"
+  },
+  "caveats": [
+    "early development smoke files predate typed-row SQLite adapter and may overlap cached checks; do not rank their req/s",
+    "zap release uses Zig 0.15.2 and compatible 15.4 SDK; upstream source unchanged",
+    "automatic response Date/Last-Modified/Connection headers differ and are retained in raw wire checks",
+    "Go uses goroutine semaphore before cgo; no artificially pinned OS thread for exhausted SQLite leases",
+    "primary measurements pending",
+    "no live Cloudflare test resources were established"
+  ]
+}

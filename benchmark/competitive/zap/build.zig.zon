@@ -1,0 +1,10 @@
+.{
+    .name = .competitive_zap,
+    .version = "0.1.0",
+    .fingerprint = 0x41db5d0466f86847,
+    .dependencies = .{ .zap = .{
+        .url = "git+https://github.com/zigzap/zap#66c5dc42c781bbb8a9100afda3c7e69ee96eddf3",
+        .hash = "zap-0.10.6-GoeB8xCEJABLgoiZjWZMMT5TsoZ5OO2EZe6j24RTUYEH",
+    } },
+    .paths = .{ "build.zig", "build.zig.zon", "main.zig" },
+}

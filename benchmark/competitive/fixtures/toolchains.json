@@ -1,0 +1,22 @@
+{
+  "akamata_source": "8a521fb16e2a6dbffb92627b73350cdb8c551925",
+  "zig": "0.17.0",
+  "rust": "1.99.0 (Homebrew)",
+  "actix_web": "4.16.0",
+  "axum": "0.8.9",
+  "tokio": "1.53.2",
+  "serde": "1.0.228",
+  "go": "1.27.2",
+  "zap_release": "v0.11.0",
+  "zap_commit": "66c5dc42c781bbb8a9100afda3c7e69ee96eddf3",
+  "zap_zig": "0.15.2",
+  "sqlite": "3.53.1 (repository amalgamation; source digests recorded in measurement environment)",
+  "rust_transitive_dependencies": "Cargo.lock; exact resolved versions and checksums",
+  "sqlite_settings": {
+    "connections": 8,
+    "statement": "prepare/bind/step/finalize each request",
+    "journal_mode": "memory",
+    "synchronous": "off",
+    "temp_store": "memory"
+  }
+}

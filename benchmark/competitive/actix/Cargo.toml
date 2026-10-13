@@ -1,0 +1,11 @@
+[package]
+name = "competitive-actix"
+version = "0.1.0"
+edition = "2024"
+build = "../fixtures/build.rs"
+[dependencies]
+actix-web = { version = "=4.16.0", default-features = false, features = ["macros"] }
+serde = { version = "=1.0.228", features = ["derive"] }
+[profile.release]
+lto = "thin"
+codegen-units = 1

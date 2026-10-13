@@ -303,6 +303,15 @@ pub fn build(b: *std.Build) void {
     const guestbook_test_step = b.step("guestbook-test", "run the canonical typed HTTP example contracts");
 
     if (backend == .native) {
+        const competitive_mod = b.createModule(.{ .root_source_file = b.path("src/competitive_bench.zig"), .target = native_target, .optimize = optimize });
+        competitive_mod.addOptions("build_options", opts);
+        competitive_mod.addImport("sqlite3", am_mod.import_table.get("sqlite3").?);
+        competitive_mod.link_libc = true;
+        competitive_mod.addIncludePath(b.path("third_party/sqlite"));
+        competitive_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
+        competitive_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
+        const competitive_exe = b.addExecutable(.{ .name = "competitive-akamata", .root_module = competitive_mod });
+        b.step("competitive-bench", "build private fair-workload competitive fixture").dependOn(&b.addInstallArtifact(competitive_exe, .{}).step);
         const allocation_mod = b.createModule(.{ .root_source_file = b.path("src/http_allocation_bench.zig"), .target = native_target, .optimize = optimize, .imports = &.{.{ .name = "akamata", .module = am_mod }} });
         const allocation_exe = b.addExecutable(.{ .name = "http-allocation-profile", .root_module = allocation_mod });
         b.step("http-allocation-profile", "measure logical arena and backing heap allocation separately").dependOn(&b.addRunArtifact(allocation_exe).step);

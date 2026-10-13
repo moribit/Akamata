@@ -1,0 +1,418 @@
+{
+  "schema": 1,
+  "classification": "exploratory",
+  "source_sha": "e04dbebb505205a061c21b04ba2dfa4f062c837d",
+  "command": [
+    "benchmark/competitive/scripts/measure.py",
+    "benchmark/competitive/fixtures/native.json",
+    "--output",
+    "benchmark-results/competitive/raw/zap-conformance.json",
+    "--frameworks",
+    "zap",
+    "--connections",
+    "32",
+    "--duration",
+    "1",
+    "--warmup",
+    "0",
+    "--rounds",
+    "1",
+    "--workloads",
+    "plaintext"
+  ],
+  "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "oha": "oha 1.15.0",
+  "warmup_seconds": 0,
+  "duration_seconds": 1,
+  "rounds": 1,
+  "binaries": {
+    "zap": {
+      "command": [
+        "benchmark/competitive/zap/zig-out/bin/competitive-zap"
+      ],
+      "artifacts": [
+        "benchmark/competitive/zap/zig-out/lib/libfacil.dylib"
+      ],
+      "routing_classification": "manual extraction, not a generic parameter router",
+      "sha256": "4ce8c6be2062d1b2dd8e243a62fac7546337d34cce94933c7590fc1b962078f1",
+      "artifact_sha256": {
+        "benchmark/competitive/zap/zig-out/lib/libfacil.dylib": "b5b4f61743a22e66f8e8e77062c28099bee2fe52810a583d40a7fed7d4553696"
+      }
+    }
+  },
+  "runs": [
+    {
+      "framework": "zap",
+      "workload": "plaintext",
+      "connections": 32,
+      "round": 1,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "connection",
+              "keep-alive"
+            ],
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ],
+            [
+              "last-modified",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "connection",
+              "keep-alive"
+            ],
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ],
+            [
+              "last-modified",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "connection",
+              "keep-alive"
+            ],
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ],
+            [
+              "last-modified",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "connection",
+              "keep-alive"
+            ],
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ],
+            [
+              "last-modified",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "connection",
+              "keep-alive"
+            ],
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ],
+            [
+              "last-modified",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "connection",
+              "keep-alive"
+            ],
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ],
+            [
+              "last-modified",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "connection",
+              "keep-alive"
+            ],
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "date",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ],
+            [
+              "last-modified",
+              "Tue, 13 Oct 2026 12:24:05 GMT"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "1s",
+        "-t",
+        "10s",
+        "-w",
+        "http://127.0.0.1:8088/plaintext"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 1.002053916,
+          "slowest": 0.041047542,
+          "fastest": 2.3833e-05,
+          "average": 0.0003184261617629377,
+          "requestsPerSec": 99651.3245500854,
+          "totalData": 1298128,
+          "sizePerRequest": 13,
+          "sizePerSec": 1295467.2191511102
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 99651.3245500854,
+          "latency_ms": {
+            "min": 0.024,
+            "mean": 0.318,
+            "p50": 0.299,
+            "p95": 0.477,
+            "p99": 1.107,
+            "max": 41.048
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000023833": 1,
+          "0.0041262039": 99753,
+          "0.0082285748": 77,
+          "0.0123309457": 15,
+          "0.0164333166": 1,
+          "0.0205356875": 0,
+          "0.024638058400000003": 6,
+          "0.028740429300000002": 0,
+          "0.0328428002": 1,
+          "0.0369451711": 0,
+          "0.041047542": 2
+        },
+        "latencyPercentiles": {
+          "p10": 0.000166333,
+          "p25": 0.000249833,
+          "p50": 0.000299,
+          "p75": 0.000335542,
+          "p90": 0.00038325,
+          "p95": 0.000477042,
+          "p99": 0.001107083,
+          "p99.9": 0.004209166,
+          "p99.99": 0.013988084
+        },
+        "firstByteHistogram": {
+          "0.00002375": 1,
+          "0.0041261208": 99753,
+          "0.008228491599999999": 77,
+          "0.012330862399999998": 15,
+          "0.016433233199999998": 1,
+          "0.020535603999999996": 0,
+          "0.024637974799999997": 6,
+          "0.028740345599999998": 0,
+          "0.0328427164": 1,
+          "0.0369450872": 0,
+          "0.041047457999999995": 2
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000166209,
+          "p25": 0.000249666,
+          "p50": 0.000298792,
+          "p75": 0.000335333,
+          "p90": 0.000382791,
+          "p95": 0.000476625,
+          "p99": 0.001104917,
+          "p99.9": 0.004209125,
+          "p99.99": 0.013988042
+        },
+        "rps": {
+          "mean": 99584.73647313735,
+          "stddev": 13976.6320625476,
+          "max": 128114.95101478291,
+          "min": 22327.9098873592,
+          "percentiles": {
+            "p10": 94124.70773578087,
+            "p25": 96492.98597194346,
+            "p50": 99974.98123592735,
+            "p75": 105516.94442951138,
+            "p90": 111090.72779739222,
+            "p95": 114962.38436791963,
+            "p99": 126060.92524517205,
+            "p99.9": 128114.95101478291,
+            "p99.99": 128114.95101478291
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.0006749100625,
+            "fastest": 0.000399833,
+            "slowest": 0.000851083
+          },
+          "DNSLookup": {
+            "average": 7.1900625e-06,
+            "fastest": 7.08e-07,
+            "slowest": 4.4042e-05
+          },
+          "firstByte": {
+            "average": 0.0003181805617489203,
+            "fastest": 2.375e-05,
+            "slowest": 0.041047458
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 99856
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 29664,
+            "cpu_seconds": 0.02,
+            "threads": 9
+          },
+          "generator": {
+            "rss_kib": 15120,
+            "cpu_seconds": 0.02,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 30256,
+            "cpu_seconds": 2.27,
+            "threads": 9
+          },
+          "generator": {
+            "rss_kib": 43952,
+            "cpu_seconds": 2.78,
+            "threads": 19
+          }
+        }
+      ],
+      "cpu_percent": 220.0051578580272,
+      "rss_mean_kib": 29960,
+      "threads_peak": 9,
+      "measurement_wall_seconds": 1.1636090830434114,
+      "stderr": "",
+      "shutdown_ms": 964.1220420016907,
+      "server_exit": 0,
+      "server_log": "INFO: Listening on port 8088\nINFO: Server is running 1 worker X 8 threads with facil.io 0.7.4 (kqueue)\n* Detected capacity: 131056 open file limit\n* Root pid: 24057\n* Press ^C to stop\n\nINFO: (24057) detected exit signal.\nINFO:    ---  Shutdown Complete  ---\n\n\n"
+    }
+  ]
+}
