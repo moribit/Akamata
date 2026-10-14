@@ -5,6 +5,23 @@ on:
   pull_request:
 
 jobs:
+  competitive-fixtures:
+    name: private competitive fixture contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29
+        with:
+          version: 0.17.0
+          use-cache: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - run: ./third_party/sqlite/fetch.sh
+      - run: zig build competitive-bench competitive-micro-build -Doptimize=ReleaseFast
+      - run: zig build competitive-worker-build -Dbackend=workers -Doptimize=ReleaseSafe
+      - run: npm ci --prefix benchmark/competitive/workers --ignore-scripts --no-audit --no-fund
+      - run: node benchmark/competitive/workers/wasm-host.mjs zig-out/bin/competitive-worker.wasm .zig-cache/competitive-workers-host.json
   build:
     name: ${{ matrix.job.name }}
     runs-on: ubuntu-latest

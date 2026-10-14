@@ -140,6 +140,11 @@ pub fn build(b: *std.Build) void {
     // The identical in-process application suite also runs as Workers WASM.
     // Test providers isolate application semantics from live Cloudflare APIs.
     if (backend == .workers) {
+        const competitive_worker_mod = b.createModule(.{ .root_source_file = b.path("src/competitive_workers.zig"), .target = target, .optimize = optimize, .imports = &.{.{ .name = "akamata", .module = am_mod }} });
+        const competitive_worker = b.addExecutable(.{ .name = "competitive-worker", .root_module = competitive_worker_mod });
+        competitive_worker.entry = .disabled;
+        competitive_worker.rdynamic = true;
+        b.step("competitive-worker-build", "build private Workers competitive fixture").dependOn(&b.addInstallArtifact(competitive_worker, .{}).step);
         const fixture_module = b.createModule(.{
             .root_source_file = b.path("tests/portable_application_worker.zig"),
             .target = target,
@@ -303,6 +308,9 @@ pub fn build(b: *std.Build) void {
     const guestbook_test_step = b.step("guestbook-test", "run the canonical typed HTTP example contracts");
 
     if (backend == .native) {
+        const micro_mod = b.createModule(.{ .root_source_file = b.path("src/competitive_micro.zig"), .target = native_target, .optimize = optimize, .imports = &.{.{ .name = "akamata", .module = am_mod }} });
+        const micro_exe = b.addExecutable(.{ .name = "competitive-micro", .root_module = micro_mod });
+        b.step("competitive-micro-build", "build offline HTTP/JSON/route cost experiments").dependOn(&b.addInstallArtifact(micro_exe, .{}).step);
         const competitive_mod = b.createModule(.{ .root_source_file = b.path("src/competitive_bench.zig"), .target = native_target, .optimize = optimize });
         competitive_mod.addOptions("build_options", opts);
         competitive_mod.addImport("sqlite3", am_mod.import_table.get("sqlite3").?);
