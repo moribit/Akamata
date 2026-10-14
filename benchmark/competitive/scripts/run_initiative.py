@@ -90,6 +90,9 @@ def main():
                 raise RuntimeError(f"measurement exited {code}; checkpoint retained, no silent retry")
             table = subprocess.check_output([sys.executable, "benchmark/competitive/scripts/summarize.py", str(output)], cwd=ROOT, text=True)
             (RAW.parent / report).write_text(table)
+        subprocess.run([sys.executable, "benchmark/competitive/scripts/compare_matrix.py",
+                        str(RAW / "native-baseline.json"), str(RAW / "native-after.json"),
+                        "--output", str(RAW.parent / "matrix-comparison.md")], cwd=ROOT, check=True)
         status["state"] = "complete"
     except Exception as error:
         status["state"] = "failed"

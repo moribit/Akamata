@@ -7,9 +7,47 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 from measure import runtime_reports, owned_load, require_disk_reserve
+from compare_matrix import validate, compare, BASE, AFTER, WORKLOADS, CONNECTIONS
 
 
 class ReportingTests(unittest.TestCase):
+    def matrix(self, frameworks):
+        import itertools
+        return {"warmup_seconds": 10, "duration_seconds": 30, "rounds": 5,
+                "os": "fixture", "cpu_count": 8, "oha": "fixture",
+                "binaries": dict.fromkeys(frameworks),
+                "runs": [{"framework": f, "workload": w, "connections": c, "round": n,
+                          "wire_checks": [None] * 7, "cpu_percent": 100,
+                          "rss_mean_kib": 1000, "threads_peak": 8,
+                          "oha": {"summary": {"total": 30},
+                                  "statusCodeDistribution": {"200": 3000, "503": 1},
+                                  "errorDistribution": {"timeout": 2},
+                                  "latencyPercentiles": dict.fromkeys(("p50", "p95", "p99", "p99.9"), .001)}}
+                         for f, w, c, n in itertools.product(frameworks, WORKLOADS, CONNECTIONS, range(1, 6))]}
+
+    def test_full_matrix_comparison_keeps_errors(self):
+        report = compare(self.matrix(BASE), self.matrix(AFTER))
+        self.assertEqual(1260, report["baseline_cases"])
+        self.assertEqual(630, report["after_cases"])
+        first = report["comparisons"][0]
+        self.assertEqual(100, first["after"]["http_200_per_second"])
+        self.assertEqual(10, first["after"]["client_errors"])
+        self.assertEqual(5, first["after"]["non_200"])
+        self.assertEqual(0, first["throughput_change_percent"])
+
+    def test_matrix_rejects_missing_duplicate_and_drift(self):
+        data = self.matrix(BASE)
+        row = data["runs"].pop()
+        with self.assertRaisesRegex(ValueError, "incomplete matrix"):
+            validate(data, BASE)
+        data["runs"].extend([row, row])
+        with self.assertRaisesRegex(ValueError, "duplicate completed case"):
+            validate(data, BASE)
+        after = self.matrix(AFTER)
+        after["os"] = "other"
+        with self.assertRaisesRegex(ValueError, "environment drift"):
+            compare(self.matrix(BASE), after)
+
     def test_disk_reserve_fails_before_case_admission(self):
         from collections import namedtuple
         usage = namedtuple("usage", "total used free")
