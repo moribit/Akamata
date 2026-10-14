@@ -83,7 +83,7 @@ not passage of all criteria. Full five-round results are still required.
 
 ## Remaining completion gates
 
-1. Resume the full frozen baseline (257/1260 cases at the last checkpoint), then
+1. Resume the full frozen baseline (269/1260 cases at the last checkpoint), then
    the final frozen after matrix, with no local builds/tests/other load.
 2. Final test/fixture additions passed the 23-job cross-platform CI run above;
    the vectored candidate is rejected, with production writer restored.
@@ -104,3 +104,16 @@ removed, preserving frozen binaries and raw data. The runner now checks a 1 GiB
 reserve on output and temporary volumes before each case; low capacity stops
 admission instead of starting another measurement. A stale `running` status file
 alone is not evidence that the owning process is alive.
+
+The next restart began with approximately 11 GiB free, but stopped again during
+zap / 64 KiB echo / 512 connections / round 1. The cause of the rapid capacity
+decline is not established. [Follow-up evidence](raw/matrix-disk-interruption-followup.json)
+preserves the 269-case checkpoint state and failure log. Measurement is stopped
+until storage capacity can be maintained; no full-matrix conclusion is claimed.
+
+`compare_matrix.py` now validates the exact 1260 baseline / 630 after case sets,
+rejects duplicate completed cases and environment drift, and retains failed
+attempts separately. After both stages complete, the supervisor automatically
+generates `matrix-comparison.md` and its JSON (all round medians, errors and binary
+digests). Eight offline reporting tests passed. Completion of this reporting
+implementation does not imply completion of the actual measurements.
