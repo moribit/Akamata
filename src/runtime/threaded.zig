@@ -49,7 +49,11 @@ pub fn serveWithReadiness(comptime State: type, comptime Readiness: type, app: *
     try threads.ensureTotalCapacity(app.gpa, n_threads);
 
     const Ctx = LoopCtx(State, Readiness);
-    var ctx: Ctx = .{ .app = app, .io = io, .listener = &listener, .opts = &opts, .connections = .{ .mutex = .init() } };
+    // Two descriptors per serving App, not per connection. Admission stops
+    // before notification; descriptors outlive every detached socket owner.
+    var idle_wake: ?@import("readiness_poll.zig").ShutdownWake = if (@hasDecl(Readiness, "waitIdle")) try .init() else null;
+    defer if (idle_wake) |*wake| wake.deinit();
+    var ctx: Ctx = .{ .app = app, .io = io, .listener = &listener, .opts = &opts, .connections = .{ .mutex = .init() }, .idle_wake = if (idle_wake) |*wake| wake else null };
     defer ctx.connections.mutex.deinit();
 
     var signals = installSignalHandlers(State, app);
@@ -73,6 +77,7 @@ pub fn serveWithReadiness(comptime State: type, comptime Readiness: type, app: *
 }
 
 fn drain(comptime State: type, comptime Readiness: type, ctx: *LoopCtx(State, Readiness)) void {
+    if (ctx.idle_wake) |wake| wake.notify();
     const clock = @import("../observability/clock.zig");
     const recorded = ctx.app.shutdown_started_ns.load(.acquire);
     const started = if (recorded == 0) clock.monotonicNs() else recorded;
@@ -100,6 +105,7 @@ fn LoopCtx(comptime State: type, comptime Readiness: type) type {
         opts: *const app_mod.ServeOptions,
         active_connections: std.atomic.Value(usize) = .init(0),
         connections: @import("drain.zig").Registry,
+        idle_wake: ?*@import("readiness_poll.zig").ShutdownWake = null,
     };
 }
 
@@ -213,6 +219,7 @@ fn connectionThread(comptime State: type, comptime Readiness: type, ctx: *LoopCt
         return;
     };
     transport.control = &node;
+    if (ctx.idle_wake) |wake| transport.idle_wake_fd = wake.descriptors[0];
     transport.metrics = ctx.opts.metrics;
     defer transport.deinit();
     @import("../http/connection.zig").run(State, ctx.app, &transport, ctx.opts) catch |err| switch (err) {

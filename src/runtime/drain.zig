@@ -80,3 +80,18 @@ pub const Node = struct {
         unreachable;
     }
 };
+
+test "clearing a write budget preserves unarmed and armed states" {
+    var registry: Registry = .{ .mutex = .init() };
+    defer registry.mutex.deinit();
+    var node: Node = undefined;
+    registry.attach(&node, -1);
+    defer node.detach();
+    node.clearWriteDeadline();
+    try std.testing.expectEqual(@as(u64, 0), node.write_deadline_ns.load(.acquire));
+    node.write_deadline_ns.store(123, .release);
+    node.clearWriteDeadline();
+    try std.testing.expectEqual(@as(u64, 0), node.write_deadline_ns.load(.acquire));
+    registry.expireWrites(124);
+    try std.testing.expect(!node.isClosed());
+}

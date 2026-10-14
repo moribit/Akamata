@@ -1,0 +1,1356 @@
+{
+  "classification": "idle-diagnostic",
+  "command": [
+    "benchmark/competitive/scripts/idle.py",
+    "benchmark-results/competitive/raw/idle-refined-manifest.json",
+    "--output",
+    "benchmark-results/competitive/raw/idle-refined-retention.json",
+    "--connections",
+    "1024",
+    "--seconds",
+    "10",
+    "--rounds",
+    "3"
+  ],
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "source_sha": "a562592aba392cf8a05f0bde1c06111c76f2106b",
+  "fd_limit": [
+    4096,
+    9223372036854775807
+  ],
+  "binaries": {
+    "before": {
+      "command": [
+        ".zig-cache/competitive/baseline/akamata-threaded"
+      ],
+      "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098",
+      "sha256": "292d5370da41b7c87b240ab526e61c86112bd549d25f383c5d0a0c5c85dcf763"
+    },
+    "idle-refined": {
+      "command": [
+        ".zig-cache/competitive/idle-refined"
+      ],
+      "source_sha": "a562592+idle-first-socket-probe+numeric-writer",
+      "build": {
+        "optimize": "ReleaseFast"
+      },
+      "sha256": "54bca00995dbee5046665b5cebd2a45f31b00daafcf6d9bba44368bb7212d443"
+    }
+  },
+  "runs": [
+    {
+      "framework": "before",
+      "round": 1,
+      "requested_connections": 1024,
+      "established_connections": 1024,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "base": {
+        "rss_kib": 4080,
+        "cpu_seconds": 0.0,
+        "threads": 8
+      },
+      "establishment_seconds": 0.14078662497922778,
+      "samples": [
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 0.13,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 0.55,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 0.97,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 1.4,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 1.85,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 2.27,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 2.7,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 3.14,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 3.53,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 3.95,
+          "threads": 1032
+        }
+      ],
+      "wall_seconds": 10.030264540982898,
+      "cpu_percent": 41.17537261387087,
+      "retention_checks": 1024,
+      "shutdown_ms": 125.01508300192654,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    },
+    {
+      "framework": "idle-refined",
+      "round": 1,
+      "requested_connections": 1024,
+      "established_connections": 1024,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "base": {
+        "rss_kib": 4112,
+        "cpu_seconds": 0.01,
+        "threads": 8
+      },
+      "establishment_seconds": 0.13924620795296505,
+      "samples": [
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.14,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.22,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.23,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.24,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.25,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.26,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.27,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.28,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.29,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.3,
+          "threads": 1032
+        }
+      ],
+      "wall_seconds": 10.018939041998237,
+      "cpu_percent": 1.6967862444266073,
+      "retention_checks": 1024,
+      "shutdown_ms": 126.60470796981826,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    },
+    {
+      "framework": "idle-refined",
+      "round": 2,
+      "requested_connections": 1024,
+      "established_connections": 1024,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "base": {
+        "rss_kib": 4112,
+        "cpu_seconds": 0.01,
+        "threads": 8
+      },
+      "establishment_seconds": 0.1424653750145808,
+      "samples": [
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.15,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.22,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.23,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.24,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.25,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.26,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.27,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.28,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.29,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121968,
+          "cpu_seconds": 0.3,
+          "threads": 1032
+        }
+      ],
+      "wall_seconds": 10.034170250000898,
+      "cpu_percent": 1.6942106421650083,
+      "retention_checks": 1024,
+      "shutdown_ms": 124.5919160428457,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    },
+    {
+      "framework": "before",
+      "round": 2,
+      "requested_connections": 1024,
+      "established_connections": 1024,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "base": {
+        "rss_kib": 4112,
+        "cpu_seconds": 0.01,
+        "threads": 8
+      },
+      "establishment_seconds": 0.13892279198626056,
+      "samples": [
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.13,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.49,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.87,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 1.23,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 1.51,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 1.92,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 2.25,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 2.61,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 2.99,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 3.37,
+          "threads": 1032
+        }
+      ],
+      "wall_seconds": 10.030348624975886,
+      "cpu_percent": 34.59500258273334,
+      "retention_checks": 1024,
+      "shutdown_ms": 125.42116694385186,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    },
+    {
+      "framework": "before",
+      "round": 3,
+      "requested_connections": 1024,
+      "established_connections": 1024,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "base": {
+        "rss_kib": 4080,
+        "cpu_seconds": 0.01,
+        "threads": 8
+      },
+      "establishment_seconds": 0.155048375017941,
+      "samples": [
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 0.12,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 0.43,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 0.82,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 1.2,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 1.62,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 1.98,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 2.42,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 2.8,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 3.18,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121936,
+          "cpu_seconds": 3.55,
+          "threads": 1032
+        }
+      ],
+      "wall_seconds": 10.01867650001077,
+      "cpu_percent": 37.629708487231596,
+      "retention_checks": 1024,
+      "shutdown_ms": 128.12554195988923,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    },
+    {
+      "framework": "idle-refined",
+      "round": 3,
+      "requested_connections": 1024,
+      "established_connections": 1024,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "base": {
+        "rss_kib": 4112,
+        "cpu_seconds": 0.01,
+        "threads": 8
+      },
+      "establishment_seconds": 0.1442738330224529,
+      "samples": [
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.15,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.23,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.24,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.25,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.26,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.27,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.28,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.29,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.3,
+          "threads": 1032
+        },
+        {
+          "rss_kib": 121984,
+          "cpu_seconds": 0.31,
+          "threads": 1032
+        }
+      ],
+      "wall_seconds": 10.03629204101162,
+      "cpu_percent": 1.7934901390664308,
+      "retention_checks": 1024,
+      "shutdown_ms": 126.19883404113352,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\n"
+    }
+  ]
+}

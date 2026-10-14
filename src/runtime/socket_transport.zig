@@ -18,6 +18,7 @@ pub fn Transport(comptime Readiness: type) type {
         metrics: ?*@import("../mw/metrics.zig").Counters = null,
         write_timeout_ms: u32 = 30_000,
         control: ?*@import("drain.zig").Node = null,
+        idle_wake_fd: ?c_int = null,
 
         pub fn init(io: Io, stream: net.Stream, shutdown: *std.atomic.Value(bool)) !Self {
             return .{ .io = io, .stream = stream, .shutdown = shutdown, .readiness = try Readiness.init(stream.socket.handle) };
@@ -60,6 +61,7 @@ pub fn Transport(comptime Readiness: type) type {
                     _ = m.http_connections_idle.fetchSub(1, .monotonic);
                 };
                 const started = clock.monotonicNs();
+                var checked_idle = false;
                 while (true) {
                     try self.io.checkCancel();
                     if (shutdown_if_idle and self.shutdown.load(.acquire)) return error.EndOfStream;
@@ -69,6 +71,21 @@ pub fn Transport(comptime Readiness: type) type {
                         return error.Timeout;
                     }
                     const remaining: u32 = @intCast(timeout_ms - elapsed);
+                    if (comptime @hasDecl(Readiness, "waitIdle")) {
+                        if (shutdown_if_idle) if (self.idle_wake_fd) |wake_fd| {
+                            // Shared-descriptor polling on every hot read
+                            // regressed measured high-concurrency throughput.
+                            // Probe just the socket first; only genuinely quiet
+                            // connections enter the long, shutdown-aware park.
+                            if (!checked_idle) {
+                                checked_idle = true;
+                                if (try self.readiness.wait(self.stream.socket.handle, @min(remaining, 100))) break;
+                                continue;
+                            }
+                            if (try self.readiness.waitIdle(self.stream.socket.handle, wake_fd, remaining)) break;
+                            continue;
+                        };
+                    }
                     // The raw readiness call is not an Io cancellation point.
                     // Bound it so the experimental Group scope can observe
                     // cancellation too, without canceling in-flight HTTP on

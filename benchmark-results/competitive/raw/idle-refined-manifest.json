@@ -1,0 +1,17 @@
+{
+  "before": {
+    "command": [
+      ".zig-cache/competitive/baseline/akamata-threaded"
+    ],
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  },
+  "idle-refined": {
+    "command": [
+      ".zig-cache/competitive/idle-refined"
+    ],
+    "source_sha": "a562592+idle-first-socket-probe+numeric-writer",
+    "build": {
+      "optimize": "ReleaseFast"
+    }
+  }
+}
