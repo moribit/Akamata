@@ -36,3 +36,28 @@ Calibration retains each generator's distribution; it does not average latency
 percentiles. A frozen executable's source revision and digest identify the code
 being measured. Resume checks those identities and records harness revisions
 separately, allowing documentation/profiling work between checkpointed runs.
+
+Private multi-loop research uses `COMPETITIVE_RUNTIME=reactor-sharded` with the
+competitive Akamata executable: four loops, eight **total** application workers.
+`reactor` uses one loop and the same eight workers. Neither can be selected by
+production `App.serve`. Re-run `zig build transport-contract-test runtime-stress-test
+runtime-isolation-test` before interpreting a candidate's performance.
+
+The offline JSON/parser/matcher fixture builds with `zig build competitive-micro-build
+-Doptimize=ReleaseFast`; run `./zig-out/bin/competitive-micro` only after builds
+finish. It reports five rounds, checks JSON byte equivalence, and does not claim
+network throughput or include prepared App indices/middleware in matcher timings.
+
+To keep the full serial matrix independent of an interactive terminal:
+
+```sh
+# First freeze the final after executables and verify their manifest.
+python3 benchmark/competitive/scripts/run_initiative.py --launch --after-manifest benchmark-results/competitive/raw/after-manifest.json
+```
+
+The supervisor checkpoints its state in `.zig-cache/competitive/supervisor/status.json`
+and logs to `supervisor.log`. It resumes the frozen baseline first, then measures
+the frozen after manifest, using the requested 10/30-second, five-round defaults.
+It never builds or runs tests, retries a failed case silently, publishes a release,
+or changes production runtime selection. **Do not run local builds/tests/other
+load while it runs.** Inspect the child PID before starting another measurement.

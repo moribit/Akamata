@@ -1,0 +1,11 @@
+{
+  "operation": "ReleaseSafe full suite and competitive-bench build",
+  "result": "compiler NoSpaceLeft before affected test execution; not an assertion failure",
+  "available_mib_before_cleanup": 104,
+  "available_gib_after_cleanup": 2.8,
+  "removed_regenerable_caches": [
+    ".zig-cache/o",
+    "Homebrew/downloads"
+  ],
+  "frozen_binaries_preserved": true
+}

@@ -1,0 +1,17 @@
+{
+  "before": {
+    "command": [
+      ".zig-cache/competitive/baseline/akamata-threaded"
+    ],
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  },
+  "deadline-candidate": {
+    "command": [
+      ".zig-cache/competitive/deadline-candidate"
+    ],
+    "source_sha": "a562592+deadline-clear-candidate",
+    "build": {
+      "optimize": "ReleaseFast"
+    }
+  }
+}

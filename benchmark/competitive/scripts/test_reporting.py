@@ -5,10 +5,16 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from measure import runtime_reports
+from measure import runtime_reports, owned_load
 
 
 class ReportingTests(unittest.TestCase):
+    def test_interrupted_owner_reaps_its_load_generator(self):
+        with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
+            with self.assertRaisesRegex(RuntimeError, "interrupt"):
+                with owned_load([sys.executable, "-c", "import time; time.sleep(60)"], out, err) as child:
+                    raise RuntimeError("interrupt")
+            self.assertIsNotNone(child.poll())
     def test_runtime_diagnostics_preserve_unknown_counters(self):
         reports = runtime_reports('info: started\nRUNTIME_COST {"future_counter":{"count":7}}\nBENCH_STATS {"live":0}\n')
         self.assertEqual(7, reports["runtime_cost"]["future_counter"]["count"])

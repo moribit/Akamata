@@ -6,6 +6,8 @@ Different warmup/duration/round counts are explicitly exploratory, never relabel
 Server command manifests include optional environment overrides for private runtimes.
 """
 import argparse
+import contextlib
+import fcntl
 import hashlib
 import http.client
 import json
@@ -68,43 +70,60 @@ def verify():
         conn.close()
     return checks
 
+@contextlib.contextmanager
+def owned_load(command, out, err):
+    process = subprocess.Popen(command, stdout=out, stderr=err)
+    try:
+        yield process
+    finally:
+        # Interrupts/sampling failures must not leave a generator applying load
+        # after its server or the owning measurement process has been stopped.
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+
+
 def load(command, server, seconds):
     with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
-        process = subprocess.Popen(command, stdout=out, stderr=err)
-        initial = sample(server.pid)
-        started = time.monotonic()
-        samples = []
-        while process.poll() is None:
-            if server.poll() is not None:
-                process.kill(); process.wait()
-                raise RuntimeError("server exited during load")
-            if time.monotonic() - started > seconds + 60:
-                process.kill(); process.wait()
-                raise RuntimeError("load generator exceeded bounded drain")
-            try:
-                generator = sample(process.pid)
-            except (subprocess.CalledProcessError, IndexError, FileNotFoundError):
-                # The child may exit between poll() and ps. Preserve its exit
-                # status below; an absent final sample is not a load failure.
-                if process.poll() is None:
-                    raise
-                generator = None
-            samples.append({"server": sample(server.pid), "generator": generator})
-            try:
-                process.wait(timeout=1)
-            except subprocess.TimeoutExpired:
-                pass
-        final = sample(server.pid)
-        elapsed = time.monotonic() - started
-        out.seek(0); err.seek(0)
-        output, errors = out.read(), err.read().decode()
-        if process.returncode:
-            raise RuntimeError(f"oha exit {process.returncode}: {errors}")
-        return {"oha": json.loads(output), "process_samples": samples,
-                "cpu_percent": 100 * (final["cpu_seconds"] - initial["cpu_seconds"]) / elapsed,
-                "rss_mean_kib": statistics.mean(s["server"]["rss_kib"] for s in samples),
-                "threads_peak": max(s["server"]["threads"] for s in samples),
-                "measurement_wall_seconds": elapsed, "stderr": errors}
+        with owned_load(command, out, err) as process:
+            return collect_load(process, server, seconds, out, err)
+
+
+def collect_load(process, server, seconds, out, err):
+    initial = sample(server.pid)
+    started = time.monotonic()
+    samples = []
+    while process.poll() is None:
+        if server.poll() is not None:
+            process.kill(); process.wait()
+            raise RuntimeError("server exited during load")
+        if time.monotonic() - started > seconds + 60:
+            process.kill(); process.wait()
+            raise RuntimeError("load generator exceeded bounded drain")
+        try:
+            generator = sample(process.pid)
+        except (subprocess.CalledProcessError, IndexError, FileNotFoundError):
+            # The child may exit between poll() and ps. Preserve its exit
+            # status below; an absent final sample is not a load failure.
+            if process.poll() is None:
+                raise
+            generator = None
+        samples.append({"server": sample(server.pid), "generator": generator})
+        try:
+            process.wait(timeout=1)
+        except subprocess.TimeoutExpired:
+            pass
+    final = sample(server.pid)
+    elapsed = time.monotonic() - started
+    out.seek(0); err.seek(0)
+    output, errors = out.read(), err.read().decode()
+    if process.returncode:
+        raise RuntimeError(f"oha exit {process.returncode}: {errors}")
+    return {"oha": json.loads(output), "process_samples": samples,
+            "cpu_percent": 100 * (final["cpu_seconds"] - initial["cpu_seconds"]) / elapsed,
+            "rss_mean_kib": statistics.mean(s["server"]["rss_kib"] for s in samples),
+            "threads_peak": max(s["server"]["threads"] for s in samples),
+            "measurement_wall_seconds": elapsed, "stderr": errors}
 
 def main():
     parser = argparse.ArgumentParser()
@@ -127,6 +146,13 @@ def main():
     frameworks = args.frameworks or list(manifest)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
+    # A checkpoint can be resumed, but never by two writers concurrently.
+    # Keep the descriptor alive until main returns; process exit releases it.
+    checkpoint_lock = output.with_suffix(output.suffix + ".lock").open("a+")
+    try:
+        fcntl.flock(checkpoint_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        parser.error(f"another measurement owns {output}")
     binaries = {name: {**manifest[name], "sha256": hashlib.sha256(Path(manifest[name]["command"][0]).read_bytes()).hexdigest()} for name in frameworks}
     for name in frameworks:
         binaries[name]["artifact_sha256"] = {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in manifest[name].get("artifacts", [])}
