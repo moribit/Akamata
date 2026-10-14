@@ -11,6 +11,96 @@ const net = std.Io.net;
 const cost = @import("cost.zig");
 const tasks = @import("../http/application_session.zig");
 
+// Private experiment: selectors and ownership stay local to each loop. Only
+// admission is shared, so adding loops never multiplies the application's
+// connection or explicitly configured pending-work limits.
+const SharedAdmission = struct {
+    connections: std.atomic.Value(usize) = .init(0),
+    pending: std.atomic.Value(usize) = .init(0),
+    connection_limit: usize,
+    task_limit: ?usize,
+    fn acquire(counter: *std.atomic.Value(usize), limit: usize) bool {
+        if (counter.fetchAdd(1, .acq_rel) < limit) return true;
+        _ = counter.fetchSub(1, .acq_rel);
+        return false;
+    }
+    fn task(self: *SharedAdmission) bool {
+        return if (self.task_limit) |limit| acquire(&self.pending, limit) else true;
+    }
+    fn releaseTask(self: *SharedAdmission) void {
+        if (self.task_limit != null) _ = self.pending.fetchSub(1, .acq_rel);
+    }
+};
+
+pub fn evaluateSharded(comptime State: type, app: *app_mod.App(State), opts: app_mod.ServeOptions, loop_count: usize) !void {
+    if (loop_count == 1) return evaluate(State, app, opts);
+    const worker_count = @max(1, opts.worker_count orelse (std.Thread.getCpuCount() catch 2));
+    if (loop_count < 2 or loop_count > 8 or loop_count > worker_count) return error.InvalidReactorLoopCount;
+    if (@sizeOf(usize) != 8) return error.UnsupportedPlatform;
+    if (opts.max_connections == 0 or opts.max_connections > std.math.maxInt(u32) - 2) return error.InvalidConnectionLimit;
+    defer cost.report();
+    app.trust_proxy_headers = opts.trust_proxy_headers;
+    app.trusted_proxy_fn = opts.trusted_proxy_fn;
+    try app.prepare();
+    var io_impl: std.Io.Threaded = .init(app.gpa, .{});
+    defer io_impl.deinit();
+    const io = io_impl.io();
+    var address = try net.IpAddress.parseIp4(opts.address orelse "0.0.0.0", opts.port);
+    var listener = try address.listen(io, .{ .reuse_address = true });
+    defer {
+        app.listener_fd.store(-1, .seq_cst);
+        listener.deinit(io);
+    }
+    try readiness.nonblocking(listener.socket.handle);
+    app.listener_fd.store(listener.socket.handle, .seq_cst);
+    var signals = @import("threaded.zig").installSignalHandlers(State, app);
+    defer signals.deinit();
+    const Ctx = Context(State);
+    const contexts = try app.gpa.alloc(Ctx, loop_count);
+    defer app.gpa.free(contexts);
+    const loop_options = try app.gpa.alloc(app_mod.ServeOptions, loop_count);
+    defer app.gpa.free(loop_options);
+    var admission: SharedAdmission = .{ .connection_limit = opts.max_connections, .task_limit = opts.max_pending_application_tasks };
+    var initialized: usize = 0;
+    defer for (contexts[0..initialized]) |*ctx| ctx.deinit();
+    for (contexts, loop_options, 0..) |*ctx, *local, index| {
+        local.* = opts;
+        local.worker_count = worker_count / loop_count + @intFromBool(index < worker_count % loop_count);
+        ctx.* = try Ctx.init(app, io, local, listener.socket.handle);
+        ctx.shared_admission = &admission;
+        initialized += 1;
+    }
+    for (contexts) |*ctx| try ctx.startWorkers();
+    var threads: std.ArrayList(std.Thread) = .empty;
+    defer threads.deinit(app.gpa);
+    try threads.ensureTotalCapacity(app.gpa, loop_count - 1);
+    // Error slots are written by one loop and read only after joining it.
+    const failures = try app.gpa.alloc(?anyerror, loop_count);
+    defer app.gpa.free(failures);
+    @memset(failures, null);
+    const Runner = struct {
+        fn run(ctx: *Ctx, failure: *?anyerror) void {
+            ctx.run() catch |err| {
+                failure.* = err;
+                ctx.app.requestShutdown();
+            };
+        }
+    };
+    errdefer {
+        app.requestShutdown();
+        for (threads.items) |thread| thread.join();
+    }
+    for (contexts[1..], failures[1..]) |*ctx, *failure| {
+        threads.appendAssumeCapacity(try std.Thread.spawn(.{}, Runner.run, .{ ctx, failure }));
+    }
+    std.log.info("private sharded reactor: {d} loops, {d} total workers", .{ loop_count, worker_count });
+    Runner.run(&contexts[0], &failures[0]);
+    for (threads.items) |thread| thread.join();
+    // The joins above are complete, including on a loop failure.
+    threads.clearRetainingCapacity();
+    for (failures) |failure| if (failure) |err| return err;
+}
+
 pub fn evaluate(comptime State: type, app: *app_mod.App(State), opts: app_mod.ServeOptions) !void {
     defer cost.report();
     if (@sizeOf(usize) != 8) return error.UnsupportedPlatform;
@@ -144,6 +234,7 @@ fn Context(comptime State: type) type {
         free_slots: []usize,
         free_len: usize,
         count: usize = 0,
+        shared_admission: ?*SharedAdmission = null,
         registry: drain.Registry,
         workers: std.ArrayList(std.Thread) = .empty,
         jobs_mutex: sync.Mutex,
@@ -201,7 +292,7 @@ fn Context(comptime State: type) type {
             for (self.workers.items) |worker| worker.join();
             // Setup/unit evaluation may not have started any workers. Abort
             // above revokes their I/O; queued borrows are now unowned.
-            while (self.jobs.pop()) |_| {}
+            while (self.jobs.pop()) |_| if (self.shared_admission) |shared| shared.releaseTask();
             while (self.cleanup_jobs.pop()) |_| {}
             self.jobs.deinit(self.app.gpa);
             self.cleanup_jobs.deinit(self.app.gpa);
@@ -233,10 +324,12 @@ fn Context(comptime State: type) type {
                     self.jobs_changed.wait(&self.jobs_mutex);
                     wait_cost.end(.worker_wait);
                 }
-                const c = self.cleanup_jobs.pop() orelse self.jobs.pop() orelse {
+                const cleanup = self.cleanup_jobs.pop();
+                const c = cleanup orelse self.jobs.pop() orelse {
                     self.jobs_mutex.unlock();
                     return;
                 };
+                if (cleanup == null) if (self.shared_admission) |shared| shared.releaseTask();
                 self.jobs_mutex.unlock();
                 if (comptime cost.enabled) cost.elapsed(.queue_wait, c.measured.queued);
                 const work_cost = cost.begin();
@@ -310,6 +403,7 @@ fn Context(comptime State: type) type {
             self.free_slots[self.free_len] = c.slot;
             self.free_len += 1;
             self.count -= 1;
+            if (self.shared_admission) |shared| _ = shared.connections.fetchSub(1, .acq_rel);
             self.app.gpa.destroy(c);
         }
         fn fail(self: *Self, c: *Connection) void {
@@ -368,7 +462,9 @@ fn Context(comptime State: type) type {
                     const enqueue_cost = cost.begin();
                     if (comptime cost.enabled) c.measured.queued = cost.now();
                     self.jobs_mutex.lock();
-                    if (!self.jobs.push(c)) {
+                    const reserved = if (self.shared_admission) |shared| shared.task() else true;
+                    if (!reserved or !self.jobs.push(c)) {
+                        if (reserved) if (self.shared_admission) |shared| shared.releaseTask();
                         self.jobs_mutex.unlock();
                         // No worker owns the rejected borrow. fail() must not
                         // wait for a completion which can never be published.
@@ -510,7 +606,9 @@ fn Context(comptime State: type) type {
             c.done.store(false, .release);
             if (comptime cost.enabled) c.measured.queued = cost.now();
             self.jobs_mutex.lock();
-            const admitted = self.jobs.push(c);
+            const reserved = if (self.shared_admission) |shared| shared.task() else true;
+            const admitted = reserved and self.jobs.push(c);
+            if (reserved and !admitted) if (self.shared_admission) |shared| shared.releaseTask();
             if (admitted) self.jobs_changed.signal();
             self.jobs_mutex.unlock();
             if (!admitted) {
@@ -634,6 +732,12 @@ fn Context(comptime State: type) type {
         }
         fn admit(self: *Self, stream: net.Stream) !void {
             errdefer stream.close(self.io);
+            if (self.shared_admission) |shared| {
+                if (!SharedAdmission.acquire(&shared.connections, shared.connection_limit)) return error.ConnectionLimitReached;
+            }
+            errdefer {
+                if (self.shared_admission) |shared| _ = shared.connections.fetchSub(1, .acq_rel);
+            }
             try readiness.nonblocking(stream.socket.handle);
             @import("threaded.zig").applyTcpNoDelay(stream) catch {};
             const c = try self.app.gpa.create(Connection);
@@ -766,6 +870,29 @@ fn allocationFailureSetup(gpa: std.mem.Allocator) !void {
     const opts: app_mod.ServeOptions = .{ .max_connections = 8 };
     var ctx = try Context(State).init(&app, std.testing.io, &opts, -1);
     defer ctx.deinit();
+}
+
+test "sharded admission retains one global connection and task budget" {
+    var shared: SharedAdmission = .{ .connection_limit = 2, .task_limit = 1 };
+    try std.testing.expect(SharedAdmission.acquire(&shared.connections, shared.connection_limit));
+    try std.testing.expect(SharedAdmission.acquire(&shared.connections, shared.connection_limit));
+    try std.testing.expect(!SharedAdmission.acquire(&shared.connections, shared.connection_limit));
+    try std.testing.expectEqual(@as(usize, 2), shared.connections.load(.acquire));
+    try std.testing.expect(shared.task());
+    try std.testing.expect(!shared.task());
+    shared.releaseTask();
+    try std.testing.expect(shared.task());
+    shared.releaseTask();
+    try std.testing.expectEqual(@as(usize, 0), shared.pending.load(.acquire));
+    _ = shared.connections.fetchSub(2, .acq_rel);
+}
+
+test "sharded runtime rejects invalid loop counts before resource acquisition" {
+    const State = struct {};
+    var app = app_mod.App(State).init(std.testing.allocator, .{});
+    defer app.deinit();
+    const opts: app_mod.ServeOptions = .{ .worker_count = 2 };
+    for ([_]usize{ 0, 3, 9 }) |count| try std.testing.expectError(error.InvalidReactorLoopCount, evaluateSharded(State, &app, opts, count));
 }
 fn allocationFailureSessionHandoff(gpa: std.mem.Allocator) !void {
     const State = struct {};

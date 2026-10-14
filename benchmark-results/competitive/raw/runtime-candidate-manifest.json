@@ -1,0 +1,41 @@
+{
+  "before": {
+    "command": [
+      ".zig-cache/competitive/baseline/akamata-threaded"
+    ],
+    "source_sha": "023b101d6c3b3b22b2e5bed489c3e398cefa3098"
+  },
+  "idle-wake-candidate": {
+    "command": [
+      ".zig-cache/competitive/runtime-candidate"
+    ],
+    "source_sha": "a562592+idle-wake-candidate",
+    "build": {
+      "optimize": "ReleaseFast"
+    }
+  },
+  "single-loop": {
+    "command": [
+      ".zig-cache/competitive/runtime-candidate"
+    ],
+    "env": {
+      "COMPETITIVE_RUNTIME": "reactor"
+    },
+    "source_sha": "a562592+sharded-candidate",
+    "build": {
+      "optimize": "ReleaseFast"
+    }
+  },
+  "four-loops": {
+    "command": [
+      ".zig-cache/competitive/runtime-candidate"
+    ],
+    "env": {
+      "COMPETITIVE_RUNTIME": "reactor-sharded"
+    },
+    "source_sha": "a562592+sharded-candidate",
+    "build": {
+      "optimize": "ReleaseFast"
+    }
+  }
+}

@@ -177,8 +177,8 @@ pub const Runtime = enum {
     /// accept_thread_count controls acceptors; max_connections bounds clients.
     threaded,
     /// Reserved experimental reactor. `serve()` currently fails closed with
-    /// `error.ExperimentalRuntimeDisabled` because it has not reached the
-    /// threaded runtime's security and backpressure guarantees.
+    /// `error.ExperimentalRuntimeDisabled`. Private contract/performance
+    /// experiments do not certify production adoption.
     reactor,
 };
 

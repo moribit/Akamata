@@ -14,10 +14,11 @@ pub fn serve(comptime State: type, app: *app_mod.App(State), opts: app_mod.Serve
     if (is_native) {
         switch (opts.runtime) {
             .threaded => return @import("runtime/threaded.zig").serve(State, app, opts),
-            // The reactor implementations do not yet enforce the production
-            // parser, deadline, connection, peer-IP, and backpressure
-            // contracts of the threaded runtime. Fail closed until parity is
-            // proven by the shared integration suite.
+            // Shared HTTP/Session/Cursor and private multiplexed contract
+            // tests exist, but passing them alone is not a production gate.
+            // Performance, resources and cross-platform stress evidence must
+            // justify a separate adoption decision. Never select an experiment
+            // through the production App.serve entrypoint.
             .reactor => return error.ExperimentalRuntimeDisabled,
         }
     }

@@ -24,6 +24,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("binary")
 parser.add_argument("--output", required=True)
 parser.add_argument("--record-blockers", action="store_true")
+parser.add_argument("--sharded", action="store_true")
 args = parser.parse_args()
 binary = Path(args.binary).resolve()
 spec = importlib.util.spec_from_file_location("contract", Path(__file__).parents[2] / "tests/transport_contract.py")
@@ -113,7 +114,7 @@ def http_probe(connect):
 
 try:
     host = "epoll" if platform.system() == "Linux" else "kqueue"
-    for adapter in ("threaded", host):
+    for adapter in ["threaded", host] + (["sharded"] if args.sharded else []):
         for scenario, paths in (
             ("four-idle-upgrades", ["/upgrade-wait"] * 4),
             ("four-slow-streams", ["/large"] * 4),
@@ -146,7 +147,7 @@ try:
             time.sleep(.05)
             rejected = connect()
             rejected.send(contract.request(close=True))
-            if adapter == host:
+            if adapter != "threaded":
                 rejected.eof()
                 run["overflow_closed_without_response"] = True
             else:

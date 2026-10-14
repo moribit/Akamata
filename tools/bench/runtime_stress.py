@@ -27,6 +27,7 @@ p = argparse.ArgumentParser()
 p.add_argument("binary")
 p.add_argument("--output", required=True)
 p.add_argument("--quick", action="store_true")
+p.add_argument("--sharded", action="store_true")
 a = p.parse_args()
 spec = importlib.util.spec_from_file_location("contract", Path(__file__).parents[2] / "tests/transport_contract.py")
 contract = importlib.util.module_from_spec(spec)
@@ -99,6 +100,8 @@ def hello(connect):
     c = connect(); c.send(contract.request(close=True)); assert c.response()[2] == b"hello"; c.close()
 
 adapters = ["threaded", "epoll" if platform.system() == "Linux" else "kqueue"]
+if a.sharded:
+    adapters.append("sharded")
 for adapter in adapters:
     for count in ([32] if a.quick else [64, 256]):
         with server(adapter, f"idle-{count}") as (proc, connect, run):

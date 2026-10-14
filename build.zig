@@ -369,6 +369,7 @@ pub fn build(b: *std.Build) void {
         b.step("runtime-certify-fixture", "build private incremental session certification fixture").dependOn(&b.addInstallArtifact(contract_server, .{}).step);
         const contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
         contract.addArtifactArg(contract_server);
+        contract.addArg("--sharded");
         b.step("transport-contract-test", "run shared socket Contract on Threaded and host multiplexed Reactor").dependOn(&contract.step);
         b.step("transport-contract-build", "compile private Transport Contract fixture").dependOn(&contract_server.step);
         const poc_step = b.step("runtime-poc-test", "evaluate isolated Io.Group lifecycle and socket contract");
@@ -377,7 +378,7 @@ pub fn build(b: *std.Build) void {
         b.step("runtime-contract-unit", "run lifecycle, allocation and bounded-output fault tests").dependOn(&b.addRunArtifact(poc_unit).step);
         const stress = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_stress.py" });
         stress.addArtifactArg(contract_server);
-        stress.addArgs(&.{ "--quick", "--output", ".zig-cache/runtime-stress.json" });
+        stress.addArgs(&.{ "--quick", "--sharded", "--output", ".zig-cache/runtime-stress.json" });
         b.step("runtime-stress-test", "run bounded CI stress and production-gate evidence").dependOn(&stress.step);
         const stress_full = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_stress.py" });
         stress_full.addArtifactArg(contract_server);
@@ -385,10 +386,11 @@ pub fn build(b: *std.Build) void {
         b.step("runtime-stress-full", "run full local runtime stress matrix").dependOn(&stress_full.step);
         const isolation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_application_isolation.py" });
         isolation.addArtifactArg(contract_server);
-        isolation.addArgs(&.{ "--output", ".zig-cache/runtime-application-isolation.json" });
+        isolation.addArgs(&.{ "--sharded", "--output", ".zig-cache/runtime-application-isolation.json" });
         b.step("runtime-isolation-test", "require HTTP isolation from long-lived application execution (Phase 6 gate)").dependOn(&isolation.step);
         const session_validation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_certify.py" });
         session_validation.addArtifactArg(contract_server);
+        session_validation.addArgs(&.{ "--adapters", "threaded", if (native_target.result.os.tag == .linux) "epoll" else "kqueue", "sharded" });
         session_validation.addArgs(&.{ "--idle-levels", "100", "--mixed-idle", "20", "--soak-seconds", "5", "--session-rounds", "10", "--output", ".zig-cache/runtime-session-validation.json" });
         b.step("runtime-session-test", "run bounded incremental stream/frame performance and lifecycle race validation (not long soak)").dependOn(&session_validation.step);
         const isolation_evaluation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_application_isolation.py" });

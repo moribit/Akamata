@@ -32,6 +32,7 @@ jobs:
           adapter=epoll
           if [ "$(uname -s)" = Darwin ]; then adapter=kqueue; fi
           python3 tools/bench/runtime_contract_repeat.py zig-out/bin/runtime-contract-server --adapter "$adapter" --repeats 50 --output sanitizer/upgrade-publication-repeat.json
+          python3 tools/bench/runtime_contract_repeat.py zig-out/bin/runtime-contract-server --adapter sharded --repeats 50 --output sanitizer/sharded-upgrade-publication-repeat.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

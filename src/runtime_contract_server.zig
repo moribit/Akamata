@@ -25,6 +25,8 @@ test {
     _ = @import("runtime/deadline_heap.zig");
     _ = @import("runtime/reactor_notifications.zig");
     _ = @import("runtime/reactor.zig");
+    _ = @import("runtime/drain.zig");
+    _ = @import("runtime/readiness_poll.zig");
     _ = @import("runtime/application_admission.zig");
     _ = @import("runtime/reactor_output.zig");
     _ = @import("http/session.zig");
@@ -46,7 +48,7 @@ pub fn main(init: std.process.Init) !void {
     const args = try init.minimal.args.toSlice(arena.allocator());
     if (args.len != 4) return error.InvalidArguments;
     const adapter = args[1];
-    const use_incremental = std.mem.eql(u8, adapter, "kqueue") or std.mem.eql(u8, adapter, "epoll") or std.mem.startsWith(u8, args[3], "incremental-");
+    const use_incremental = std.mem.eql(u8, adapter, "kqueue") or std.mem.eql(u8, adapter, "epoll") or std.mem.eql(u8, adapter, "sharded") or std.mem.startsWith(u8, args[3], "incremental-");
     const profile = if (std.mem.startsWith(u8, args[3], "incremental-")) args[3]["incremental-".len..] else args[3];
     var hub = Hub.init(alloc);
     defer hub.deinit();
@@ -163,6 +165,7 @@ pub fn main(init: std.process.Init) !void {
         opts.trusted_proxy_fn = untrusted;
     }
     if (std.mem.eql(u8, adapter, "threaded")) return app.serve(opts);
+    if (std.mem.eql(u8, adapter, "sharded")) return @import("runtime/reactor.zig").evaluateSharded(State, &app, opts, @min(2, opts.worker_count orelse 4));
     if (std.mem.eql(u8, adapter, "group")) return @import("runtime/io_group_experiment.zig").serve(State, &app, opts);
     if (std.mem.eql(u8, adapter, "disabled")) {
         opts.runtime = .reactor;

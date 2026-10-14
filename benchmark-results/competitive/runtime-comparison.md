@@ -16,8 +16,8 @@ candidate gate. It is not a final workload or high-concurrency conclusion.
 
 The load generator uses several cores on this local host. [Calibration](generator-calibration.md) completed: splitting at the same total
 32 connections did not improve throughput. This does not prove unlimited
-generator headroom or a controlled server ceiling. No multi-loop candidate
-has been measured yet. No optimization has been accepted from this table.
+generator headroom or a controlled server ceiling. This baseline table alone
+does not justify production adoption.
 
 ## Attribution design
 
@@ -110,7 +110,88 @@ ReleaseFast executable's Mach-O `__TEXT,__text` equal to the frozen baseline aft
 the diagnostics change; enabled error classification is explicitly comptime-gated.
 This check is narrower than whole-artifact or performance equivalence.
 
-Validation so far: ReleaseSafe instrumented runtime units (68 tests), ReleaseFast
-instrumented runtime units, normal ReleaseSafe shared Transport Contract on the
-three macOS adapters, and four offline reporting checks. Linux/TSan and full
-post-optimization regression have not yet been run for this initiative.
+The instrumentation-only revision passed the complete GitHub CI and manual
+Linux/macOS TSan (`38413470788`). New runtime changes require their own rerun;
+the earlier success is not evidence for untested changes.
+
+## Idle shutdown notification candidate
+
+[48 serial idle cases](raw/idle-candidate-screen.json): 10 seconds, three rounds
+at each of 32/128/512/1024 connections. Every connection was retained, answered
+another request and survived until explicit shutdown. No failed cases or forced
+runner kills. CPU is process time, one core = 100%; very small deltas are coarse.
+
+| Connections | Before CPU % | Notification CPU % | Before RSS KiB | Notification RSS KiB |
+|---:|---:|---:|---:|---:|
+| 32 | 0.80 | 0.20 | 7,696 | 7,776 |
+| 128 | 2.79 | 0.30 | 18,784 | 18,832 |
+| 512 | 13.77 | 0.70 | 62,960 | 63,040 |
+| 1024 | 35.85 | 1.00 | 121,936 | 121,984 |
+
+The two App-owned pipe descriptors replace only idle-read 100ms polling. The
+byte is never consumed, so all current and future idle waiters see shutdown.
+Admission stops before notification, sockets remain owned by their connection
+thread, and the pipe remains alive until all detached owners drain. Active
+request/cancel/read deadlines retain their original bounded waits. Io.Group
+experiments do not receive the pipe and retain cancellation polling.
+
+At 1024 connections shutdown median is 126 ms before versus 178 ms candidate;
+waking many OS threads together adds a scheduling tradeoff. RSS/threads remain
+approximately 119 MiB / 1032. This is an idle-CPU optimization, not a change to
+Threaded's thread-per-connection memory model. Normal HTTP regression comparison
+and two-platform post-change validation are separate gates.
+
+## Private multi-loop candidate
+
+`evaluateSharded` partitions a fixed worker budget across up to eight loops,
+each owning its selector, generation tokens, bounded queues, deadline heap and
+connections. Four loops in the competitive fixture share **eight total workers**;
+the Contract fixture uses two loops and four total workers. The one-worker
+admission scenario intentionally uses one loop, not an inflated worker budget.
+Connection admission is global; an explicit pending-task limit is also global.
+Default one-pending-task-per-connection bounds work without a per-request shared
+counter. Cleanup tasks retain their reserved bounded queue. Streams/upgrades use
+the same incremental sessions and retain explicit rejection of synchronous
+application execution. There is no second HTTP implementation or Group scheduler.
+
+The common listener can wake multiple selectors, and connection distribution is
+not guaranteed even. Each loop has metadata capacity for the application's full
+connection ceiling; this costs more fixed metadata, not an unbounded queue.
+These are measured tradeoffs, not hidden assumptions about nonblocking handlers.
+
+At 1024 idle connections: single loop 31,168 KiB / 9 threads; four loops 31,920
+KiB / 12 threads. Four-loop CPU median 0.10%; single-loop delta is below coarse
+resolution. Shutdown is about 126 ms versus 9 ms because all loops must observe
+the process-wide stop. Full throughput/error/TSan criteria remain required.
+
+Local initial validation passed 136 common Transport tests, 12 application
+isolation/admission scenarios and 24 stress/fault scenarios, covering Threaded,
+host single-loop and sharded paths. The first sharded Contract run correctly
+returned 501 for sync stream/upgrade but the test classified the new adapter as
+Threaded; its adapter classification was fixed and all 136 tests rerun.
+Public `.runtime = .reactor` remains `ExperimentalRuntimeDisabled`.
+
+## Rejected first notification implementation
+
+[108 exploratory HTTP cases](raw/runtime-candidate-screen.json) use 2-second
+warmup, 5-second measurement and three rounds. One offline reporting check ran
+during this screen, so it is not a certification run; the large, repeated
+regression below warrants rejection rather than selecting favorable rounds.
+
+Always polling both the socket and shared pipe lowered plaintext HTTP 200/s
+from 178,734 to 152,907 at c32 and from 167,399 to 34,210 at c1024. c1024 P99
+increased 31.981 → 238.857 ms and CPU 313.1% → 641.1%; errors were retained.
+JSON and echo reproduced the same pattern. The shared-poll implementation is
+**not accepted** on the strength of its idle CPU result. Exact kernel lock cost
+has not been isolated, and is not reported as a measured percentage.
+
+A refinement first probes the socket alone for at most 100 ms, preserving the
+hot-read path. Only a quiet connection enters the longer shared-notification
+park. Its separate `idle-refined-screen.json` remains required evidence before
+retaining the change; the full requested-duration after matrix is also required.
+
+The four-loop research candidate improves c1024 plaintext P99 to 15.415 ms and
+retains 160,033 HTTP 200/s in this screen, but c32 throughput is only 121,709
+versus Threaded's 178,734. Thus its low-concurrency throughput fails the 5%
+candidate threshold. Three rounds are not the required five longer rounds,
+and Linux performance remains unmeasured. No production gate is relaxed.

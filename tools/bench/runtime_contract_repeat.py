@@ -13,7 +13,7 @@ import unittest
 sys.dont_write_bytecode = True
 p = argparse.ArgumentParser()
 p.add_argument("binary")
-p.add_argument("--adapter", choices=["threaded", "kqueue", "epoll"], required=True)
+p.add_argument("--adapter", choices=["threaded", "kqueue", "epoll", "sharded"], required=True)
 p.add_argument("--test", default="test_upgrade_hub_snapshot_disconnect_ownership")
 p.add_argument("--repeats", type=int, default=30)
 p.add_argument("--output", required=True)

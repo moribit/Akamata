@@ -58,6 +58,7 @@ pub fn main() !void {
         .address = "127.0.0.1",
         .port = 8088,
         .accept_thread_count = 8,
+        .worker_count = 8,
         .max_connections = 4096,
         .max_requests_per_connection = std.math.maxInt(u32),
         .keep_alive_idle_timeout_ms = 60_000,
@@ -67,5 +68,9 @@ pub fn main() !void {
     defer if (runtime) |v| gpa.free(v);
     if (runtime != null and std.mem.eql(u8, runtime.?, "reactor")) {
         try @import("runtime/reactor.zig").evaluate(State, &app.core, opts);
-    } else try app.serve(opts);
+    } else if (runtime != null and std.mem.eql(u8, runtime.?, "reactor-sharded")) {
+        try @import("runtime/reactor.zig").evaluateSharded(State, &app.core, opts, 4);
+    } else if (runtime == null or std.mem.eql(u8, runtime.?, "threaded")) {
+        try app.serve(opts);
+    } else return error.InvalidExperimentalRuntime;
 }

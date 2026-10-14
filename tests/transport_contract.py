@@ -147,7 +147,7 @@ class Contract(unittest.TestCase):
                 c = connect()
                 c.send(request(path, close=True, extra=UPGRADE if "upgrade" in path else b""))
                 raw = c.collect()
-                if self.adapter in ("kqueue", "epoll"):
+                if self.adapter in ("kqueue", "epoll", "sharded"):
                     self.assertTrue(raw.startswith(b"HTTP/1.1 501"), raw)
                     self.assertIn(b"unsupported_application_execution", raw)
                     self.assertEqual(raw.count(b"HTTP/1.1"), 1)
@@ -672,6 +672,8 @@ if __name__ == "__main__":
         adapters.append("group")
     if "--only-group" in sys.argv[2:]:
         adapters = ["group"]
+    if "--sharded" in sys.argv[2:]:
+        adapters.append("sharded")
     suite = unittest.TestSuite()
     for adapter in adapters:
         kind = type("Contract_" + adapter, (Contract,), {"adapter": adapter})
