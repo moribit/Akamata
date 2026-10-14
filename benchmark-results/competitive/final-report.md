@@ -44,6 +44,13 @@ generated clients, living examples and scaffold/update/sync. [TSan](https://gith
 passed Linux and macOS, including sharded upgrade publication repeats. These
 results do not automatically certify later uncommitted optimization candidates.
 
+Final frozen SHA `c13650d2bf6c6330cb6f33114b16ddce533c7ad0` also passed
+[all 23 normal CI jobs](https://github.com/moribit/Akamata/actions/runs/38521159568).
+The production writer is restored; this revision adds the partial-write regression
+test and records the rejected candidate. [CI metadata](raw/ci-c13650d.json)
+records the individual jobs. The earlier two-platform TSan run covers the
+unchanged accepted production implementation.
+
 The [large-output shutdown probe](raw/drain-probe-instrumented.json) distinguishes
 a runner's premature 10-second kill from the configured 30-second drain: the
 process exited normally after 24.5 seconds, framework live bytes zero, 54 read
@@ -76,10 +83,10 @@ not passage of all criteria. Full five-round results are still required.
 
 ## Remaining completion gates
 
-1. Resume the full frozen baseline (250/1260 cases at the last checkpoint), then
+1. Resume the full frozen baseline (257/1260 cases at the last checkpoint), then
    the final frozen after matrix, with no local builds/tests/other load.
-2. Rerun final test/fixture additions and collect their cross-platform CI result;
-   the vectored candidate is already rejected, with production writer restored.
+2. Final test/fixture additions passed the 23-job cross-platform CI run above;
+   the vectored candidate is rejected, with production writer restored.
 3. Populate the final full framework/runtime tables from every round/error,
    retaining source/environment/command/binary hashes.
 4. Update this status report with exact completion, remaining unknown causes and
@@ -88,3 +95,12 @@ not passage of all criteria. Full five-round results are still required.
 The durable supervisor in `benchmark/competitive/scripts/run_initiative.py`
 resumes fixed binaries and writes process/stage status independently of a terminal.
 Its completion is not presumed merely because it has been launched.
+
+Two resumed attempts stopped when host disk space was exhausted during the next
+zap warmup. The 257 saved cases remain valid; the incomplete case is not counted
+and is rerun. [Interruption evidence](raw/matrix-disk-interruption.json) preserves
+the failure, including failed status/checkpoint writes. Regenerable caches were
+removed, preserving frozen binaries and raw data. The runner now checks a 1 GiB
+reserve on output and temporary volumes before each case; low capacity stops
+admission instead of starting another measurement. A stale `running` status file
+alone is not evidence that the owning process is alive.

@@ -57,10 +57,10 @@ def main():
     def stop(signum, _):
         status["state"] = "interrupted"
         status["signal"] = signum
-        save()
         if child is not None and child.poll() is None:
             child.send_signal(signal.SIGINT)
             child.wait(timeout=30)
+        save()
         raise SystemExit(128 + signum)
 
     signal.signal(signal.SIGINT, stop)
@@ -96,6 +96,14 @@ def main():
         status["failure"] = repr(error)
         raise
     finally:
+        # Even a status/checkpoint write failure must not orphan a generator.
+        if child is not None and child.poll() is None:
+            child.send_signal(signal.SIGINT)
+            try:
+                child.wait(timeout=30)
+            except subprocess.TimeoutExpired:
+                child.kill()
+                child.wait()
         status["finished_unix"] = time.time()
         save()
 

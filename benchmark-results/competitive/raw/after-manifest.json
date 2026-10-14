@@ -1,0 +1,42 @@
+{
+  "akamata-threaded-after": {
+    "command": [
+      ".zig-cache/competitive/final/akamata"
+    ],
+    "source_sha": "c13650d2bf6c6330cb6f33114b16ddce533c7ad0",
+    "build": {
+      "optimize": "ReleaseFast",
+      "runtime_cost": false,
+      "allocator": "smp"
+    },
+    "env": {}
+  },
+  "akamata-reactor-single-after": {
+    "command": [
+      ".zig-cache/competitive/final/akamata"
+    ],
+    "source_sha": "c13650d2bf6c6330cb6f33114b16ddce533c7ad0",
+    "build": {
+      "optimize": "ReleaseFast",
+      "runtime_cost": false,
+      "allocator": "smp"
+    },
+    "env": {
+      "COMPETITIVE_RUNTIME": "reactor"
+    }
+  },
+  "akamata-reactor-sharded-after": {
+    "command": [
+      ".zig-cache/competitive/final/akamata"
+    ],
+    "source_sha": "c13650d2bf6c6330cb6f33114b16ddce533c7ad0",
+    "build": {
+      "optimize": "ReleaseFast",
+      "runtime_cost": false,
+      "allocator": "smp"
+    },
+    "env": {
+      "COMPETITIVE_RUNTIME": "reactor-sharded"
+    }
+  }
+}

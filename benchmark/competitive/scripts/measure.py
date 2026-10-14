@@ -15,6 +15,7 @@ import os
 import platform
 import random
 import resource
+import shutil
 import signal
 import socket
 import statistics
@@ -31,6 +32,16 @@ WORKLOADS = {
 }
 for size in (64, 1024, 65536):
     WORKLOADS[f"echo-{size}"] = ("POST", "/echo", b"x" * size, "application/octet-stream", b"x" * size)
+
+def require_disk_reserve(output_directory, reserve_bytes=1024**3):
+    # A full disk can destroy the next checkpoint and even the failure report.
+    # Check before admitting a case, keeping the previous checkpoint intact.
+    # This does not change the workload or run a background sampler during load.
+    for directory in (output_directory, Path(tempfile.gettempdir())):
+        free = shutil.disk_usage(directory).free
+        if free < reserve_bytes:
+            raise RuntimeError(f"insufficient disk reserve at {directory}: {free} bytes free; "
+                               f"need {reserve_bytes}; checkpoint retained, no case started")
 
 def cpu_time(value):
     return sum(float(part) * 60 ** i for i, part in enumerate(reversed(value.split(":"))))
@@ -206,6 +217,7 @@ def main():
                 for name in order:
                     if (name, workload, connections, round_no) in done:
                         continue
+                    require_disk_reserve(output.parent)
                     print(f"round={round_no} workload={workload} c={connections} framework={name}", flush=True)
                     row = {"framework": name, "workload": workload, "connections": connections, "round": round_no,
                            "runner_shutdown_wait_seconds": args.shutdown_wait}

@@ -5,10 +5,21 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from measure import runtime_reports, owned_load
+from unittest.mock import patch
+from measure import runtime_reports, owned_load, require_disk_reserve
 
 
 class ReportingTests(unittest.TestCase):
+    def test_disk_reserve_fails_before_case_admission(self):
+        from collections import namedtuple
+        usage = namedtuple("usage", "total used free")
+        with patch("measure.shutil.disk_usage", return_value=usage(2000, 1500, 500)):
+            with self.assertRaisesRegex(RuntimeError, "checkpoint retained, no case started"):
+                require_disk_reserve(Path("."), reserve_bytes=1000)
+        with patch("measure.shutil.disk_usage", return_value=usage(2000, 1000, 1000)) as probe:
+            require_disk_reserve(Path("."), reserve_bytes=1000)
+            self.assertEqual(2, probe.call_count)
+
     def test_interrupted_owner_reaps_its_load_generator(self):
         with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
             with self.assertRaisesRegex(RuntimeError, "interrupt"):
