@@ -2,7 +2,8 @@
 
 Baseline: `8a521fb16e2a6dbffb92627b73350cdb8c551925`, fetched from main on
 2026-10-13. Zig 0.17.0. This document distinguishes existing evidence from new
-competitive measurements; no competitive result exists yet.
+competitive measurements. This is the pre-change snapshot; current measurements
+and rejected candidates are recorded in the companion comparison reports.
 
 ## HTTP path
 

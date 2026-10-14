@@ -14,7 +14,7 @@ run_one() {
     -Dbench-router="$router" -Dbench-routes="$routes" \
     -Dbench-route-kind="$kind" -Dbench-middlewares="$middleware"
   local binary_bytes
-  binary_bytes="$(stat -f '%z' zig-out/bin/router-bench)"
+  binary_bytes="$(python3 -c 'import os; print(os.path.getsize("zig-out/bin/router-bench"))')"
   local started ready now startup_ms
   started="$(python3 -c 'import time; print(time.monotonic_ns())')"
   ./zig-out/bin/router-bench >/tmp/akamata-router-bench-server.log 2>&1 &
@@ -39,10 +39,10 @@ run_one() {
   local rss output rps p50 p95 p99
   rss="$(ps -o rss= -p "$server_pid" | tr -d ' ')"
   output="$(oha -z "$DURATION" -c "$CONNECTIONS" --no-tui --output-format json "http://127.0.0.1:8090$path")"
-  rps="$(jq -r '.metrics.requests_per_sec' <<<"$output")"
-  p50="$(jq -r '.metrics.latency_ms.p50' <<<"$output")ms"
-  p95="$(jq -r '.metrics.latency_ms.p95' <<<"$output")ms"
-  p99="$(jq -r '.metrics.latency_ms.p99' <<<"$output")ms"
+  rps="$(jq -r '(.statusCodeDistribution["200"] // 0) / .summary.total' <<<"$output")"
+  p50="$(jq -r '.latencyPercentiles.p50 * 1000' <<<"$output")ms"
+  p95="$(jq -r '.latencyPercentiles.p95 * 1000' <<<"$output")ms"
+  p99="$(jq -r '.latencyPercentiles.p99 * 1000' <<<"$output")ms"
   printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' \
     "$router" "$routes" "$kind" "$middleware" "$rps" "$p50" "$p95" "$p99" \
     "$rss" "$binary_bytes" "$startup_ms" | tee -a "$OUT"
@@ -55,7 +55,7 @@ run_one() {
 # and middleware scaling at 100 routes. This avoids redundant cross-products
 # while covering every requested dimension for both implementations.
 for router in ${ROUTERS:-runtime static}; do
-  for routes in ${ROUTE_COUNTS:-1 10 100 500}; do run_one "$router" "$routes" static 0; done
+  for routes in ${ROUTE_COUNTS:-10 100 1000}; do run_one "$router" "$routes" static 0; done
   for kind in ${EXTRA_KINDS:-parameter wildcard}; do run_one "$router" 100 "$kind" 0; done
   for middleware in ${EXTRA_MIDDLEWARES:-3 6}; do run_one "$router" 100 static "$middleware"; done
 done

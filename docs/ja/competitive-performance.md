@@ -20,7 +20,7 @@ zapはupstream対応のZig toolchainを使い、架空のAkamata向け移植は�
 ## 検証中の限定的な変更
 
 - Threadedのidle接続は、100msごとの起床の代わりにAppが所有する共有shutdown
-  通知を待てます。[3回のidle試験](../../benchmark-results/competitive/runtime-comparison.md)
+  通知を待てます。[3回のidle試験](../../benchmark-results/competitive/idle-shutdown.md)
   では1,024接続のCPUが大幅に低下し、thread数/RSSはほぼ同じでした。
   多数のthreadを同時に起こすためshutdown latencyにはトレードオフがあります。
   read/write deadlineとCPU handlerの協調的drainは維持します。

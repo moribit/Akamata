@@ -1,0 +1,28 @@
+{
+  "before": {
+    "command": [
+      ".zig-cache/competitive/cost-after"
+    ],
+    "source_sha": "13ac0849a0234ddc3a4822a15371059cd6e5ac59",
+    "build": {
+      "optimize": "ReleaseFast",
+      "runtime_cost": true
+    },
+    "env": {
+      "BENCH_STATS": "1"
+    }
+  },
+  "vectored": {
+    "command": [
+      ".zig-cache/competitive/vectored-cost"
+    ],
+    "env": {
+      "BENCH_STATS": "1"
+    },
+    "source_sha": "13ac084+bounded-vectored-output",
+    "build": {
+      "optimize": "ReleaseFast",
+      "runtime_cost": true
+    }
+  }
+}

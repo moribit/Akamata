@@ -67,3 +67,54 @@ pub const Writer = struct {
         return std.Io.Writer.countSplat(data, splat);
     }
 };
+
+test "buffered prefix and large body preserve partial writes under backpressure" {
+    var sockets: [2]c_int = undefined;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
+    defer for (sockets) |fd| {
+        _ = std.c.close(fd);
+    };
+    const capacity: c_int = 1024;
+    try std.testing.expectEqual(@as(c_int, 0), std.c.setsockopt(sockets[0], std.c.SOL.SOCKET, std.c.SO.SNDBUF, &capacity, @sizeOf(c_int)));
+    const Peer = struct {
+        fd: c_int,
+        count: usize = 0,
+        valid: bool = true,
+        fn run(self: *@This()) void {
+            var buffer: [1024]u8 = undefined;
+            while (true) {
+                const n = std.c.recv(self.fd, &buffer, buffer.len, 0);
+                if (n < 0) {
+                    if (std.posix.errno(n) == .INTR) continue;
+                    self.valid = false;
+                    return;
+                }
+                if (n == 0) return;
+                for (buffer[0..@intCast(n)]) |byte| {
+                    const expected: u8 = if (self.count < 4) "HEAD"[self.count] else 'x';
+                    if (byte != expected) self.valid = false;
+                    self.count += 1;
+                }
+                std.Io.sleep(std.testing.io, .fromMilliseconds(1), .awake) catch {};
+            }
+        }
+    };
+    var peer: Peer = .{ .fd = sockets[1] };
+    const thread = try std.Thread.spawn(.{}, Peer.run, .{&peer});
+    var joined = false;
+    defer if (!joined) {
+        _ = std.c.shutdown(sockets[0], std.c.SHUT.RDWR);
+        thread.join();
+    };
+    var buffer: [32]u8 = undefined;
+    var writer = Writer.init(sockets[0], std.testing.io, &buffer, 2000);
+    try writer.interface.writeAll("HEAD");
+    const body: [65536]u8 = @splat('x');
+    try writer.interface.writeAll(&body);
+    try writer.interface.flush();
+    _ = std.c.shutdown(sockets[0], std.c.SHUT.WR);
+    thread.join();
+    joined = true;
+    try std.testing.expect(peer.valid);
+    try std.testing.expectEqual(@as(usize, 4 + body.len), peer.count);
+}

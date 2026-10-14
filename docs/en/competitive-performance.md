@@ -22,7 +22,7 @@ from completed HTTP 200 responses.
 ## Targeted changes under validation
 
 - Threaded idle connections can wait on one App-owned shutdown notification
-  instead of waking every 100 ms. The [three-round idle experiment](../../benchmark-results/competitive/runtime-comparison.md)
+  instead of waking every 100 ms. The [three-round idle experiment](../../benchmark-results/competitive/idle-shutdown.md)
   reduces CPU substantially at 1,024 idle clients while retaining the same
   thread count/RSS. Waking many threads together has a shutdown-latency tradeoff.
   Read/write deadlines and cooperative CPU-handler drain are unchanged.

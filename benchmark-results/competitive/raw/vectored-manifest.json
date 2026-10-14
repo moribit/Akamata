@@ -1,0 +1,20 @@
+{
+  "before": {
+    "command": [
+      ".zig-cache/competitive/idle-refined"
+    ],
+    "source_sha": "a562592+idle-first-socket-probe+numeric-writer",
+    "build": {
+      "optimize": "ReleaseFast"
+    }
+  },
+  "vectored-candidate": {
+    "command": [
+      ".zig-cache/competitive/vectored-candidate"
+    ],
+    "source_sha": "13ac084+bounded-vectored-output",
+    "build": {
+      "optimize": "ReleaseFast"
+    }
+  }
+}

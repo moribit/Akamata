@@ -1,0 +1,4850 @@
+{
+  "schema": 1,
+  "classification": "exploratory",
+  "source_sha": "13ac0849a0234ddc3a4822a15371059cd6e5ac59",
+  "command": [
+    "benchmark/competitive/scripts/measure.py",
+    "benchmark-results/competitive/raw/vectored-cost-manifest.json",
+    "--output",
+    "benchmark-results/competitive/raw/vectored-cost.json",
+    "--workloads",
+    "echo-65536",
+    "--connections",
+    "32",
+    "--warmup",
+    "2",
+    "--duration",
+    "5",
+    "--rounds",
+    "3"
+  ],
+  "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "invocations": [
+    [
+      "benchmark/competitive/scripts/measure.py",
+      "benchmark-results/competitive/raw/vectored-cost-manifest.json",
+      "--output",
+      "benchmark-results/competitive/raw/vectored-cost.json",
+      "--workloads",
+      "echo-65536",
+      "--connections",
+      "32",
+      "--warmup",
+      "2",
+      "--duration",
+      "5",
+      "--rounds",
+      "3"
+    ]
+  ],
+  "oha": "oha 1.15.0",
+  "warmup_seconds": 2,
+  "duration_seconds": 5,
+  "rounds": 3,
+  "binaries": {
+    "before": {
+      "command": [
+        ".zig-cache/competitive/cost-after"
+      ],
+      "source_sha": "13ac0849a0234ddc3a4822a15371059cd6e5ac59",
+      "build": {
+        "optimize": "ReleaseFast",
+        "runtime_cost": true
+      },
+      "env": {
+        "BENCH_STATS": "1"
+      },
+      "sha256": "77d4d9a1fd9503674383bf6c59ae605c5c5922f071f81243f868d1723bcb00c2",
+      "artifact_sha256": {}
+    },
+    "vectored": {
+      "command": [
+        ".zig-cache/competitive/vectored-cost"
+      ],
+      "env": {
+        "BENCH_STATS": "1"
+      },
+      "source_sha": "13ac084+bounded-vectored-output",
+      "build": {
+        "optimize": "ReleaseFast",
+        "runtime_cost": true
+      },
+      "sha256": "c1e3d7021a9ffdbc1afcfa84fcd96d2faa4d1b6b03f29d657d386a23e17e9ff1",
+      "artifact_sha256": {}
+    }
+  },
+  "runs": [
+    {
+      "framework": "before",
+      "workload": "echo-65536",
+      "connections": 32,
+      "round": 1,
+      "runner_shutdown_wait_seconds": 45,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "warmup": {
+        "oha": {
+          "summary": {
+            "successRate": 1.0,
+            "total": 2.002366375,
+            "slowest": 0.105588208,
+            "fastest": 4.2709e-05,
+            "average": 0.0004383588665363253,
+            "requestsPerSec": 72289.96741418014,
+            "totalData": 9486401536,
+            "sizePerRequest": 65536,
+            "sizePerSec": 4737595304.455709
+          },
+          "metrics": {
+            "success_rate": 1.0,
+            "requests_per_sec": 72289.96741418014,
+            "latency_ms": {
+              "min": 0.043,
+              "mean": 0.438,
+              "p50": 0.247,
+              "p95": 1.02,
+              "p99": 3.343,
+              "max": 105.588
+            }
+          },
+          "responseTimeHistogram": {
+            "0.000042709": 1,
+            "0.0105972589": 144404,
+            "0.021151808799999998": 229,
+            "0.0317063587": 41,
+            "0.0422609086": 32,
+            "0.0528154585": 14,
+            "0.0633700084": 16,
+            "0.0739245583": 8,
+            "0.0844791082": 2,
+            "0.0950336581": 0,
+            "0.105588208": 4
+          },
+          "latencyPercentiles": {
+            "p10": 0.00013,
+            "p25": 0.00018375,
+            "p50": 0.000247291,
+            "p75": 0.000384,
+            "p90": 0.000622833,
+            "p95": 0.001019917,
+            "p99": 0.003342917,
+            "p99.9": 0.017898667,
+            "p99.99": 0.063111958
+          },
+          "firstByteHistogram": {
+            "0.000036709": 1,
+            "0.0105918464": 144406,
+            "0.0211469838": 228,
+            "0.03170212120000001": 41,
+            "0.04225725860000001": 31,
+            "0.052812396000000005": 14,
+            "0.06336753340000001": 16,
+            "0.0739226708": 8,
+            "0.0844778082": 2,
+            "0.0950329456": 0,
+            "0.105588083": 4
+          },
+          "firstBytePercentiles": {
+            "p10": 0.000126,
+            "p25": 0.000180334,
+            "p50": 0.000244208,
+            "p75": 0.00038175,
+            "p90": 0.000621125,
+            "p95": 0.001016875,
+            "p99": 0.003332334,
+            "p99.9": 0.017854583,
+            "p99.99": 0.063111542
+          },
+          "rps": {
+            "mean": 72281.58834391262,
+            "stddev": 10407.777088201874,
+            "max": 81006.81330539472,
+            "min": 7034.366660797695,
+            "percentiles": {
+              "p10": 57763.297020875136,
+              "p25": 72910.0251284573,
+              "p50": 75423.88674493226,
+              "p75": 77624.5759407406,
+              "p90": 78959.54339167158,
+              "p95": 79450.98369623766,
+              "p99": 80064.13146951226,
+              "p99.9": 81006.81330539472,
+              "p99.99": 81006.81330539472
+            }
+          },
+          "details": {
+            "DNSDialup": {
+              "average": 0.0007210364687500001,
+              "fastest": 0.000454875,
+              "slowest": 0.000978083
+            },
+            "DNSLookup": {
+              "average": 5.4154062499999994e-06,
+              "fastest": 7.09e-07,
+              "slowest": 3.6541e-05
+            },
+            "firstByte": {
+              "average": 0.0004348550105007874,
+              "fastest": 3.6709e-05,
+              "slowest": 0.105588083
+            }
+          },
+          "statusCodeDistribution": {
+            "200": 144751
+          },
+          "errorDistribution": {}
+        },
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 4144,
+              "cpu_seconds": 0.0,
+              "threads": 8
+            },
+            "generator": {
+              "rss_kib": 13456,
+              "cpu_seconds": 0.01,
+              "threads": 11
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13408,
+              "cpu_seconds": 3.01,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 45568,
+              "cpu_seconds": 2.75,
+              "threads": 19
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13408,
+              "cpu_seconds": 6.5,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 63168,
+              "cpu_seconds": 5.88,
+              "threads": 19
+            }
+          }
+        ],
+        "cpu_percent": 306.78269105639805,
+        "rss_mean_kib": 10320,
+        "threads_peak": 40,
+        "measurement_wall_seconds": 2.1969948750338517,
+        "stderr": ""
+      },
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "5s",
+        "-t",
+        "10s",
+        "-w",
+        "-m",
+        "POST",
+        "-T",
+        "application/octet-stream",
+        "-D",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/tmp8nw1be20/body.bin",
+        "http://127.0.0.1:8088/echo"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 5.002326459,
+          "slowest": 0.091570875,
+          "fastest": 4.2416e-05,
+          "average": 0.0004336355288700347,
+          "requestsPerSec": 73086.79331438252,
+          "totalData": 23960223744,
+          "sizePerRequest": 65536,
+          "sizePerSec": 4789816086.651373
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 73086.79331438252,
+          "latency_ms": {
+            "min": 0.042,
+            "mean": 0.434,
+            "p50": 0.243,
+            "p95": 0.97,
+            "p99": 3.677,
+            "max": 91.571
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000042416": 1,
+          "0.0091952619": 364514,
+          "0.0183481078": 676,
+          "0.0275009537": 191,
+          "0.0366537996": 80,
+          "0.0458066455": 41,
+          "0.054959491400000005": 49,
+          "0.0641123373": 19,
+          "0.0732651832": 12,
+          "0.0824180291": 10,
+          "0.091570875": 11
+        },
+        "latencyPercentiles": {
+          "p10": 0.000131875,
+          "p25": 0.000184916,
+          "p50": 0.00024325,
+          "p75": 0.000357,
+          "p90": 0.000601833,
+          "p95": 0.000970292,
+          "p99": 0.003677125,
+          "p99.9": 0.019903625,
+          "p99.99": 0.062467916
+        },
+        "firstByteHistogram": {
+          "0.000038042": 1,
+          "0.0091912795": 364515,
+          "0.018344516999999998": 675,
+          "0.027497754499999996": 192,
+          "0.036650992": 80,
+          "0.0458042295": 41,
+          "0.054957466999999996": 49,
+          "0.0641107045": 19,
+          "0.073263942": 12,
+          "0.08241717949999999": 9,
+          "0.091570417": 11
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000127958,
+          "p25": 0.000181333,
+          "p50": 0.000240292,
+          "p75": 0.000354125,
+          "p90": 0.000600333,
+          "p95": 0.000968125,
+          "p99": 0.003669042,
+          "p99.9": 0.019903417,
+          "p99.99": 0.062342792
+        },
+        "rps": {
+          "mean": 73088.26549824084,
+          "stddev": 8792.783014243852,
+          "max": 81664.73256355216,
+          "min": 10456.11378021289,
+          "percentiles": {
+            "p10": 64379.24497507907,
+            "p25": 72510.27470592418,
+            "p50": 75810.2432557429,
+            "p75": 77819.12794164785,
+            "p90": 79312.22201341236,
+            "p95": 80060.7100364217,
+            "p99": 81032.5738897591,
+            "p99.9": 81664.73256355216,
+            "p99.99": 81664.73256355216
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.0006703879375,
+            "fastest": 0.000334583,
+            "slowest": 0.000879291
+          },
+          "DNSLookup": {
+            "average": 7.203125000000001e-06,
+            "fastest": 7.91e-07,
+            "slowest": 5.65e-05
+          },
+          "firstByte": {
+            "average": 0.00043028720839487455,
+            "fastest": 3.8042e-05,
+            "slowest": 0.091570417
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 365604
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 6240,
+            "cpu_seconds": 6.74,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 13488,
+            "cpu_seconds": 0.01,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14336,
+            "cpu_seconds": 9.71,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 45952,
+            "cpu_seconds": 2.82,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14336,
+            "cpu_seconds": 13.16,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 64320,
+            "cpu_seconds": 6.01,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14336,
+            "cpu_seconds": 16.58,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 71312,
+            "cpu_seconds": 9.2,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14336,
+            "cpu_seconds": 20.06,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 100000,
+            "cpu_seconds": 12.37,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 7168,
+            "cpu_seconds": 23.54,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 103184,
+            "cpu_seconds": 15.5,
+            "threads": 11
+          }
+        }
+      ],
+      "cpu_percent": 324.43111884274686,
+      "rss_mean_kib": 11792,
+      "threads_peak": 40,
+      "measurement_wall_seconds": 5.178294875018764,
+      "stderr": "",
+      "shutdown_ms": 121.93533405661583,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\nRUNTIME_COST {\"event_loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"parse\":{\"count\":1531301,\"wall_ns\":1814584000,\"cpu_ns\":1529840211},\"dispatch\":{\"count\":510362,\"wall_ns\":1676711000,\"cpu_ns\":1455228409},\"read\":{\"count\":1020939,\"wall_ns\":206627500000,\"cpu_ns\":8904710298},\"serialize\":{\"count\":510362,\"wall_ns\":165659000,\"cpu_ns\":140420536},\"send\":{\"count\":1020718,\"wall_ns\":9912310000,\"cpu_ns\":8953610771},\"enqueue\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_lock\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_work\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"queue_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_publish\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_wait\":{\"count\":513545,\"wall_ns\":199552608000,\"cpu_ns\":2780118010},\"selector_update\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_add\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_modify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_delete\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_same\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_enable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_disable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"notify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_write\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_read\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"request\":{\"count\":510362,\"wall_ns\":0,\"cpu_ns\":0},\"recv_call\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"send_call\":{\"count\":1020718,\"wall_ns\":0,\"cpu_ns\":0},\"accept_call\":{\"count\":232,\"wall_ns\":0,\"cpu_ns\":0},\"copy_bytes\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"poll_call\":{\"count\":513545,\"wall_ns\":0,\"cpu_ns\":0},\"readvec_call\":{\"count\":513538,\"wall_ns\":0,\"cpu_ns\":0},\"mutex_lock\":{\"count\":1021805,\"wall_ns\":1219753000,\"cpu_ns\":390026479},\"mutex_unlock\":{\"count\":1021805,\"wall_ns\":0,\"cpu_ns\":0},\"condition_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_signal\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_broadcast\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_wait\":{\"count\":816,\"wall_ns\":59851061000,\"cpu_ns\":7951364},\"thread_spawn\":{\"count\":66,\"wall_ns\":939000,\"cpu_ns\":919331},\"peer_ip\":{\"count\":510362,\"wall_ns\":161787000,\"cpu_ns\":142414126},\"deadline_clear\":{\"count\":1020724,\"wall_ns\":1887120000,\"cpu_ns\":964115130},\"accept_hard_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_resource_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"connection_limit_rejected\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"thread_spawn_failed\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"read_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_again\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_reset\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_pipe\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_other_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0}}\nBENCH_STATS {\"calls\":372,\"requested\":25985233,\"live\":0,\"peak\":7217433}\n",
+      "runtime_cost": {
+        "event_loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "parse": {
+          "count": 1531301,
+          "wall_ns": 1814584000,
+          "cpu_ns": 1529840211
+        },
+        "dispatch": {
+          "count": 510362,
+          "wall_ns": 1676711000,
+          "cpu_ns": 1455228409
+        },
+        "read": {
+          "count": 1020939,
+          "wall_ns": 206627500000,
+          "cpu_ns": 8904710298
+        },
+        "serialize": {
+          "count": 510362,
+          "wall_ns": 165659000,
+          "cpu_ns": 140420536
+        },
+        "send": {
+          "count": 1020718,
+          "wall_ns": 9912310000,
+          "cpu_ns": 8953610771
+        },
+        "enqueue": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_lock": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_work": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "queue_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_publish": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_wait": {
+          "count": 513545,
+          "wall_ns": 199552608000,
+          "cpu_ns": 2780118010
+        },
+        "selector_update": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_add": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_modify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_delete": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_same": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_enable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_disable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "notify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_write": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_read": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "request": {
+          "count": 510362,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "recv_call": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "send_call": {
+          "count": 1020718,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_call": {
+          "count": 232,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "copy_bytes": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "poll_call": {
+          "count": 513545,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "readvec_call": {
+          "count": 513538,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "mutex_lock": {
+          "count": 1021805,
+          "wall_ns": 1219753000,
+          "cpu_ns": 390026479
+        },
+        "mutex_unlock": {
+          "count": 1021805,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_signal": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_broadcast": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_wait": {
+          "count": 816,
+          "wall_ns": 59851061000,
+          "cpu_ns": 7951364
+        },
+        "thread_spawn": {
+          "count": 66,
+          "wall_ns": 939000,
+          "cpu_ns": 919331
+        },
+        "peer_ip": {
+          "count": 510362,
+          "wall_ns": 161787000,
+          "cpu_ns": 142414126
+        },
+        "deadline_clear": {
+          "count": 1020724,
+          "wall_ns": 1887120000,
+          "cpu_ns": 964115130
+        },
+        "accept_hard_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_resource_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "connection_limit_rejected": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "thread_spawn_failed": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "read_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_again": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_reset": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_pipe": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_other_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        }
+      },
+      "allocator": {
+        "calls": 372,
+        "requested": 25985233,
+        "live": 0,
+        "peak": 7217433
+      }
+    },
+    {
+      "framework": "vectored",
+      "workload": "echo-65536",
+      "connections": 32,
+      "round": 1,
+      "runner_shutdown_wait_seconds": 45,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "warmup": {
+        "oha": {
+          "summary": {
+            "successRate": 1.0,
+            "total": 2.002127667,
+            "slowest": 0.108594,
+            "fastest": 4.2292e-05,
+            "average": 0.0003961130495264244,
+            "requestsPerSec": 79680.7329669652,
+            "totalData": 10455023616,
+            "sizePerRequest": 65536,
+            "sizePerSec": 5221956515.723031
+          },
+          "metrics": {
+            "success_rate": 1.0,
+            "requests_per_sec": 79680.7329669652,
+            "latency_ms": {
+              "min": 0.042,
+              "mean": 0.396,
+              "p50": 0.233,
+              "p95": 0.853,
+              "p99": 2.838,
+              "max": 108.594
+            }
+          },
+          "responseTimeHistogram": {
+            "0.000042292": 1,
+            "0.010897462799999999": 159230,
+            "0.021752633599999998": 152,
+            "0.032607804399999996": 62,
+            "0.0434629752": 18,
+            "0.054318146": 26,
+            "0.06517331679999999": 22,
+            "0.0760284876": 11,
+            "0.0868836584": 2,
+            "0.09773882919999999": 2,
+            "0.108594": 5
+          },
+          "latencyPercentiles": {
+            "p10": 0.000124375,
+            "p25": 0.000179416,
+            "p50": 0.000233416,
+            "p75": 0.000332125,
+            "p90": 0.000521291,
+            "p95": 0.000853333,
+            "p99": 0.002837916,
+            "p99.9": 0.020596167,
+            "p99.99": 0.069513958
+          },
+          "firstByteHistogram": {
+            "0.000042209": 1,
+            "0.0108973714": 159231,
+            "0.0217525338": 152,
+            "0.0326076962": 62,
+            "0.0434628586": 17,
+            "0.054318021": 26,
+            "0.0651731834": 22,
+            "0.0760283458": 11,
+            "0.0868835082": 2,
+            "0.09773867060000001": 2,
+            "0.108593833": 5
+          },
+          "firstBytePercentiles": {
+            "p10": 0.000123458,
+            "p25": 0.000178625,
+            "p50": 0.000232959,
+            "p75": 0.000331667,
+            "p90": 0.000520917,
+            "p95": 0.000852792,
+            "p99": 0.002825333,
+            "p99.9": 0.020511583,
+            "p99.99": 0.069513833
+          },
+          "rps": {
+            "mean": 79693.95282680649,
+            "stddev": 11659.343245052514,
+            "max": 88508.11619425533,
+            "min": 7534.659433393611,
+            "percentiles": {
+              "p10": 63565.42153184066,
+              "p25": 80975.23408999312,
+              "p50": 83704.63078848575,
+              "p75": 85102.83392436977,
+              "p90": 86368.01481166403,
+              "p95": 86835.89840159741,
+              "p99": 87642.84957187853,
+              "p99.9": 88508.11619425533,
+              "p99.99": 88508.11619425533
+            }
+          },
+          "details": {
+            "DNSDialup": {
+              "average": 0.0006415780937499999,
+              "fastest": 0.000465209,
+              "slowest": 0.000825792
+            },
+            "DNSLookup": {
+              "average": 4.830624999999999e-06,
+              "fastest": 7.08e-07,
+              "slowest": 3.5375e-05
+            },
+            "firstByte": {
+              "average": 0.0003952648985150235,
+              "fastest": 4.2209e-05,
+              "slowest": 0.108593833
+            }
+          },
+          "statusCodeDistribution": {
+            "200": 159531
+          },
+          "errorDistribution": {}
+        },
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 4144,
+              "cpu_seconds": 0.01,
+              "threads": 8
+            },
+            "generator": {
+              "rss_kib": 13488,
+              "cpu_seconds": 0.02,
+              "threads": 11
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13392,
+              "cpu_seconds": 2.75,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 47536,
+              "cpu_seconds": 2.97,
+              "threads": 19
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13392,
+              "cpu_seconds": 6.11,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 66320,
+              "cpu_seconds": 6.22,
+              "threads": 19
+            }
+          }
+        ],
+        "cpu_percent": 288.02455318571697,
+        "rss_mean_kib": 10309.333333333334,
+        "threads_peak": 40,
+        "measurement_wall_seconds": 2.194257374969311,
+        "stderr": ""
+      },
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "5s",
+        "-t",
+        "10s",
+        "-w",
+        "-m",
+        "POST",
+        "-T",
+        "application/octet-stream",
+        "-D",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/tmp3y2x6c_x/body.bin",
+        "http://127.0.0.1:8088/echo"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 5.001367875,
+          "slowest": 0.107446542,
+          "fastest": 3.95e-05,
+          "average": 0.0003954213156333544,
+          "requestsPerSec": 80083.69110420617,
+          "totalData": 26249003008,
+          "sizePerRequest": 65536,
+          "sizePerSec": 5248364780.2052555
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 80083.69110420617,
+          "latency_ms": {
+            "min": 0.04,
+            "mean": 0.395,
+            "p50": 0.231,
+            "p95": 0.852,
+            "p99": 2.95,
+            "max": 107.447
+          }
+        },
+        "responseTimeHistogram": {
+          "0.0000395": 1,
+          "0.0107802042": 399714,
+          "0.021520908400000004": 459,
+          "0.0322616126": 193,
+          "0.0430023168": 58,
+          "0.053743021": 24,
+          "0.06448372520000001": 32,
+          "0.0752244294": 23,
+          "0.08596513360000001": 11,
+          "0.09670583780000001": 9,
+          "0.107446542": 4
+        },
+        "latencyPercentiles": {
+          "p10": 0.000124125,
+          "p25": 0.000174667,
+          "p50": 0.000230583,
+          "p75": 0.000331,
+          "p90": 0.000555583,
+          "p95": 0.000851667,
+          "p99": 0.0029495,
+          "p99.9": 0.019662125,
+          "p99.99": 0.06817725
+        },
+        "firstByteHistogram": {
+          "0.000035958": 1,
+          "0.010777012199999998": 399714,
+          "0.021518066399999997": 460,
+          "0.032259120599999996": 192,
+          "0.0430001748": 58,
+          "0.053741229": 24,
+          "0.06448228319999999": 32,
+          "0.07522333739999999": 23,
+          "0.0859643916": 11,
+          "0.0967054458": 9,
+          "0.1074465": 4
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000123083,
+          "p25": 0.000173917,
+          "p50": 0.000230208,
+          "p75": 0.000330625,
+          "p90": 0.000555125,
+          "p95": 0.000851042,
+          "p99": 0.002946042,
+          "p99.9": 0.019614917,
+          "p99.99": 0.068177167
+        },
+        "rps": {
+          "mean": 80078.8784509472,
+          "stddev": 9957.98942011104,
+          "max": 88558.67057006109,
+          "min": 28824.38254519498,
+          "percentiles": {
+            "p10": 63284.909362892235,
+            "p25": 80812.46670992015,
+            "p50": 83695.55521538806,
+            "p75": 85448.06453629977,
+            "p90": 86491.17900090269,
+            "p95": 86903.19754708704,
+            "p99": 87631.39833002182,
+            "p99.9": 88558.67057006109,
+            "p99.99": 88558.67057006109
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.0006204648437499999,
+            "fastest": 0.000418792,
+            "slowest": 0.000851584
+          },
+          "DNSLookup": {
+            "average": 7.088625e-06,
+            "fastest": 7.5e-07,
+            "slowest": 6.7209e-05
+          },
+          "firstByte": {
+            "average": 0.0003947514390804277,
+            "fastest": 3.5958e-05,
+            "slowest": 0.1074465
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 400528
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 6224,
+            "cpu_seconds": 6.33,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 13456,
+            "cpu_seconds": 0.01,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14608,
+            "cpu_seconds": 9.25,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 47136,
+            "cpu_seconds": 2.94,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14608,
+            "cpu_seconds": 12.61,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 66112,
+            "cpu_seconds": 6.15,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14608,
+            "cpu_seconds": 15.92,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 73520,
+            "cpu_seconds": 9.48,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14608,
+            "cpu_seconds": 19.26,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 97312,
+            "cpu_seconds": 12.79,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 7440,
+            "cpu_seconds": 22.62,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 102528,
+            "cpu_seconds": 16.01,
+            "threads": 16
+          }
+        }
+      ],
+      "cpu_percent": 314.80656897419914,
+      "rss_mean_kib": 12016,
+      "threads_peak": 40,
+      "measurement_wall_seconds": 5.174606124986894,
+      "stderr": "",
+      "shutdown_ms": 125.14312495477498,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\nRUNTIME_COST {\"event_loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"parse\":{\"count\":1680398,\"wall_ns\":1928812000,\"cpu_ns\":1626890490},\"dispatch\":{\"count\":560066,\"wall_ns\":1762291000,\"cpu_ns\":1542191964},\"read\":{\"count\":1120332,\"wall_ns\":208067839000,\"cpu_ns\":9378357816},\"serialize\":{\"count\":560066,\"wall_ns\":168312000,\"cpu_ns\":144854501},\"send\":{\"count\":560066,\"wall_ns\":8111351000,\"cpu_ns\":7396514341},\"enqueue\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_lock\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_work\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"queue_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_publish\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_wait\":{\"count\":563550,\"wall_ns\":200621940000,\"cpu_ns\":2911377777},\"selector_update\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_add\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_modify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_delete\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_same\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_enable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_disable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"notify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_write\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_read\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"request\":{\"count\":560066,\"wall_ns\":0,\"cpu_ns\":0},\"recv_call\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"send_call\":{\"count\":560066,\"wall_ns\":0,\"cpu_ns\":0},\"accept_call\":{\"count\":199,\"wall_ns\":0,\"cpu_ns\":0},\"copy_bytes\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"poll_call\":{\"count\":563550,\"wall_ns\":0,\"cpu_ns\":0},\"readvec_call\":{\"count\":563543,\"wall_ns\":0,\"cpu_ns\":0},\"mutex_lock\":{\"count\":1121180,\"wall_ns\":1385419000,\"cpu_ns\":398249496},\"mutex_unlock\":{\"count\":1121180,\"wall_ns\":0,\"cpu_ns\":0},\"condition_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_signal\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_broadcast\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_wait\":{\"count\":783,\"wall_ns\":59748169000,\"cpu_ns\":7770585},\"thread_spawn\":{\"count\":66,\"wall_ns\":873000,\"cpu_ns\":860460},\"peer_ip\":{\"count\":560066,\"wall_ns\":177366000,\"cpu_ns\":154524213},\"deadline_clear\":{\"count\":1120132,\"wall_ns\":2107063000,\"cpu_ns\":998797924},\"accept_hard_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_resource_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"connection_limit_rejected\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"thread_spawn_failed\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"read_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_again\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_reset\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_pipe\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_other_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0}}\nBENCH_STATS {\"calls\":372,\"requested\":25985233,\"live\":0,\"peak\":7217433}\n",
+      "runtime_cost": {
+        "event_loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "parse": {
+          "count": 1680398,
+          "wall_ns": 1928812000,
+          "cpu_ns": 1626890490
+        },
+        "dispatch": {
+          "count": 560066,
+          "wall_ns": 1762291000,
+          "cpu_ns": 1542191964
+        },
+        "read": {
+          "count": 1120332,
+          "wall_ns": 208067839000,
+          "cpu_ns": 9378357816
+        },
+        "serialize": {
+          "count": 560066,
+          "wall_ns": 168312000,
+          "cpu_ns": 144854501
+        },
+        "send": {
+          "count": 560066,
+          "wall_ns": 8111351000,
+          "cpu_ns": 7396514341
+        },
+        "enqueue": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_lock": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_work": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "queue_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_publish": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_wait": {
+          "count": 563550,
+          "wall_ns": 200621940000,
+          "cpu_ns": 2911377777
+        },
+        "selector_update": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_add": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_modify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_delete": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_same": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_enable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_disable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "notify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_write": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_read": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "request": {
+          "count": 560066,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "recv_call": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "send_call": {
+          "count": 560066,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_call": {
+          "count": 199,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "copy_bytes": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "poll_call": {
+          "count": 563550,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "readvec_call": {
+          "count": 563543,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "mutex_lock": {
+          "count": 1121180,
+          "wall_ns": 1385419000,
+          "cpu_ns": 398249496
+        },
+        "mutex_unlock": {
+          "count": 1121180,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_signal": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_broadcast": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_wait": {
+          "count": 783,
+          "wall_ns": 59748169000,
+          "cpu_ns": 7770585
+        },
+        "thread_spawn": {
+          "count": 66,
+          "wall_ns": 873000,
+          "cpu_ns": 860460
+        },
+        "peer_ip": {
+          "count": 560066,
+          "wall_ns": 177366000,
+          "cpu_ns": 154524213
+        },
+        "deadline_clear": {
+          "count": 1120132,
+          "wall_ns": 2107063000,
+          "cpu_ns": 998797924
+        },
+        "accept_hard_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_resource_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "connection_limit_rejected": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "thread_spawn_failed": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "read_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_again": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_reset": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_pipe": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_other_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        }
+      },
+      "allocator": {
+        "calls": 372,
+        "requested": 25985233,
+        "live": 0,
+        "peak": 7217433
+      }
+    },
+    {
+      "framework": "before",
+      "workload": "echo-65536",
+      "connections": 32,
+      "round": 2,
+      "runner_shutdown_wait_seconds": 45,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "warmup": {
+        "oha": {
+          "summary": {
+            "successRate": 1.0,
+            "total": 2.002907125,
+            "slowest": 0.107051625,
+            "fastest": 4.3375e-05,
+            "average": 0.0004338012952088985,
+            "requestsPerSec": 73123.21084283925,
+            "totalData": 9598337024,
+            "sizePerRequest": 65536,
+            "sizePerSec": 4792202745.796313
+          },
+          "metrics": {
+            "success_rate": 1.0,
+            "requests_per_sec": 73123.21084283925,
+            "latency_ms": {
+              "min": 0.043,
+              "mean": 0.434,
+              "p50": 0.238,
+              "p95": 0.969,
+              "p99": 3.394,
+              "max": 107.052
+            }
+          },
+          "responseTimeHistogram": {
+            "0.000043375": 1,
+            "0.0107442": 146066,
+            "0.021445025": 222,
+            "0.032145850000000004": 87,
+            "0.042846675": 33,
+            "0.0535475": 20,
+            "0.06424832500000001": 10,
+            "0.07494915": 5,
+            "0.085649975": 9,
+            "0.0963508": 1,
+            "0.107051625": 5
+          },
+          "latencyPercentiles": {
+            "p10": 0.00012925,
+            "p25": 0.000180292,
+            "p50": 0.000237833,
+            "p75": 0.000344,
+            "p90": 0.0005945,
+            "p95": 0.000968958,
+            "p99": 0.003393959,
+            "p99.9": 0.02393975,
+            "p99.99": 0.080845042
+          },
+          "firstByteHistogram": {
+            "0.000035": 1,
+            "0.01073665": 146068,
+            "0.0214383": 222,
+            "0.03213995": 84,
+            "0.0428416": 35,
+            "0.05354325": 20,
+            "0.0642449": 10,
+            "0.07494654999999999": 6,
+            "0.0856482": 9,
+            "0.09634985": 0,
+            "0.1070515": 4
+          },
+          "firstBytePercentiles": {
+            "p10": 0.00012525,
+            "p25": 0.00017675,
+            "p50": 0.000234917,
+            "p75": 0.000340542,
+            "p90": 0.000592542,
+            "p95": 0.000966708,
+            "p99": 0.00338675,
+            "p99.9": 0.023873792,
+            "p99.99": 0.07350725
+          },
+          "rps": {
+            "mean": 73055.84497501294,
+            "stddev": 9307.20618108912,
+            "max": 83951.77305844508,
+            "min": 16185.851374274289,
+            "percentiles": {
+              "p10": 66009.34692352453,
+              "p25": 72937.96946303567,
+              "p50": 75575.3953775939,
+              "p75": 77880.64163599632,
+              "p90": 79217.49914556132,
+              "p95": 79549.71857410863,
+              "p99": 80619.14704742368,
+              "p99.9": 83951.77305844508,
+              "p99.99": 83951.77305844508
+            }
+          },
+          "details": {
+            "DNSDialup": {
+              "average": 0.0006450638125000002,
+              "fastest": 0.000362541,
+              "slowest": 0.00085375
+            },
+            "DNSLookup": {
+              "average": 6.911437500000001e-06,
+              "fastest": 7.91e-07,
+              "slowest": 4.7417e-05
+            },
+            "firstByte": {
+              "average": 0.00042949120437118615,
+              "fastest": 3.5e-05,
+              "slowest": 0.1070515
+            }
+          },
+          "statusCodeDistribution": {
+            "200": 146459
+          },
+          "errorDistribution": {}
+        },
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 4128,
+              "cpu_seconds": 0.01,
+              "threads": 8
+            },
+            "generator": {
+              "rss_kib": 13504,
+              "cpu_seconds": 0.01,
+              "threads": 11
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13376,
+              "cpu_seconds": 3.08,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 47248,
+              "cpu_seconds": 2.89,
+              "threads": 19
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13376,
+              "cpu_seconds": 6.5,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 66096,
+              "cpu_seconds": 6.04,
+              "threads": 19
+            }
+          }
+        ],
+        "cpu_percent": 307.83741116839496,
+        "rss_mean_kib": 10293.333333333334,
+        "threads_peak": 40,
+        "measurement_wall_seconds": 2.1829705410054885,
+        "stderr": ""
+      },
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "5s",
+        "-t",
+        "10s",
+        "-w",
+        "-m",
+        "POST",
+        "-T",
+        "application/octet-stream",
+        "-D",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/tmpyckkti7h/body.bin",
+        "http://127.0.0.1:8088/echo"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 5.002510458,
+          "slowest": 0.110919875,
+          "fastest": 4.1708e-05,
+          "average": 0.00043440250584121366,
+          "requestsPerSec": 72996.14924663093,
+          "totalData": 23931387904,
+          "sizePerRequest": 65536,
+          "sizePerSec": 4783875637.0272045
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 72996.14924663093,
+          "latency_ms": {
+            "min": 0.042,
+            "mean": 0.434,
+            "p50": 0.24,
+            "p95": 0.99,
+            "p99": 3.768,
+            "max": 110.92
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000041708": 1,
+          "0.011129524699999999": 364383,
+          "0.0222173414": 486,
+          "0.033305158099999996": 124,
+          "0.0443929748": 62,
+          "0.0554807915": 37,
+          "0.06656860819999999": 35,
+          "0.07765642489999999": 14,
+          "0.0887442416": 6,
+          "0.0998320583": 8,
+          "0.110919875": 8
+        },
+        "latencyPercentiles": {
+          "p10": 0.0001305,
+          "p25": 0.000181208,
+          "p50": 0.000239792,
+          "p75": 0.00035325,
+          "p90": 0.00060375,
+          "p95": 0.000990208,
+          "p99": 0.003767875,
+          "p99.9": 0.019737917,
+          "p99.99": 0.064794292
+        },
+        "firstByteHistogram": {
+          "0.000038792": 1,
+          "0.0111268586": 364386,
+          "0.0222149252": 485,
+          "0.0333029918": 124,
+          "0.0443910584": 60,
+          "0.055479125000000004": 37,
+          "0.06656719159999999": 35,
+          "0.0776552582": 14,
+          "0.0887433248": 6,
+          "0.0998313914": 8,
+          "0.110919458": 8
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000126417,
+          "p25": 0.000177708,
+          "p50": 0.000236833,
+          "p75": 0.000350458,
+          "p90": 0.00060175,
+          "p95": 0.000986583,
+          "p99": 0.003761166,
+          "p99.9": 0.019698583,
+          "p99.99": 0.064794167
+        },
+        "rps": {
+          "mean": 72918.56075192174,
+          "stddev": 8977.842395449212,
+          "max": 83040.81837328292,
+          "min": 30566.41362471087,
+          "percentiles": {
+            "p10": 60516.89631745095,
+            "p25": 72846.13345631922,
+            "p50": 75716.08966905602,
+            "p75": 77801.46088513758,
+            "p90": 79216.86746987623,
+            "p95": 79826.50771564305,
+            "p99": 81328.79852755759,
+            "p99.9": 83040.81837328292,
+            "p99.99": 83040.81837328292
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.00027590496874999997,
+            "fastest": 0.000132916,
+            "slowest": 0.000500458
+          },
+          "DNSLookup": {
+            "average": 5.6445937500000005e-06,
+            "fastest": 7.5e-07,
+            "slowest": 2.8e-05
+          },
+          "firstByte": {
+            "average": 0.00043087332831823715,
+            "fastest": 3.8792e-05,
+            "slowest": 0.110919458
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 365164
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 6208,
+            "cpu_seconds": 6.73,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 13696,
+            "cpu_seconds": 0.01,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14400,
+            "cpu_seconds": 9.8,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 47696,
+            "cpu_seconds": 2.88,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14400,
+            "cpu_seconds": 13.24,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 65632,
+            "cpu_seconds": 6.03,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14400,
+            "cpu_seconds": 16.71,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 72336,
+            "cpu_seconds": 9.17,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14400,
+            "cpu_seconds": 20.2,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 95696,
+            "cpu_seconds": 12.32,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 7232,
+            "cpu_seconds": 23.68,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 101296,
+            "cpu_seconds": 15.43,
+            "threads": 11
+          }
+        }
+      ],
+      "cpu_percent": 327.4517456009913,
+      "rss_mean_kib": 11840,
+      "threads_peak": 40,
+      "measurement_wall_seconds": 5.176335208991077,
+      "stderr": "",
+      "shutdown_ms": 127.5285420124419,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\nRUNTIME_COST {\"event_loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"parse\":{\"count\":1535064,\"wall_ns\":1895204000,\"cpu_ns\":1536512937},\"dispatch\":{\"count\":511630,\"wall_ns\":1735686000,\"cpu_ns\":1462659916},\"read\":{\"count\":1023434,\"wall_ns\":206291320000,\"cpu_ns\":8969645195},\"serialize\":{\"count\":511630,\"wall_ns\":166774000,\"cpu_ns\":139340018},\"send\":{\"count\":1023254,\"wall_ns\":10125655000,\"cpu_ns\":9050549858},\"enqueue\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_lock\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_work\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"queue_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_publish\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_wait\":{\"count\":514905,\"wall_ns\":198976519000,\"cpu_ns\":2792511615},\"selector_update\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_add\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_modify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_delete\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_same\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_enable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_disable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"notify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_write\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_read\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"request\":{\"count\":511630,\"wall_ns\":0,\"cpu_ns\":0},\"recv_call\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"send_call\":{\"count\":1023254,\"wall_ns\":0,\"cpu_ns\":0},\"accept_call\":{\"count\":82,\"wall_ns\":0,\"cpu_ns\":0},\"copy_bytes\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"poll_call\":{\"count\":514905,\"wall_ns\":0,\"cpu_ns\":0},\"readvec_call\":{\"count\":514892,\"wall_ns\":0,\"cpu_ns\":0},\"mutex_lock\":{\"count\":1024195,\"wall_ns\":1126863000,\"cpu_ns\":370456512},\"mutex_unlock\":{\"count\":1024195,\"wall_ns\":0,\"cpu_ns\":0},\"condition_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_signal\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_broadcast\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_wait\":{\"count\":670,\"wall_ns\":59796609000,\"cpu_ns\":4301571},\"thread_spawn\":{\"count\":66,\"wall_ns\":1082000,\"cpu_ns\":1088041},\"peer_ip\":{\"count\":511630,\"wall_ns\":169830000,\"cpu_ns\":142864326},\"deadline_clear\":{\"count\":1023260,\"wall_ns\":1823528000,\"cpu_ns\":934783745},\"accept_hard_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_resource_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"connection_limit_rejected\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"thread_spawn_failed\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"read_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_again\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_reset\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_pipe\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_other_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0}}\nBENCH_STATS {\"calls\":372,\"requested\":25985233,\"live\":0,\"peak\":7217433}\n",
+      "runtime_cost": {
+        "event_loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "parse": {
+          "count": 1535064,
+          "wall_ns": 1895204000,
+          "cpu_ns": 1536512937
+        },
+        "dispatch": {
+          "count": 511630,
+          "wall_ns": 1735686000,
+          "cpu_ns": 1462659916
+        },
+        "read": {
+          "count": 1023434,
+          "wall_ns": 206291320000,
+          "cpu_ns": 8969645195
+        },
+        "serialize": {
+          "count": 511630,
+          "wall_ns": 166774000,
+          "cpu_ns": 139340018
+        },
+        "send": {
+          "count": 1023254,
+          "wall_ns": 10125655000,
+          "cpu_ns": 9050549858
+        },
+        "enqueue": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_lock": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_work": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "queue_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_publish": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_wait": {
+          "count": 514905,
+          "wall_ns": 198976519000,
+          "cpu_ns": 2792511615
+        },
+        "selector_update": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_add": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_modify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_delete": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_same": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_enable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_disable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "notify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_write": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_read": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "request": {
+          "count": 511630,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "recv_call": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "send_call": {
+          "count": 1023254,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_call": {
+          "count": 82,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "copy_bytes": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "poll_call": {
+          "count": 514905,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "readvec_call": {
+          "count": 514892,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "mutex_lock": {
+          "count": 1024195,
+          "wall_ns": 1126863000,
+          "cpu_ns": 370456512
+        },
+        "mutex_unlock": {
+          "count": 1024195,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_signal": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_broadcast": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_wait": {
+          "count": 670,
+          "wall_ns": 59796609000,
+          "cpu_ns": 4301571
+        },
+        "thread_spawn": {
+          "count": 66,
+          "wall_ns": 1082000,
+          "cpu_ns": 1088041
+        },
+        "peer_ip": {
+          "count": 511630,
+          "wall_ns": 169830000,
+          "cpu_ns": 142864326
+        },
+        "deadline_clear": {
+          "count": 1023260,
+          "wall_ns": 1823528000,
+          "cpu_ns": 934783745
+        },
+        "accept_hard_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_resource_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "connection_limit_rejected": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "thread_spawn_failed": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "read_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_again": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_reset": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_pipe": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_other_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        }
+      },
+      "allocator": {
+        "calls": 372,
+        "requested": 25985233,
+        "live": 0,
+        "peak": 7217433
+      }
+    },
+    {
+      "framework": "vectored",
+      "workload": "echo-65536",
+      "connections": 32,
+      "round": 2,
+      "runner_shutdown_wait_seconds": 45,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "warmup": {
+        "oha": {
+          "summary": {
+            "successRate": 1.0,
+            "total": 2.002717416,
+            "slowest": 0.112422292,
+            "fastest": 3.7875e-05,
+            "average": 0.0003954043225009339,
+            "requestsPerSec": 80221.00308134536,
+            "totalData": 10529013760,
+            "sizePerRequest": 65536,
+            "sizePerSec": 5257363657.93905
+          },
+          "metrics": {
+            "success_rate": 1.0,
+            "requests_per_sec": 80221.00308134536,
+            "latency_ms": {
+              "min": 0.038,
+              "mean": 0.395,
+              "p50": 0.245,
+              "p95": 0.865,
+              "p99": 2.645,
+              "max": 112.422
+            }
+          },
+          "responseTimeHistogram": {
+            "0.000037875": 1,
+            "0.011276316699999999": 160428,
+            "0.022514758399999998": 131,
+            "0.0337532001": 42,
+            "0.044991641799999996": 32,
+            "0.05623008349999999": 9,
+            "0.0674685252": 4,
+            "0.0787069669": 4,
+            "0.0899454086": 1,
+            "0.1011838503": 0,
+            "0.112422292": 8
+          },
+          "latencyPercentiles": {
+            "p10": 0.000129791,
+            "p25": 0.00018925,
+            "p50": 0.000244583,
+            "p75": 0.000358375,
+            "p90": 0.000545541,
+            "p95": 0.0008645,
+            "p99": 0.0026455,
+            "p99.9": 0.01585625,
+            "p99.99": 0.065779666
+          },
+          "firstByteHistogram": {
+            "0.00003725": 1,
+            "0.0112757375": 160429,
+            "0.022514225": 131,
+            "0.033752712500000004": 42,
+            "0.0449912": 32,
+            "0.0562296875": 8,
+            "0.067468175": 4,
+            "0.0787066625": 4,
+            "0.08994515": 1,
+            "0.1011836375": 0,
+            "0.112422125": 8
+          },
+          "firstBytePercentiles": {
+            "p10": 0.000128708,
+            "p25": 0.000188709,
+            "p50": 0.000244167,
+            "p75": 0.000357958,
+            "p90": 0.000545208,
+            "p95": 0.000863625,
+            "p99": 0.002639583,
+            "p99.9": 0.015729917,
+            "p99.99": 0.065779375
+          },
+          "rps": {
+            "mean": 80216.55058424339,
+            "stddev": 11300.950562393491,
+            "max": 92076.34970917845,
+            "min": 8736.767813667037,
+            "percentiles": {
+              "p10": 64002.14467564101,
+              "p25": 81370.2020516314,
+              "p50": 83501.39447328805,
+              "p75": 85547.05087798179,
+              "p90": 87328.01482715724,
+              "p95": 88765.046252713,
+              "p99": 90660.44331756038,
+              "p99.9": 92076.34970917845,
+              "p99.99": 92076.34970917845
+            }
+          },
+          "details": {
+            "DNSDialup": {
+              "average": 0.0006839023125,
+              "fastest": 0.000403125,
+              "slowest": 0.000909542
+            },
+            "DNSLookup": {
+              "average": 6.690125e-06,
+              "fastest": 7.5e-07,
+              "slowest": 5.5542e-05
+            },
+            "firstByte": {
+              "average": 0.00039446528523589245,
+              "fastest": 3.725e-05,
+              "slowest": 0.112422125
+            }
+          },
+          "statusCodeDistribution": {
+            "200": 160660
+          },
+          "errorDistribution": {}
+        },
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 4144,
+              "cpu_seconds": 0.01,
+              "threads": 8
+            },
+            "generator": {
+              "rss_kib": 13520,
+              "cpu_seconds": 0.01,
+              "threads": 11
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13360,
+              "cpu_seconds": 2.88,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 47376,
+              "cpu_seconds": 2.87,
+              "threads": 19
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13360,
+              "cpu_seconds": 5.95,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 65552,
+              "cpu_seconds": 6.17,
+              "threads": 19
+            }
+          }
+        ],
+        "cpu_percent": 280.8456080520635,
+        "rss_mean_kib": 10288,
+        "threads_peak": 40,
+        "measurement_wall_seconds": 2.2004972920403816,
+        "stderr": ""
+      },
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "5s",
+        "-t",
+        "10s",
+        "-w",
+        "-m",
+        "POST",
+        "-T",
+        "application/octet-stream",
+        "-D",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/tmpuzeftvpp/body.bin",
+        "http://127.0.0.1:8088/echo"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 5.002166083,
+          "slowest": 0.111862125,
+          "fastest": 4.4708e-05,
+          "average": 0.00039617083594966414,
+          "requestsPerSec": 79962.75880550366,
+          "totalData": 26213548032,
+          "sizePerRequest": 65536,
+          "sizePerSec": 5240439361.077488
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 79962.75880550366,
+          "latency_ms": {
+            "min": 0.045,
+            "mean": 0.396,
+            "p50": 0.228,
+            "p95": 0.85,
+            "p99": 3.075,
+            "max": 111.862
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000044708": 1,
+          "0.0112264497": 399193,
+          "0.022408191400000003": 441,
+          "0.033589933100000004": 123,
+          "0.0447716748": 91,
+          "0.0559534165": 50,
+          "0.06713515820000002": 43,
+          "0.07831689990000001": 20,
+          "0.08949864160000001": 22,
+          "0.10068038330000001": 0,
+          "0.111862125": 3
+        },
+        "latencyPercentiles": {
+          "p10": 0.000124375,
+          "p25": 0.000173167,
+          "p50": 0.0002275,
+          "p75": 0.000312958,
+          "p90": 0.000523584,
+          "p95": 0.000850291,
+          "p99": 0.003074625,
+          "p99.9": 0.019340375,
+          "p99.99": 0.068869
+        },
+        "firstByteHistogram": {
+          "0.00004": 1,
+          "0.0112222": 399193,
+          "0.022404399999999998": 441,
+          "0.033586599999999994": 124,
+          "0.0447688": 90,
+          "0.055951": 50,
+          "0.06713319999999999": 43,
+          "0.0783154": 20,
+          "0.0894976": 22,
+          "0.1006798": 0,
+          "0.111862": 3
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000123333,
+          "p25": 0.000172375,
+          "p50": 0.000227084,
+          "p75": 0.0003125,
+          "p90": 0.000523041,
+          "p95": 0.00084975,
+          "p99": 0.003069667,
+          "p99.9": 0.019340209,
+          "p99.99": 0.068868792
+        },
+        "rps": {
+          "mean": 79961.22276565895,
+          "stddev": 9799.200523540705,
+          "max": 88258.15510367899,
+          "min": 23837.84257508795,
+          "percentiles": {
+            "p10": 67305.04787859153,
+            "p25": 80742.64803628607,
+            "p50": 83084.47198266567,
+            "p75": 84972.57507637267,
+            "p90": 86119.02369233382,
+            "p95": 86728.18666066472,
+            "p99": 87539.75180129505,
+            "p99.9": 88258.15510367899,
+            "p99.99": 88258.15510367899
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.0006677121875,
+            "fastest": 0.00039175,
+            "slowest": 0.000886666
+          },
+          "DNSLookup": {
+            "average": 5.1783125e-06,
+            "fastest": 7.08e-07,
+            "slowest": 3.6417e-05
+          },
+          "firstByte": {
+            "average": 0.000395453867320685,
+            "fastest": 4e-05,
+            "slowest": 0.111862
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 399987
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 6192,
+            "cpu_seconds": 6.19,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 13440,
+            "cpu_seconds": 0.01,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14512,
+            "cpu_seconds": 9.16,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 46736,
+            "cpu_seconds": 2.9,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14512,
+            "cpu_seconds": 12.48,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 64144,
+            "cpu_seconds": 6.21,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14512,
+            "cpu_seconds": 15.82,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 70544,
+            "cpu_seconds": 9.46,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14512,
+            "cpu_seconds": 19.18,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 98672,
+            "cpu_seconds": 12.68,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 7344,
+            "cpu_seconds": 22.51,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 104720,
+            "cpu_seconds": 15.94,
+            "threads": 19
+          }
+        }
+      ],
+      "cpu_percent": 315.53374616188114,
+      "rss_mean_kib": 11930.666666666666,
+      "threads_peak": 40,
+      "measurement_wall_seconds": 5.172188457974698,
+      "stderr": "",
+      "shutdown_ms": 125.6931250100024,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\nRUNTIME_COST {\"event_loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"parse\":{\"count\":1682166,\"wall_ns\":1956474000,\"cpu_ns\":1642608163},\"dispatch\":{\"count\":560654,\"wall_ns\":1775790000,\"cpu_ns\":1536472317},\"read\":{\"count\":1121512,\"wall_ns\":208407633000,\"cpu_ns\":9283247030},\"serialize\":{\"count\":560654,\"wall_ns\":171690000,\"cpu_ns\":148943759},\"send\":{\"count\":560654,\"wall_ns\":8002407000,\"cpu_ns\":7335921847},\"enqueue\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_lock\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_work\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"queue_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_publish\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_wait\":{\"count\":563695,\"wall_ns\":200993626000,\"cpu_ns\":2877808567},\"selector_update\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_add\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_modify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_delete\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_same\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_enable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_disable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"notify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_write\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_read\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"request\":{\"count\":560654,\"wall_ns\":0,\"cpu_ns\":0},\"recv_call\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"send_call\":{\"count\":560654,\"wall_ns\":0,\"cpu_ns\":0},\"accept_call\":{\"count\":223,\"wall_ns\":0,\"cpu_ns\":0},\"copy_bytes\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"poll_call\":{\"count\":563695,\"wall_ns\":0,\"cpu_ns\":0},\"readvec_call\":{\"count\":563684,\"wall_ns\":0,\"cpu_ns\":0},\"mutex_lock\":{\"count\":1122381,\"wall_ns\":1169309000,\"cpu_ns\":423570900},\"mutex_unlock\":{\"count\":1122381,\"wall_ns\":0,\"cpu_ns\":0},\"condition_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_signal\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_broadcast\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_wait\":{\"count\":808,\"wall_ns\":59870386000,\"cpu_ns\":7963811},\"thread_spawn\":{\"count\":66,\"wall_ns\":718000,\"cpu_ns\":721082},\"peer_ip\":{\"count\":560654,\"wall_ns\":176590000,\"cpu_ns\":152133721},\"deadline_clear\":{\"count\":1121308,\"wall_ns\":1870631000,\"cpu_ns\":1036528104},\"accept_hard_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_resource_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"connection_limit_rejected\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"thread_spawn_failed\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"read_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_again\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_reset\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_pipe\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_other_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0}}\nBENCH_STATS {\"calls\":372,\"requested\":25985233,\"live\":0,\"peak\":7217433}\n",
+      "runtime_cost": {
+        "event_loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "parse": {
+          "count": 1682166,
+          "wall_ns": 1956474000,
+          "cpu_ns": 1642608163
+        },
+        "dispatch": {
+          "count": 560654,
+          "wall_ns": 1775790000,
+          "cpu_ns": 1536472317
+        },
+        "read": {
+          "count": 1121512,
+          "wall_ns": 208407633000,
+          "cpu_ns": 9283247030
+        },
+        "serialize": {
+          "count": 560654,
+          "wall_ns": 171690000,
+          "cpu_ns": 148943759
+        },
+        "send": {
+          "count": 560654,
+          "wall_ns": 8002407000,
+          "cpu_ns": 7335921847
+        },
+        "enqueue": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_lock": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_work": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "queue_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_publish": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_wait": {
+          "count": 563695,
+          "wall_ns": 200993626000,
+          "cpu_ns": 2877808567
+        },
+        "selector_update": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_add": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_modify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_delete": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_same": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_enable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_disable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "notify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_write": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_read": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "request": {
+          "count": 560654,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "recv_call": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "send_call": {
+          "count": 560654,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_call": {
+          "count": 223,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "copy_bytes": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "poll_call": {
+          "count": 563695,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "readvec_call": {
+          "count": 563684,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "mutex_lock": {
+          "count": 1122381,
+          "wall_ns": 1169309000,
+          "cpu_ns": 423570900
+        },
+        "mutex_unlock": {
+          "count": 1122381,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_signal": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_broadcast": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_wait": {
+          "count": 808,
+          "wall_ns": 59870386000,
+          "cpu_ns": 7963811
+        },
+        "thread_spawn": {
+          "count": 66,
+          "wall_ns": 718000,
+          "cpu_ns": 721082
+        },
+        "peer_ip": {
+          "count": 560654,
+          "wall_ns": 176590000,
+          "cpu_ns": 152133721
+        },
+        "deadline_clear": {
+          "count": 1121308,
+          "wall_ns": 1870631000,
+          "cpu_ns": 1036528104
+        },
+        "accept_hard_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_resource_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "connection_limit_rejected": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "thread_spawn_failed": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "read_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_again": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_reset": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_pipe": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_other_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        }
+      },
+      "allocator": {
+        "calls": 372,
+        "requested": 25985233,
+        "live": 0,
+        "peak": 7217433
+      }
+    },
+    {
+      "framework": "before",
+      "workload": "echo-65536",
+      "connections": 32,
+      "round": 3,
+      "runner_shutdown_wait_seconds": 45,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "warmup": {
+        "oha": {
+          "summary": {
+            "successRate": 1.0,
+            "total": 2.001687375,
+            "slowest": 0.113167417,
+            "fastest": 4.4625e-05,
+            "average": 0.000443599392882098,
+            "requestsPerSec": 71491.68336039488,
+            "totalData": 9378463744,
+            "sizePerRequest": 65536,
+            "sizePerSec": 4685278960.706839
+          },
+          "metrics": {
+            "success_rate": 1.0,
+            "requests_per_sec": 71491.68336039488,
+            "latency_ms": {
+              "min": 0.045,
+              "mean": 0.444,
+              "p50": 0.244,
+              "p95": 0.982,
+              "p99": 3.871,
+              "max": 113.167
+            }
+          },
+          "responseTimeHistogram": {
+            "0.000044625": 2,
+            "0.0113569042": 142767,
+            "0.0226691834": 235,
+            "0.033981462600000005": 26,
+            "0.0452937418": 24,
+            "0.056606021": 8,
+            "0.06791830020000002": 13,
+            "0.07923057940000001": 15,
+            "0.09054285860000001": 6,
+            "0.10185513780000001": 4,
+            "0.113167417": 4
+          },
+          "latencyPercentiles": {
+            "p10": 0.000129792,
+            "p25": 0.000182583,
+            "p50": 0.00024375,
+            "p75": 0.000361875,
+            "p90": 0.000582042,
+            "p95": 0.000981875,
+            "p99": 0.003871417,
+            "p99.9": 0.019335917,
+            "p99.99": 0.079113667
+          },
+          "firstByteHistogram": {
+            "0.000034583": 1,
+            "0.0113478622": 142770,
+            "0.0226611414": 233,
+            "0.0339744206": 26,
+            "0.0452876998": 25,
+            "0.056600978999999996": 7,
+            "0.06791425820000001": 13,
+            "0.0792275374": 15,
+            "0.0905408166": 6,
+            "0.1018540958": 4,
+            "0.113167375": 4
+          },
+          "firstBytePercentiles": {
+            "p10": 0.00012575,
+            "p25": 0.000178917,
+            "p50": 0.000240875,
+            "p75": 0.000359417,
+            "p90": 0.000579959,
+            "p95": 0.000978666,
+            "p99": 0.003838875,
+            "p99.9": 0.019335834,
+            "p99.99": 0.0791135
+          },
+          "rps": {
+            "mean": 71492.91973440991,
+            "stddev": 11505.936974931776,
+            "max": 81458.54644967454,
+            "min": 7147.441140570537,
+            "percentiles": {
+              "p10": 54046.84239830606,
+              "p25": 71663.30019306116,
+              "p50": 74805.61042078165,
+              "p75": 77437.10786208748,
+              "p90": 78946.70487060046,
+              "p95": 79545.40451689812,
+              "p99": 81221.49905972768,
+              "p99.9": 81458.54644967454,
+              "p99.99": 81458.54644967454
+            }
+          },
+          "details": {
+            "DNSDialup": {
+              "average": 0.0006665326250000001,
+              "fastest": 0.000393542,
+              "slowest": 0.000799083
+            },
+            "DNSLookup": {
+              "average": 6.3242500000000005e-06,
+              "fastest": 6.67e-07,
+              "slowest": 4.8709e-05
+            },
+            "firstByte": {
+              "average": 0.0004397903769636037,
+              "fastest": 3.4583e-05,
+              "slowest": 0.113167375
+            }
+          },
+          "statusCodeDistribution": {
+            "200": 143104
+          },
+          "errorDistribution": {}
+        },
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 4128,
+              "cpu_seconds": 0.01,
+              "threads": 8
+            },
+            "generator": {
+              "rss_kib": 13792,
+              "cpu_seconds": 0.01,
+              "threads": 11
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13296,
+              "cpu_seconds": 3.08,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 47040,
+              "cpu_seconds": 2.86,
+              "threads": 19
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13296,
+              "cpu_seconds": 6.53,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 62896,
+              "cpu_seconds": 5.92,
+              "threads": 19
+            }
+          }
+        ],
+        "cpu_percent": 306.3086418585037,
+        "rss_mean_kib": 10240,
+        "threads_peak": 40,
+        "measurement_wall_seconds": 2.193865624954924,
+        "stderr": ""
+      },
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "5s",
+        "-t",
+        "10s",
+        "-w",
+        "-m",
+        "POST",
+        "-T",
+        "application/octet-stream",
+        "-D",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/tmp_vtup9jk/body.bin",
+        "http://127.0.0.1:8088/echo"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 5.002680125,
+          "slowest": 0.104584667,
+          "fastest": 4.3167e-05,
+          "average": 0.00044005460180363974,
+          "requestsPerSec": 72015.79773202068,
+          "totalData": 23610785792,
+          "sizePerRequest": 65536,
+          "sizePerSec": 4719627320.165708
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 72015.79773202068,
+          "latency_ms": {
+            "min": 0.043,
+            "mean": 0.44,
+            "p50": 0.242,
+            "p95": 1.002,
+            "p99": 3.543,
+            "max": 104.585
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000043167": 1,
+          "0.010497317": 359425,
+          "0.020951467": 471,
+          "0.031405617": 134,
+          "0.041859767": 72,
+          "0.052313917": 38,
+          "0.062768067": 72,
+          "0.073222217": 38,
+          "0.083676367": 14,
+          "0.094130517": 0,
+          "0.104584667": 7
+        },
+        "latencyPercentiles": {
+          "p10": 0.000129375,
+          "p25": 0.000181458,
+          "p50": 0.000241666,
+          "p75": 0.000359959,
+          "p90": 0.000621,
+          "p95": 0.001002166,
+          "p99": 0.003542834,
+          "p99.9": 0.021439917,
+          "p99.99": 0.069718917
+        },
+        "firstByteHistogram": {
+          "0.000037542": 1,
+          "0.0103641045": 359416,
+          "0.020690667000000003": 477,
+          "0.031017229500000004": 140,
+          "0.041343792000000004": 70,
+          "0.0516703545": 39,
+          "0.061996917000000006": 72,
+          "0.07232347950000001": 35,
+          "0.082650042": 16,
+          "0.0929766045": 0,
+          "0.103303167": 6
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000125458,
+          "p25": 0.000177916,
+          "p50": 0.000238833,
+          "p75": 0.000357208,
+          "p90": 0.000619,
+          "p95": 0.000998708,
+          "p99": 0.003518958,
+          "p99.9": 0.021314167,
+          "p99.99": 0.069700542
+        },
+        "rps": {
+          "mean": 71953.66927927993,
+          "stddev": 8844.17562111359,
+          "max": 82092.7921524932,
+          "min": 34627.70216172938,
+          "percentiles": {
+            "p10": 62064.47084774603,
+            "p25": 71685.72178611321,
+            "p50": 74540.68430549356,
+            "p75": 76685.62717129903,
+            "p90": 78505.88794159637,
+            "p95": 79547.06800013567,
+            "p99": 80579.28891784213,
+            "p99.9": 82092.7921524932,
+            "p99.99": 82092.7921524932
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.00032623696875,
+            "fastest": 0.000150625,
+            "slowest": 0.000487583
+          },
+          "DNSLookup": {
+            "average": 7.898499999999999e-06,
+            "fastest": 7.5e-07,
+            "slowest": 4.6083e-05
+          },
+          "firstByte": {
+            "average": 0.0004359434018103016,
+            "fastest": 3.7542e-05,
+            "slowest": 0.103303167
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 360272
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 6128,
+            "cpu_seconds": 6.73,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 13440,
+            "cpu_seconds": 0.01,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14368,
+            "cpu_seconds": 9.82,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 46288,
+            "cpu_seconds": 2.84,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14368,
+            "cpu_seconds": 13.32,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 64768,
+            "cpu_seconds": 5.96,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14368,
+            "cpu_seconds": 16.81,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 70832,
+            "cpu_seconds": 9.11,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14368,
+            "cpu_seconds": 20.22,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 100752,
+            "cpu_seconds": 12.28,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 7200,
+            "cpu_seconds": 23.47,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 117616,
+            "cpu_seconds": 15.35,
+            "threads": 11
+          }
+        }
+      ],
+      "cpu_percent": 323.4038649816404,
+      "rss_mean_kib": 11800,
+      "threads_peak": 40,
+      "measurement_wall_seconds": 5.176190458005294,
+      "stderr": "",
+      "shutdown_ms": 129.9728329759091,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\nRUNTIME_COST {\"event_loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"parse\":{\"count\":1510318,\"wall_ns\":1987107000,\"cpu_ns\":1545656082},\"dispatch\":{\"count\":503383,\"wall_ns\":1715931000,\"cpu_ns\":1460526392},\"read\":{\"count\":1006935,\"wall_ns\":206223129000,\"cpu_ns\":8864598387},\"serialize\":{\"count\":503383,\"wall_ns\":171678000,\"cpu_ns\":141400452},\"send\":{\"count\":1006760,\"wall_ns\":9981505000,\"cpu_ns\":8915064525},\"enqueue\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_lock\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_work\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"queue_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_publish\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_wait\":{\"count\":506232,\"wall_ns\":199032808000,\"cpu_ns\":2771235603},\"selector_update\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_add\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_modify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_delete\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_same\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_enable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_disable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"notify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_write\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_read\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"request\":{\"count\":503383,\"wall_ns\":0,\"cpu_ns\":0},\"recv_call\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"send_call\":{\"count\":1006760,\"wall_ns\":0,\"cpu_ns\":0},\"accept_call\":{\"count\":114,\"wall_ns\":0,\"cpu_ns\":0},\"copy_bytes\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"poll_call\":{\"count\":506232,\"wall_ns\":0,\"cpu_ns\":0},\"readvec_call\":{\"count\":506224,\"wall_ns\":0,\"cpu_ns\":0},\"mutex_lock\":{\"count\":1007732,\"wall_ns\":1244633000,\"cpu_ns\":373680423},\"mutex_unlock\":{\"count\":1007732,\"wall_ns\":0,\"cpu_ns\":0},\"condition_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_signal\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_broadcast\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_wait\":{\"count\":701,\"wall_ns\":59894122000,\"cpu_ns\":4872677},\"thread_spawn\":{\"count\":66,\"wall_ns\":915000,\"cpu_ns\":888956},\"peer_ip\":{\"count\":503383,\"wall_ns\":172770000,\"cpu_ns\":144769600},\"deadline_clear\":{\"count\":1006766,\"wall_ns\":1937827000,\"cpu_ns\":941214966},\"accept_hard_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_resource_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"connection_limit_rejected\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"thread_spawn_failed\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"read_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_again\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_reset\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_pipe\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_other_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0}}\nBENCH_STATS {\"calls\":372,\"requested\":25985233,\"live\":0,\"peak\":7217433}\n",
+      "runtime_cost": {
+        "event_loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "parse": {
+          "count": 1510318,
+          "wall_ns": 1987107000,
+          "cpu_ns": 1545656082
+        },
+        "dispatch": {
+          "count": 503383,
+          "wall_ns": 1715931000,
+          "cpu_ns": 1460526392
+        },
+        "read": {
+          "count": 1006935,
+          "wall_ns": 206223129000,
+          "cpu_ns": 8864598387
+        },
+        "serialize": {
+          "count": 503383,
+          "wall_ns": 171678000,
+          "cpu_ns": 141400452
+        },
+        "send": {
+          "count": 1006760,
+          "wall_ns": 9981505000,
+          "cpu_ns": 8915064525
+        },
+        "enqueue": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_lock": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_work": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "queue_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_publish": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_wait": {
+          "count": 506232,
+          "wall_ns": 199032808000,
+          "cpu_ns": 2771235603
+        },
+        "selector_update": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_add": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_modify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_delete": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_same": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_enable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_disable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "notify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_write": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_read": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "request": {
+          "count": 503383,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "recv_call": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "send_call": {
+          "count": 1006760,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_call": {
+          "count": 114,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "copy_bytes": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "poll_call": {
+          "count": 506232,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "readvec_call": {
+          "count": 506224,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "mutex_lock": {
+          "count": 1007732,
+          "wall_ns": 1244633000,
+          "cpu_ns": 373680423
+        },
+        "mutex_unlock": {
+          "count": 1007732,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_signal": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_broadcast": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_wait": {
+          "count": 701,
+          "wall_ns": 59894122000,
+          "cpu_ns": 4872677
+        },
+        "thread_spawn": {
+          "count": 66,
+          "wall_ns": 915000,
+          "cpu_ns": 888956
+        },
+        "peer_ip": {
+          "count": 503383,
+          "wall_ns": 172770000,
+          "cpu_ns": 144769600
+        },
+        "deadline_clear": {
+          "count": 1006766,
+          "wall_ns": 1937827000,
+          "cpu_ns": 941214966
+        },
+        "accept_hard_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_resource_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "connection_limit_rejected": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "thread_spawn_failed": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "read_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_again": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_reset": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_pipe": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_other_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        }
+      },
+      "allocator": {
+        "calls": 372,
+        "requested": 25985233,
+        "live": 0,
+        "peak": 7217433
+      }
+    },
+    {
+      "framework": "vectored",
+      "workload": "echo-65536",
+      "connections": 32,
+      "round": 3,
+      "runner_shutdown_wait_seconds": 45,
+      "wire_checks": [
+        {
+          "workload": "plaintext",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "text/plain; charset=utf-8"
+            ],
+            [
+              "content-length",
+              "13"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 13,
+          "body_sha256": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        },
+        {
+          "workload": "json",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "27"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 27,
+          "body_sha256": "8811a6f55cb434d10921bccf7108016db61792083bb929eef0e592e376a0db9a"
+        },
+        {
+          "workload": "routing",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "23"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 23,
+          "body_sha256": "256f6eb09f07e0a626ac5af061715f7ba242a5daae780f51824482d6f8bc0213"
+        },
+        {
+          "workload": "db",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/json"
+            ],
+            [
+              "content-length",
+              "36"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 36,
+          "body_sha256": "a4785f2f43fc4e07ad4e58fdfb68d09e24ddb37756593387e8ef73cfc9c8c905"
+        },
+        {
+          "workload": "echo-64",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "64"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 64,
+          "body_sha256": "7ce100971f64e7001e8fe5a51973ecdfe1ced42befe7ee8d5fd6219506b5393c"
+        },
+        {
+          "workload": "echo-1024",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "1024"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 1024,
+          "body_sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7"
+        },
+        {
+          "workload": "echo-65536",
+          "status": 200,
+          "http_version": 11,
+          "headers": [
+            [
+              "content-type",
+              "application/octet-stream"
+            ],
+            [
+              "content-length",
+              "65536"
+            ],
+            [
+              "connection",
+              "keep-alive"
+            ]
+          ],
+          "body_bytes": 65536,
+          "body_sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+        }
+      ],
+      "warmup": {
+        "oha": {
+          "summary": {
+            "successRate": 1.0,
+            "total": 2.002754291,
+            "slowest": 0.110626208,
+            "fastest": 4.125e-05,
+            "average": 0.00040527232338045407,
+            "requestsPerSec": 78278.19952976948,
+            "totalData": 10274209792,
+            "sizePerRequest": 65536,
+            "sizePerSec": 5130040084.382973
+          },
+          "metrics": {
+            "success_rate": 1.0,
+            "requests_per_sec": 78278.19952976948,
+            "latency_ms": {
+              "min": 0.041,
+              "mean": 0.405,
+              "p50": 0.231,
+              "p95": 0.845,
+              "p99": 3.128,
+              "max": 110.626
+            }
+          },
+          "responseTimeHistogram": {
+            "0.00004125": 1,
+            "0.0110997458": 156414,
+            "0.0221582416": 202,
+            "0.0332167374": 78,
+            "0.0442752332": 29,
+            "0.055333729": 14,
+            "0.06639222480000001": 12,
+            "0.07745072060000001": 13,
+            "0.08850921640000001": 5,
+            "0.0995677122": 2,
+            "0.110626208": 2
+          },
+          "latencyPercentiles": {
+            "p10": 0.000124375,
+            "p25": 0.000173125,
+            "p50": 0.000230875,
+            "p75": 0.000336875,
+            "p90": 0.000527916,
+            "p95": 0.000845458,
+            "p99": 0.003127625,
+            "p99.9": 0.021599875,
+            "p99.99": 0.071629292
+          },
+          "firstByteHistogram": {
+            "0.000041209": 1,
+            "0.011099696400000001": 156415,
+            "0.0221581838": 201,
+            "0.033216671200000006": 78,
+            "0.0442751586": 29,
+            "0.055333646": 14,
+            "0.06639213340000001": 12,
+            "0.07745062080000001": 13,
+            "0.0885091082": 5,
+            "0.0995675956": 2,
+            "0.110626083": 2
+          },
+          "firstBytePercentiles": {
+            "p10": 0.000123291,
+            "p25": 0.000172333,
+            "p50": 0.000230375,
+            "p75": 0.000336417,
+            "p90": 0.000527541,
+            "p95": 0.00084425,
+            "p99": 0.003124292,
+            "p99.9": 0.021599834,
+            "p99.99": 0.071629084
+          },
+          "rps": {
+            "mean": 78278.31947590438,
+            "stddev": 11304.444801120362,
+            "max": 86943.83708265709,
+            "min": 8231.554842332598,
+            "percentiles": {
+              "p10": 63213.87149141675,
+              "p25": 79371.10063194606,
+              "p50": 82214.75535552547,
+              "p75": 83632.41520299076,
+              "p90": 85002.12505312607,
+              "p95": 85588.0872594075,
+              "p99": 86479.41206080961,
+              "p99.9": 86943.83708265709,
+              "p99.99": 86943.83708265709
+            }
+          },
+          "details": {
+            "DNSDialup": {
+              "average": 0.00074780603125,
+              "fastest": 0.000468459,
+              "slowest": 0.000943375
+            },
+            "DNSLookup": {
+              "average": 4.71628125e-06,
+              "fastest": 7.5e-07,
+              "slowest": 2.8959e-05
+            },
+            "firstByte": {
+              "average": 0.00040448813570024715,
+              "fastest": 4.1209e-05,
+              "slowest": 0.110626083
+            }
+          },
+          "statusCodeDistribution": {
+            "200": 156772
+          },
+          "errorDistribution": {}
+        },
+        "process_samples": [
+          {
+            "server": {
+              "rss_kib": 4144,
+              "cpu_seconds": 0.01,
+              "threads": 8
+            },
+            "generator": {
+              "rss_kib": 13552,
+              "cpu_seconds": 0.01,
+              "threads": 11
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13424,
+              "cpu_seconds": 2.95,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 47168,
+              "cpu_seconds": 2.83,
+              "threads": 19
+            }
+          },
+          {
+            "server": {
+              "rss_kib": 13424,
+              "cpu_seconds": 6.34,
+              "threads": 40
+            },
+            "generator": {
+              "rss_kib": 65328,
+              "cpu_seconds": 6.03,
+              "threads": 19
+            }
+          }
+        ],
+        "cpu_percent": 300.5709360047637,
+        "rss_mean_kib": 10330.666666666666,
+        "threads_peak": 40,
+        "measurement_wall_seconds": 2.185840083984658,
+        "stderr": ""
+      },
+      "load_command": [
+        "oha",
+        "--no-tui",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "-c",
+        "32",
+        "-z",
+        "5s",
+        "-t",
+        "10s",
+        "-w",
+        "-m",
+        "POST",
+        "-T",
+        "application/octet-stream",
+        "-D",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/tmpx5f_i_1t/body.bin",
+        "http://127.0.0.1:8088/echo"
+      ],
+      "oha": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 5.002665875,
+          "slowest": 0.112206167,
+          "fastest": 4.1667e-05,
+          "average": 0.0004053604561168925,
+          "requestsPerSec": 78195.7080033853,
+          "totalData": 25636831232,
+          "sizePerRequest": 65536,
+          "sizePerSec": 5124633919.709859
+        },
+        "metrics": {
+          "success_rate": 1.0,
+          "requests_per_sec": 78195.7080033853,
+          "latency_ms": {
+            "min": 0.042,
+            "mean": 0.405,
+            "p50": 0.232,
+            "p95": 0.871,
+            "p99": 3.194,
+            "max": 112.206
+          }
+        },
+        "responseTimeHistogram": {
+          "0.000041667": 1,
+          "0.011258117": 390346,
+          "0.022474566999999997": 541,
+          "0.033691017": 157,
+          "0.044907467": 39,
+          "0.056123917": 38,
+          "0.06734036699999998": 30,
+          "0.07855681699999999": 16,
+          "0.08977326699999999": 11,
+          "0.10098971699999999": 4,
+          "0.112206167": 4
+        },
+        "latencyPercentiles": {
+          "p10": 0.000129208,
+          "p25": 0.00017825,
+          "p50": 0.000232084,
+          "p75": 0.000332125,
+          "p90": 0.000559542,
+          "p95": 0.000871417,
+          "p99": 0.003193625,
+          "p99.9": 0.018637458,
+          "p99.99": 0.064572166
+        },
+        "firstByteHistogram": {
+          "0.000041625": 1,
+          "0.0112580458": 390347,
+          "0.0224744666": 541,
+          "0.0336908874": 156,
+          "0.0449073082": 39,
+          "0.056123729000000004": 38,
+          "0.0673401498": 30,
+          "0.0785565706": 16,
+          "0.0897729914": 11,
+          "0.1009894122": 4,
+          "0.112205833": 4
+        },
+        "firstBytePercentiles": {
+          "p10": 0.000128083,
+          "p25": 0.000177459,
+          "p50": 0.000231667,
+          "p75": 0.000331708,
+          "p90": 0.000558958,
+          "p95": 0.000870292,
+          "p99": 0.0031865,
+          "p99.9": 0.018637083,
+          "p99.99": 0.064572125
+        },
+        "rps": {
+          "mean": 78095.37838941351,
+          "stddev": 9670.200847982192,
+          "max": 88814.0592655824,
+          "min": 25813.36293265213,
+          "percentiles": {
+            "p10": 63504.49611832628,
+            "p25": 78107.81078107393,
+            "p50": 81305.7645787035,
+            "p75": 83404.17020851048,
+            "p90": 84835.80556918215,
+            "p95": 86110.61796046971,
+            "p99": 87807.31434928502,
+            "p99.9": 88814.0592655824,
+            "p99.99": 88814.0592655824
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.00029322653125,
+            "fastest": 0.000134333,
+            "slowest": 0.000677792
+          },
+          "DNSLookup": {
+            "average": 6.282562499999998e-06,
+            "fastest": 8.33e-07,
+            "slowest": 2.6458e-05
+          },
+          "firstByte": {
+            "average": 0.0004046217085613797,
+            "fastest": 4.1625e-05,
+            "slowest": 0.112205833
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 391187
+        },
+        "errorDistribution": {}
+      },
+      "process_samples": [
+        {
+          "server": {
+            "rss_kib": 6256,
+            "cpu_seconds": 6.58,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 13488,
+            "cpu_seconds": 0.01,
+            "threads": 11
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14672,
+            "cpu_seconds": 9.2,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 47456,
+            "cpu_seconds": 2.92,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14672,
+            "cpu_seconds": 12.51,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 63440,
+            "cpu_seconds": 6.09,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14672,
+            "cpu_seconds": 15.94,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 69040,
+            "cpu_seconds": 9.3,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 14672,
+            "cpu_seconds": 19.35,
+            "threads": 40
+          },
+          "generator": {
+            "rss_kib": 94368,
+            "cpu_seconds": 12.5,
+            "threads": 19
+          }
+        },
+        {
+          "server": {
+            "rss_kib": 7504,
+            "cpu_seconds": 22.7,
+            "threads": 8
+          },
+          "generator": {
+            "rss_kib": 98832,
+            "cpu_seconds": 15.7,
+            "threads": 11
+          }
+        }
+      ],
+      "cpu_percent": 311.5203666434367,
+      "rss_mean_kib": 12074.666666666666,
+      "threads_peak": 40,
+      "measurement_wall_seconds": 5.174621541984379,
+      "stderr": "",
+      "shutdown_ms": 126.50979100726545,
+      "server_exit": 0,
+      "server_log": "info: akamata listening on http://127.0.0.1:8088/\nRUNTIME_COST {\"event_loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"parse\":{\"count\":1644074,\"wall_ns\":1983844000,\"cpu_ns\":1660692062},\"dispatch\":{\"count\":547966,\"wall_ns\":1808395000,\"cpu_ns\":1552740385},\"read\":{\"count\":1096108,\"wall_ns\":208291378000,\"cpu_ns\":9386968149},\"serialize\":{\"count\":547966,\"wall_ns\":180037000,\"cpu_ns\":151831636},\"send\":{\"count\":547966,\"wall_ns\":8083262000,\"cpu_ns\":7389467982},\"enqueue\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_lock\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"worker_work\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"queue_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_publish\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"completion_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_wait\":{\"count\":551053,\"wall_ns\":200825903000,\"cpu_ns\":2928007759},\"selector_update\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_add\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_modify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_delete\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"selector_same\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_enable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"writable_disable\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"notify\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_write\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"wake_read\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"loop\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"request\":{\"count\":547966,\"wall_ns\":0,\"cpu_ns\":0},\"recv_call\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"send_call\":{\"count\":547966,\"wall_ns\":0,\"cpu_ns\":0},\"accept_call\":{\"count\":143,\"wall_ns\":0,\"cpu_ns\":0},\"copy_bytes\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"poll_call\":{\"count\":551053,\"wall_ns\":0,\"cpu_ns\":0},\"readvec_call\":{\"count\":551045,\"wall_ns\":0,\"cpu_ns\":0},\"mutex_lock\":{\"count\":1096929,\"wall_ns\":1114840000,\"cpu_ns\":405279924},\"mutex_unlock\":{\"count\":1096929,\"wall_ns\":0,\"cpu_ns\":0},\"condition_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_signal\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"condition_broadcast\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_wait\":{\"count\":732,\"wall_ns\":59876561000,\"cpu_ns\":5964543},\"thread_spawn\":{\"count\":66,\"wall_ns\":840000,\"cpu_ns\":826416},\"peer_ip\":{\"count\":547966,\"wall_ns\":177765000,\"cpu_ns\":153508555},\"deadline_clear\":{\"count\":1095932,\"wall_ns\":1818015000,\"cpu_ns\":1013800778},\"accept_hard_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"accept_resource_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"connection_limit_rejected\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"thread_spawn_failed\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"read_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_timeout\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_again\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_wait\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_reset\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_pipe\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0},\"write_other_failure\":{\"count\":0,\"wall_ns\":0,\"cpu_ns\":0}}\nBENCH_STATS {\"calls\":372,\"requested\":25985233,\"live\":0,\"peak\":7217433}\n",
+      "runtime_cost": {
+        "event_loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "parse": {
+          "count": 1644074,
+          "wall_ns": 1983844000,
+          "cpu_ns": 1660692062
+        },
+        "dispatch": {
+          "count": 547966,
+          "wall_ns": 1808395000,
+          "cpu_ns": 1552740385
+        },
+        "read": {
+          "count": 1096108,
+          "wall_ns": 208291378000,
+          "cpu_ns": 9386968149
+        },
+        "serialize": {
+          "count": 547966,
+          "wall_ns": 180037000,
+          "cpu_ns": 151831636
+        },
+        "send": {
+          "count": 547966,
+          "wall_ns": 8083262000,
+          "cpu_ns": 7389467982
+        },
+        "enqueue": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_lock": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "worker_work": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "queue_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_publish": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "completion_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_wait": {
+          "count": 551053,
+          "wall_ns": 200825903000,
+          "cpu_ns": 2928007759
+        },
+        "selector_update": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_add": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_modify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_delete": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "selector_same": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_enable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "writable_disable": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "notify": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_write": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "wake_read": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "loop": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "request": {
+          "count": 547966,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "recv_call": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "send_call": {
+          "count": 547966,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_call": {
+          "count": 143,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "copy_bytes": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "poll_call": {
+          "count": 551053,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "readvec_call": {
+          "count": 551045,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "mutex_lock": {
+          "count": 1096929,
+          "wall_ns": 1114840000,
+          "cpu_ns": 405279924
+        },
+        "mutex_unlock": {
+          "count": 1096929,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_signal": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "condition_broadcast": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_wait": {
+          "count": 732,
+          "wall_ns": 59876561000,
+          "cpu_ns": 5964543
+        },
+        "thread_spawn": {
+          "count": 66,
+          "wall_ns": 840000,
+          "cpu_ns": 826416
+        },
+        "peer_ip": {
+          "count": 547966,
+          "wall_ns": 177765000,
+          "cpu_ns": 153508555
+        },
+        "deadline_clear": {
+          "count": 1095932,
+          "wall_ns": 1818015000,
+          "cpu_ns": 1013800778
+        },
+        "accept_hard_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "accept_resource_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "connection_limit_rejected": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "thread_spawn_failed": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "read_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_timeout": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_again": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_wait": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_reset": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_pipe": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        },
+        "write_other_failure": {
+          "count": 0,
+          "wall_ns": 0,
+          "cpu_ns": 0
+        }
+      },
+      "allocator": {
+        "calls": 372,
+        "requested": 25985233,
+        "live": 0,
+        "peak": 7217433
+      }
+    }
+  ],
+  "shutdown_wait_seconds": 45
+}

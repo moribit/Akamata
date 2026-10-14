@@ -27,6 +27,7 @@ test {
     _ = @import("runtime/reactor.zig");
     _ = @import("runtime/drain.zig");
     _ = @import("runtime/readiness_poll.zig");
+    _ = @import("runtime/bounded_writer.zig");
     _ = @import("runtime/application_admission.zig");
     _ = @import("runtime/reactor_output.zig");
     _ = @import("http/session.zig");

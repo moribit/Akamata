@@ -69,3 +69,9 @@ index must not be described as a 1,000-route linear scan based on this table.
 The existing bounded specialization threshold is retained; an unmeasured trie
 rewrite would introduce compile-size/ownership complexity for a different path.
 Use `examples/router_bench` for full App/middleware network scaling.
+
+The existing router runner's oha decoding has been updated from the obsolete
+`metrics.*` JSON shape to oha 1.15's response-count/total and latencyPercentiles
+fields, and artifact sizing is portable across macOS/Linux. Its default counts
+now include 10/100/1000. This short diagnostic runner is not the requested
+competitive 10/30-second five-round matrix; its results must not be relabeled.

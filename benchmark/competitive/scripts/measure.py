@@ -137,9 +137,13 @@ def main():
     parser.add_argument("--rounds", type=int, default=5)
     parser.add_argument("--seed", type=int, default=20261013)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--shutdown-wait", type=int, default=45,
+                        help="runner cleanup bound; must exceed Native's 30s default I/O drain")
     args = parser.parse_args()
-    if max(args.connections) > 1024:
+    if min(args.connections) < 1 or max(args.connections) > 1024:
         parser.error("explicit OS safety review required above 1024")
+    if args.shutdown_wait < 1:
+        parser.error("shutdown wait must be positive")
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE, (max(soft, min(4096, hard)), hard))
     manifest = json.loads(Path(args.manifest).read_text())
@@ -164,6 +168,7 @@ def main():
               "oha": subprocess.check_output(["oha", "--version"], text=True).strip(),
               "warmup_seconds": args.warmup, "duration_seconds": args.duration, "rounds": args.rounds,
               "binaries": binaries, "runs": []}
+    result["shutdown_wait_seconds"] = args.shutdown_wait
     if args.resume and output.exists():
         previous = json.loads(output.read_text())
         # Fixture source identity belongs to each frozen binary. The harness
@@ -179,6 +184,13 @@ def main():
         if result["command"] not in invocations:
             invocations.append(result["command"])
         result = previous
+        if result.get("shutdown_wait_seconds", 10) != args.shutdown_wait:
+            result.setdefault("shutdown_policy_revisions", []).append({
+                "previous_seconds": result.get("shutdown_wait_seconds", 10),
+                "seconds": args.shutdown_wait,
+                "source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+                "reason": "allow configured Native 30s drain; measurement conditions/binaries unchanged"})
+        result["shutdown_wait_seconds"] = args.shutdown_wait
     done = {(r["framework"], r["workload"], r["connections"], r["round"]) for r in result["runs"] if "oha" in r}
     def save():
         temporary = output.with_suffix(".tmp")
@@ -195,7 +207,8 @@ def main():
                     if (name, workload, connections, round_no) in done:
                         continue
                     print(f"round={round_no} workload={workload} c={connections} framework={name}", flush=True)
-                    row = {"framework": name, "workload": workload, "connections": connections, "round": round_no}
+                    row = {"framework": name, "workload": workload, "connections": connections, "round": round_no,
+                           "runner_shutdown_wait_seconds": args.shutdown_wait}
                     with tempfile.TemporaryFile() as log, tempfile.TemporaryDirectory() as directory:
                         # Refuse occupied ports before starting, never kill another process.
                         with socket.socket() as probe:
@@ -231,7 +244,7 @@ def main():
                         finally:
                             started = time.monotonic()
                             if process.poll() is None: process.send_signal(signal.SIGINT)
-                            try: process.wait(timeout=10)
+                            try: process.wait(timeout=args.shutdown_wait)
                             except subprocess.TimeoutExpired:
                                 process.kill(); process.wait(); row["forced_runner_cleanup"] = True
                             row["shutdown_ms"] = (time.monotonic() - started) * 1000

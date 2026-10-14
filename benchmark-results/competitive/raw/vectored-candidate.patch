@@ -1,0 +1,125 @@
+diff --git a/src/runtime/bounded_writer.zig b/src/runtime/bounded_writer.zig
+index be9cb28..5dd666e 100644
+--- a/src/runtime/bounded_writer.zig
++++ b/src/runtime/bounded_writer.zig
+@@ -13,13 +13,24 @@ pub const Writer = struct {
+         return .{ .fd = fd, .io = io, .timeout_ms = timeout_ms, .interface = .{ .buffer = buffer, .vtable = &.{ .drain = drain } } };
+     }
+     fn send(self: *Writer, bytes: []const u8) std.Io.Writer.Error!void {
+-        if (bytes.len == 0) return;
++        return self.sendParts(bytes, "", false);
++    }
++    fn sendParts(self: *Writer, first: []const u8, second: []const u8, comptime pair: bool) std.Io.Writer.Error!void {
++        if (first.len == 0 and second.len == 0) return;
+         if (self.started == null or (self.control != null and self.control.?.write_deadline_ns.load(.acquire) == 0)) {
+             self.started = clock.monotonicNs();
+             if (self.control) |node| node.write_deadline_ns.store(self.started.? +| @as(u64, self.timeout_ms) * std.time.ns_per_ms, .release);
+         }
+-        var offset: usize = 0;
+-        while (offset < bytes.len) {
++        var parts: [if (pair) 2 else 1]std.c.iovec_const = if (pair)
++            .{ .{ .base = first.ptr, .len = first.len }, .{ .base = second.ptr, .len = second.len } }
++        else
++            .{.{ .base = first.ptr, .len = first.len }};
++        var index: usize = 0;
++        while (index < parts.len) {
++            if (parts[index].len == 0) {
++                index += 1;
++                continue;
++            }
+             self.io.checkCancel() catch return error.WriteFailed;
+             const elapsed = clock.elapsedNs(self.started.?) / std.time.ns_per_ms;
+             if (elapsed >= self.timeout_ms) {
+@@ -28,10 +39,20 @@ pub const Writer = struct {
+             }
+             const send_cost = cost.begin();
+             cost.add(.send_call, 1);
+-            const n = std.c.send(self.fd, bytes[offset..].ptr, bytes.len - offset, std.c.MSG.DONTWAIT | std.c.MSG.NOSIGNAL);
++            const n = if (pair and index + 1 < parts.len) blk: {
++                const message: std.c.msghdr_const = .{ .name = null, .namelen = 0, .iov = parts[index..].ptr, .iovlen = @intCast(parts.len - index), .control = null, .controllen = 0, .flags = 0 };
++                break :blk std.c.sendmsg(self.fd, &message, std.c.MSG.DONTWAIT | std.c.MSG.NOSIGNAL);
++            } else std.c.send(self.fd, parts[index].base, parts[index].len, std.c.MSG.DONTWAIT | std.c.MSG.NOSIGNAL);
+             send_cost.end(.send);
+             if (n > 0) {
+-                offset += @intCast(n);
++                var consumed: usize = @intCast(n);
++                while (consumed != 0) {
++                    const advance = @min(consumed, parts[index].len);
++                    parts[index].base += advance;
++                    parts[index].len -= advance;
++                    consumed -= advance;
++                    if (parts[index].len == 0) index += 1;
++                }
+                 continue;
+             }
+             if (n == 0) return error.WriteFailed;
+@@ -60,6 +81,14 @@ pub const Writer = struct {
+     }
+     fn drain(w: *std.Io.Writer, data: []const []const u8, splat: usize) std.Io.Writer.Error!usize {
+         const self: *Writer = @alignCast(@fieldParentPtr("interface", w));
++        // Common large-body drain: co-send the retained header and one body
++        // slice. Both borrows live until this bounded synchronous call returns.
++        // Arbitrary vector/splat shapes retain the existing ordered path.
++        if (data.len == 1 and splat == 1 and w.end != 0 and data[0].len != 0) {
++            try self.sendParts(w.buffered(), data[0], true);
++            w.end = 0;
++            return data[0].len;
++        }
+         try self.send(w.buffered());
+         w.end = 0;
+         for (data[0 .. data.len - 1]) |bytes| try self.send(bytes);
+@@ -67,3 +96,54 @@ pub const Writer = struct {
+         return std.Io.Writer.countSplat(data, splat);
+     }
+ };
++
++test "vectored prefix and body preserve partial writes under backpressure" {
++    var sockets: [2]c_int = undefined;
++    try std.testing.expectEqual(@as(c_int, 0), std.c.socketpair(std.c.AF.UNIX, std.c.SOCK.STREAM, 0, &sockets));
++    defer for (sockets) |fd| {
++        _ = std.c.close(fd);
++    };
++    const capacity: c_int = 1024;
++    try std.testing.expectEqual(@as(c_int, 0), std.c.setsockopt(sockets[0], std.c.SOL.SOCKET, std.c.SO.SNDBUF, &capacity, @sizeOf(c_int)));
++    const Peer = struct {
++        fd: c_int,
++        count: usize = 0,
++        valid: bool = true,
++        fn run(self: *@This()) void {
++            var buffer: [1024]u8 = undefined;
++            while (true) {
++                const n = std.c.recv(self.fd, &buffer, buffer.len, 0);
++                if (n < 0) {
++                    if (std.posix.errno(n) == .INTR) continue;
++                    self.valid = false;
++                    return;
++                }
++                if (n == 0) return;
++                for (buffer[0..@intCast(n)]) |byte| {
++                    const expected: u8 = if (self.count < 4) "HEAD"[self.count] else 'x';
++                    if (byte != expected) self.valid = false;
++                    self.count += 1;
++                }
++                std.Io.sleep(std.testing.io, .fromMilliseconds(1), .awake) catch {};
++            }
++        }
++    };
++    var peer: Peer = .{ .fd = sockets[1] };
++    const thread = try std.Thread.spawn(.{}, Peer.run, .{&peer});
++    var joined = false;
++    defer if (!joined) {
++        _ = std.c.shutdown(sockets[0], std.c.SHUT.RDWR);
++        thread.join();
++    };
++    var buffer: [32]u8 = undefined;
++    var writer = Writer.init(sockets[0], std.testing.io, &buffer, 2000);
++    try writer.interface.writeAll("HEAD");
++    const body: [65536]u8 = @splat('x');
++    try writer.interface.writeAll(&body);
++    try writer.interface.flush();
++    _ = std.c.shutdown(sockets[0], std.c.SHUT.WR);
++    thread.join();
++    joined = true;
++    try std.testing.expect(peer.valid);
++    try std.testing.expectEqual(@as(usize, 4 + body.len), peer.count);
++}
