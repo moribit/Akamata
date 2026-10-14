@@ -34,6 +34,7 @@ Zig 0.17.x向けの入口です。Getting Startedから始めてください。o
 - [SQLite／D1／Turso](db-backends.md)
 - [WebSocket](websocket.md)
 - [Observability](observability.md)
+- [競合性能の調査](competitive-performance.md) — 実測のトレードオフ、private runtimeと証拠レベル
 - [Security](security.md)
 - [Release process](releasing.md)
 

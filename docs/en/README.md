@@ -34,6 +34,7 @@ is development-oriented; pin a tagged release for reproducible builds.
 - [SQLite, D1, and Turso](db-backends.md)
 - [WebSocket](websocket.md)
 - [Observability](observability.md)
+- [Competitive performance research](competitive-performance.md) — measured tradeoffs, private runtime experiments and evidence limits
 - [Security](security.md)
 - [Release process](releasing.md)
 
