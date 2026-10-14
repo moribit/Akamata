@@ -45,16 +45,14 @@ pub fn appendValue(comptime T: type, value: T, w: *std.Io.Writer) !void {
         .null => try w.writeAll("null"),
         .bool => try w.writeAll(if (value) "true" else "false"),
         .int, .comptime_int => {
-            // Format directly into a small stack buffer; up to 24 chars for i64.
-            var buf: [24]u8 = undefined;
-            const s = std.fmt.bufPrint(&buf, "{d}", .{value}) catch unreachable;
-            try w.writeAll(s);
+            // Let Writer size its integer formatting buffer for the actual
+            // Zig type, including u128/i128, rather than assuming 64-bit values.
+            try w.print("{d}", .{value});
         },
         .float, .comptime_float => {
-            // Floats need more digits; 32 bytes covers everything finite.
-            var buf: [32]u8 = undefined;
-            const s = std.fmt.bufPrint(&buf, "{d}", .{value}) catch unreachable;
-            try w.writeAll(s);
+            // Decimal output of a finite f64 can exceed 32 characters. Preserve
+            // the existing decimal representation without a fixed-size trap.
+            try w.print("{d}", .{value});
         },
         .optional => {
             if (value) |v| try appendValue(@TypeOf(v), v, w) else try w.writeAll("null");
@@ -170,4 +168,15 @@ test "fast JSON preserves custom bounded wire representation" {
     defer output.deinit();
     try stringify(value, &output.writer);
     try std.testing.expectEqualStrings("{\"text\":\"hello\"}", output.written());
+}
+
+test "JSON numeric output supports wide integers and finite float extremes" {
+    inline for (.{ @as(u128, std.math.maxInt(u128)), @as(i128, std.math.minInt(i128)), @as(f64, 1e308), @as(f64, 1e-308) }) |value| {
+        var output: std.Io.Writer.Allocating = .init(std.testing.allocator);
+        defer output.deinit();
+        try stringify(value, &output.writer);
+        const decoded = try std.json.parseFromSlice(@TypeOf(value), std.testing.allocator, output.written(), .{});
+        defer decoded.deinit();
+        try std.testing.expectEqual(value, decoded.value);
+    }
 }

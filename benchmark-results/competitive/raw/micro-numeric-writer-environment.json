@@ -1,0 +1,12 @@
+{
+  "source_sha": "a562592aba392cf8a05f0bde1c06111c76f2106b",
+  "working_tree_candidate": true,
+  "zig": "0.17.0",
+  "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "binary_sha256": "7b637a111afe725c2e69646cd699f1431c660e1fc95436343c7244fe2914577a",
+  "command": [
+    "zig-out/bin/competitive-micro"
+  ],
+  "optimize": "ReleaseFast",
+  "serial_no_build": true
+}
