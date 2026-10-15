@@ -33,6 +33,7 @@ def main():
         success_rate = med(lambda row: row["oha"]["statusCodeDistribution"].get("200", 0) / row["oha"]["summary"]["total"])
         print(f"| {workload} | {connections} | {framework} | {len(rows)} | {success_rate:,.0f} | {med(lambda row: row['oha']['summary']['requestsPerSec']):,.0f} | " + " | ".join(f"{value:.3f}" for value in latency) + f" | {med(lambda row: row['cpu_percent']):.1f} | {med(lambda row: row['rss_mean_kib']):,.0f} | {med(lambda row: row['threads_peak']):g} | {non200} | {errors} | {error_percent:.4f} |")
     print(f"\nFailed cases: {len(failed)}. Full requested matrix completion is not implied by a subset table.")
+    print(f"Excluded prior cases retained in raw evidence: {len(data.get('excluded_runs', []))}.")
     print("HTTP 200/s counts expected completed responses over the observed oha interval. Attempts/s is oha's reported rate including client failures. Error % aggregates client failures and non-200 responses across recorded rounds; warmup remains separate in raw evidence.")
     for row in failed:
         print(f"- {row['framework']} / {row['workload']} / {row['connections']} / round {row['round']}: {row.get('failure', 'incomplete')}")

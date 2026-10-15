@@ -1,0 +1,37 @@
+{
+  "directory": "/private/var/tmp",
+  "count": 781641,
+  "allocated_bytes": 51222626304,
+  "sizes": {
+    "65536": 781509,
+    "40769": 117,
+    "65137": 9,
+    "48961": 3,
+    "32577": 2,
+    "57153": 1
+  },
+  "earliest_mtime": 1792028682.2262146,
+  "latest_mtime": 1792038191.9948509,
+  "examples": [
+    {
+      "name": "facil_io_tmpfile_VXYwcKPq",
+      "bytes": 65536,
+      "sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3",
+      "all_x": true
+    },
+    {
+      "name": "facil_io_tmpfile_qptm0tAS",
+      "bytes": 65536,
+      "sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3",
+      "all_x": true
+    },
+    {
+      "name": "facil_io_tmpfile_RD1y4ABz",
+      "bytes": 65536,
+      "sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3",
+      "all_x": true
+    }
+  ],
+  "scan_seconds": 43.091524839401245,
+  "source": "zap v0.11.0 facil.io fio_tmpfile.h calls mkstemp without unlink; HTTP body above header threshold spills to file"
+}

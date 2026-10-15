@@ -68,3 +68,14 @@ The full matrix is deliberately long (hours). Never relabel reduced duration or
 fewer rounds as completing it. A resumed run rejects changed binary digests and
 per-binary source SHA, and records harness revisions separately. Live Workers runs are opt-in on isolated resources; host simulation
 never proves Cloudflare CPU time, cold-start performance or production superiority.
+
+## Pinned zap spill files
+
+The pinned unmodified facil.io path leaves named request-body files in macOS
+`/var/tmp`. [The investigation](zap-tempfile-cleanup.md) records this behavior.
+The harness removes only verified benchmark payload files after each zap process
+has exited, outside measured intervals. File creation/write/close remain measured;
+the competitor binary and its spill threshold are unchanged. Per-case cleanup
+counts and bytes are recorded. Nine pre-correction large-echo cases are preserved
+as excluded raw evidence and rerun, rather than mixing filesystem cleanup policies
+or deleting unfavorable results. A low disk reserve still stops admission.

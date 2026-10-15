@@ -76,6 +76,8 @@ def compare(before, after):
                                                                      / baseline["http_200_per_second"] - 1)})
     return {"complete": True, "baseline_cases": len(left), "after_cases": len(right),
             "failed_attempts": {"baseline": failed_left, "after": failed_right},
+            "excluded_prior_runs": {"baseline": before.get("excluded_runs", []),
+                                    "after": after.get("excluded_runs", [])},
             "comparisons": comparisons}
 
 

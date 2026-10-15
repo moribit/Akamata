@@ -83,7 +83,8 @@ not passage of all criteria. Full five-round results are still required.
 
 ## Remaining completion gates
 
-1. Resume the full frozen baseline (269/1260 cases at the last checkpoint), then
+1. Resume the full frozen baseline (490/1260 retained cases after the spill-file
+   investigation below), then
    the final frozen after matrix, with no local builds/tests/other load.
 2. Final test/fixture additions passed the 23-job cross-platform CI run above;
    the vectored candidate is rejected, with production writer restored.
@@ -117,3 +118,20 @@ attempts separately. After both stages complete, the supervisor automatically
 generates `matrix-comparison.md` and its JSON (all round medians, errors and binary
 digests). Eight offline reporting tests passed. Completion of this reporting
 implementation does not imply completion of the actual measurements.
+
+## Storage cause identified and corrected
+
+The later restart reached 499 cases. The disk reserve stopped the next admission
+without losing its checkpoint. The repeated capacity decline is now traced to
+the pinned zap/facil.io request-body spill path: `mkstemp` creates named files in
+`/var/tmp` without unlinking them. Approximately 47.7 GiB in 781,641 files belonged
+to this stopped measurement owner. [Investigation and cleanup policy](zap-tempfile-cleanup.md)
+record the source, ownership checks and recovery evidence. The competitor binary
+is unchanged; its I/O stays in the workload, and reclamation occurs only after
+server exit. Prior statements that the cause was unknown describe earlier stages
+of the investigation, not the current conclusion.
+
+Nine previous zap 64 KiB echo cases are preserved as excluded raw rows and will
+be rerun under the corrected post-exit cleanup protocol, independent of their
+performance. Other 490 completed cases remain checkpointed. Full matrix completion
+and final comparative conclusions are still pending.

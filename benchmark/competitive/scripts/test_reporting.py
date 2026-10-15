@@ -8,9 +8,31 @@ from pathlib import Path
 from unittest.mock import patch
 from measure import runtime_reports, owned_load, require_disk_reserve
 from compare_matrix import validate, compare, BASE, AFTER, WORKLOADS, CONNECTIONS
+from zap_cleanup import cleanup as cleanup_zap
 
 
 class ReportingTests(unittest.TestCase):
+    def test_zap_cleanup_respects_payload_owner_window_and_links(self):
+        import os
+        import time
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            since = time.time() - 1
+            for name, body in (("facil_io_tmpfile_full", b"x" * 65536),
+                               ("facil_io_tmpfile_partial", b"x" * 40769),
+                               ("facil_io_tmpfile_other", b"not benchmark data"),
+                               ("unrelated", b"x" * 65536),
+                               ("facil_io_tmpfile_old", b"x")):
+                (root / name).write_bytes(body)
+            os.utime(root / "facil_io_tmpfile_old", (since - 10, since - 10))
+            (root / "facil_io_tmpfile_symlink").symlink_to(root / "unrelated")
+            os.link(root / "unrelated", root / "facil_io_tmpfile_hardlink")
+            report = cleanup_zap(root, since, time.time() + 1)
+            self.assertEqual(2, report["removed_files"])
+            self.assertEqual({"facil_io_tmpfile_other", "facil_io_tmpfile_old", "unrelated",
+                              "facil_io_tmpfile_symlink", "facil_io_tmpfile_hardlink"},
+                             {p.name for p in root.iterdir()})
+
     def matrix(self, frameworks):
         import itertools
         return {"warmup_seconds": 10, "duration_seconds": 30, "rounds": 5,

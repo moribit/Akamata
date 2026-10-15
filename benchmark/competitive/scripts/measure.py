@@ -23,6 +23,7 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
+from zap_cleanup import cleanup as cleanup_zap
 
 WORKLOADS = {
     "plaintext": ("GET", "/plaintext", None, "text/plain; charset=utf-8", b"Hello, World!"),
@@ -202,7 +203,13 @@ def main():
                 "source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
                 "reason": "allow configured Native 30s drain; measurement conditions/binaries unchanged"})
         result["shutdown_wait_seconds"] = args.shutdown_wait
-    done = {(r["framework"], r["workload"], r["connections"], r["round"]) for r in result["runs"] if "oha" in r}
+    if platform.system() == "Darwin" and "zap" in frameworks:
+        result.setdefault("tempfile_cleanup_policy", {
+            "framework": "zap", "source_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+            "directory": "/private/var/tmp", "timing": "only after server exit, outside measured intervals",
+            "selection": "same uid, regular single-link file, owner lifetime, facil prefix, x payload <=64KiB",
+            "binary_changes": False})
+    done = {(r["framework"], r["workload"], r["connections"], r["round"]) for r in result["runs"] if "oha" in r and "failure" not in r}
     def save():
         temporary = output.with_suffix(".tmp")
         temporary.write_text(json.dumps(result, indent=2) + "\n")
@@ -226,6 +233,7 @@ def main():
                         with socket.socket() as probe:
                             probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                             probe.bind(("127.0.0.1", 8088))
+                        server_started_unix = time.time()
                         process = subprocess.Popen(manifest[name]["command"], env={**os.environ, **manifest[name].get("env", {})}, stdout=log, stderr=log)
                         try:
                             deadline = time.monotonic() + 10
@@ -261,12 +269,20 @@ def main():
                                 process.kill(); process.wait(); row["forced_runner_cleanup"] = True
                             row["shutdown_ms"] = (time.monotonic() - started) * 1000
                             row["server_exit"] = process.returncode
+                            if name == "zap" and platform.system() == "Darwin":
+                                try:
+                                    row["post_exit_tempfile_cleanup"] = cleanup_zap(
+                                        "/private/var/tmp", server_started_unix, time.time())
+                                except Exception as error:
+                                    row["failure"] = f"post-exit tempfile cleanup failed: {error}"
                             log.seek(0); row["server_log"] = log.read().decode(errors="replace")
                             try:
                                 row.update(runtime_reports(row["server_log"]))
                             except (ValueError, json.JSONDecodeError) as error:
                                 row["diagnostic_parse_failure"] = str(error)
                             result["runs"].append(row); save()
+                            if "failure" in row:
+                                raise RuntimeError(row["failure"])
 
 if __name__ == "__main__":
     main()
