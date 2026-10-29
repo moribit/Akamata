@@ -1,0 +1,141 @@
+{
+  "complete": true,
+  "environment": {
+    "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "cpu_count": 8,
+    "oha": "oha 1.15.0",
+    "warmup_seconds": 10,
+    "duration_seconds": 30,
+    "rounds": 5
+  },
+  "evidence": [
+    {
+      "path": "raw/native-baseline.json",
+      "sha256": "4a3b63e3bd6e93631fc82490d1b6b8fe5be99787fea938117cf826db6724f0cf",
+      "distinct_cases": 1260,
+      "failed_attempts": 0,
+      "excluded_prior_cases": 9,
+      "forced_cleanup": 0,
+      "observed_load_wall_seconds": [
+        30.1591855410079,
+        31.74176966700179
+      ],
+      "frameworks": {
+        "akamata-threaded": {
+          "client_errors": {
+            "connection error": 6824
+          },
+          "non_200": 0,
+          "server_exits": {
+            "0": 210
+          }
+        },
+        "akamata-reactor": {
+          "client_errors": {
+            "connection error": 1574
+          },
+          "non_200": 0,
+          "server_exits": {
+            "0": 210
+          }
+        },
+        "actix": {
+          "client_errors": {
+            "connection error": 56
+          },
+          "non_200": 0,
+          "server_exits": {
+            "0": 210
+          }
+        },
+        "axum": {
+          "client_errors": {
+            "connection error": 15
+          },
+          "non_200": 0,
+          "server_exits": {
+            "0": 210
+          }
+        },
+        "go": {
+          "client_errors": {
+            "connection error": 24
+          },
+          "non_200": 0,
+          "server_exits": {
+            "-2": 210
+          }
+        },
+        "zap": {
+          "client_errors": {
+            "Connection reset by peer (os error 54)": 389478,
+            "Invalid argument (os error 22)": 210,
+            "connection error": 125869,
+            "error writing a body to connection": 12660,
+            "operation was canceled": 5469,
+            "connection closed before message completed": 1
+          },
+          "non_200": 0,
+          "server_exits": {
+            "0": 210
+          }
+        }
+      }
+    },
+    {
+      "path": "raw/native-after.json",
+      "sha256": "1e59e3bcbcb8a08c587ddd4b03400643b20e2ee27175f48e342b0aee3b6ace42",
+      "distinct_cases": 630,
+      "failed_attempts": 0,
+      "excluded_prior_cases": 0,
+      "forced_cleanup": 0,
+      "observed_load_wall_seconds": [
+        30.16151604100014,
+        32.41968120900856
+      ],
+      "frameworks": {
+        "akamata-threaded-after": {
+          "client_errors": {
+            "connection closed before message completed": 45,
+            "connection error": 8375,
+            "operation was canceled": 609,
+            "Connection reset by peer (os error 54)": 85,
+            "error writing a body to connection": 5
+          },
+          "non_200": 0,
+          "server_exits": {
+            "0": 210
+          }
+        },
+        "akamata-reactor-single-after": {
+          "client_errors": {
+            "connection closed before message completed": 1069,
+            "connection error": 2935,
+            "operation was canceled": 5,
+            "Connection reset by peer (os error 54)": 5,
+            "error writing a body to connection": 4
+          },
+          "non_200": 0,
+          "server_exits": {
+            "0": 210
+          }
+        },
+        "akamata-reactor-sharded-after": {
+          "client_errors": {
+            "connection closed before message completed": 872,
+            "connection error": 225,
+            "operation was canceled": 25,
+            "timeout": 1,
+            "Connection reset by peer (os error 54)": 72,
+            "error writing a body to connection": 9
+          },
+          "non_200": 0,
+          "server_exits": {
+            "0": 210
+          }
+        }
+      }
+    }
+  ],
+  "production_gate": "unchanged; Reactor fail-closed"
+}

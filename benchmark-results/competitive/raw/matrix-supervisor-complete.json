@@ -1,0 +1,42 @@
+{
+  "pid": 90354,
+  "started_unix": 1792044538.6866581,
+  "state": "complete",
+  "stages": [
+    {
+      "manifest": "/Users/mimoc/Akamata/benchmark-results/competitive/raw/baseline-manifest.json",
+      "output": "/Users/mimoc/Akamata/benchmark-results/competitive/raw/native-baseline.json",
+      "started_unix": 1792044538.686966,
+      "state": "complete",
+      "child_pid": 90356,
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "benchmark/competitive/scripts/measure.py",
+        "/Users/mimoc/Akamata/benchmark-results/competitive/raw/baseline-manifest.json",
+        "--output",
+        "/Users/mimoc/Akamata/benchmark-results/competitive/raw/native-baseline.json",
+        "--resume"
+      ],
+      "exit": 0,
+      "finished_unix": 1792086740.3759701
+    },
+    {
+      "manifest": "/Users/mimoc/Akamata/benchmark-results/competitive/raw/after-manifest.json",
+      "output": "/Users/mimoc/Akamata/benchmark-results/competitive/raw/native-after.json",
+      "started_unix": 1792086740.768994,
+      "state": "complete",
+      "child_pid": 75345,
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "benchmark/competitive/scripts/measure.py",
+        "/Users/mimoc/Akamata/benchmark-results/competitive/raw/after-manifest.json",
+        "--output",
+        "/Users/mimoc/Akamata/benchmark-results/competitive/raw/native-after.json",
+        "--resume"
+      ],
+      "exit": 0,
+      "finished_unix": 1792132883.743447
+    }
+  ],
+  "finished_unix": 1792132884.2479758
+}

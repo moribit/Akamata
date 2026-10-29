@@ -1,137 +1,163 @@
-# Competitive initiative: evaluation status
+# Competitive initiative: completed matrix and decision
 
-**The requested full measurement matrix is not complete.** This report separates
-implemented/verified work from remaining measurement gates. Do not use the
-short screens as five 30-second-round competitive certification.
+**All 1,890 Native cases are complete:** 1,260 baseline + 630 after, with all five
+rounds, no missing/duplicate completed cases, failed measurement cases, forced
+runner kills or non-200 responses. Client failures remain separately reported.
+Nine prior zap large-echo cases are preserved as excluded raw evidence and were
+replaced under the documented cleanup protocol, independent of performance.
 
-## Source and environment
+**Reactor Not Ready.** Threaded remains the production default; public Reactor
+remains fail-closed. Four loops offer a useful concurrency/resource tradeoff,
+but fail the low-concurrency throughput gate and expose a large-response P99
+blocker. No tag or GitHub Release is created.
 
-Initial main `8a521fb`; frozen competitive fixtures `023b101`; verified core and
-documentation candidate `13ac0849a0234ddc3a4822a15371059cd6e5ac59`. Apple M2,
-macOS 27.0 (26A428), Zig 0.17.0, ReleaseFast measurements, oha 1.15.0.
-Pinned compiler/framework versions and SQLite source digest are in
-[environment](raw/environment.json), [methodology](methodology.md) and manifests.
-No comparison against the historical M2 v0.2.1 fixture's absolute rates is made.
+## Evidence and conditions
 
-## Implemented and verified
+- [All baseline/competitor results](framework-comparison.md).
+- [All final runtime results](runtime-after-table.md).
+- [Every before/after comparison](matrix-comparison.md) and [metrics JSON](matrix-comparison.json).
+- [Decision tables and round spread](decision-evidence.md).
+- [Completeness, errors, exit codes and raw-data digests](raw/matrix-validation.json).
+- [Raw baseline](raw/native-baseline.json), [raw after](raw/native-after.json),
+  [baseline manifest](raw/baseline-manifest.json), [after manifest](raw/after-manifest.json).
+- [Methodology](methodology.md), [environment/toolchains](raw/environment.json),
+  [generator calibration](generator-calibration.md), [architecture snapshot](architecture-baseline.md).
 
-- Pinned Actix/Axum/Go/zap/Akamata fixtures, exact HTTP/1.1 wire conformance,
-  identical SQLite source/SQL/data and eight-handle pool setup.
-- Checkpointed, serial, resume-validated measurement; successful HTTP rates
-  separated from failed attempts; owned generators cleaned on interruption.
-- [Threaded idle notification](idle-shutdown.md): hot socket-only probe before
-  parking quiet connections. Refined 1024-idle CPU median 37.63% → 1.70%, RSS
-  approximately unchanged, shutdown median 125.42 → 126.20 ms.
-- [JSON numeric Writer](routing-json.md): integer-array micro time 3440 → 2195 ns
-  and valid wide-number panic fixes. Other measured shapes broadly unchanged.
-- [Private sharded Reactor](runtime-comparison.md): fixed total worker budget,
-  global admission, shared HTTP/Session/Cursor and incremental ownership.
-  The research path does not enter production App.serve.
-- [Actual Workers WASM/Hono host fixture](workers-comparison.md): seven exact
-  response checks with fake D1. No live Cloudflare measurements or superiority.
+Apple M2, macOS 27.0 (26A428), Zig 0.17.0, Akamata ReleaseFast/SMP, HTTP/1.1
+loopback, oha 1.15.0. Connections: 1/8/32/128/512/1024. Seven workloads: plaintext,
+JSON, parameter routing, eight-handle SQLite pool query, echo 64 B/1 KiB/64 KiB.
+Each case uses 10 s warmup + 30 s load, five rounds. SQLite 3.53.1 source,
+SQL/data/pool settings and wire bodies/Content-Type match across implementations.
+Automatic headers and runtime designs differ and are retained in wire evidence.
+Pinned zap v0.11.0 uses its upstream-compatible Zig 0.15.2 toolchain/SDK.
 
-## Reliability evidence
+Baseline fixture source: `023b101d6c3b3b22b2e5bed489c3e398cefa3098`, against initial
+main `8a521fb16e2a6dbffb92627b73350cdb8c551925`. Final executable source:
+`c13650d2bf6c6330cb6f33114b16ddce533c7ad0`; SHA-256
+`c165114733bcdbdbfb5eca59aba4a74fed9913d56f63d600f1770c2311f6d909`.
+Raw artifacts retain each binary/source identity, command and harness revision.
+Both stages exited 0; [supervisor completion](raw/matrix-supervisor-complete.json)
+is 2026-10-16 06:41:24 UTC. Resumptions/pauses mean this was not a continuous,
+isolated-host performance certification.
 
-Local final runtime candidate: 136 Transport tests, 12 application isolation
-scenarios and 24 stress/fault scenarios passed, plus three-adapter session/race
-validation. Native ReleaseSafe full suite: 178 passed, one skipped, zero failed.
-The first full build ran out of disk before affected tests executed; cache
-cleanup and successful rerun are recorded separately.
+```sh
+# Requires unchanged frozen binaries; no concurrent builds or load.
+python3 benchmark/competitive/scripts/run_initiative.py --launch --after-manifest benchmark-results/competitive/raw/after-manifest.json
+# Offline regeneration, without rerunning load:
+python3 benchmark/competitive/scripts/compare_matrix.py benchmark-results/competitive/raw/native-baseline.json benchmark-results/competitive/raw/native-after.json --output benchmark-results/competitive/matrix-comparison.md
+python3 benchmark/competitive/scripts/report_matrix.py
+```
 
-For core SHA `13ac084`, [normal CI](https://github.com/moribit/Akamata/actions/runs/38514430563)
-passed all 23 jobs, including Linux/macOS, Native/Workers/Container, docs,
-generated clients, living examples and scaffold/update/sync. [TSan](https://github.com/moribit/Akamata/actions/runs/38515245637)
-passed Linux and macOS, including sharded upgrade publication repeats. These
-results do not automatically certify later uncommitted optimization candidates.
+## Observed Threaded before/after
 
-Final frozen SHA `c13650d2bf6c6330cb6f33114b16ddce533c7ad0` also passed
-[all 23 normal CI jobs](https://github.com/moribit/Akamata/actions/runs/38521159568).
-The production writer is restored; this revision adds the partial-write regression
-test and records the rejected candidate. [CI metadata](raw/ci-c13650d.json)
-records the individual jobs. The earlier two-platform TSan run covers the
-unchanged accepted production implementation.
+32 connections, medians of all rounds. Rates count completed HTTP 200 responses.
+P99 is median of round percentiles for completed requests, not pooled latency or
+a timeout-inclusive SLO. CPU means one core = 100%; RSS is sampled mean per round,
+then median across rounds. Full tables retain every error and connection level.
 
-The [large-output shutdown probe](raw/drain-probe-instrumented.json) distinguishes
-a runner's premature 10-second kill from the configured 30-second drain: the
-process exited normally after 24.5 seconds, framework live bytes zero, 54 read
-timeouts, no writer-budget timeout. Wall samples show partial-request readiness
-waits. The root network/burst cause of those connections remains unknown. Runner
-cleanup now permits 45 seconds without changing runtime deadlines.
+| Workload | Before req/s | After req/s | Observed change | Before P99 ms | After P99 ms |
+|---|---:|---:|---:|---:|---:|
+| Plaintext | 89,479 | 142,245 | +59.0% | 0.569 | 0.863 |
+| JSON | 136,871 | 154,732 | +13.0% | 1.045 | 0.878 |
+| DB pool query | 85,302 | 125,333 | +46.9% | 1.776 | 1.734 |
+| Echo 1 KiB | 120,336 | 129,342 | +7.5% | 1.468 | 1.057 |
 
-## Rejected / unproven
+**Observed cohort differences are not causal optimization estimates.** Runs were
+collected at different times on a shared fanless workstation. Plaintext c32 CPU
+rises 206.3% → 340.9%, with worse P99 despite higher throughput. CPU/request from
+the ratio of medians is about 23.1 → 24.0 us, not an efficiency win. Baseline
+plaintext rounds range 85,419–105,402 req/s; final rounds 93,206–154,506. Final
+four-loop rounds span 36,619–130,245. Exact thermal/background/scheduling
+contributions are unknown. Active-traffic non-regression is not established.
 
-- Zero-deadline lock skipping: small/inconsistent benefit; reverted.
-- Shared pipe registration on every hot read: severe active-traffic regression;
-  rejected and replaced by the quiet-connection-only park.
-- Group/custom scheduler/lock-free replacement/unsafe event-loop handlers:
-  not introduced without evidence.
-- SIMD/trie rewrite: isolated costs recorded, but no measured end-to-end reason
-  to change security checks or the prepared App route index.
-- Native vectored large-output candidate: reverted after the five-round,
-  10/30-second paired subset. Large echo improves ~13.5%, but plaintext P99
-  worsens ~21%. The candidate patch and all results remain in the repository.
+Compare competitors within the baseline cohort, not final Akamata against older
+competitor runs. Baseline c32 Threaded plaintext is about 5.3% below Axum and
+3.1% above Actix; DB is materially below both. The evidence does not establish
+universal competitive leadership or unlimited generator headroom.
 
-## Runtime adoption decision
+## Multiplexed decision
 
-**No production promotion.** Threaded remains default; `.runtime = .reactor`
-continues to return `ExperimentalRuntimeDisabled`.
-The four-loop screen improves high-concurrency latency/resources, but c32
-plaintext remains 121709 versus Threaded 178734 HTTP 200/s, failing the proposed
-5% low-concurrency throughput gate. c1024 P99 is 15.415 versus 31.981 ms and
-idle RSS is about 31 MiB versus 119 MiB, demonstrating a research tradeoff,
-not passage of all criteria. Full five-round results are still required.
+Four loops divide **eight total workers**. Shared HTTP Session/Cursor, bounded
+output, global admission, deadlines, drain and incremental session ownership
+remain. No unconditional event-loop handlers or Group scheduler are introduced.
 
-## Remaining completion gates
+| Final cohort case | Threaded req/s | Four-loop req/s | Threaded P99 ms | Four-loop P99 ms |
+|---|---:|---:|---:|---:|
+| Plaintext / 32 | 142,245 | 96,831 | 0.863 | 0.881 |
+| Plaintext / 1,024 | 137,681 | 152,274 | 39.249 | 19.127 |
+| Echo 1 KiB / 1,024 | 125,718 | 126,795 | 43.403 | 22.627 |
+| Echo 64 KiB / 512 | 29,114 | 14,017 | 25.095 | 366.327 |
+| Echo 64 KiB / 1,024 | 24,861 | 8,802 | 459.215 | 1,013.514 |
 
-1. Resume the full frozen baseline (490/1260 retained cases after the spill-file
-   investigation below), then
-   the final frozen after matrix, with no local builds/tests/other load.
-2. Final test/fixture additions passed the 23-job cross-platform CI run above;
-   the vectored candidate is rejected, with production writer restored.
-3. Populate the final full framework/runtime tables from every round/error,
-   retaining source/environment/command/binary hashes.
-4. Update this status report with exact completion, remaining unknown causes and
-   adoption decision, then commit/push evidence. No tag/release is created.
+At c32, plaintext is 31.9% slower, failing the allowed 5% deficit. At c1024,
+plaintext gains 10.6% throughput, roughly halves P99, and uses 31.7 versus
+131.9 MiB RSS / 12 versus 1,032 threads. These advantages do not cancel the
+large-echo deficit: throughput −51.9% / −64.6% at c512/c1024, with severe P99.
+Equivalent Linux performance is unmeasured. Production promotion is rejected.
 
-The durable supervisor in `benchmark/competitive/scripts/run_initiative.py`
-resumes fixed binaries and writes process/stage status independently of a terminal.
-Its completion is not presumed merely because it has been launched.
+## Improvements, rejected experiments and attribution
 
-Two resumed attempts stopped when host disk space was exhausted during the next
-zap warmup. The 257 saved cases remain valid; the incomplete case is not counted
-and is rerun. [Interruption evidence](raw/matrix-disk-interruption.json) preserves
-the failure, including failed status/checkpoint writes. Regenerable caches were
-removed, preserving frozen binaries and raw data. The runner now checks a 1 GiB
-reserve on output and temporary volumes before each case; low capacity stops
-admission instead of starting another measurement. A stale `running` status file
-alone is not evidence that the owning process is alive.
+- [Quiet-connection notification](idle-shutdown.md): separate 1024-idle, 10 s ×
+  three-round medians: CPU 37.63% → 1.70%, RSS 121,936 → 121,984 KiB, threads
+  unchanged at 1,032, shutdown 125.42 → 126.20 ms. This is an idle-CPU benefit,
+  not a fix for thread-per-connection memory or a macro throughput claim.
+- [JSON numeric Writer](routing-json.md): five-round integer-array micro time
+  3,440 → 2,195 ns (~36% lower), plus wide integer/finite-float boundary fixes.
+  No matching percentage HTTP improvement is inferred.
+- Shared pipe polling on every hot read: rejected for severe regression.
+- Zero-deadline lock skipping: reverted for small/inconsistent benefit and P99.
+- [Vectored output](http-optimization.md): five-round 10/30 s subset improves
+  large echo ~13.5% but worsens plaintext P99 ~21%; implementation reverted,
+  partial-write test retained. Original production writer remains.
+- No speculative SIMD/trie/lock-free scheduler/Group/unsafe preemption was added.
 
-The next restart began with approximately 11 GiB free, but stopped again during
-zap / 64 KiB echo / 512 connections / round 1. The cause of the rapid capacity
-decline is not established. [Follow-up evidence](raw/matrix-disk-interruption-followup.json)
-preserves the 269-case checkpoint state and failure log. Measurement is stopped
-until storage capacity can be maintained; no full-matrix conclusion is claimed.
+[Attribution](runtime-attribution.md) distinguishes inclusive wall waits from CPU
+time. Empty→nonempty batching already amortizes wakeups (~0.04 writes/request in
+the c32 diagnostic). Handoff/completion are fixed-cost candidates, but an exclusive
+percentage explaining the full gap is **unknown**. Exact macOS process-wide
+syscalls/context switches are unknown; readVec operations are not recv counts.
 
-`compare_matrix.py` now validates the exact 1260 baseline / 630 after case sets,
-rejects duplicate completed cases and environment drift, and retains failed
-attempts separately. After both stages complete, the supervisor automatically
-generates `matrix-comparison.md` and its JSON (all round medians, errors and binary
-digests). Eight offline reporting tests passed. Completion of this reporting
-implementation does not imply completion of the actual measurements.
+## Errors, lifecycle and verification
 
-## Storage cause identified and corrected
+Across all workloads/connection levels, baseline client errors total: Threaded
+6,824; legacy Reactor 1,574; Actix 56; Axum 15; Go 24; pinned zap 533,687. Final
+Threaded totals 9,119, single loop 4,018 and four loops 1,204. Use per-case error
+rates rather than treating these mixed-workload totals as rankings. Exact root
+causes of connection/reset/cancel failures remain unresolved. Completion is not
+an error-free-operation claim. Go exits on the runner's SIGINT (-2), not a forced
+kill or proof of graceful drain. All runtimes stayed within the runner bound.
 
-The later restart reached 499 cases. The disk reserve stopped the next admission
-without losing its checkpoint. The repeated capacity decline is now traced to
-the pinned zap/facil.io request-body spill path: `mkstemp` creates named files in
-`/var/tmp` without unlinking them. Approximately 47.7 GiB in 781,641 files belonged
-to this stopped measurement owner. [Investigation and cleanup policy](zap-tempfile-cleanup.md)
-record the source, ownership checks and recovery evidence. The competitor binary
-is unchanged; its I/O stays in the workload, and reclamation occurs only after
-server exit. Prior statements that the cause was unknown describe earlier stages
-of the investigation, not the current conclusion.
+[Zap spill-file investigation](zap-tempfile-cleanup.md) identified 781,641 files /
+47.7 GiB in `/var/tmp`. Verified payloads are now reclaimed only after server
+exit; actual file I/O remains measured and the pinned binary is unchanged.
+Nine earlier cases are retained with exclusion reasons and replaced.
 
-Nine previous zap 64 KiB echo cases are preserved as excluded raw rows and will
-be rerun under the corrected post-exit cleanup protocol, independent of their
-performance. Other 490 completed cases remain checkpointed. Full matrix completion
-and final comparative conclusions are still pending.
+Accepted core validation: 136 Transport checks, 12 isolation scenarios, 24
+stress/fault scenarios and three-adapter session/race validation passed. Saved
+Native ReleaseSafe full suite: 178 passed / one skipped / zero failed. Normal
+CI for frozen c13650d passed all 23 jobs; accepted unchanged production code
+passed Linux/macOS TSan at 13ac084. Harness c4f3dc1 also passed all 23 normal CI
+jobs, including Native/Workers/Container, examples, generated clients, docs and
+scaffold/update/sync. [Revision-scoped CI evidence](raw/ci-matrix-completion.json)
+preserves the runs; documentation changes do not certify new runtime code.
+
+Completion reporting was rerun offline: nine reporting/cleanup tests passed,
+37 developer documents passed the existing link check, all competitive-report
+relative links resolved, and both full case sets validated again. No new load
+test or benchmark number was substituted during this finalization.
+
+[Workers WASM/Hono host contract](workers-comparison.md): seven response/D1
+simulation checks pass. Dedicated live resources were not established; live
+Cloudflare CPU/edge/cold-start superiority is untested. Framework allocator
+counters do not include all SQLite/libc/kernel/stack allocations.
+
+## Next work
+
+1. Paired/interleaved Threaded confirmation with host/generator headroom and
+   focused P99/error diagnostics; do not attribute the observed +59% to the patch.
+2. Isolate the four-loop large-output tail, queue/readiness fairness and error paths.
+3. Equivalent Linux performance before reconsidering any runtime gate.
+
+Resource/latency advantages justify narrow research, not production migration
+or a more complicated scheduler. [Historical progress notes](investigation-history.md)
+retain the intermediate failures and decisions.

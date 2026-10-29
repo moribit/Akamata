@@ -69,6 +69,14 @@ fewer rounds as completing it. A resumed run rejects changed binary digests and
 per-binary source SHA, and records harness revisions separately. Live Workers runs are opt-in on isolated resources; host simulation
 never proves Cloudflare CPU time, cold-start performance or production superiority.
 
+The completed result contains 1260 baseline and 630 after cases. These were
+separate time cohorts on a shared fanless workstation; large round-to-round and
+cohort variation prevents interpreting raw deltas as causal optimization gains.
+Compare competitors within their baseline cohort. Latency percentiles describe
+completed requests; client failures are separate, not silently included in an
+SLO percentile. [Final decision](final-report.md) and [round spread](decision-evidence.md)
+document these limits and the unchanged runtime gate.
+
 ## Pinned zap spill files
 
 The pinned unmodified facil.io path leaves named request-body files in macOS

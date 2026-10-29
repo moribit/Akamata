@@ -5,6 +5,12 @@ new production runtime. Native fixtures share HTTP/1.1 bodies, Content-Type,
 payload limit and keep-alive policy. Dedicated runtime entrypoints cannot enable
 Reactor through public App.serve. Dependencies here are benchmark-only.
 
+The [completed 1,890-case report](../../benchmark-results/competitive/final-report.md)
+links all raw rounds, errors, identities and the Not Ready runtime decision.
+Regenerate its tables offline with `python3 benchmark/competitive/scripts/report_matrix.py`
+after `compare_matrix.py`. The pinned zap spill-file cleanup policy is documented
+in the methodology; cleanup occurs only after the owning server exits.
+
 Build: `COMPETITIVE_ZIG=/path/to/zig-0.17.0 python3 benchmark/competitive/scripts/build.py`.
 zap has an upstream-compatible compiler/SDK recipe in its README. Pin all
 transitive Rust/JS dependencies with the included lockfiles. Hono host checks:

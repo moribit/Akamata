@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Competitive performance investigation
+
+- Reduce Threaded idle wakeups with an owned shutdown notification while preserving
+  read/write budgets, socket ownership and the Threaded production default.
+- Emit JSON numbers through the existing Writer; cover wide integer and finite
+  floating-point boundaries without fixed intermediate-buffer traps.
+- Evaluate private sharded reactors with a fixed total worker budget. Keep public
+  Reactor fail-closed: low-concurrency throughput and large-response P99 remain blockers.
+- Complete the pinned 1,260-case competitive baseline and 630-case final runtime
+  matrix, retaining all rounds/errors and source/binary identities. Document host
+  variation and avoid attributing separate-cohort deltas to optimization alone.
+- Reject vectored-output and deadline-lock candidates without sufficient overall
+  benefit. No release tag, live Cloudflare performance claim or runtime promotion.
+
+See the [completed investigation](benchmark-results/competitive/final-report.md).
+
 ### v0.2.1 Performance & Reliability preparation
 
 - Add compatible `Pool.tryAcquire`, monotonic `acquireWithDeadline`, explicit

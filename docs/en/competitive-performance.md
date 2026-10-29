@@ -19,7 +19,25 @@ loopback figures are neither a controlled performance certification nor proof
 of unlimited load-generator headroom. Failed attempts are reported separately
 from completed HTTP 200 responses.
 
-## Targeted changes under validation
+## Completed matrix
+
+The [final report](../../benchmark-results/competitive/final-report.md) contains
+1,260 baseline and 630 after cases: seven workloads, six connection levels,
+10 s warmup + 30 s load, five rounds. Every case is present; failures are retained.
+The [decision tables](../../benchmark-results/competitive/decision-evidence.md)
+include all-round medians, CPU/RSS, P99, errors and round spread.
+
+Four loops improve 1,024-connection plaintext P99 (39.249 → 19.127 ms) and
+RSS (131.9 → 31.7 MiB) relative to final Threaded, but are 31.9% slower at
+32 connections. Large-echo P99 is a known blocker (512 clients: 25.095 →
+366.327 ms). Reactor remains **Not Ready** and fail-closed.
+
+Before/after macro differences are observations from separate time cohorts,
+not causal optimization gains. Plaintext c32 throughput rises while CPU and
+P99 also rise; host variation is substantial. No universal winning claim is made.
+Exact root causes of client connection/reset errors remain unresolved.
+
+## Targeted changes and evidence
 
 - Threaded idle connections can wait on one App-owned shutdown notification
   instead of waking every 100 ms. The [three-round idle experiment](../../benchmark-results/competitive/idle-shutdown.md)
@@ -35,8 +53,9 @@ from completed HTTP 200 responses.
   stream/frame ownership. Synchronous stream/upgrade execution remains explicitly
   unsupported in Reactor evaluation; Threaded retains it.
 
-The full requested matrix and post-change cross-platform verification must be
-completed before a final comparison/adoption claim. The [raw evidence](../../benchmark-results/competitive/raw/)
+The full Native matrix is complete; Linux performance and live Workers performance
+remain unmeasured. Revision-scoped Contract/CI/TSan evidence is linked from the
+final report. The [raw evidence](../../benchmark-results/competitive/raw/)
 and [reproduction scripts](../../benchmark/competitive/README.md) distinguish
 short screens, instrumentation, idle measurements and requested-duration runs.
 Do not run builds/tests/other load during the serial matrix.

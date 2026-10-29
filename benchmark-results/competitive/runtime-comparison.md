@@ -1,4 +1,13 @@
-# Runtime investigation — work in progress
+# Runtime investigation and final decision
+
+The full 1260/630-case matrix is complete. See [final report](final-report.md),
+[final runtime table](runtime-after-table.md) and [decision evidence](decision-evidence.md).
+Four-loop c32 plaintext remains 31.9% below final Threaded; c512 large-echo P99
+is 366.327 versus 25.095 ms. High-concurrency small responses and memory improve,
+but the adoption gates are not met. Public Reactor remains fail-closed.
+
+The sections below retain the investigation's chronological snapshots and short
+screens; their former pending lists do not describe current matrix completion.
 
 Production remains **Threaded**. Public Reactor remains fail-closed. The private
 competitive executable can evaluate the existing multiplexed runtime; that is

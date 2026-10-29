@@ -17,7 +17,25 @@ zapはupstream対応のZig toolchainを使い、架空のAkamata向け移植は�
 性能認証や負荷生成器の無限の余力の証明として扱いません。HTTP 200の完了数と
 失敗を含むattempt数は分けて報告します。
 
-## 検証中の限定的な変更
+## 全matrixの完了結果
+
+[最終レポート](../../benchmark-results/competitive/final-report.md)にbaseline
+1,260件とafter 630件を保存しています。7 workload・6接続段階で、warmup 10秒＋
+測定30秒を各5回実施し、欠落なく検証しました。失敗も保持しています。
+[判断用の表](../../benchmark-results/competitive/decision-evidence.md)では全roundの
+中央値、CPU/RSS、P99、エラー、round間のばらつきを確認できます。
+
+4-loopは最終Threaded比で1,024接続plaintextのP99を39.249→19.127 ms、RSSを
+131.9→31.7 MiBに抑える一方、32接続のthroughputは31.9%低下しました。
+大きなEchoのP99もblockerです（512接続で25.095→366.327 ms）。
+Reactorは **Not Ready** と判断し、fail-closedを維持します。
+
+before/afterのmacro差は異なる時期の観測値であり、最適化による因果的な改善率
+ではありません。32接続plaintextはthroughputと同時にCPU・P99も増加し、環境の
+変動も大きく見られます。普遍的な競合優位性は主張しません。clientの接続・reset
+エラーの正確な原因も未解明です。
+
+## 限定的な変更と証拠
 
 - Threadedのidle接続は、100msごとの起床の代わりにAppが所有する共有shutdown
   通知を待てます。[3回のidle試験](../../benchmark-results/competitive/idle-shutdown.md)
@@ -31,8 +49,9 @@ zapはupstream対応のZig toolchainを使い、架空のAkamata向け移植は�
   Session、Cursor、incremental stream/frameのownershipを再利用します。
   Reactor評価では同期stream/upgradeを明示unsupportedとし、Threadedでは維持します。
 
-最終比較・採用判断には、指定された全matrixと変更後のcross-platform検証が
-必要です。[raw evidence](../../benchmark-results/competitive/raw/)と
+Nativeの全matrixは完了しています。Linux性能と実Workers性能は未測定です。
+revisionを明記したContract/CI/TSan結果は最終レポートから辿れます。
+[raw evidence](../../benchmark-results/competitive/raw/)と
 [再現script](../../benchmark/competitive/README.md)で短時間screen、instrumentation、
 idle測定、指定時間での測定を区別します。逐次測定中はbuild/test/他の負荷を
 実行しないでください。

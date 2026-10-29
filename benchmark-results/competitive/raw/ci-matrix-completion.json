@@ -1,0 +1,318 @@
+[
+  {
+    "conclusion": "success",
+    "headSha": "c13650d2bf6c6330cb6f33114b16ddce533c7ad0",
+    "jobs": [
+      {
+        "name": "public documentation and PDF contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "private competitive fixture contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "living examples (macos-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "adversarial HTTP smoke",
+        "conclusion": "success"
+      },
+      {
+        "name": "macos native + kqueue contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "generated DX client strict typecheck",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-test",
+        "conclusion": "success"
+      },
+      {
+        "name": "tasks-test",
+        "conclusion": "success"
+      },
+      {
+        "name": "living examples (ubuntu-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-openssl",
+        "conclusion": "success"
+      },
+      {
+        "name": "cli-build",
+        "conclusion": "success"
+      },
+      {
+        "name": "device-messaging-native",
+        "conclusion": "success"
+      },
+      {
+        "name": "chat-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-release-safe",
+        "conclusion": "success"
+      },
+      {
+        "name": "portable-application-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "guestbook-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "linux threaded + epoll contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "package-archive",
+        "conclusion": "success"
+      },
+      {
+        "name": "chat-native",
+        "conclusion": "success"
+      },
+      {
+        "name": "device-messaging-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "docker-build (chat container)",
+        "conclusion": "success"
+      },
+      {
+        "name": "cli init smoke test",
+        "conclusion": "success"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/moribit/Akamata/actions/runs/38521159568"
+  },
+  {
+    "conclusion": "success",
+    "headSha": "13ac0849a0234ddc3a4822a15371059cd6e5ac59",
+    "jobs": [
+      {
+        "name": "sanitizer (macos-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "sanitizer (ubuntu-latest)",
+        "conclusion": "success"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/moribit/Akamata/actions/runs/38515245637"
+  },
+  {
+    "conclusion": "success",
+    "headSha": "d35793a92f53ebcce3a591db7d1bc8dc4b54ae47",
+    "jobs": [
+      {
+        "name": "generated DX client strict typecheck",
+        "conclusion": "success"
+      },
+      {
+        "name": "private competitive fixture contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "tasks-test",
+        "conclusion": "success"
+      },
+      {
+        "name": "adversarial HTTP smoke",
+        "conclusion": "success"
+      },
+      {
+        "name": "macos native + kqueue contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "living examples (ubuntu-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "public documentation and PDF contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "chat-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "guestbook-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "chat-native",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "device-messaging-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-release-safe",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-openssl",
+        "conclusion": "success"
+      },
+      {
+        "name": "device-messaging-native",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-test",
+        "conclusion": "success"
+      },
+      {
+        "name": "package-archive",
+        "conclusion": "success"
+      },
+      {
+        "name": "cli-build",
+        "conclusion": "success"
+      },
+      {
+        "name": "portable-application-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "linux threaded + epoll contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "living examples (macos-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "cli init smoke test",
+        "conclusion": "success"
+      },
+      {
+        "name": "docker-build (chat container)",
+        "conclusion": "success"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/moribit/Akamata/actions/runs/38689927110"
+  },
+  {
+    "conclusion": "success",
+    "headSha": "c4f3dc13c52d16bf657141d2e54489e477c2af6d",
+    "jobs": [
+      {
+        "name": "private competitive fixture contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "linux threaded + epoll contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "macos native + kqueue contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "public documentation and PDF contract",
+        "conclusion": "success"
+      },
+      {
+        "name": "generated DX client strict typecheck",
+        "conclusion": "success"
+      },
+      {
+        "name": "living examples (macos-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "living examples (ubuntu-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "device-messaging-native",
+        "conclusion": "success"
+      },
+      {
+        "name": "adversarial HTTP smoke",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "package-archive",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-release-safe",
+        "conclusion": "success"
+      },
+      {
+        "name": "cli-build",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-openssl",
+        "conclusion": "success"
+      },
+      {
+        "name": "device-messaging-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "chat-native",
+        "conclusion": "success"
+      },
+      {
+        "name": "native-test",
+        "conclusion": "success"
+      },
+      {
+        "name": "portable-application-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "chat-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "tasks-test",
+        "conclusion": "success"
+      },
+      {
+        "name": "guestbook-workers",
+        "conclusion": "success"
+      },
+      {
+        "name": "docker-build (chat container)",
+        "conclusion": "success"
+      },
+      {
+        "name": "cli init smoke test",
+        "conclusion": "success"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/moribit/Akamata/actions/runs/38690711344"
+  }
+]
