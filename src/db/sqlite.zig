@@ -68,6 +68,10 @@ pub const Backend = struct {
         const rc = c.sqlite3_prepare_v2(self.handle, sql.ptr, @intCast(sql.len), &stmt, null);
         profile.end(.sqlite_prepare, start);
         if (rc != c.SQLITE_OK or stmt == null) return SqliteError.PrepareFailed;
+        // SQLite already owns a live statement here. If the Zig wrapper cannot
+        // be allocated, finalize before returning OOM so close cannot leak a
+        // SQLITE_BUSY connection. Ownership transfers only after both succeed.
+        errdefer _ = c.sqlite3_finalize(stmt.?);
         const allocation_start = profile.begin();
         const s = try self.gpa.create(StmtBackend);
         profile.end(.stmt_wrapper_alloc, allocation_start);

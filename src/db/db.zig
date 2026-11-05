@@ -32,6 +32,9 @@ pub const StmtVTable = struct {
     deinit: *const fn (ptr: *anyopaque) void,
 };
 
+/// Linear statement owner. Do not copy for independent use or finalize twice.
+/// Finalize before closing Db (or returning its Pool lease). Column text/blob
+/// slices are borrowed until the next step/reset/finalize; copy escaping values.
 pub const Stmt = struct {
     ptr: *anyopaque,
     vt: *const StmtVTable,
