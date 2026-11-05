@@ -308,6 +308,18 @@ pub fn build(b: *std.Build) void {
     const guestbook_test_step = b.step("guestbook-test", "run the canonical typed HTTP example contracts");
 
     if (backend == .native) {
+        const db_bench_mod = b.createModule(.{ .root_source_file = b.path("src/db_optimization_bench.zig"), .target = native_target, .optimize = optimize });
+        const db_bench_options = b.addOptions();
+        db_bench_options.addOption(bool, "diagnostics", b.option(bool, "db-diagnostics", "enable DB diagnostic timestamps and allocation accounting") orelse false);
+        db_bench_mod.addOptions("db_bench_options", db_bench_options);
+        db_bench_mod.addOptions("build_options", opts);
+        db_bench_mod.addImport("sqlite3", am_mod.import_table.get("sqlite3").?);
+        db_bench_mod.link_libc = true;
+        db_bench_mod.addIncludePath(b.path("third_party/sqlite"));
+        db_bench_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
+        db_bench_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/akamata_sqlite_shim.c"), .flags = sqlite_flags });
+        const db_bench = b.addExecutable(.{ .name = "db-optimization-bench", .root_module = db_bench_mod });
+        b.step("db-optimization-bench", "build private DB cost and allocation benchmark").dependOn(&b.addInstallArtifact(db_bench, .{}).step);
         const micro_mod = b.createModule(.{ .root_source_file = b.path("src/competitive_micro.zig"), .target = native_target, .optimize = optimize, .imports = &.{.{ .name = "akamata", .module = am_mod }} });
         const micro_exe = b.addExecutable(.{ .name = "competitive-micro", .root_module = micro_mod });
         b.step("competitive-micro-build", "build offline HTTP/JSON/route cost experiments").dependOn(&b.addInstallArtifact(micro_exe, .{}).step);

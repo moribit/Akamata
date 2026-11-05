@@ -1,6 +1,7 @@
 const std = @import("std");
 const sc = @import("sqlite_c.zig");
 const c = sc.c;
+const profile = @import("profile.zig");
 const db_mod = @import("db.zig");
 
 pub const SqliteError = error{
@@ -63,9 +64,13 @@ pub const Backend = struct {
     fn prepareBackend(ptr: *anyopaque, sql: []const u8) anyerror!db_mod.Stmt {
         const self: *Backend = @ptrCast(@alignCast(ptr));
         var stmt: ?*c.sqlite3_stmt = null;
+        const start = profile.begin();
         const rc = c.sqlite3_prepare_v2(self.handle, sql.ptr, @intCast(sql.len), &stmt, null);
+        profile.end(.sqlite_prepare, start);
         if (rc != c.SQLITE_OK or stmt == null) return SqliteError.PrepareFailed;
+        const allocation_start = profile.begin();
         const s = try self.gpa.create(StmtBackend);
+        profile.end(.stmt_wrapper_alloc, allocation_start);
         s.* = .{ .stmt = stmt.?, .gpa = self.gpa };
         return .{ .ptr = s, .vt = &stmt_vtable };
     }
@@ -152,8 +157,10 @@ fn resetStmt(ptr: *anyopaque) anyerror!void {
 
 fn deinitStmt(ptr: *anyopaque) void {
     const self: *StmtBackend = @ptrCast(@alignCast(ptr));
+    const start = profile.begin();
     _ = c.sqlite3_finalize(self.stmt);
     self.gpa.destroy(self);
+    profile.end(.stmt_finalize, start);
 }
 
 const stmt_vtable: db_mod.StmtVTable = .{
