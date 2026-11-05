@@ -41,6 +41,7 @@ const Work = struct {
     counts: profile.Counts = .{},
     checksum: u64 = 0,
     errors: usize = 0,
+    sql_length_mode: usize = 0,
     fn operation(self: *Work, arena: std.mem.Allocator) !void {
         var t = profile.begin();
         var lease: ?@import("db/pool.zig").Lease = null;
@@ -60,7 +61,13 @@ const Work = struct {
             const backend: *sqlite.Backend = @ptrCast(@alignCast(handle.ptr));
             var stmt: ?*c.sqlite3_stmt = null;
             t = profile.begin();
-            const rc = c.sqlite3_prepare_v2(backend.handle, sql, sql.len, &stmt, null);
+            const sql_bytes: c_int = switch (self.sql_length_mode) {
+                0 => sql.len,
+                1 => sql.len + 1,
+                2 => -1,
+                else => unreachable,
+            };
+            const rc = c.sqlite3_prepare_v2(backend.handle, sql, sql_bytes, &stmt, null);
             profile.end(.sqlite_prepare, t);
             if (rc != c.SQLITE_OK or stmt == null) return error.PrepareFailed;
             defer {
@@ -157,6 +164,8 @@ pub fn main() !void {
     const kind_num = try number("DB_CASE", 0);
     if (kind_num > 5) return error.InvalidCase;
     const kind: u8 = @intCast('A' + kind_num);
+    const sql_length_mode = try number("DB_SQL_LENGTH", 0);
+    if (sql_length_mode > 2 or (sql_length_mode != 0 and kind != 'A')) return error.InvalidSqlLengthMode;
     const threads_count = try number("DB_THREADS", 1);
     const operations = try number("DB_OPS", 20_000);
     if (threads_count == 0 or threads_count > 128 or operations == 0) return error.InvalidSize;
@@ -188,7 +197,7 @@ pub fn main() !void {
         for (threads[0..started]) |thread| thread.join();
     }
     for (workers, threads, 0..) |*worker, *thread, i| {
-        worker.* = .{ .shared = &shared, .kind = kind, .latencies = latencies[i * operations ..][0..operations] };
+        worker.* = .{ .shared = &shared, .kind = kind, .latencies = latencies[i * operations ..][0..operations], .sql_length_mode = sql_length_mode };
         thread.* = try std.Thread.spawn(.{}, Work.run, .{worker});
         started += 1;
     }

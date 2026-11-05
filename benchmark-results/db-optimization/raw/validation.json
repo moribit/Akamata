@@ -1,0 +1,129 @@
+{
+  "source_sha": "d04139dc05f151ff9896936a5c2df9c6f08e4b09",
+  "note": "working tree core is source delta recorded in final commit",
+  "runs": [
+    {
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "db-pool-test",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 1.4369207079871558,
+      "log": "benchmark-results/db-optimization/raw/validation-0.log",
+      "summary": [
+        "Build Summary: 89/89 steps succeeded"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "db-pool-test",
+        "documentation-test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 1.434685125015676,
+      "log": "benchmark-results/db-optimization/raw/validation-1.log",
+      "summary": [
+        "developer documentation links: 37 documents passed",
+        "Build Summary: 92/92 steps succeeded"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseFast",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 280.64875041600317,
+      "log": "benchmark-results/db-optimization/raw/validation-2.log",
+      "summary": [
+        "Build Summary: 86/86 steps succeeded; 178/179 tests passed (1 skipped)"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "portable-application-test",
+        "documentation-test",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 17.73251029200037,
+      "log": "benchmark-results/db-optimization/raw/validation-3.log",
+      "summary": [
+        "managed D1 bridge: named/default bindings, async statements, metadata and missing binding passed",
+        "managed R2/Queue bridge: bounded write abort, conditional failure, envelope metadata passed",
+        "developer documentation links: 37 documents passed",
+        "generated DX client: TypeScript syntax transform and mocked HTTP text/query/error semantics passed",
+        "Workers WASM: shared routing, typed input/validation/errors, DB effects, storage, queue, realtime/event schema and capability contract passed (10 runs; test providers)",
+        "Build Summary: 8/8 steps succeeded"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "transport-contract-test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 82.72648954202305,
+      "log": "benchmark-results/db-optimization/raw/validation-4.log",
+      "summary": [
+        "Build Summary: 28/28 steps succeeded",
+        "transport-contract-test success",
+        "   +- compile exe runtime-contract-server safe native success 44s MaxRSS:874M"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "db-pool-test",
+        "-Druntime-tsan=true",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 61.44364458299242,
+      "log": "benchmark-results/db-optimization/raw/validation-5.log",
+      "summary": [
+        "Build Summary: 28/28 steps succeeded; 14/14 tests passed"
+      ]
+    }
+  ],
+  "core_fix_commit": "ccd7662a7fdac328d20ad81fa935c0b14a97390a",
+  "source_files_sha256": {
+    "src/db/sqlite.zig": "eccfcf01f734a0e47c248ff785ecab28ca8e22ca4bc6cc9d84717d9896e9e1c9",
+    "src/db/db.zig": "b9f58f62d9805f027c1a62e8694465cd3abbd3d672dd6b680dc8062a4873e509",
+    "src/db/pool.zig": "b7ed6ae83cd37537c85a33ac26bbf62127c74c0143f937077fb0554d1b35107a",
+    "src/db_pool_test.zig": "3f4615315de5b871ad0f7f60a4c4707f42049fcfcd9b28bb9d50075138bdbb62",
+    "src/db/profile.zig": "d10240fc9d75cf15c7359717b96837525661ea17cd3c4a44c6fe4e4ae2a876af"
+  }
+}

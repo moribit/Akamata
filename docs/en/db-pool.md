@@ -63,3 +63,19 @@ Native Threaded only, no labels. Gauges are concurrent snapshots rather than ato
 `akamata_http_phase_seconds` is a summary (count/sum, seconds) with one fixed `phase` label: `read`, `parse`, `route_middleware`, `handler`, `serialize`, `write`. No route values or identities are labels. `App.metrics` explicitly borrows the same Counters owner for application phases, including in-process tests. Native serve supplies it from ServeOptions and restores the previous pointer after drain.
 
 Read includes readiness/idle wait; parse counts session steps, not only successful requests. Route/middleware is dispatch elapsed time minus terminal handler time. Handler includes binding and JSON serialization; serialize measures Response.json. Write covers buffered HTTP response serialization and flush; synchronous streaming and upgraded frame I/O are currently outside this phase metric. These inclusive measurements overlap: do not add them as a request total or treat wall time as CPU time. Workers can enable application handler/serialization phases with App.metrics, while native socket/read/parse/write metrics are unavailable there. Existing DB query spans, backend metrics and Server-Timing remain unchanged.
+
+## DB performance investigation
+
+[The DB cost study](../../benchmark-results/db-optimization/final-report.md)
+separates SQLite prepare, statement-wrapper allocation, binding, step, typed row
+conversion, owned response copy, pool acquisition/release and JSON. Its private
+[reproducible fixture](../../benchmark/db-optimization/README.md) has a separate
+opt-in diagnostic build; application metrics and ordinary ReleaseFast do not
+collect those additional phase clocks or allocator counters.
+
+Keep statement finalization inside the lease lifetime. Text/Blob column views
+belong to SQLite and must be copied before reset/step/finalize if the response
+outlives the statement. A backend column type conversion can also invalidate a
+column view; copy before performing it. A copied Stmt is not an additional owner. The native pool,
+FULLMUTEX, tracing and D1/Turso facades keep their existing semantics. Historical
+competitive DB rates are not a paired estimate of the DB facade's overhead.

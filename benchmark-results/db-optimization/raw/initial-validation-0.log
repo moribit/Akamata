@@ -1,0 +1,223 @@
+test
++- run test w
+[default] (warn): unhandled handler error on GET /fail: SecretDatabaseFailure
+failed command: ./.zig-cache/o/76d4732a21af1989a475480013d49c9d/test --cache-dir=./.zig-cache --seed=0x7a7cc87 --listen=-
+
+test
++- run test w
+==> akamata: wrangler deploy
+==> akamata: wrangler deploy
+failed command: ./.zig-cache/o/576cc367aea379e228ac2047657b9ce7/test --cache-dir=./.zig-cache --seed=0x7a7cc87 --listen=-
+
+db-pool-test
++- run test 13 pass, 1 fail (14 total)
+error: 'db_pool_test.test.32 SQLite borrowers retain statement ownership across an eight-handle pool' failed:
+       expected 0, found 17
+       /Users/mimoc/.zvm/0.17.0/lib/std/testing.zig:93:17: 0x10150450b in expectEqualInner__func_1006 (test)
+                       return error.TestExpectedEqual;
+                       ^
+       /Users/mimoc/.zvm/0.17.0/lib/std/testing.zig:57:5: 0x101504d7b in expectEqual (test)
+           return expectEqualInner(T, expected, actual);
+           ^
+       /Users/mimoc/Akamata/src/db_pool_test.zig:200:5: 0x101504f6f in test.32 SQLite borrowers retain statement ownership across an eight-handle pool (test)
+           try std.testing.expectEqual(@as(u32, 0), stress.errors.load(.acquire));
+           ^
+failed command: ./.zig-cache/o/23a688cefb36f904f95cc8c0c2bc0b94/test --cache-dir=./.zig-cache --seed=0x7a7cc87 --listen=-
+
+Build Summary: 87/89 steps succeeded (1 failed); 191/193 tests passed (1 skipped, 1 failed)
+db-pool-test transitive failure
++- run test 13 pass, 1 fail (14 total)
+   +- compile test debug native success 1s MaxRSS:359M
+      +- options cached
+      +- translate-c sqlite3 success 80ms
+         +- compile exe translate-c debug native cached 42ms MaxRSS:31M
+            +- options cached
+            +- options cached
+            +- options cached
+            +- run exe generate-def (aarch64.zig) cached
+            |  +- compile exe generate-def debug native cached 41ms MaxRSS:31M
+            +- run exe generate-def (amdgcn.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) cached
+               +- compile exe generate-def debug native (reused)
+test success
++- run test 8 pass (8 total) 478ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:324M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 15 pass (15 total) 356ms MaxRSS:7M
+|  +- compile test debug native success 2s MaxRSS:427M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 8 pass (8 total) 419ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:328M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 14 pass (14 total) 335ms MaxRSS:11M
+|  +- compile test debug native success 1s MaxRSS:354M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 2 pass (2 total) 314ms MaxRSS:10M
+|  +- compile test debug native success 1s MaxRSS:324M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 3 pass, 1 skip (4 total) 313ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:352M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 1 pass (1 total) 321ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:320M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 1 pass (1 total) 306ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:318M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 17 pass (17 total) 323ms MaxRSS:7M
+|  +- compile test debug native success 1s MaxRSS:369M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 4 pass (4 total) 329ms MaxRSS:10M
+|  +- compile test debug native success 3s MaxRSS:551M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 2 pass (2 total) 308ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:319M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test success 308ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:316M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 2 pass (2 total) 297ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:346M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 5 pass (5 total) 321ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:346M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 3 pass (3 total) 313ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:337M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 3 pass (3 total) 315ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:332M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 2 pass (2 total) 304ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:331M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 3 pass (3 total) 532ms MaxRSS:11M
+|  +- compile test debug native success 1s MaxRSS:323M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 3 pass (3 total) 331ms MaxRSS:11M
+|  +- compile test debug native success 1s MaxRSS:345M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 6 pass (6 total) 651ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:346M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 1 pass (1 total) 306ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:327M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 8 pass (8 total) 318ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:345M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 9 pass (9 total) 366ms MaxRSS:13M
+|  +- compile test debug native success 4s MaxRSS:623M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 2 pass (2 total) 358ms MaxRSS:12M
+|  +- compile test debug native success 4s MaxRSS:617M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 3 pass (3 total) 313ms MaxRSS:10M
+|  +- compile test debug native success 1s MaxRSS:326M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 5 pass (5 total) 308ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:335M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 4 pass (4 total) 414ms MaxRSS:5M
+|  +- compile test debug native success 6s MaxRSS:605M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 9 pass (9 total) 384ms MaxRSS:5M
+|  +- compile test debug native success 6s MaxRSS:359M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 6 pass (6 total) 315ms MaxRSS:5M
+|  +- compile test debug native success 1s MaxRSS:354M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 29 pass (29 total) 321ms MaxRSS:5M
+   +- compile test debug native success 1s MaxRSS:347M
+      +- options (reused)
+      +- translate-c sqlite3 (+1 more reused dependencies)
+

@@ -1,0 +1,148 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-11-05T10:00:14Z",
+  "headSha": "ccd7662a7fdac328d20ad81fa935c0b14a97390a",
+  "jobs": [
+    {
+      "completedAt": "2026-11-05T10:02:19Z",
+      "conclusion": "success",
+      "name": "generated DX client strict typecheck",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:33Z",
+      "conclusion": "success",
+      "name": "private competitive fixture contracts",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:08:34Z",
+      "conclusion": "success",
+      "name": "living examples (macos-latest)",
+      "startedAt": "2026-11-05T10:00:18Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:10:00Z",
+      "conclusion": "success",
+      "name": "native-release-safe",
+      "startedAt": "2026-11-05T10:00:18Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:03:03Z",
+      "conclusion": "success",
+      "name": "adversarial HTTP smoke",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:00:37Z",
+      "conclusion": "success",
+      "name": "public documentation and PDF contract",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:11:47Z",
+      "conclusion": "success",
+      "name": "living examples (ubuntu-latest)",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:07Z",
+      "conclusion": "success",
+      "name": "chat-workers",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:08:22Z",
+      "conclusion": "success",
+      "name": "macos native + kqueue contract",
+      "startedAt": "2026-11-05T10:00:39Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:20Z",
+      "conclusion": "success",
+      "name": "package-archive",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:09:47Z",
+      "conclusion": "success",
+      "name": "native-openssl",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:03:13Z",
+      "conclusion": "success",
+      "name": "native-integration",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:21Z",
+      "conclusion": "success",
+      "name": "device-messaging-workers",
+      "startedAt": "2026-11-05T10:00:18Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:37Z",
+      "conclusion": "success",
+      "name": "chat-native",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:06Z",
+      "conclusion": "success",
+      "name": "portable-application-workers",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:21Z",
+      "conclusion": "success",
+      "name": "guestbook-workers",
+      "startedAt": "2026-11-05T10:00:18Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:26Z",
+      "conclusion": "success",
+      "name": "native-test",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:04:49Z",
+      "conclusion": "success",
+      "name": "linux threaded + epoll contract",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:47Z",
+      "conclusion": "success",
+      "name": "cli-build",
+      "startedAt": "2026-11-05T10:00:19Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:35Z",
+      "conclusion": "success",
+      "name": "device-messaging-native",
+      "startedAt": "2026-11-05T10:00:18Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:02:34Z",
+      "conclusion": "success",
+      "name": "tasks-test",
+      "startedAt": "2026-11-05T10:00:18Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:13:39Z",
+      "conclusion": "success",
+      "name": "docker-build (chat container)",
+      "startedAt": "2026-11-05T10:10:03Z"
+    },
+    {
+      "completedAt": "2026-11-05T10:15:45Z",
+      "conclusion": "success",
+      "name": "cli init smoke test",
+      "startedAt": "2026-11-05T10:10:03Z"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-05T10:15:46Z",
+  "url": "https://github.com/moribit/Akamata/actions/runs/42007031671"
+}

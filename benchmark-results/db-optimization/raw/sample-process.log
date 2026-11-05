@@ -1,0 +1,1 @@
+DB_MICRO {"case":"D","diagnostics":false,"threads":32,"operations":3200000,"elapsed_ns":11851601000,"p50_ns":14000,"p95_ns":439000,"p99_ns":869000,"errors":0,"checksum":1710508800,"allocations":0,"frees":0,"bytes":0,"peak_sum_bytes":0,"stage_ns":{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },"stage_calls":{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }}

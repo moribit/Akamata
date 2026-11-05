@@ -61,3 +61,19 @@ Native Threaded専用でlabelはありません。gaugeは並行処理のsnapsho
 `akamata_http_phase_seconds`はcount / sumを持つ秒単位のsummaryです。固定label `phase`は`read`、`parse`、`route_middleware`、`handler`、`serialize`、`write`の6種類です。route値や利用者IDをlabelにしません。`App.metrics`はin-process testを含むapplication計測用に同じCounters ownerを明示borrowします。Native serveはServeOptionsから設定し、drain後に元のpointerへ戻します。
 
 readにはreadiness / idle待機を含みます。parseは成功requestだけでなくsession stepを数えます。route / middlewareはdispatch経過時間からterminal handler時間を引いた値です。handlerにはbindingとJSON serializationを含み、serializeはResponse.jsonを計測します。writeはbuffered HTTPのheader serializationとflushを含み、同期streamとupgrade frame I/Oは対象外です。これらは重複する計測なので、request totalとして加算したりCPU時間とみなしたりしないでください。WorkersではApp.metricsからapplicationのhandler / serializationを有効にできますが、Native socket / read / parse / writeのmetricは利用できません。既存DB query span、backend metric、Server-Timingは維持します。
+
+## DB性能の調査
+
+[DB処理の計測結果](../../benchmark-results/db-optimization/final-report.md)では、
+SQLite prepare、Statement wrapper確保、bind、step、typed row変換、response用copy、
+Pool取得・返却、JSONを分けて扱います。
+[再現用fixture](../../benchmark/db-optimization/README.md)は追加の区間clockと
+allocator counterを専用の診断buildだけで有効化します。既存application metricsや
+通常のReleaseFastへ常時の追加計測を入れません。
+
+Statementはlease返却より前にfinalizeしてください。Text/Blobのcolumn viewは
+SQLiteからの借用です。reset / step / finalizeより長くresponseが生存する場合は
+copyが必要です。同じcolumnのbackend型変換でもviewが無効になる場合があるため、
+変換前にcopyしてください。Stmtの値をコピーしても別ownerにはなりません。Native Pool、
+FULLMUTEX、tracing、D1/Turso facadeの意味は維持します。過去の競合DB数値は、
+DB facadeのoverheadを直接示すpaired比較ではありません。

@@ -18,7 +18,11 @@ jobs:
         with:
           node-version: '24'
       - run: ./third_party/sqlite/fetch.sh
-      - run: zig build competitive-bench competitive-micro-build -Doptimize=ReleaseFast
+      - run: zig build competitive-bench competitive-micro-build db-optimization-bench -Doptimize=ReleaseFast
+      - run: python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench
+      - run: python3 benchmark/db-optimization/test_reporting.py
+      - run: zig build db-optimization-bench -Doptimize=ReleaseSafe -Ddb-diagnostics=true
+      - run: python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench
       - run: zig build competitive-worker-build -Dbackend=workers -Doptimize=ReleaseSafe
       - run: npm ci --prefix benchmark/competitive/workers --ignore-scripts --no-audit --no-fund
       - run: node benchmark/competitive/workers/wasm-host.mjs zig-out/bin/competitive-worker.wasm .zig-cache/competitive-workers-host.json

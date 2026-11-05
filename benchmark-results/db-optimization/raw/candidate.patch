@@ -1,0 +1,130 @@
+diff --git a/src/db/sqlite.zig b/src/db/sqlite.zig
+index cf9aedb..527f586 100644
+--- a/src/db/sqlite.zig
++++ b/src/db/sqlite.zig
+@@ -68,11 +68,7 @@ pub const Backend = struct {
+         const rc = c.sqlite3_prepare_v2(self.handle, sql.ptr, @intCast(sql.len), &stmt, null);
+         profile.end(.sqlite_prepare, start);
+         if (rc != c.SQLITE_OK or stmt == null) return SqliteError.PrepareFailed;
+-        const allocation_start = profile.begin();
+-        const s = try self.gpa.create(StmtBackend);
+-        profile.end(.stmt_wrapper_alloc, allocation_start);
+-        s.* = .{ .stmt = stmt.?, .gpa = self.gpa };
+-        return .{ .ptr = s, .vt = &stmt_vtable };
++        return .{ .ptr = stmt.?, .vt = &stmt_vtable };
+     }
+ 
+     const vtable: db_mod.VTable = .{
+@@ -83,27 +79,25 @@ pub const Backend = struct {
+     };
+ };
+ 
+-const StmtBackend = struct {
+-    stmt: *c.sqlite3_stmt,
+-    gpa: std.mem.Allocator,
+-};
+-
++// The SQLite statement is already a stable heap-owned handle. The portable
++// facade borrows no stack storage; finalize consumes this handle exactly once.
++// As before, all statements must be finalized before closing their Db owner.
+ fn bindStmt(ptr: *anyopaque, idx: usize, v: db_mod.Value) anyerror!void {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
+     const i: c_int = @intCast(idx);
+     const rc: c_int = switch (v) {
+-        .null_value => c.sqlite3_bind_null(self.stmt, i),
+-        .int => |x| c.sqlite3_bind_int64(self.stmt, i, x),
+-        .float => |x| c.sqlite3_bind_double(self.stmt, i, x),
+-        .text => |s| c.sqlite3_bind_text(self.stmt, i, s.ptr, @intCast(s.len), sc.sqliteTransient()),
+-        .blob => |s| c.sqlite3_bind_blob(self.stmt, i, s.ptr, @intCast(s.len), sc.sqliteTransient()),
++        .null_value => c.sqlite3_bind_null(stmt, i),
++        .int => |x| c.sqlite3_bind_int64(stmt, i, x),
++        .float => |x| c.sqlite3_bind_double(stmt, i, x),
++        .text => |s| c.sqlite3_bind_text(stmt, i, s.ptr, @intCast(s.len), sc.sqliteTransient()),
++        .blob => |s| c.sqlite3_bind_blob(stmt, i, s.ptr, @intCast(s.len), sc.sqliteTransient()),
+     };
+     if (rc != c.SQLITE_OK) return SqliteError.BindFailed;
+ }
+ 
+ fn stepStmt(ptr: *anyopaque) anyerror!db_mod.StepResult {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
+-    const rc = c.sqlite3_step(self.stmt);
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
++    const rc = c.sqlite3_step(stmt);
+     return switch (rc) {
+         c.SQLITE_ROW => .row,
+         c.SQLITE_DONE => .done,
+@@ -112,54 +106,53 @@ fn stepStmt(ptr: *anyopaque) anyerror!db_mod.StepResult {
+ }
+ 
+ fn columnIntFn(ptr: *anyopaque, idx: usize) anyerror!i64 {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
+-    return c.sqlite3_column_int64(self.stmt, @intCast(idx));
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
++    return c.sqlite3_column_int64(stmt, @intCast(idx));
+ }
+ 
+ fn columnFloatFn(ptr: *anyopaque, idx: usize) anyerror!f64 {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
+-    return c.sqlite3_column_double(self.stmt, @intCast(idx));
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
++    return c.sqlite3_column_double(stmt, @intCast(idx));
+ }
+ 
+ fn columnTextFn(ptr: *anyopaque, idx: usize) anyerror![]const u8 {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
+     const i: c_int = @intCast(idx);
+-    const txt = c.sqlite3_column_text(self.stmt, i);
+-    const len = c.sqlite3_column_bytes(self.stmt, i);
++    const txt = c.sqlite3_column_text(stmt, i);
++    const len = c.sqlite3_column_bytes(stmt, i);
+     if (txt == null or len <= 0) return "";
+     return @as([*]const u8, @ptrCast(txt))[0..@intCast(len)];
+ }
+ 
+ fn columnBlobFn(ptr: *anyopaque, idx: usize) anyerror![]const u8 {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
+     const i: c_int = @intCast(idx);
+-    const blob = c.sqlite3_column_blob(self.stmt, i);
+-    const len = c.sqlite3_column_bytes(self.stmt, i);
++    const blob = c.sqlite3_column_blob(stmt, i);
++    const len = c.sqlite3_column_bytes(stmt, i);
+     if (blob == null or len <= 0) return "";
+     return @as([*]const u8, @ptrCast(blob))[0..@intCast(len)];
+ }
+ 
+ fn columnIsNullFn(ptr: *anyopaque, idx: usize) anyerror!bool {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
+-    return c.sqlite3_column_type(self.stmt, @intCast(idx)) == c.SQLITE_NULL;
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
++    return c.sqlite3_column_type(stmt, @intCast(idx)) == c.SQLITE_NULL;
+ }
+ 
+ fn columnCountFn(ptr: *anyopaque) usize {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
+-    return @intCast(c.sqlite3_column_count(self.stmt));
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
++    return @intCast(c.sqlite3_column_count(stmt));
+ }
+ 
+ fn resetStmt(ptr: *anyopaque) anyerror!void {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
+-    _ = c.sqlite3_reset(self.stmt);
+-    _ = c.sqlite3_clear_bindings(self.stmt);
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
++    _ = c.sqlite3_reset(stmt);
++    _ = c.sqlite3_clear_bindings(stmt);
+ }
+ 
+ fn deinitStmt(ptr: *anyopaque) void {
+-    const self: *StmtBackend = @ptrCast(@alignCast(ptr));
++    const stmt: *c.sqlite3_stmt = @ptrCast(@alignCast(ptr));
+     const start = profile.begin();
+-    _ = c.sqlite3_finalize(self.stmt);
+-    self.gpa.destroy(self);
++    _ = c.sqlite3_finalize(stmt);
+     profile.end(.stmt_finalize, start);
+ }
+ 

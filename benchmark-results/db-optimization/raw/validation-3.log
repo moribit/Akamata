@@ -1,0 +1,18 @@
+managed D1 bridge: named/default bindings, async statements, metadata and missing binding passed
+managed R2/Queue bridge: bounded write abort, conditional failure, envelope metadata passed
+developer documentation links: 37 documents passed
+generated DX client: TypeScript syntax transform and mocked HTTP text/query/error semantics passed
+Workers WASM: shared routing, typed input/validation/errors, DB effects, storage, queue, realtime/event schema and capability contract passed (10 runs; test providers)
+(node:66296) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+Build Summary: 8/8 steps succeeded
+documentation-test success
++- run python3 success 49ms
++- run node success 291ms
+   +- compile exe portable-application-worker safe wasm32-freestanding success 17s MaxRSS:446M
+   |  +- options success
+   +- run node success 223ms
+   +- run node success 75ms
+portable-application-test success
++- run node (+3 more reused dependencies)
+

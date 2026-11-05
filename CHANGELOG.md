@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+### Native SQLite cost and reliability investigation
+
+- Add private A-F DB microbenchmarks and opt-in phase/allocation diagnostics,
+  with frozen paired HTTP controls, SQL-length parity checks and saved raw evidence.
+- Finalize a prepared SQLite handle when allocating its Zig statement wrapper
+  fails, preventing an outstanding-statement/connection leak on OutOfMemory.
+- Expand statement/reset/NULL/Unicode/blob/owned JSON, query stress and lifecycle
+  checks; document linear statement ownership without changing DB or Pool APIs.
+- Reject direct-handle wrapper removal: it saves one 24-byte allocation but the
+  paired HTTP screen does not show a repeatable throughput benefit. No cache,
+  mutex-mode change, Pool contract relaxation or Reactor activation is retained.
+
+See the [DB investigation](benchmark-results/db-optimization/final-report.md)
+and [Japanese summary](benchmark-results/db-optimization/final-report.ja.md).
+
 ### Competitive performance investigation
 
 - Reduce Threaded idle wakeups with an owned shutdown notification while preserving

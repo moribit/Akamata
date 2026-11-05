@@ -1,0 +1,45 @@
+{
+  "source_sha": "d04139dc05f151ff9896936a5c2df9c6f08e4b09",
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "zig": "0.17.0",
+  "cpu": "Apple M2",
+  "oha": "oha 1.15.0",
+  "optimization": "ReleaseFast",
+  "sqlite": "3.53.1",
+  "unix": 1793870105.660526,
+  "sqlite_flags": [
+    "SQLITE_THREADSAFE=1",
+    "SQLITE_DQS=0",
+    "SQLITE_OMIT_LOAD_EXTENSION",
+    "SQLITE_DEFAULT_FOREIGN_KEYS=1",
+    "SQLITE_USE_URI=1"
+  ],
+  "binaries": {
+    "db-diagnostic-before": "7fd9673a341bb49d097cd7d462154db4dfcad3d12fe8fb90bb51a7c7d9b5ddcd",
+    "db-optimization-bench-before": "2c3e0ff47eef76c44b2e0c7d199264d32755d3a6878d41ea4cc6c9b94c96b012",
+    "competitive-akamata-candidate": "73cd4ffa98a4a2eb183a94ca5e023b3efa560b6b38426a6cbe045493a3059efb",
+    "db-optimization-bench-candidate": "221cb22eaf225a62c96000587863717b27dfbcec0398ec794ae90635ddbdc1ab",
+    "competitive-akamata-before": "c8f5681d7cf924907c75a79fd1fe83b8bc60d11a038b68119c464ffc4769d720"
+  },
+  "patch": "candidate.patch",
+  "baseline_source_sha": "d04139d",
+  "cpu_frequency": "not available per case; no frequency claim",
+  "thermal": "pmset -g therm before/after HTTP; no exact die temperature",
+  "inherited_rlimit_nofile": [
+    61440,
+    9223372036854775807
+  ],
+  "sql_length_control": "modes 0 length excluding sentinel, 1 length including sentinel, 2 -1; only literal-backed direct C case",
+  "final_binaries": {
+    "competitive-akamata-final": "764769cebe440e42291dc7474976585a72a75a7c5615e31621ce6c6cc25d6ab0",
+    "db-optimization-bench-final": "e26a7345cce803df1b8f2154d39595144bc2ba478d3679ea4625fbd429704127"
+  },
+  "core_fix_commit": "ccd7662a7fdac328d20ad81fa935c0b14a97390a",
+  "final_binary_source": "d04139d + final-binary-source.patch",
+  "successful_http_cases": 192,
+  "client_errors": {
+    "before": 3821,
+    "rejected_candidate": 4063
+  },
+  "normal_http_instrumented_logs": 0
+}

@@ -34,7 +34,8 @@ pub const StmtVTable = struct {
 
 /// Linear statement owner. Do not copy for independent use or finalize twice.
 /// Finalize before closing Db (or returning its Pool lease). Column text/blob
-/// slices are borrowed until the next step/reset/finalize; copy escaping values.
+/// slices are borrowed; step/reset/finalize or a backend column conversion may
+/// invalidate them. Copy escaping values before these operations.
 pub const Stmt = struct {
     ptr: *anyopaque,
     vt: *const StmtVTable,

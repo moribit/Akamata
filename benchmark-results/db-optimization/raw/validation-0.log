@@ -1,0 +1,197 @@
+Build Summary: 89/89 steps succeeded
+db-pool-test success
++- run test cached
+   +- compile test debug native cached 47ms MaxRSS:31M
+      +- options cached
+      +- translate-c sqlite3 cached
+         +- compile exe translate-c debug native cached 41ms MaxRSS:31M
+            +- options cached
+            +- options cached
+            +- options cached
+            +- run exe generate-def (aarch64.zig) cached
+            |  +- compile exe generate-def debug native cached 40ms MaxRSS:31M
+            +- run exe generate-def (amdgcn.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) cached
+               +- compile exe generate-def debug native (reused)
+test success
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 45ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 45ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 40ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 43ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 44ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 40ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 48ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 43ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 46ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 44ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 41ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 45ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 39ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 45ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 39ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+|  +- compile test debug native cached 39ms MaxRSS:31M
+|     +- options (reused)
+|     +- options (reused)
+|     +- translate-c sqlite3 (+1 more reused dependencies)
++- run test cached
+   +- compile test debug native cached 41ms MaxRSS:31M
+      +- options (reused)
+      +- translate-c sqlite3 (+1 more reused dependencies)
+

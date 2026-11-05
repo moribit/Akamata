@@ -1,0 +1,36 @@
+{
+  "source_sha": "d04139dc05f151ff9896936a5c2df9c6f08e4b09",
+  "note": "working tree core is source delta recorded in final commit",
+  "runs": [
+    {
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "db-pool-test",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 6.800820250005927,
+      "log": "benchmark-results/db-optimization/raw/validation-0.log"
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "db-pool-test",
+        "documentation-test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 1,
+      "seconds": 310.96246204100316,
+      "log": "benchmark-results/db-optimization/raw/validation-1.log"
+    }
+  ]
+}
