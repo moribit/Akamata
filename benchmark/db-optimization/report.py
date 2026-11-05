@@ -56,7 +56,7 @@ def main():
                     row[field] = ''
             rows.append(row)
     with (base / 'microbenchmark.csv').open('w', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator='\n')
         writer.writeheader()
         writer.writerows(rows)
     lines = ['# Microbenchmark results', '', 'Three ABBA cycles; each cell has six observations/variant. Medians, all errors retained.', 'A/B labels in this table mean frozen binary variants; Case A/B means API path.', 'Latency clock pairs are enabled in both ordinary micro executables. Process CPU includes warmup/start/teardown.', '', '| Case | Threads | Before ops/s | Candidate ops/s | Change % | Before P99 ns | Candidate P99 ns |', '|---|---:|---:|---:|---:|---:|---:|']
