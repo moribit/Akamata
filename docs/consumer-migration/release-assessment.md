@@ -22,3 +22,18 @@ Stable release is not approved. Threaded remains the Native production default; 
 ## Additional local candidate checks
 
 CLI fix `072b21e`, documentation `087793d`, migration checkpoint `85c36ae`. `zig build test documentation-test db-pool-test -Doptimize=ReleaseSafe -j2 --summary all`: 92/92 steps, 169 tests pass, one skip, exit 0. `zig build portable-application-test documentation-test -Dbackend=workers -Doptimize=ReleaseSafe -j2 --summary all`: 8/8 steps, exit 0, ten simulated-provider runs pass. CLI operations and project-update tests pass including current-tag dry-run and unknown-tag rejection. These local results do not replace Linux/macOS candidate CI or staging live tests.
+
+## v0.2.0 comparison: provisional classification
+
+| Area | Classification | Evidence / migration consideration |
+|---|---|---|
+| DB Pool | additive API and lifecycle behavior | `8607435`, `005f110`: deadline acquisition, close/waiter ownership; preserve lease release before deinit |
+| SQLite | compatible safety fix | `ccd7662`: finalize prepared statement if wrapper allocation fails |
+| Threaded/HTTP | correctness and performance behavior | `278e2c5` buffered request tails; `87e5d93` owned shutdown notification; deadlines unchanged |
+| Observability | additive metrics, optional cost | `ab56634`, `289abf2`: bounded-cardinality lifecycle/phase diagnostics |
+| OpenAPI/client | generated source compatibility impact | `3f477a7`, `2be84be`, `9e707f0`, `8128827`: valid identifiers, bounded wire schemas, strict enums/tagged unions; regenerate clients and type-check caller assumptions |
+| Workers bridge | compatible Fetch correctness | bodyless statuses use null response bodies; review managed diffs, retain app-owned entry/gateway behavior |
+| CLI | compatibility fix | `072b21e`: separate current template support from old scaffold bootstrap; unknown versions fail closed |
+| Experimental runtime | not release-promoted | `78ed9c5` evaluation only; Reactor remains parked/fail-closed |
+
+No new App/Context, provider, auth or Realtime abstraction is proposed. Existing Consumer compilation is evidence of source compatibility for those four SHAs, not proof of all public API compatibility. v0.2.1 is the provisional patch candidate because retained production changes are additive/corrective; generated TypeScript tightening requires explicit migration notes. Final version and stable status await the remaining gates. Candidate CI: https://github.com/moribit/Akamata/actions/runs/42166135796 (running when recorded).
