@@ -53,3 +53,7 @@ tagは必ず`vMAJOR.MINOR.PATCH`とし、annotated tagを使用します。公�
 ## Release artifact
 
 GitHub Releaseを公開releaseの記録とします。この手順はpackage registry、Homebrew、container registryの公開を意味しません。
+
+## Zig 0.17のpackage cache検証
+
+bareな`zig fetch <GitHub tar URL>`は正しいhashを計算しても、Zig 0.17のglobal cache再圧縮でarchiveの親directoryを余分に残す場合があります。次のbuildがmanifestを認識できず`N-V-...`のhash不一致になる再現を確認しました。`--pkg-dir`だけではfetchのlocal storageは有効になりません。使い捨ての**Consumer project**で`zig fetch --save=akamata <immutable-tag-url>`を実行し、`--fork`なしでbuildしてください。hash検証は維持し、naked packageのhashへ変更しないでください。framework自身を自分のdependencyに追加せず、local cacheの問題を隠すために既存tagを変更しないでください。

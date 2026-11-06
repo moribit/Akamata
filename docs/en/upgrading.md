@@ -112,7 +112,7 @@ and [compiled contracts](../../tests/dx_test.zig) for old/new interoperability.
 
 The default scaffold is now Hello; use `--template=notes` for the old DB tutorial.
 Existing project source is never rewritten by update/sync. Current CLI scaffolds
-pin v0.2.0. For an older project, run `akamata update --to=v0.2.0` before using
+pin v0.2.1. For an older project, run `akamata update --to=v0.2.1` before using
 typed APIs. A local checkout override is only needed for framework development.
 
 Typed principal retrieval now verifies the type recorded by `setPrincipal`; direct

@@ -24,10 +24,10 @@ curl http://127.0.0.1:8080/
 
 The default project returns `Hello, myapp!` without opening a database or initializing providers. It contains build files, `src/main.zig`, README and `.gitignore`. `PORT` changes the Native port.
 
-Current CLI projects pin v0.2.0, which includes these typed APIs. If your CLI generated an older dependency, update it first:
+Current CLI projects pin v0.2.1, which includes these typed APIs. If your CLI generated an older dependency, update it first:
 
 ```sh
-akamata update --to=v0.2.0
+akamata update --to=v0.2.1
 ```
 
 For framework development only, `zig build --fork=/absolute/path/to/Akamata run` selects a local checkout. Update/sync do not rewrite existing application source.

@@ -62,3 +62,7 @@ Use annotated tags named exactly `vMAJOR.MINOR.PATCH`, for example `v0.0.1` and 
 ## Release artifacts and support
 
 GitHub Releases are the public release record. No package registry, Homebrew formula, or container registry is implied by this process. The current `main` and current release line are supported until a later policy is published.
+
+## Zig 0.17 package-cache verification
+
+A bare `zig fetch <GitHub tar URL>` can compute the correct hash but leave a recompressed global-cache tarball with a nested archive root in Zig 0.17. We reproduced a subsequent `N-V-...` manifest/hash mismatch. `--pkg-dir` alone does not enable local storage in fetch mode. In a disposable **Consumer** project, use `zig fetch --save=akamata <immutable-tag-url>` and verify a build without `--fork`. This preserves hash verification and normalizes the local package/cache; do not change the declared hash to the naked-package value. Do not add the framework as its own dependency. Record this upstream tooling limitation, and never retag a release to hide a local cache error.

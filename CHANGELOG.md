@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-06
+
 ### Consumer release validation fixes
 
 - Reject unsupported deploy options before any build, migration or remote
