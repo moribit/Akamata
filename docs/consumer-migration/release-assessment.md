@@ -1,5 +1,7 @@
 # Release-candidate final assessment
 
+**Published rollout update:** user approval received; v0.2.1 is public and approved Worker updates are complete. The remainder below records pre-publication validation. See [current publication/rollout](publication-and-rollout.md) for actual versions, commits, data boundaries and verification limits.
+
 候補: **v0.2.1**, source **`2714af09fb6c910581a8397c0cb69ebe6a4eccda`**.
 候補CIとTSanは完了。正式リリースの承認判断に提示可能。本番反映は別ゲートであり、いずれの公開操作も未実施。
 

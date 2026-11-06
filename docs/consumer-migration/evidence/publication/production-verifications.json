@@ -1,0 +1,105 @@
+{
+  "Yaku": {
+    "status": "success",
+    "checks": [
+      "HTTP smoke catalog/quiz/privacy/grading/body limit/OpenAPI/client/static pages"
+    ]
+  },
+  "mimoc_news": {
+    "status": "success",
+    "checks": [
+      {
+        "path": "/api/news",
+        "status": 200,
+        "content_type": "application/json",
+        "json_keys": [
+          "news",
+          "pagination"
+        ],
+        "request_id": true,
+        "server_timing": "db;dur=35.000"
+      },
+      {
+        "path": "/admin",
+        "status": 401,
+        "content_type": "application/json",
+        "json_keys": [
+          "error"
+        ],
+        "request_id": true,
+        "server_timing": null
+      }
+    ],
+    "authenticated_crud": "success; temporary fixture deleted and R2 cleanup verified"
+  },
+  "Ehagaki": {
+    "status": "success",
+    "checks": [
+      {
+        "path": "/health",
+        "status": 200,
+        "content_type": "application/json",
+        "json_keys": [
+          "backend",
+          "status"
+        ],
+        "request_id": false,
+        "server_timing": null
+      },
+      {
+        "path": "/api/timeline",
+        "status": 200,
+        "content_type": "application/json",
+        "json_keys": [
+          "authenticated",
+          "has_next",
+          "page",
+          "page_size",
+          "posts",
+          "query",
+          "total"
+        ],
+        "request_id": false,
+        "server_timing": null
+      }
+    ]
+  },
+  "mobus-backend": {
+    "status": "success",
+    "checks": [
+      {
+        "path": "/api/public/ping",
+        "status": 200,
+        "content_type": "application/json",
+        "json_keys": [
+          "service",
+          "status"
+        ],
+        "request_id": true,
+        "server_timing": null
+      },
+      {
+        "path": "/api/ping",
+        "status": 401,
+        "content_type": "application/json",
+        "json_keys": [
+          "error_kind",
+          "message"
+        ],
+        "request_id": true,
+        "server_timing": null
+      },
+      {
+        "path": "/ehagaki/health",
+        "status": 200,
+        "content_type": "application/json",
+        "json_keys": [
+          "backend",
+          "status"
+        ],
+        "request_id": false,
+        "server_timing": null
+      }
+    ]
+  }
+}

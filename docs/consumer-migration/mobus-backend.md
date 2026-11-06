@@ -1,5 +1,7 @@
 # mobus-backend — final staging result
 
+**Published rollout update:** user approval received; v0.2.1 is public and approved Worker updates are complete. The remainder below records pre-publication validation. See [current publication/rollout](publication-and-rollout.md) for actual versions, commits, data boundaries and verification limits.
+
 Original SHA: da3f9c0. Isolated validated SHA:
 `dd8273beb0fa47f119c59304e740c1d0b9fa667a` (app fix c389a8e plus acceptance coverage).
 Native production remains Threaded. Original checkout/production unchanged.

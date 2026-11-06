@@ -1,0 +1,143 @@
+{
+  "phase": "production",
+  "base": "https://mimoc-news.mimoc-maker.workers.dev",
+  "checks": [
+    "public list",
+    "admin unauthorized",
+    "admin authorized",
+    "origin rejected",
+    "create without required title image",
+    "two 9 MiB uploads",
+    "R2 GET/HEAD bytes and both images",
+    "detail observability",
+    "update retaining images",
+    "replace both images",
+    "image size exceeded",
+    "delete images",
+    "deleted detail"
+  ],
+  "response_contract": {
+    "public list": {
+      "status": 200,
+      "content_type": "application/json",
+      "keys": [
+        "news",
+        "pagination"
+      ]
+    },
+    "admin unauthorized": {
+      "status": 401,
+      "content_type": "application/json",
+      "keys": [
+        "error"
+      ]
+    },
+    "admin authorized": {
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "keys": []
+    },
+    "origin rejected": {
+      "status": 403,
+      "content_type": "application/json",
+      "keys": [
+        "error"
+      ]
+    },
+    "create without required title image": {
+      "status": 400,
+      "content_type": "application/json",
+      "keys": [
+        "error_kind",
+        "message"
+      ]
+    },
+    "two 9 MiB uploads": {
+      "status": 201,
+      "content_type": "application/json",
+      "keys": [
+        "body",
+        "categories",
+        "created_at",
+        "id",
+        "is_pinned",
+        "link_1_description",
+        "link_1_url",
+        "link_2_description",
+        "link_2_url",
+        "link_3_description",
+        "link_3_url",
+        "main_image_url",
+        "published_date",
+        "title",
+        "title_image_url"
+      ]
+    },
+    "detail observability": {
+      "status": 200,
+      "content_type": "application/json",
+      "keys": [
+        "body",
+        "categories",
+        "created_at",
+        "id",
+        "is_pinned",
+        "link_1_description",
+        "link_1_url",
+        "link_2_description",
+        "link_2_url",
+        "link_3_description",
+        "link_3_url",
+        "main_image_url",
+        "published_date",
+        "title",
+        "title_image_url"
+      ]
+    },
+    "update retaining images": {
+      "status": 200,
+      "content_type": "application/json",
+      "keys": [
+        "image_cleanup",
+        "news"
+      ]
+    },
+    "replace both images": {
+      "status": 200,
+      "content_type": "application/json",
+      "keys": [
+        "image_cleanup",
+        "news"
+      ]
+    },
+    "image size exceeded": {
+      "status": 400,
+      "content_type": "application/json",
+      "keys": [
+        "error_kind",
+        "message"
+      ]
+    },
+    "delete images": {
+      "status": 200,
+      "content_type": "application/json",
+      "keys": [
+        "deleted",
+        "image_cleanup"
+      ]
+    },
+    "deleted detail": {
+      "status": 404,
+      "content_type": "application/json",
+      "keys": [
+        "error_kind",
+        "path"
+      ]
+    }
+  },
+  "observability": {
+    "request_id": true,
+    "server_timing": "db;dur=12.000"
+  },
+  "status": "success"
+}

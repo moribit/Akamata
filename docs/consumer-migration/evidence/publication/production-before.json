@@ -1,0 +1,76 @@
+[
+  {
+    "repo": "Yaku",
+    "worker": "yaku-mvp",
+    "deployment": "c26ecc38-ed46-4aac-8b2a-3d73e222f0c5",
+    "versions": [
+      {
+        "version_id": "902175ab-8d7a-45dd-8e02-83dfb013b4be",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-11-06T01:22:54.390085Z",
+    "secret_names": []
+  },
+  {
+    "repo": "mimoc_news",
+    "worker": "mimoc-news",
+    "deployment": "a306ad23-4451-41cd-8e15-7c868ca7be94",
+    "versions": [
+      {
+        "version_id": "199079db-6915-424e-8182-f96cf7c33984",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-07T01:48:59.685271Z",
+    "secret_names": [
+      "BASIC_AUTH_TOKEN"
+    ]
+  },
+  {
+    "repo": "Ehagaki",
+    "worker": "ehagaki",
+    "deployment": "87ff645f-9b88-46d5-836a-b78131a96fc1",
+    "versions": [
+      {
+        "version_id": "5082d8fd-af87-4a35-b306-e8a613c6e5aa",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-07T01:51:23.212154Z",
+    "secret_names": [
+      "JWT_SECRET"
+    ]
+  },
+  {
+    "repo": "mobus-backend",
+    "worker": "mobus-backend",
+    "deployment": "4e661645-3241-4e2b-b063-a9a53ee8cd84",
+    "versions": [
+      {
+        "version_id": "5fd6ea15-f2cc-42fc-bc43-417e46a6a107",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-18T04:22:26.420486Z",
+    "secret_names": [
+      "ADMIN_SECRET",
+      "JWT_SECRET"
+    ]
+  },
+  {
+    "repo": "mobus-backend",
+    "worker": "mobus-realtime-handler",
+    "deployment": "41ea1ac4-3431-490b-a8e0-4670c9e7233d",
+    "versions": [
+      {
+        "version_id": "75d3d501-a46c-4e60-b8a8-53a50da97c58",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-18T04:20:19.86211Z",
+    "secret_names": [
+      "JWT_SECRET"
+    ]
+  }
+]

@@ -7,3 +7,5 @@ Before any performance claim, freeze baseline/candidate artifacts and record env
 ## Final reliability fixes
 
 2714af0 keeps the Threaded default and parked Reactor. Storage download metadata now incurs two small request-arena snapshots (Content-Type and optional ETag) to avoid use-after-cleanup. Plaintext/JSON/DB hot paths are not changed by this fix. No speedup or zero-overhead claim is made, and this functional investigation did not measure a new before/after throughput or Consumer latency series. CLI option rejection has no request-time path.
+
+Published code-only rollout succeeded; production Server-Timing snapshots are functional observations, not a new controlled performance comparison. No new req/s or P99 improvement is claimed.

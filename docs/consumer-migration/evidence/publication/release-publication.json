@@ -1,0 +1,29 @@
+{
+  "assets": [
+    {
+      "name": "akamata-chat-aarch64-linux-musl.tar.gz",
+      "size": 3971462
+    },
+    {
+      "name": "akamata-chat-aarch64-macos.tar.gz",
+      "size": 975619
+    },
+    {
+      "name": "akamata-chat-x86_64-linux-musl.tar.gz",
+      "size": 4038739
+    },
+    {
+      "name": "akamata-chat-x86_64-macos.tar.gz",
+      "size": 995692
+    }
+  ],
+  "isDraft": false,
+  "isPrerelease": false,
+  "publishedAt": "2026-11-06T06:48:59Z",
+  "tagName": "v0.2.1",
+  "url": "https://github.com/moribit/Akamata/releases/tag/v0.2.1",
+  "commit": "2714af09fb6c910581a8397c0cb69ebe6a4eccda",
+  "tag_object": "7b0cf0aabaf025e07a01d6be70dd4ab0be807b72",
+  "signature": "SSH ED25519; verified locally against existing public key",
+  "package_hash": "akamata-0.2.1-uJIoI3crPQE12CxtQ0Iv_d0wHvo0M3USWct-sZKaIc1_"
+}

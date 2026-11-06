@@ -1,5 +1,7 @@
 # Approval-gated migration guide
 
+**Status update:** release/deployment approval was received and the code-only rollout is completed. This guide retains the approval-gated procedure; see [actual results](publication-and-rollout.md).
+
 No command in this document authorizes a formal release or production rollout.
 
 ## After explicit release approval

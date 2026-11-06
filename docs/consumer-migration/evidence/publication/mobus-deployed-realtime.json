@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "scope": "existing dev Workers; production /api and DB route unchanged",
+  "checks": [
+    "user rooms, call offer/accept via named Service Binding and DO",
+    "bidirectional Signal/Text, sender exclusion, reconnect",
+    "existing /dev WebSocket proxy",
+    "call end and inactive state; outsider denied",
+    "Ehagaki gateway service binding",
+    "dedicated dev Crash Dump upload and byte-exact R2 readback",
+    "existing /dev HTTP proxy with explicit verification User-Agent"
+  ],
+  "probe_note": "initial default Python User-Agent returned 403; explicit verification User-Agent returns 200",
+  "retained_synthetic_test_accounts": 3,
+  "firmware_admin_writes": "not performed; isolated full suite passed; existing firmware untouched"
+}

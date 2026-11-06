@@ -37,3 +37,7 @@ news_log_probe.py; cli_final.py; collect_evidence.py. prepare_staging.py and
 staging_config.py create only the explicit dedicated inventory/test secrets and
 must not be invoked as automatic production setup. Preserve the ignored inventory
 between runs. See migration-guide.md before any approved release/pin/deployment.
+
+## Approved publication and rollout
+
+See [current operational report](../publication-and-rollout.md) and [publication snapshots](publication/). Earlier snapshots remain immutable historical evidence. Production snapshots include only versions, schema fingerprints, Secret names and synthetic-test summaries, never values or user data.

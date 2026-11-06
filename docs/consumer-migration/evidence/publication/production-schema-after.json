@@ -1,0 +1,42 @@
+[
+  {
+    "repo": "mimoc_news",
+    "database": "mimoc-news",
+    "exit": 0,
+    "missing": [],
+    "schema_sha256": "ff63dd6e2cf1d68a5747db0f468d948fecba8a2c15d6c88bdc19810fd685e6ce",
+    "tables": [
+      "news"
+    ],
+    "status": "validated"
+  },
+  {
+    "repo": "Ehagaki",
+    "database": "ehagaki",
+    "exit": 0,
+    "missing": [],
+    "schema_sha256": "77f06e2fa366a3d163f363cde6e77f8d884a9a4386802ef2f9d1c060fec48357",
+    "tables": [
+      "posts"
+    ],
+    "status": "validated"
+  },
+  {
+    "repo": "mobus-backend",
+    "database": "mobus-backend-dev",
+    "exit": 0,
+    "missing": [],
+    "schema_sha256": "9762370c976e0c5279efba96b48dc4c9dc0b8dfc73f32e4f109df0b03da5b499",
+    "tables": [
+      "auth_device_credentials",
+      "calls",
+      "crash_reports",
+      "devices",
+      "firmware",
+      "friendships",
+      "messages",
+      "users"
+    ],
+    "status": "validated"
+  }
+]

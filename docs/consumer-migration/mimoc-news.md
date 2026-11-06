@@ -1,5 +1,7 @@
 # mimoc_news — final staging result
 
+**Published rollout update:** user approval received; v0.2.1 is public and approved Worker updates are complete. The remainder below records pre-publication validation. See [current publication/rollout](publication-and-rollout.md) for actual versions, commits, data boundaries and verification limits.
+
 Source: `24eb3e140f9e669ec62c842b4074d5ee63e548d4` (unchanged). Framework candidate
 2714af0, library source 0ea0c17. Native SQLite tests and Workers build: **成功**.
 Default Native build is a dev launcher, not a Native HTTP implementation.

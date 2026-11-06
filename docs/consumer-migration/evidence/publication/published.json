@@ -1,0 +1,182 @@
+{
+  "phase": "published",
+  "akamata_sha": "2714af09fb6c910581a8397c0cb69ebe6a4eccda",
+  "runs": [
+    {
+      "repo": "Yaku",
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 36.22697712498484,
+      "log": ".zig-cache/consumer-migration/logs/published-Yaku-0.log"
+    },
+    {
+      "repo": "Yaku",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 32.766388334013755,
+      "log": ".zig-cache/consumer-migration/logs/published-Yaku-1.log"
+    },
+    {
+      "repo": "Yaku",
+      "command": [
+        "zig",
+        "build",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 6.448986040981254,
+      "log": ".zig-cache/consumer-migration/logs/published-Yaku-2.log"
+    },
+    {
+      "repo": "mimoc_news",
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 30.628357542009326,
+      "log": ".zig-cache/consumer-migration/logs/published-mimoc_news-0.log"
+    },
+    {
+      "repo": "mimoc_news",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 5.607444458000828,
+      "log": ".zig-cache/consumer-migration/logs/published-mimoc_news-1.log"
+    },
+    {
+      "repo": "mimoc_news",
+      "command": [
+        "zig",
+        "build",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 0.1800252920074854,
+      "log": ".zig-cache/consumer-migration/logs/published-mimoc_news-2.log"
+    },
+    {
+      "repo": "Ehagaki",
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 46.87191304101725,
+      "log": ".zig-cache/consumer-migration/logs/published-Ehagaki-0.log"
+    },
+    {
+      "repo": "Ehagaki",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 34.637044500006596,
+      "log": ".zig-cache/consumer-migration/logs/published-Ehagaki-1.log"
+    },
+    {
+      "repo": "Ehagaki",
+      "command": [
+        "zig",
+        "build",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 3.7299339169985615,
+      "log": ".zig-cache/consumer-migration/logs/published-Ehagaki-2.log"
+    },
+    {
+      "repo": "mobus-backend",
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 29.001307625003392,
+      "log": ".zig-cache/consumer-migration/logs/published-mobus-backend-0.log"
+    },
+    {
+      "repo": "mobus-backend",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 38.00565341699985,
+      "log": ".zig-cache/consumer-migration/logs/published-mobus-backend-1.log"
+    },
+    {
+      "repo": "mobus-backend",
+      "command": [
+        "zig",
+        "build",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit": 0,
+      "seconds": 6.720036957995035,
+      "log": ".zig-cache/consumer-migration/logs/published-mobus-backend-2.log"
+    }
+  ]
+}

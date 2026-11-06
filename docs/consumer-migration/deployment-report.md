@@ -1,5 +1,7 @@
 # Isolated staging deployment report
 
+**Published rollout update:** user approval received; v0.2.1 is public and approved Worker updates are complete. The remainder below records pre-publication validation. See [current publication/rollout](publication-and-rollout.md) for actual versions, commits, data boundaries and verification limits.
+
 No formal tag, GitHub Release, production deployment, production DB migration,
 production service switch, production resource deletion or tag rewrite was performed.
 Production rollback references remain in [baseline](baseline.md).

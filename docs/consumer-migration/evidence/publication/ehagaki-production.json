@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "checks": [
+    "fresh test accounts issued by unchanged production Mo-Bus",
+    "production-issued JWT user_id compatibility, public/private visibility, owner and nonowner semantics",
+    "invalid signature rejected",
+    "existing public Ehagaki proxy health"
+  ],
+  "production_secret_read": false,
+  "deleted_posts": 2,
+  "deleted_test_accounts": 2
+}

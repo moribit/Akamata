@@ -1,5 +1,7 @@
 # Ehagaki — final staging result
 
+**Published rollout update:** user approval received; v0.2.1 is public and approved Worker updates are complete. The remainder below records pre-publication validation. See [current publication/rollout](publication-and-rollout.md) for actual versions, commits, data boundaries and verification limits.
+
 Original SHA: 9962b4a; isolated validated SHA:
 `3889b758bd3b12a0869b4c1423b27006e1c37f12` (includes auth fix 8ba1655).
 Original checkout and production remain unchanged.

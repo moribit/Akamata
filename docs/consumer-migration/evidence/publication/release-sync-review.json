@@ -1,0 +1,17 @@
+[
+  {
+    "repo": "Yaku",
+    "exit": 0,
+    "log": ".zig-cache/consumer-migration/logs/Yaku-release-sync-review.log"
+  },
+  {
+    "repo": "Ehagaki",
+    "exit": 0,
+    "log": ".zig-cache/consumer-migration/logs/Ehagaki-release-sync-review.log"
+  },
+  {
+    "repo": "mobus-backend",
+    "exit": 0,
+    "log": ".zig-cache/consumer-migration/logs/mobus-backend-release-sync-review.log"
+  }
+]

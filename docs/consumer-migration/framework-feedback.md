@@ -1,5 +1,7 @@
 # Framework feedback — final release validation
 
+**Published rollout update:** user approval received; v0.2.1 is public and approved Worker updates are complete. The remainder below records pre-publication validation. See [current publication/rollout](publication-and-rollout.md) for actual versions, commits, data boundaries and verification limits.
+
 Framework candidate: 2714af0. Full source SHAs and evidence are linked from
 [release assessment](release-assessment.md). No new capability/runtime abstraction
 was added to work around Consumer code.
@@ -37,3 +39,7 @@ certification remain unverified. Staging functional success and framework TSan
 must not be presented as those stronger claims. No speculative core workaround,
 Reactor activation, production data import or automatic production provisioning
 was used to make this matrix pass.
+
+## F13 — Zig 0.17 fetch cache (high; upstream/tooling documentation)
+
+Bare fetch returned the correct v0.2.1 hash but wrote a nested-root recompressed cache; subsequent consumers saw N-V manifest mismatch. The package archive and declared hash were unchanged. Local-storage `zig fetch --save=akamata` and cold-cache build pass; --pkg-dir alone was not an effective fix. See the current rollout report. Do not change immutable tags or disable hash checks to work around this tooling behavior.

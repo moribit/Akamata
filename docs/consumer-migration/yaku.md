@@ -1,5 +1,7 @@
 # Yaku — final staging result
 
+**Published rollout update:** user approval received; v0.2.1 is public and approved Worker updates are complete. The remainder below records pre-publication validation. See [current publication/rollout](publication-and-rollout.md) for actual versions, commits, data boundaries and verification limits.
+
 Source unchanged: `f1f809fb6cba61b819dab35592b59ca7fae27db8`.
 **成功**: baseline and candidate ReleaseSafe tests/Native/Workers builds; catalog
 38, quiz 35 and all difficulty generation/grading/answer privacy; free-hand analysis,

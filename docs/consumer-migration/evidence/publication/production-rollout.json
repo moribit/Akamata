@@ -1,0 +1,152 @@
+[
+  {
+    "repo": "Yaku",
+    "worker": "yaku-mvp",
+    "action": "dry_run",
+    "version": null,
+    "app_sha": "b7c75c373d59ae7e6aef347f35863e2aceecfe39",
+    "wasm_sha256": "08bd355a6d2656e9b6205d69187c1890db43c1409e965a1a2edda7a84dff02b0",
+    "rollback": [
+      {
+        "version_id": "902175ab-8d7a-45dd-8e02-83dfb013b4be",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing production Worker"
+  },
+  {
+    "repo": "Yaku",
+    "worker": "yaku-mvp",
+    "action": "deploy",
+    "version": "1e4dc0d0-4e81-49e0-9e9b-09bd98f3f012",
+    "app_sha": "b7c75c373d59ae7e6aef347f35863e2aceecfe39",
+    "wasm_sha256": "08bd355a6d2656e9b6205d69187c1890db43c1409e965a1a2edda7a84dff02b0",
+    "rollback": [
+      {
+        "version_id": "902175ab-8d7a-45dd-8e02-83dfb013b4be",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing production Worker"
+  },
+  {
+    "repo": "mimoc_news",
+    "worker": "mimoc-news",
+    "action": "dry_run",
+    "version": null,
+    "app_sha": "1c3478704bcac9537f5e7f891084d32308c5fd9c",
+    "wasm_sha256": "cdfc963dc078a05f6b323ca9cde5ba7c7708c7c6cdd8c05c1fe9175d1d29df16",
+    "rollback": [
+      {
+        "version_id": "199079db-6915-424e-8182-f96cf7c33984",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing production Worker"
+  },
+  {
+    "repo": "mimoc_news",
+    "worker": "mimoc-news",
+    "action": "deploy",
+    "version": "ed98b409-ab1a-4654-ab41-b0cd4a8638f3",
+    "app_sha": "1c3478704bcac9537f5e7f891084d32308c5fd9c",
+    "wasm_sha256": "cdfc963dc078a05f6b323ca9cde5ba7c7708c7c6cdd8c05c1fe9175d1d29df16",
+    "rollback": [
+      {
+        "version_id": "199079db-6915-424e-8182-f96cf7c33984",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing production Worker"
+  },
+  {
+    "repo": "Ehagaki",
+    "worker": "ehagaki",
+    "action": "dry_run",
+    "version": null,
+    "app_sha": "c0e1b21007601e910e03d6f530683060bef320f0",
+    "wasm_sha256": "4771161d9ce5522d74a39f8bb11f132e079dc731bc0b9863f778a7082877fb4e",
+    "rollback": [
+      {
+        "version_id": "5082d8fd-af87-4a35-b306-e8a613c6e5aa",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing production Worker"
+  },
+  {
+    "repo": "Ehagaki",
+    "worker": "ehagaki",
+    "action": "deploy",
+    "version": "594ae616-2b32-4219-b399-2c57afd451a5",
+    "app_sha": "c0e1b21007601e910e03d6f530683060bef320f0",
+    "wasm_sha256": "4771161d9ce5522d74a39f8bb11f132e079dc731bc0b9863f778a7082877fb4e",
+    "rollback": [
+      {
+        "version_id": "5082d8fd-af87-4a35-b306-e8a613c6e5aa",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing production Worker"
+  },
+  {
+    "repo": "mobus-backend",
+    "worker": "mobus-realtime-handler",
+    "action": "dry_run",
+    "version": null,
+    "app_sha": "668f99acfaa19c6bdd818bbbd9072be49fb7c303",
+    "wasm_sha256": "01652bda7656be3d67ed589a8f2f52efd26d6d1d11830106051ff963a8cdf767",
+    "rollback": [
+      {
+        "version_id": "75d3d501-a46c-4e60-b8a8-53a50da97c58",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing /dev Workers; production /api unchanged"
+  },
+  {
+    "repo": "mobus-backend",
+    "worker": "mobus-backend",
+    "action": "dry_run",
+    "version": null,
+    "app_sha": "668f99acfaa19c6bdd818bbbd9072be49fb7c303",
+    "wasm_sha256": "01652bda7656be3d67ed589a8f2f52efd26d6d1d11830106051ff963a8cdf767",
+    "rollback": [
+      {
+        "version_id": "5fd6ea15-f2cc-42fc-bc43-417e46a6a107",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing /dev Workers; production /api unchanged"
+  },
+  {
+    "repo": "mobus-backend",
+    "worker": "mobus-realtime-handler",
+    "action": "deploy",
+    "version": "dbccb2ec-c55f-4cb8-9d6e-e5b131d49851",
+    "app_sha": "668f99acfaa19c6bdd818bbbd9072be49fb7c303",
+    "wasm_sha256": "01652bda7656be3d67ed589a8f2f52efd26d6d1d11830106051ff963a8cdf767",
+    "rollback": [
+      {
+        "version_id": "75d3d501-a46c-4e60-b8a8-53a50da97c58",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing /dev Workers; production /api unchanged"
+  },
+  {
+    "repo": "mobus-backend",
+    "worker": "mobus-backend",
+    "action": "deploy",
+    "version": "a8a01cb9-62c9-413b-8ee4-6e996fbcb46d",
+    "app_sha": "668f99acfaa19c6bdd818bbbd9072be49fb7c303",
+    "wasm_sha256": "01652bda7656be3d67ed589a8f2f52efd26d6d1d11830106051ff963a8cdf767",
+    "rollback": [
+      {
+        "version_id": "5fd6ea15-f2cc-42fc-bc43-417e46a6a107",
+        "percentage": 100
+      }
+    ],
+    "scope": "existing /dev Workers; production /api unchanged"
+  }
+]

@@ -1,5 +1,7 @@
 # Release-candidate compatibility matrix
 
+**Published rollout update:** user approval received; v0.2.1 is public and approved Worker updates are complete. The remainder below records pre-publication validation. See [current publication/rollout](publication-and-rollout.md) for actual versions, commits, data boundaries and verification limits.
+
 Status vocabulary: **成功** = observed success; **失敗** = reproduced failure;
 **未実施** = not performed; **環境制約により未確認** = evidence unavailable in this environment.
 Historical failures remain recorded even when a later fix passes.

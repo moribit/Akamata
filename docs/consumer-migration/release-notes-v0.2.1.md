@@ -1,6 +1,6 @@
-# v0.2.1 — draft release notes (not published)
+# v0.2.1 — Performance & Reliability
 
-Candidate: `2714af09fb6c910581a8397c0cb69ebe6a4eccda`.
+Release commit: `2714af09fb6c910581a8397c0cb69ebe6a4eccda`. Validated with 23 CI jobs and Linux/macOS ThreadSanitizer.
 
 ## Highlights
 
@@ -44,6 +44,9 @@ certification was performed. Named-environment migration and custom glue limitat
 remain documented. No Reactor promotion, automatic production resource creation,
 production DB switch or exactly-once Queue claim is included.
 
-Formal annotated/signed tag creation and GitHub Release publication require explicit
-approval after reviewing [release assessment](release-assessment.md). No existing
-tag will be changed.
+
+## Zig 0.17 fetch-cache note
+
+If a build reports an `N-V-...` hash after a bare `zig fetch`, use `zig fetch --save=akamata https://github.com/moribit/Akamata/archive/refs/tags/v0.2.1.tar.gz` from the Consumer project, then rebuild. This works around a reproduced Zig 0.17 archive-root recompression/cache issue. The immutable release hash remains `akamata-0.2.1-uJIoI3crPQE12CxtQ0Iv_d0wHvo0M3USWct-sZKaIc1_`; never weaken hash checking or replace it with the naked-package hash.
+
+Published: https://github.com/moribit/Akamata/releases/tag/v0.2.1
