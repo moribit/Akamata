@@ -1,39 +1,106 @@
-# Release assessment — in progress
+# Release-candidate final assessment
 
-Starting candidate: `280c53481b527b7c11e4d7edb2b1252b7f03f2e6`. Published stable release: v0.2.0. Package and CLI identify as 0.2.1, but no 0.2.1 tag has been created. Version selection remains provisional until compatibility review is complete.
+候補: **v0.2.1**, source **`2714af09fb6c910581a8397c0cb69ebe6a4eccda`**.
+候補CIとTSanは完了。正式リリースの承認判断に提示可能。本番反映は別ゲートであり、いずれの公開操作も未実施。
 
-## Verified evidence
+## Decision scope
 
-- Starting SHA existing CI: 23 successful jobs (run 42009937630). This is prior CI evidence, not a new run for uncommitted changes.
-- Four Consumers: 12 baseline and 12 local-candidate ReleaseSafe commands passed.
-- Mo-Bus disposable Native end-to-end scenario passed before and after candidate substitution.
-- Ehagaki actual WASM/D1 host simulation passed; this is not live Cloudflare validation.
+The candidate is frozen after two release-validation fixes: Storage metadata
+lifetime (`0ea0c17`) and unsupported deploy-option rejection (`2714af0`). Subsequent
+migration documentation/test-runner commits do not change this fixed release target.
+Threaded remains production default; Reactor remains parked/fail-closed.
 
-## Release blockers / unresolved gates
+Status vocabulary: 成功 / 失敗 / 未実施 / 環境制約により未確認.
 
-- CLI template checks incorrectly use the previous scaffold bootstrap tag; a focused fix is under test.
-- Ehagaki missing-secret fallback and request-time migration need production-safe review.
-- Mo-Bus Native sender echo differs from Workers sender exclusion; common Realtime scenario still needs semantic reconciliation.
-- mimoc_news custom glue owns image proxy/upload behavior and cannot be force-replaced with standard glue.
-- Staging E2E, mobile E2E, live provider coverage and candidate-specific full CI remain incomplete.
-
-Stable release is not approved. Threaded remains the Native production default; Reactor remains parked/fail-closed. Tag creation and Release publication require the user approval specified in the task.
-
-## Additional local candidate checks
-
-CLI fix `072b21e`, documentation `087793d`, migration checkpoint `85c36ae`. `zig build test documentation-test db-pool-test -Doptimize=ReleaseSafe -j2 --summary all`: 92/92 steps, 169 tests pass, one skip, exit 0. `zig build portable-application-test documentation-test -Dbackend=workers -Doptimize=ReleaseSafe -j2 --summary all`: 8/8 steps, exit 0, ten simulated-provider runs pass. CLI operations and project-update tests pass including current-tag dry-run and unknown-tag rejection. These local results do not replace Linux/macOS candidate CI or staging live tests.
-
-## v0.2.0 comparison: provisional classification
-
-| Area | Classification | Evidence / migration consideration |
+| Gate | Result | Evidence |
 |---|---|---|
-| DB Pool | additive API and lifecycle behavior | `8607435`, `005f110`: deadline acquisition, close/waiter ownership; preserve lease release before deinit |
-| SQLite | compatible safety fix | `ccd7662`: finalize prepared statement if wrapper allocation fails |
-| Threaded/HTTP | correctness and performance behavior | `278e2c5` buffered request tails; `87e5d93` owned shutdown notification; deadlines unchanged |
-| Observability | additive metrics, optional cost | `ab56634`, `289abf2`: bounded-cardinality lifecycle/phase diagnostics |
-| OpenAPI/client | generated source compatibility impact | `3f477a7`, `2be84be`, `9e707f0`, `8128827`: valid identifiers, bounded wire schemas, strict enums/tagged unions; regenerate clients and type-check caller assumptions |
-| Workers bridge | compatible Fetch correctness | bodyless statuses use null response bodies; review managed diffs, retain app-owned entry/gateway behavior |
-| CLI | compatibility fix | `072b21e`: separate current template support from old scaffold bootstrap; unknown versions fail closed |
-| Experimental runtime | not release-promoted | `78ed9c5` evaluation only; Reactor remains parked/fail-closed |
+| Starting 720464d CI | 成功, 23/23 | run 42166466775 |
+| Storage fix 0ea0c17 CI | 成功, 23/23 | run 42168484632 |
+| Storage fix Linux/macOS TSan | 成功, 2/2 | run 42168586988 |
+| Final candidate CI | 成功: 23/23 jobs | [run 42169950892](https://github.com/moribit/Akamata/actions/runs/42169950892) |
+| Final candidate Linux/macOS TSan | 成功: 2/2 jobs | [run 42170078817](https://github.com/moribit/Akamata/actions/runs/42170078817) |
+| Local ReleaseSafe unit/docs/Pool | 成功: 92/92 steps; last rerun executes 128 tests, others cached | exact library tree 0ea0c17 |
+| Storage cleanup regression | 成功: 28/28 direct module tests | old two-line implementation fails poison-on-close test; corrected implementation passes |
+| Workers application/docs contracts | 成功: 8/8 steps, 10 simulated-provider runs | same library/runtime source as candidate |
+| Consumer ReleaseSafe matrix | 成功: 12/12 commands | tests/default/Workers per app with local --fork; mimoc_news default is a launcher |
+| CLI operations and update/sync | 成功: 30/30 steps, plus new unsupported-option guard smoke | no real deployment during mocked CLI tests |
+| Final actual staging artifact dry-run | 成功: four resource-bearing targets plus resource-free Yaku | explicit Wrangler dry-run, not unsupported CLI flag |
+| Final live acceptance | 成功: four commands exit 0 | isolated Cloudflare D1/R2/DO, fresh test secrets, synthetic data |
+| Production validation/deployment | 未実施, intentionally gated | baseline contains rollback versions |
+| New Consumer latency/performance benchmark | 未実施 | no performance improvement/regression claim from functional tests |
 
-No new App/Context, provider, auth or Realtime abstraction is proposed. Existing Consumer compilation is evidence of source compatibility for those four SHAs, not proof of all public API compatibility. v0.2.1 is the provisional patch candidate because retained production changes are additive/corrective; generated TypeScript tightening requires explicit migration notes. Final version and stable status await the remaining gates. Candidate CI: https://github.com/moribit/Akamata/actions/runs/42166135796 (running when recorded).
+## Why the historical 169-success / one-skip run skipped
+
+`tests/jwt_test.zig`: optional OpenSSL RSA-SHA256 signing test returns
+`SkipZigTest` when `rs256.signPem` reports `UnsupportedOnTarget`. The default build
+does not enable `-Dopenssl=true`. This was not a skipped HS256/JWT authentication
+suite or a failing test hidden as success. The separate `native-openssl` CI job
+runs `zig build test -Dopenssl=true -Doptimize=ReleaseSafe`; it passed on 0ea0c17.
+Final candidate CI also passes that job. Cached local reruns do not reproduce
+the same executed-test count; do not add cached counts to invent a new total.
+
+## v0.2.0 change classification
+
+| Area | Classification | Consequence |
+|---|---|---|
+| App/Context, handler routing, middleware, Capability/Provider | compatible retained interfaces | four Consumers compile with local substitution |
+| DB Pool | additive reliability API/lifecycle behavior | monotonic deadlines, tryAcquire, explicit close; preserve lease ownership and shutdown ordering |
+| SQLite | compatible safety fix | finalize handle on wrapper OOM; no accepted speculative statement-allocation optimization |
+| HTTP parser/response/Threaded | correctness and measured behavior changes | buffered tails, owned shutdown wake, Storage header ownership; deadlines/admission unchanged |
+| Observability | additive opt-in metrics | fixed-cardinality labels; disabled production hot paths retain opt-in semantics |
+| OpenAPI/TS client | generated-source compatibility impact | strict enum/void-union schemas and corrected identifiers; regenerate/type-check callers |
+| Storage/R2 | correctness plus metadata lifetime preservation | no Store signature change in this release comparison; HEAD and buffered response headers request-owned |
+| Auth/JWT/Realtime | existing core APIs retained | Consumer-specific secret/migration/sender-exclusion fixes are separate app commits |
+| Workers bridge | Fetch bodyless-response correction | review managed diffs; preserve custom image proxy, gateway and upload limits |
+| CLI/scaffold/sync/deploy | compatible safety fixes; invalid usage now rejected | matching CLI/template versions; unknown flags fail before side effects; scaffold bootstrap remains previous stable |
+| Reactor/sharded research | experimental, not released as production | public gate unchanged |
+
+## SemVer recommendation
+
+Recommend **v0.2.1**, not a retag of v0.2.0. The retained production changes are
+compatible reliability/correctness improvements and additive controls, with no
+removed App/Context/DB/Store/handler API. A v0.3.0 would be appropriate for deliberate
+API removals or a broader application-model release; no such redesign is included.
+The documented 0.x SemVer flexibility does not erase generated TypeScript impacts:
+strict enum literals, closed void union objects and corrected operation identifiers
+must be called out. A prerelease remains the alternative if mandatory candidate
+CI/TSan or a major Consumer regression fails. Package and CLI already identify
+0.2.1; do not fabricate the unpublished tag/hash or change the previous bootstrap pin.
+
+## Breaking/compatibility considerations
+
+- Regenerated TypeScript callers may require narrowing and corrected operation
+  names. Valid JSON wire schemas remain the source of truth.
+- Invalid/unsupported deploy flags, especially `--dry-run`, now fail with UsageError.
+  They never promised a safe preview and previously could reach real deployment.
+- Ehagaki app fix requires an explicit non-placeholder JWT secret; previously
+  misconfigured startup silently used a development fallback. Workers request-time
+  migration becomes explicit opt-in. These are app configuration changes.
+- Native Mo-Bus client-originated frames now exclude the sender, matching Workers.
+  REST-originated notifications retain broadcast behavior. This app-specific
+  observable correction requires release notes for clients that depended on echo.
+
+## Remaining approval gates and limitations
+
+No formal tag or Release, production deployment, production DB migration, SQLite-to-D1
+switch or production resource deletion is authorized. All Consumer dependency
+pins remain unchanged until an approved immutable tag exists. App fixes are still
+isolated, committed and locally bundled; original working trees are untouched.
+Production Secret presence does not prove equality, production schema readiness
+or a completed DB cutover rehearsal. Those facts remain unverified; in particular,
+Mo-Bus DB cutover is not certified by this staging migration.
+
+See [draft release notes](release-notes-v0.2.1.md), [migration guide](migration-guide.md),
+[compatibility matrix](compatibility-matrix.md), [deployment report](deployment-report.md)
+and [CI evidence](evidence/candidate-ci.json). All listed candidate gates have passed. The proposed tag target is v0.2.1 at 2714af0; formal tag/Release and each production rollout still require explicit approval.
+
+## Per-application production gate, separate from framework release
+
+| App | Staging contract | What still precedes production approval |
+|---|---|---|
+| Yaku | 成功 | approved release pin/hash, reviewed sync, exact final app SHA and rollback command |
+| mimoc_news | 成功 | same pin; preserve custom glue; confirm existing production schema/secret names without applying migration; acknowledge host buffering limitation |
+| Ehagaki | 成功 | promote secret-required/migration-opt-in app commits; keep actual existing signing key; verify production configuration and rollback |
+| mobus-backend | 成功 | promote sender-exclusion app/test commits; verify production provider topology; do not combine with unapproved SQLite-to-D1 cutover; device/cutover readiness remains separate |
+
+The prerequisite dependency pin cannot be finalized before the immutable release tag exists. These pending production actions are intentionally not reported as completed validation. No production command is included as an implicit approval.

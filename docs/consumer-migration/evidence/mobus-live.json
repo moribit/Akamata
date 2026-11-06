@@ -1,0 +1,6 @@
+{
+  "status": "success",
+  "exit": 0,
+  "target": "https://akamata-migration-20261106-mobus.mimoc-maker.workers.dev",
+  "log": ".zig-cache/consumer-migration/logs/mobus-staging-e2e.log"
+}

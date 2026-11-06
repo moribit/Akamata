@@ -1,0 +1,194 @@
+{
+  "phase": "candidate",
+  "akamata_sha": "0ea0c175cb098cfa70c88655c269d4259dd698ab",
+  "runs": [
+    {
+      "repo": "Yaku",
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 14.905621500016423,
+      "log": ".zig-cache/consumer-migration/logs/candidate-Yaku-0.log"
+    },
+    {
+      "repo": "Yaku",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 12.908849083003588,
+      "log": ".zig-cache/consumer-migration/logs/candidate-Yaku-1.log"
+    },
+    {
+      "repo": "Yaku",
+      "command": [
+        "zig",
+        "build",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 6.401394166983664,
+      "log": ".zig-cache/consumer-migration/logs/candidate-Yaku-2.log"
+    },
+    {
+      "repo": "mimoc_news",
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 7.076415416027885,
+      "log": ".zig-cache/consumer-migration/logs/candidate-mimoc_news-0.log"
+    },
+    {
+      "repo": "mimoc_news",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 5.637499292002758,
+      "log": ".zig-cache/consumer-migration/logs/candidate-mimoc_news-1.log"
+    },
+    {
+      "repo": "mimoc_news",
+      "command": [
+        "zig",
+        "build",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 0.13311891700141132,
+      "log": ".zig-cache/consumer-migration/logs/candidate-mimoc_news-2.log"
+    },
+    {
+      "repo": "Ehagaki",
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 0.24316733301384374,
+      "log": ".zig-cache/consumer-migration/logs/candidate-Ehagaki-0.log"
+    },
+    {
+      "repo": "Ehagaki",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 16.076258707995294,
+      "log": ".zig-cache/consumer-migration/logs/candidate-Ehagaki-1.log"
+    },
+    {
+      "repo": "Ehagaki",
+      "command": [
+        "zig",
+        "build",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 0.1332064169982914,
+      "log": ".zig-cache/consumer-migration/logs/candidate-Ehagaki-2.log"
+    },
+    {
+      "repo": "mobus-backend",
+      "command": [
+        "zig",
+        "build",
+        "test",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 7.175282166019315,
+      "log": ".zig-cache/consumer-migration/logs/candidate-mobus-backend-0.log"
+    },
+    {
+      "repo": "mobus-backend",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 19.65274191601202,
+      "log": ".zig-cache/consumer-migration/logs/candidate-mobus-backend-1.log"
+    },
+    {
+      "repo": "mobus-backend",
+      "command": [
+        "zig",
+        "build",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all",
+        "--fork=<checkout>"
+      ],
+      "exit": 0,
+      "seconds": 6.936006374977296,
+      "log": ".zig-cache/consumer-migration/logs/candidate-mobus-backend-2.log"
+    }
+  ]
+}

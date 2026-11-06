@@ -1,0 +1,27 @@
+{
+  "candidate": "2714af09fb6c910581a8397c0cb69ebe6a4eccda",
+  "cli_sha256": "38d6ce0ab1a742c7b0ec9a1b2352805333b4b24d1ae18006d82f71f20c3ae9a5",
+  "sync": [
+    {
+      "repo": "Yaku",
+      "exit": 1,
+      "expected_protection": "AkamataDependencyNotFound"
+    },
+    {
+      "repo": "mimoc_news",
+      "exit": 1,
+      "expected_protection": "ManagedFileModified"
+    },
+    {
+      "repo": "Ehagaki",
+      "exit": 0,
+      "expected_protection": null
+    },
+    {
+      "repo": "mobus-backend",
+      "exit": 0,
+      "expected_protection": null
+    }
+  ],
+  "unsupported_deploy_dry_run": "rejected before external commands; CLI mock regression verifies zero invocations"
+}

@@ -1,0 +1,20 @@
+{
+  "d1": {
+    "news": {
+      "name": "akamata-migration-20261106-news",
+      "id": "82d40849-6f02-478a-8699-be1de2e0218a"
+    },
+    "ehagaki": {
+      "name": "akamata-migration-20261106-ehagaki",
+      "id": "9a44f870-5f96-4c09-9843-43de10b19807"
+    },
+    "mobus": {
+      "name": "akamata-migration-20261106-mobus",
+      "id": "23093159-7501-490e-9a3b-5367b81dc83f"
+    }
+  },
+  "r2": {
+    "news": "akamata-migration-20261106-news",
+    "mobus": "akamata-migration-20261106-mobus"
+  }
+}

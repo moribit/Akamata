@@ -1,0 +1,13 @@
+{
+  "phase": "candidate",
+  "binary": ".zig-cache/consumer-migration/mobus-backend/zig-out/bin/mobus-backend",
+  "data": "disposable local SQLite and filesystem only",
+  "tests": [
+    {
+      "name": "existing two-user Native E2E",
+      "exit": 0,
+      "log": ".zig-cache/consumer-migration/logs/candidate-mobus-native-e2e-isolation.log"
+    }
+  ],
+  "server_exit": 0
+}

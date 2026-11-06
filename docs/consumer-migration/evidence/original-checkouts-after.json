@@ -1,0 +1,25 @@
+{
+  "Yaku": {
+    "sha": "f1f809fb6cba61b819dab35592b59ca7fae27db8",
+    "status": []
+  },
+  "mimoc_news": {
+    "sha": "24eb3e140f9e669ec62c842b4074d5ee63e548d4",
+    "status": [
+      "?? .DS_Store",
+      "?? deploy/.DS_Store"
+    ]
+  },
+  "Ehagaki": {
+    "sha": "9962b4a12bda794b4ceaf7304ca02f02c2f47d23",
+    "status": [
+      "?? .DS_Store",
+      "?? deploy/.DS_Store",
+      "?? zig-pkg/"
+    ]
+  },
+  "mobus-backend": {
+    "sha": "da3f9c025c46e7c17ddb53f539c3bed6ecb76f0d",
+    "status": []
+  }
+}

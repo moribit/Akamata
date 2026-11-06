@@ -1,0 +1,6 @@
+{
+  "request_id_correlated": true,
+  "structured_messages": [
+    "info: {\"ts_unix_us\":1793942638090000,\"request_id\":\"a26f37fe-ae66-4786-8df3-a37383328d6a\",\"method\":\"GET\",\"path\":\"-\",\"route\":\"/api/news\",\"status\":200,\"duration_ms\":13.999,\"db\":{\"queries\":1,\"execs\":0,\"errors\":0,\"duration_ms\":13.999},\"outbound_http\":{\"requests\":0,\"duration_ms\":0.000},\"storage\":{\"operations\":0,\"duration_ms\":0.000}}"
+  ]
+}

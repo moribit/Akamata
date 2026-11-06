@@ -1,0 +1,150 @@
+{
+  "candidate": "2714af09fb6c910581a8397c0cb69ebe6a4eccda",
+  "runs": [
+    {
+      "id": 42170078817,
+      "name": "Native runtime ThreadSanitizer evaluation",
+      "head_sha": "2714af09fb6c910581a8397c0cb69ebe6a4eccda",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42170078817",
+      "jobs": [
+        {
+          "name": "sanitizer (macos-latest)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "sanitizer (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 42169950892,
+      "name": "ci",
+      "head_sha": "2714af09fb6c910581a8397c0cb69ebe6a4eccda",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42169950892",
+      "jobs": [
+        {
+          "name": "generated DX client strict typecheck",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "living examples (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "native-release-safe",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "native-integration",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "tasks-test",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cli-build",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "native-test",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "private competitive fixture contracts",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "chat-native",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "adversarial HTTP smoke",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "public documentation and PDF contract",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "native-openssl",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "living examples (macos-latest)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "macos native + kqueue contract",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "portable-application-workers",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "chat-workers",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "device-messaging-native",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "linux threaded + epoll contract",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "package-archive",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "device-messaging-workers",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "guestbook-workers",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "cli init smoke test",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "docker-build (chat container)",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

@@ -1,23 +1,70 @@
-# Deployment status
+# Isolated staging deployment report
 
-No tag, GitHub Release, production deployment, migration or service switch has been performed in this investigation. A dedicated resource-free Yaku staging Worker has been deployed. Existing production versions and rollback references are recorded in [baseline](baseline.md). Worker rollback does not roll back database schema.
+No formal tag, GitHub Release, production deployment, production DB migration,
+production service switch, production resource deletion or tag rewrite was performed.
+Production rollback references remain in [baseline](baseline.md).
 
-## Gates still open
+## Final targets
 
-1. Freeze the candidate after CLI regression verification and complete release CI.
-2. Finish isolated staging E2E, binding/secret-name validation and rollback rehearsals.
-3. Present a concrete release assessment for explicit tag/Release approval.
-4. Pin all Consumers to the approved immutable tag/hash and review managed sync diffs.
-5. Obtain separate production approval, then deploy sequentially: Yaku, mimoc_news, Ehagaki, mobus-backend.
+| Target | Version | Status |
+|---|---|---|
+| yaku-akamata-migration-20261106 | 1b1318c7-cf37-4b0e-8c1f-f666921da6f2 | 成功 |
+| akamata-migration-20261106-news | 4fee605c-2317-4fb1-b888-da11f26fdafe | 成功 |
+| akamata-migration-20261106-ehagaki | 736912e9-0942-41bf-a797-09853467aed5 | 成功 |
+| akamata-migration-20261106-rt | 37183f27-c433-4580-8f51-abdbc881136f | 成功 |
+| akamata-migration-20261106-mobus | e4eae085-faf5-40ff-8310-85c947dd6977 | 成功 |
 
-No production JWT values were fetched. Presence of a secret name does not prove equality, valid configuration, or cross-application JWT compatibility. No production database cutover is authorized.
+URLs are `https://<target>.mimoc-maker.workers.dev`. Exact WASM hashes and app
+SHAs are recorded in [final deployments](evidence/final-staging-deployments.json).
+Yaku has no provider bindings. All other D1/R2/DO/service references were checked
+against an explicit isolated-resource allowlist before deployment. No production
+resource or data was copied. Test secrets were generated locally, uploaded from
+mode-0600 files and never printed or committed.
 
-## Yaku isolated staging
+## Acceptance
 
-- URL: https://yaku-akamata-migration-20261106.mimoc-maker.workers.dev
-- Version: `398395c8-e63d-42d2-b17a-d19979a7733f`.
-- No DB, bucket, service binding or secrets; production Worker name unchanged.
-- Source app baseline `f1f809f`, candidate runtime built with local `--fork` at `280c534`; subsequent candidate `38e5036` changes CLI/docs only, not the deployed runtime.
-- Wrangler 4.120.0 dry-run and deploy succeeded. Stateless real HTTP suite passes: all quiz difficulties/privacy/grading, validation/body limit, OpenAPI/client, hand analysis and glossary 49.
-- Browser E2E passed 36/36 across mobile Chromium/WebKit, Android and desktop Chromium.
-- Staging is retained for verification; deletion is not automatic. No production rollback is required because production was untouched.
+- **成功**: four sequential final live acceptance commands exit 0, including actual
+  D1/R2/DO, gateway-to-Ehagaki, JWT interoperability, Realtime, firmware HEAD/Range,
+  byte/SHA/size checks and crash upload. See [final live](evidence/final-live.json).
+- **成功**: news current-dependency and candidate status/Content-Type/top-level JSON
+  keys match across the tested CRUD/error cases. This is not a universal schema diff.
+- **成功**: correlated structured news access log contains Request ID, route, status,
+  timing and one D1 query; Server-Timing is present. Public-list probe has zero
+  storage operations. Authenticated-write log payloads were not collected to avoid
+  recording authorization headers; R2 effects were checked by bytes and cleanup.
+- **成功**: dedicated R2 `crash/2.bin` readback equals the synthetic four bytes `dump`
+  (SHA-256 b6ca0868bca6a2926b70aa1a71592038d9030fe26d4214edcfbd6cf41f2f4654).
+- **未実施**: production post-deploy checks, production Secret equality, real ESP32
+  hardware E2E, production latency measurement and production rollback rehearsal.
+
+## Migration decision
+
+| App | Schema change caused by this dependency update | Staging action | Production action |
+|---|---|---|---|
+| Yaku | none: no DB | none | none |
+| mimoc_news | none: existing 0001_initial.sql unchanged | apply existing schema to new empty D1 | do not run migration for dependency update |
+| Ehagaki | none: model/schema unchanged | existing deferred bootstrap validated on new empty D1; final Worker disables it | default request migration off; no migration for dependency update |
+| mobus-backend | none: four existing SQL files unchanged | apply all four to new empty D1; history/status succeed | no migration for dependency update; SQLite-to-D1 cutover is a separate blocked gate |
+
+Ehagaki Native auto-migration remains a development convenience. Workers now
+requires explicit `EHAGAKI_AUTO_MIGRATE=true` for that convenience; final staging
+is false. mimoc_news `MIMOC_NEWS_AUTO_MIGRATE=false` remains unchanged in production
+and staging configuration. No production schema was inspected or certified by
+these isolated tests. If production schema is behind, obtain a separately reviewed
+migration plan, backup and approval rather than letting dependency deployment
+apply it implicitly.
+
+## Recovery and retention
+
+A Worker code rollback uses the old version in baseline; it is not a database
+rollback. No production schema rollback is required by this work. New empty test
+D1s and dedicated R2 buckets use the `akamata-migration-20261106-` prefix; DO state
+belongs only to the dedicated gateway namespace. Synthetic staging data/resources
+are retained temporarily for approval review, not configured with automatic TTL.
+Inventory them before explicit test-resource cleanup; never substitute production
+IDs. No production dump or credential was placed in the repository.
+
+App fixes are committed only in isolated checkouts (and private local Git bundles),
+not promoted to original Consumer main branches. Approved-tag dependency pinning,
+reviewed managed sync, app-fix promotion and production approval are still required
+before production rollout.

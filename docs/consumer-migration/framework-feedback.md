@@ -1,35 +1,39 @@
-# Framework feedback — migration evidence
+# Framework feedback — final release validation
 
-Candidate begins at `280c534`; no feedback item is yet classified as a new framework feature.
+Framework candidate: 2714af0. Full source SHAs and evidence are linked from
+[release assessment](release-assessment.md). No new capability/runtime abstraction
+was added to work around Consumer code.
 
-| ID | Repository / area | Observation and reproduction | Classification / priority | Next action |
-|---|---|---|---|---|
-| F01 | Yaku / app-owned Workers entry | 4 KiB streaming body limiter protects before standard bridge arrayBuffer; current production HTTP smoke rejects >4 KiB | framework API/docs candidate / high | inspect candidate artifact ABI; do not remove app limiter without equivalent host-side bounded-read proof |
-| F02 | mimoc_news / build.zig | backend enum is Workers-only; Native artifact is a dev launcher, while migration tests use SQLite | app scope/documentation / medium | distinguish Native tests from a real Native HTTP service; do not mark parity from a launcher build |
-| F03 | Ehagaki / Workers lifecycle | deferred request-time migration runs on first request; repository documents it as production convenience | app deployment lifecycle / high | explicit migration plan and fail-closed startup policy before production promotion |
-| F04 | Ehagaki / configuration | missing signing-secret path falls back to a development placeholder | app security / blocker for production | fail closed without a configured secret; no secret values read or compared in reports |
-| F05 | mobus-backend / existing readiness memo | Native two-client Realtime failure and DB cutover NOT READY are documented | historical app memo / baseline resolved | baseline two-user Native E2E passed including client-originated signals/text/end; repeat candidate and real Workers before considering remote cutover |
-| F06 | Ehagaki / repository hygiene | compiled Native/WASM artifacts are tracked | app build/release hygiene / medium | never treat checked-in output as freshly verified; rebuild from the recorded SHA |
-| F07 | all consumers / CLI source | no Consumer GitHub Actions workflows; dependency versions differ, Yaku is an unreleased SHA | tooling/documentation / high | use exact candidate CLI and establish explicit command/result matrix; immutable release pin only after approval |
+| ID / priority | Repository / file | Reproduction, expected vs actual | Classification / result |
+|---|---|---|---|
+| F01 high | Yaku app-owned request_limit.mjs; Akamata worker template dispatch | Body must be rejected before unbounded host materialization; Yaku 4 KiB guard does so, canonical bridge still arrayBuffers first | API/docs backlog; retain guard, do not claim universal pre-buffer admission |
+| F02 medium | mimoc_news/build.zig | default build succeeds but produces Native dev launcher, not HTTP server | app scope/docs; corrected matrix, no fake Native parity claim |
+| F03 high | Ehagaki/src/worker.zig, config.zig | production should not apply schema on first request; old worker always registered migrator | app deploy lifecycle; fixed 3889b75 explicit opt-in, final staging false; no schema change |
+| F04 high | Ehagaki/src/config.zig | missing JWT secret should fail startup; old app used development fallback | app security; 8ba1655 + 3889b75, live missing-secret 500; empty/placeholder unit rejection |
+| F05 medium | Mo-Bus historical readiness memo | historical Native delivery failure did not reproduce in baseline acceptance | historical issue closed for tested scenario, not production DB cutover certification |
+| F06 medium | Ehagaki tracked zig-out artifacts | checked-in output can be mistaken for fresh build | app hygiene; rebuilt separately, original files preserved |
+| F07 medium | Consumer tooling | PATH Node/CLI can differ; no Consumer CI workflows found | DX/docs; explicit binaries and SHA/wasm hashes recorded; JSPI flag uses actual Node 24 |
+| F08 high | tools/akamata/src/project/managed_files.zig, command/update.zig | same-version CLI should accept matching release tag; bootstrap v0.2.0 incorrectly rejected v0.2.1 | framework bug; fixed 072b21e, current/old/unknown-tag regressions pass |
+| F09 high | Mo-Bus/src/application.zig nativeRealtime | client event should reach peer without sender echo; old Native notifyCall broadcast all | app bug; minimal saved-baseline failure and Native/Workers success after c389a8e/dd8273b; existing core broadcastExcept reused |
+| F10 blocker resolved | src/storage.zig serveDownload | HEAD metadata must survive reader close; Native firmware HEAD crashed in response serialization | framework bug; 0ea0c17 request-arena metadata snapshot; old-two-line poison test fails, corrected 28/28 and full acceptance pass |
+| F11 high resolved | tools/akamata/src/command/deploy.zig | unsupported --dry-run must not deploy; source parser ignored unknown flag | framework CLI safety bug; 2714af0 rejects before any external command; mock validates zero migration/build/deploy calls |
+| F12 medium | mimoc_news custom unowned Workers bridge | sync must preserve image proxy/logging/10 MiB upload behavior; standard replacement loses behavior | app integration/docs; ManagedFileModified protection retained, actual D1/R2 contracts pass without bridge edits |
 
-Every promoted issue must add candidate SHA, file, expected/actual behavior,
-reproduction command, impact, recommended fix and evidence. Remote production
-secret equality, JWT interoperability and DB cutover readiness remain unproven.
+## Test assumptions corrected (not product regressions)
 
-## Baseline confirmations
+- News creation requires a title image (400 without it); image-free update is
+  distinct. Do not infer new optional-create semantics from an idealized test.
+- Ehagaki returns 404 for nonowner delete to avoid leaking existence, not 403.
+- Restricted browser launch and missing JSPI flag were environment failures; explicit
+  supported runtime/permissions passed. A public Python probe returned 403 until
+  an explicit User-Agent was supplied; Node/curl and corrected probe succeeded.
+- Native fixture now handles TLS and HTTP upgrade read-ahead before remote reuse.
 
-- Existing dependency: all 12 ReleaseSafe test/build/Workers commands passed.
-  mimoc_news Native result is explicitly its dev launcher, not Native HTTP parity.
-- Yaku current production stateless HTTP smoke passed: 38 catalog entries, all
-  difficulties, hidden answer DTO fields, grading, validation, 4 KiB rejection,
-  OpenAPI/client, free hand analysis and 49-term glossary.
-- Mo-Bus baseline E2E passed on disposable SQLite/filesystem with test-only
-  credentials. The historical Native Realtime blocker did not reproduce at
-  da3f9c0; no framework change is justified by the old memo alone.
-- Ehagaki WASM host test initially could not start because Node 24 does not
-  enable JSPI by default. Use the actual supported `--experimental-wasm-jspi`
-  flag; this is an environment/documentation issue, not a framework failure.
+## Still not proven
 
-## CLI finding F08
-
-`tools/akamata/src/project/managed_files.zig` rejected the matching CLI release tag because it compared against the older scaffold bootstrap pin. Fixed in `072b21e`: explicit current/bootstrap template compatibility and matching default update target. Release helper unit test and project-update dry-run regression cover current-tag acceptance, unknown-tag refusal, old-tag compatibility and no file mutation. CLI operations/project-update checks pass. No generated Consumer bridge was edited.
+Production Secret equality, production DB migration/cutover readiness, real ESP32
+hardware compatibility, production performance and long-duration application leak
+certification remain unverified. Staging functional success and framework TSan
+must not be presented as those stronger claims. No speculative core workaround,
+Reactor activation, production data import or automatic production provisioning
+was used to make this matrix pass.

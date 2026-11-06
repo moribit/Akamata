@@ -1,17 +1,34 @@
-# Ehagaki migration checkpoint
+# Ehagaki — final staging result
 
-## Verified
+Original SHA: 9962b4a; isolated validated SHA:
+`3889b758bd3b12a0869b4c1423b27006e1c37f12` (includes auth fix 8ba1655).
+Original checkout and production remain unchanged.
 
-Baseline/candidate Native tests/build and Workers build pass. Actual WASM host simulation passes with Node JSPI enabled, including authentication, ownership, expiry and migration retry. Simulation does not prove production secret interoperability.
+## Changes and validation
 
-## Remaining gates
+- **成功**: JWT_SECRET is required; empty/development-placeholder values fail.
+  Dedicated live Worker without the secret returned 500 and accepted no API work.
+  Missing-secret health is startup failure, not an authentication 401 claim.
+- **成功**: 24/24 ReleaseSafe unit tests, Native build and Workers build.
+- **成功**: actual WASM + JSPI with simulated D1, including migration retry.
+  Use an explicit Node 24 executable with `--experimental-wasm-jspi`;
+  PATH resolved inconsistently in this environment.
+- **成功**: real isolated D1 bootstrap, then final deployment with request-time
+  migration disabled (`EHAGAKI_AUTO_MIGRATE=false`). Defaults are now off for
+  Workers; true is an explicit development/test convenience. Native development
+  migration is retained. App schema/model did not change.
+- **成功**: anonymous timeline, anonymous create rejection, public/private posts,
+  owner visibility, nonowner delete 404 (existing existence-hiding behavior),
+  search/paging, Unicode/emoji validation, 1024-byte bitmap and invalid-size rejection,
+  owner deletion, expired/wrong-signature JWT rejection.
+- **成功**: a JWT actually issued by staging Mo-Bus with a fresh shared test key
+  creates Ehagaki posts with the same user_id. Gateway Service Binding to Ehagaki
+  health succeeds. No production signing key or token was fetched.
 
-Missing-secret fallback must fail closed before production; first-request migration policy requires explicit review. Preserve existing posts; do not run production migration. Existing Mo-Bus JWT compatibility and staging HTTP remain unverified.
+Final staging version: `736912e9-0942-41bf-a797-09853467aed5`.
+Production key equality, production schema readiness, production deployment and
+production data tests: **未実施**. Local commits and private Git bundles preserve
+fixes until approved migration promotion; dependency pin remains unchanged.
 
-## Version and rollback
-
-Original source/dependency and deployed code references are in [baseline](baseline.md). Original checkout and dependency hashes are unchanged. No release pin or deployment has been performed. [Compatibility matrix](compatibility-matrix.md) distinguishes compile evidence from live-provider evidence.
-
-## Isolated security fix
-
-Local isolated commit `8ba1655` removes the missing-secret fallback and rejects empty/development-placeholder values. Existing valid JWTs retain the same HS256 verification path. ReleaseSafe tests: 23/23; Workers build: pass; actual WASM JSPI simulated-D1 scenario: pass. Reproduce using `/Users/mimoc/.nvm/versions/node/v24.19.0/bin/node --experimental-wasm-jspi tests/worker_smoke.mjs`; PATH can select a different Node binary in this environment. This commit has not been promoted to the original Consumer or production. Migration policy remains unresolved.
+See [live evidence](evidence/ehagaki-live.json), [migration guide](migration-guide.md)
+and [deployment report](deployment-report.md).

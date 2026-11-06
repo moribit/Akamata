@@ -1,0 +1,28 @@
+{
+  "status": "success",
+  "base": "https://akamata-migration-20261106-ehagaki.mimoc-maker.workers.dev",
+  "checks": [
+    "isolated migration completed / health",
+    "anonymous timeline",
+    "anonymous create denied",
+    "expired JWT denied",
+    "invalid signature denied",
+    "Mo-Bus issued JWT accepted: true",
+    "anonymous visibility: true",
+    "owner visibility: true",
+    "other delete denied",
+    "Mo-Bus issued JWT accepted: false",
+    "anonymous visibility: false",
+    "owner visibility: false",
+    "other delete denied",
+    "authenticated search and paging",
+    "Unicode charset rejects emoji",
+    "bitmap create",
+    "bitmap size rejects",
+    "owner delete",
+    "owner delete",
+    "owner delete",
+    "gateway Service Binding to Ehagaki"
+  ],
+  "jwt": "fresh staging Mo-Bus-issued token with shared test-only signing secret"
+}

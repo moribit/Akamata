@@ -1,0 +1,34 @@
+[
+  {
+    "repo": "mimoc_news",
+    "worker": "akamata-migration-20261106-news",
+    "exit": 0,
+    "version": "4fee605c-2317-4fb1-b888-da11f26fdafe",
+    "app_sha": "24eb3e140f9e669ec62c842b4074d5ee63e548d4",
+    "wasm_sha256": "044cb57c1ffa10faa35f6f67217c518f2f18f04c5e883c53727f09ab35192500"
+  },
+  {
+    "repo": "Ehagaki",
+    "worker": "akamata-migration-20261106-ehagaki",
+    "exit": 0,
+    "version": "736912e9-0942-41bf-a797-09853467aed5",
+    "app_sha": "3889b758bd3b12a0869b4c1423b27006e1c37f12",
+    "wasm_sha256": "86add2906b651481c9c6559268caa1f4cceb807fb50ad33c06721c037eef0d1f"
+  },
+  {
+    "repo": "mobus-backend",
+    "worker": "akamata-migration-20261106-rt",
+    "exit": 0,
+    "version": "37183f27-c433-4580-8f51-abdbc881136f",
+    "app_sha": "dd8273beb0fa47f119c59304e740c1d0b9fa667a",
+    "wasm_sha256": "4c54869f0ebcb2df98bef6d6f7b4e96275bba4a376bc3e0a62b53c74d23a0d13"
+  },
+  {
+    "repo": "mobus-backend",
+    "worker": "akamata-migration-20261106-mobus",
+    "exit": 0,
+    "version": "e4eae085-faf5-40ff-8310-85c947dd6977",
+    "app_sha": "dd8273beb0fa47f119c59304e740c1d0b9fa667a",
+    "wasm_sha256": "4c54869f0ebcb2df98bef6d6f7b4e96275bba4a376bc3e0a62b53c74d23a0d13"
+  }
+]

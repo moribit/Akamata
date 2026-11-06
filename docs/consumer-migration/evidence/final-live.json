@@ -1,0 +1,36 @@
+[
+  {
+    "command": [
+      "node",
+      "tools/consumer-migration/news_staging.mjs",
+      "final"
+    ],
+    "exit": 0,
+    "log": ".zig-cache/consumer-migration/logs/final-live-0.log"
+  },
+  {
+    "command": [
+      "node",
+      "tools/consumer-migration/ehagaki_staging.mjs"
+    ],
+    "exit": 0,
+    "log": ".zig-cache/consumer-migration/logs/final-live-1.log"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/consumer-migration/mobus_staging.py"
+    ],
+    "exit": 0,
+    "log": ".zig-cache/consumer-migration/logs/final-live-2.log"
+  },
+  {
+    "command": [
+      "node",
+      "<checkout>/.zig-cache/consumer-migration/Yaku/tests/http-smoke.mjs",
+      "https://yaku-akamata-migration-20261106.mimoc-maker.workers.dev"
+    ],
+    "exit": 0,
+    "log": ".zig-cache/consumer-migration/logs/final-live-3.log"
+  }
+]

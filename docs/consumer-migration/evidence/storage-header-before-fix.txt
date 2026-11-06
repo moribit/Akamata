@@ -1,0 +1,11 @@
+Controlled old-two-line implementation with the new poison-on-close regression test:
+1/28 storage.test.download headers survive reader cleanup for HEAD and buffered GET...FAIL (TestUnexpectedResult)
+/Users/mimoc/.zvm/0.17.0/lib/std/testing.zig:584:14: 0x100338893 in expect (root)
+    if (!ok) return error.TestUnexpectedResult;
+             ^
+<checkout>/src/storage.zig:267:9: 0x100365647 in test.download headers survive reader cleanup for HEAD and buffered GET (root)
+        try std.testing.expect(std.mem.indexOf(u8, output.written(), "etag: tag-1\r\n") != null);
+        ^
+2/28 storage.test.HTTP range and conditionals...OK
+3/28 storage.test.portable object keys reject traversal...OK
+4/28 storage.test_0...OK

@@ -1,0 +1,13 @@
+{
+  "phase": "baseline",
+  "binary": ".zig-cache/consumer-migration/mobus-backend-baseline-artifacts/mobus-backend",
+  "data": "disposable local SQLite and filesystem only",
+  "tests": [
+    {
+      "name": "sender exclusion minimal reproduction",
+      "exit": 1,
+      "log": ".zig-cache/consumer-migration/logs/baseline-mobus-native-e2e-isolation.log"
+    }
+  ],
+  "server_exit": 0
+}
