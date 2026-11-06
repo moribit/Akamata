@@ -2,16 +2,27 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 
 const phase = process.argv[2] || 'candidate';
-const base = 'https://akamata-migration-20261106-news.mimoc-maker.workers.dev';
+const production = process.argv[3] === '--production';
+assert.ok(!production || phase === 'production');
+const base = production ? 'https://mimoc-news.mimoc-maker.workers.dev' : 'https://akamata-migration-20261106-news.mimoc-maker.workers.dev';
 const scratch = new URL('../../.zig-cache/consumer-migration/', import.meta.url);
-const { BASIC_AUTH_TOKEN } = JSON.parse(await readFile(new URL('staging-test-credentials.json', scratch)));
+let BASIC_AUTH_TOKEN;
+if (production) {
+  // Use the existing local credential in memory only, never copy it to staging or logs.
+  const vars = await readFile('/Users/mimoc/mimoc_news/deploy/.dev.vars', 'utf8');
+  BASIC_AUTH_TOKEN = vars.match(/^BASIC_AUTH_TOKEN\s*=\s*[\"']?([^\r\n\"']+)/m)?.[1];
+  assert.ok(BASIC_AUTH_TOKEN, 'local admin credential is required for production fixture checks');
+} else {
+  ({ BASIC_AUTH_TOKEN } = JSON.parse(await readFile(new URL('staging-test-credentials.json', scratch))));
+}
 const headers = { Authorization: `Basic ${BASIC_AUTH_TOKEN}` };
 const image = Buffer.alloc(9 * 1024 * 1024); image.set([0xff, 0xd8, 0xff]);
 const evidence = { phase, base, checks: [], response_contract: {} };
+const originImage = url => { const path = new URL(url).pathname; return base + (path.startsWith('/images/') ? path : '/images' + path); };
 let id;
 function form(title, upload = false, main = false, size) {
   const f = new FormData();
-  f.set('date', '2026-11-06'); f.set('title', title); f.set('body', 'isolated migration fixture');
+  f.set('date', '2026-11-06'); f.set('title', production ? '[Akamata release test - temporary] ' + title : title); f.set('body', 'isolated migration fixture');
   f.append('category', 'イベント');
   if (upload) {
     const data = size ? Buffer.alloc(size) : image;
@@ -38,7 +49,7 @@ try {
   let r = await check('two 9 MiB uploads', '/api/news', { method: 'POST', headers, body: form('image fixture', true, true) }, 201);
   const row = await r.json(); id = row.id;
   const imageUrl = row.title_image_url;
-  assert.equal(new URL(imageUrl).origin, base, 'images must stay in isolated staging');
+  if (!production) assert.equal(new URL(imageUrl).origin, base, 'images must stay in isolated staging');
   r = await fetch(imageUrl); assert.equal(r.status, 200); assert.deepEqual(Buffer.from(await r.arrayBuffer()), image);
   r = await fetch(imageUrl, { method: 'HEAD' }); assert.equal(r.status, 200); assert.equal(await r.text(), '');
   const oldMain = row.main_image_url;
@@ -54,12 +65,12 @@ try {
   r = await check('replace both images', `/api/news/${id}`, { method: 'PUT', headers, body: form('replacement fixture', true, true) }, 200);
   const replacement = (await r.json()).news;
   assert.notEqual(replacement.title_image_url, imageUrl);
-  assert.equal((await fetch(imageUrl)).status, 404);
-  assert.equal((await fetch(oldMain)).status, 404);
+  assert.equal((await fetch(originImage(imageUrl))).status, 404);
+  assert.equal((await fetch(originImage(oldMain))).status, 404);
   await check('image size exceeded', `/api/news/${id}`, { method: 'PUT', headers, body: form('oversized', true, false, 10 * 1024 * 1024 + 1) }, 400);
   r = await check('delete images', `/api/news/${id}`, { method: 'DELETE', headers }, 200);
   assert.equal((await r.json()).image_cleanup, 'complete');
-  for (const url of [replacement.title_image_url, replacement.main_image_url]) assert.equal((await fetch(url)).status, 404);
+  for (const url of [replacement.title_image_url, replacement.main_image_url]) assert.equal((await fetch(originImage(url))).status, 404);
   await check('deleted detail', `/api/news/${id}`, undefined, 404); id = null;
   evidence.status = 'success';
 } catch (error) {

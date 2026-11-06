@@ -7,16 +7,22 @@ import subprocess
 import tempfile
 import time
 import urllib.request
+import sys
+import uuid
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 S = ROOT / '.zig-cache/consumer-migration'
+production = '--production' in sys.argv[1:]
+probe = uuid.uuid4().hex
+config = 'deploy/wrangler.jsonc' if production else 'deploy/wrangler.migration-staging.json'
+url = 'https://mimoc-news.mimoc-maker.workers.dev/api/news' if production else 'https://akamata-migration-20261106-news.mimoc-maker.workers.dev/api/news'
 with tempfile.TemporaryFile(mode='w+') as stream:
     child = subprocess.Popen(['rtk', 'proxy', 'wrangler', 'tail', '--config',
-                              'deploy/wrangler.migration-staging.json', '--format=json'],
+                              config, '--format=json', '--header', 'X-Akamata-Release-Probe:' + probe],
                              cwd=S / 'mimoc_news', stdout=stream, stderr=subprocess.DEVNULL)
     try:
         time.sleep(8)
-        with urllib.request.urlopen(urllib.request.Request('https://akamata-migration-20261106-news.mimoc-maker.workers.dev/api/news', headers={'User-Agent': 'Akamata-Migration-Staging-Probe'})) as r:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Akamata-Release-Verification', 'X-Akamata-Release-Probe': probe})) as r:
             request_id = r.headers.get('x-request-id')
             r.read()
         time.sleep(5)
@@ -44,7 +50,7 @@ while raw:
             if isinstance(message, str) and request_id and request_id in message:
                 messages.append(message)
 result = {'request_id_correlated': bool(messages), 'structured_messages': messages}
-(S / 'news-log-evidence.json').write_text(json.dumps(result, indent=2) + '\n')
+(S / ('news-production-log.json' if production else 'news-log-evidence.json')).write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps(result))
 if not messages:
     raise SystemExit(1)
