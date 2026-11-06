@@ -1,0 +1,10 @@
+{
+  "checked_on": "2026-11-06",
+  "repository": "moribit/Akamata",
+  "main_protection": {
+    "http_status": 404,
+    "message": "Branch not protected"
+  },
+  "rulesets": [],
+  "mutated_settings": false
+}

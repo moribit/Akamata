@@ -1,0 +1,67 @@
+[
+  {
+    "job": "living examples (macos-latest)",
+    "id": 127955230195,
+    "observations": [
+      "2026-11-06T14:43:43.9313820Z Cache Size: ~51 MB (53988424 B)",
+      "2026-11-06T14:54:46.5934350Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "living examples (ubuntu-latest)",
+    "id": 127955230521,
+    "observations": [
+      "2026-11-06T14:43:41.1360714Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T14:52:41.1416267Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "cli init smoke test",
+    "id": 127955230791,
+    "observations": [
+      "2026-11-06T14:43:43.3231808Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T14:50:35.1297743Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "native-openssl",
+    "id": 127955231239,
+    "observations": [
+      "2026-11-06T14:43:38.4073425Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T14:46:22.1667546Z +- run test w",
+      "2026-11-06T14:48:43.6095700Z +- run test w",
+      "2026-11-06T14:49:58.8424933Z Build Summary: 87/87 steps succeeded; 203/203 tests passed",
+      "2026-11-06T14:49:58.8425511Z +- run test 8 pass (8 total) 3ms MaxRSS:6M",
+      "2026-11-06T14:49:58.8442784Z +- run test 15 pass (15 total) 6ms MaxRSS:6M",
+      "2026-11-06T14:49:58.8444789Z +- run test 8 pass (8 total) 2ms MaxRSS:6M",
+      "2026-11-06T14:49:58.8446417Z +- run test 14 pass (14 total) 17ms MaxRSS:7M",
+      "2026-11-06T14:49:58.8450444Z +- run test 2 pass (2 total) 4ms MaxRSS:6M",
+      "2026-11-06T14:49:58.8452106Z +- run test 4 pass (4 total) 4ms MaxRSS:7M",
+      "2026-11-06T14:49:58.8453752Z +- run test 1 pass (1 total) 4ms MaxRSS:4M",
+      "2026-11-06T14:49:58.8455624Z +- run test 1 pass (1 total) 3ms MaxRSS:6M",
+      "2026-11-06T14:49:58.8457258Z +- run test 17 pass (17 total) 3ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8459143Z +- run test 4 pass (4 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:49:58.8460777Z +- run test 2 pass (2 total) 2ms MaxRSS:6M",
+      "2026-11-06T14:49:58.8462585Z +- run test success 1ms MaxRSS:4M",
+      "2026-11-06T14:49:58.8464182Z +- run test 2 pass (2 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:49:58.8465849Z +- run test 5 pass (5 total) 1ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8467441Z +- run test 3 pass (3 total) 2ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8469285Z +- run test 3 pass (3 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:49:58.8471117Z +- run test 2 pass (2 total) 1ms MaxRSS:3M",
+      "2026-11-06T14:49:58.8472748Z +- run test 3 pass (3 total) 187ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8474372Z +- run test 3 pass (3 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:49:58.8475969Z +- run test 6 pass (6 total) 2ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8477830Z +- run test 1 pass (1 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:49:58.8479589Z +- run test 8 pass (8 total) 3ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8481182Z +- run test 9 pass (9 total) 7ms MaxRSS:7M",
+      "2026-11-06T14:49:58.8482924Z +- run test 2 pass (2 total) 3ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8484546Z +- run test 3 pass (3 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:49:58.8486482Z +- run test 28 pass (28 total) 6ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8488320Z +- run test 4 pass (4 total) 1ms MaxRSS:6M",
+      "2026-11-06T14:49:58.8489960Z +- run test 9 pass (9 total) 2ms MaxRSS:6M",
+      "2026-11-06T14:49:58.8491598Z +- run test 6 pass (6 total) 3ms MaxRSS:5M",
+      "2026-11-06T14:49:58.8493233Z +- run test 30 pass (30 total) 3ms MaxRSS:4M",
+      "2026-11-06T14:49:59.2421087Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  }
+]

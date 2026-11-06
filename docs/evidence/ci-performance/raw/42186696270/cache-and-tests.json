@@ -1,0 +1,44 @@
+[
+  {
+    "job": "cli init smoke test",
+    "id": 127788642112,
+    "observations": [
+      "2026-11-06T08:18:22.7772656Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T08:18:26.2910796Z Cache miss: leaving Zig cache directory at /home/runner/work/Akamata/Akamata/.zig-cache unpopulated",
+      "2026-11-06T08:24:51.1188293Z Cache directory is 1390831113 bytes, below limit of 2147483648 bytes; keeping intact",
+      "2026-11-06T08:24:55.9230260Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "living examples (ubuntu-latest)",
+    "id": 127788642135,
+    "observations": [
+      "2026-11-06T08:18:20.5380641Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T08:18:23.4503959Z Cache miss: leaving Zig cache directory at /home/runner/work/Akamata/Akamata/.zig-cache unpopulated",
+      "2026-11-06T08:25:26.8646466Z Cache directory is 1013958174 bytes, below limit of 2147483648 bytes; keeping intact",
+      "2026-11-06T08:25:30.1077415Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "living examples (macos-latest)",
+    "id": 127788642142,
+    "observations": [
+      "2026-11-06T08:18:26.2362690Z Cache Size: ~51 MB (53988424 B)",
+      "2026-11-06T08:18:33.1384680Z Cache miss: leaving Zig cache directory at /Users/runner/work/Akamata/Akamata/.zig-cache unpopulated",
+      "2026-11-06T08:27:50.3521600Z Cache directory is 521338659 bytes, below limit of 2147483648 bytes; keeping intact",
+      "2026-11-06T08:27:57.4383350Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "native-openssl",
+    "id": 127788642650,
+    "observations": [
+      "2026-11-06T08:18:20.5288238Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T08:18:23.8688149Z Cache miss: leaving Zig cache directory at /home/runner/work/Akamata/Akamata/.zig-cache unpopulated",
+      "2026-11-06T08:21:11.5779583Z +- run test w",
+      "2026-11-06T08:24:15.7299253Z +- run test w",
+      "2026-11-06T08:25:11.3701952Z Cache directory is 722427778 bytes, below limit of 2147483648 bytes; keeping intact",
+      "2026-11-06T08:25:14.9227074Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  }
+]

@@ -1,0 +1,79 @@
+[
+  {
+    "job": "living examples (ubuntu-latest)",
+    "id": 127948607154,
+    "observations": [
+      "2026-11-06T14:30:41.5345146Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T14:30:53.9965291Z Cache Size: ~185 MB (194301433 B)",
+      "2026-11-06T14:30:55.7605435Z Cache hit (key 'setup-zig-cache-v2-living_examples-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-living-42232703639-1'): populating Zig cache directory at /home/runner/work/Akamata/Akamata/.zig-cache",
+      "2026-11-06T14:42:01.4764746Z Cache directory is 1924578592 bytes, below limit of 2147483648 bytes; keeping intact",
+      "2026-11-06T14:42:07.9116619Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "living examples (macos-latest)",
+    "id": 127948607166,
+    "observations": [
+      "2026-11-06T14:30:46.8190470Z Cache Size: ~51 MB (53988424 B)",
+      "2026-11-06T14:31:11.1306050Z Cache Size: ~145 MB (152266208 B)",
+      "2026-11-06T14:31:12.8322880Z Cache hit (key 'setup-zig-cache-v2-living_examples-zig-aarch64-macos-0.17.0-ci-v2-stable-toolchain-living-42232703639-1'): populating Zig cache directory at /Users/runner/work/Akamata/Akamata/.zig-cache",
+      "2026-11-06T14:40:49.2558280Z Cache directory is 585942803 bytes, below limit of 2147483648 bytes; keeping intact",
+      "2026-11-06T14:40:58.2445170Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "cli init smoke test",
+    "id": 127948607215,
+    "observations": [
+      "2026-11-06T14:32:26.9911157Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T14:32:38.1648841Z Cache Size: ~224 MB (234590184 B)",
+      "2026-11-06T14:32:40.8937532Z Cache hit (key 'setup-zig-cache-v2-cli_smoke-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-cli-smoke-42232703639-1'): populating Zig cache directory at /home/runner/work/Akamata/Akamata/.zig-cache",
+      "2026-11-06T14:38:40.7042038Z Cache directory is 2124600110 bytes, below limit of 2147483648 bytes; keeping intact",
+      "2026-11-06T14:38:47.5299889Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  },
+  {
+    "job": "native-openssl",
+    "id": 127948607458,
+    "observations": [
+      "2026-11-06T14:30:42.3040217Z Cache Size: ~55 MB (57335739 B)",
+      "2026-11-06T14:30:52.8481066Z Cache Size: ~179 MB (188166953 B)",
+      "2026-11-06T14:30:53.5798410Z Cache hit (key 'setup-zig-cache-v2-build-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-native-openssl-42232703639-1'): populating Zig cache directory at /home/runner/work/Akamata/Akamata/.zig-cache",
+      "2026-11-06T14:34:33.2777012Z +- run test w",
+      "2026-11-06T14:35:12.3517633Z +- run test w",
+      "2026-11-06T14:36:45.9216189Z Build Summary: 87/87 steps succeeded; 203/203 tests passed",
+      "2026-11-06T14:36:45.9216728Z +- run test 8 pass (8 total) 4ms MaxRSS:3M",
+      "2026-11-06T14:36:45.9228122Z +- run test 15 pass (15 total) 3ms MaxRSS:5M",
+      "2026-11-06T14:36:45.9229199Z +- run test 8 pass (8 total) 2ms MaxRSS:3M",
+      "2026-11-06T14:36:45.9230282Z +- run test 14 pass (14 total) 15ms MaxRSS:7M",
+      "2026-11-06T14:36:45.9231329Z +- run test 2 pass (2 total) 1ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9232365Z +- run test 4 pass (4 total) 5ms MaxRSS:7M",
+      "2026-11-06T14:36:45.9233848Z +- run test 1 pass (1 total) 5ms MaxRSS:5M",
+      "2026-11-06T14:36:45.9235695Z +- run test 1 pass (1 total) 2ms MaxRSS:5M",
+      "2026-11-06T14:36:45.9237391Z +- run test 17 pass (17 total) 3ms MaxRSS:5M",
+      "2026-11-06T14:36:45.9238652Z +- run test 4 pass (4 total) 2ms MaxRSS:5M",
+      "2026-11-06T14:36:45.9239687Z +- run test 2 pass (2 total) 1ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9240715Z +- run test success 1ms MaxRSS:5M",
+      "2026-11-06T14:36:45.9241749Z +- run test 2 pass (2 total) 2ms MaxRSS:3M",
+      "2026-11-06T14:36:45.9242785Z +- run test 5 pass (5 total) 1ms MaxRSS:3M",
+      "2026-11-06T14:36:45.9243823Z +- run test 3 pass (3 total) 2ms MaxRSS:3M",
+      "2026-11-06T14:36:45.9244851Z +- run test 3 pass (3 total) 1ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9246227Z +- run test 2 pass (2 total) 2ms MaxRSS:3M",
+      "2026-11-06T14:36:45.9247266Z +- run test 3 pass (3 total) 188ms MaxRSS:5M",
+      "2026-11-06T14:36:45.9248401Z +- run test 3 pass (3 total) 3ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9249433Z +- run test 6 pass (6 total) 1ms MaxRSS:3M",
+      "2026-11-06T14:36:45.9250475Z +- run test 1 pass (1 total) 2ms MaxRSS:5M",
+      "2026-11-06T14:36:45.9251513Z +- run test 8 pass (8 total) 1ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9252546Z +- run test 9 pass (9 total) 8ms MaxRSS:7M",
+      "2026-11-06T14:36:45.9253582Z +- run test 2 pass (2 total) 4ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9254614Z +- run test 3 pass (3 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9255658Z +- run test 28 pass (28 total) 5ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9257017Z +- run test 4 pass (4 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9258130Z +- run test 9 pass (9 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:36:45.9259162Z +- run test 6 pass (6 total) 1ms MaxRSS:3M",
+      "2026-11-06T14:36:45.9260201Z +- run test 30 pass (30 total) 2ms MaxRSS:4M",
+      "2026-11-06T14:36:46.1196965Z Cache directory is 1357952501 bytes, below limit of 2147483648 bytes; keeping intact",
+      "2026-11-06T14:36:50.6085724Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/"
+    ]
+  }
+]

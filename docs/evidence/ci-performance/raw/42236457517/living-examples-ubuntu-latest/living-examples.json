@@ -1,0 +1,1038 @@
+{
+  "commands": [
+    {
+      "command": [
+        "zig",
+        "version"
+      ],
+      "seconds": 0.004,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "seconds": 0.004,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "guestbook-test",
+        "tasks-test",
+        "chat-test",
+        "-Doptimize=Debug",
+        "--summary",
+        "all"
+      ],
+      "seconds": 97.856,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 34/34 steps succeeded; 13/13 tests passed",
+        "+- run test 2 pass (2 total) 26ms MaxRSS:14M",
+        "   +- compile test debug native success 8s MaxRSS:254M",
+        "         +- compile exe translate-c debug native success 2s MaxRSS:301M",
+        "            |  +- compile exe generate-def debug native success 454ms MaxRSS:143M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)",
+        "+- run test 9 pass (9 total) 32ms MaxRSS:15M",
+        "   +- compile test debug native success 9s MaxRSS:245M",
+        "+- run test 2 pass (2 total) 22ms MaxRSS:14M",
+        "   +- compile test debug native success 8s MaxRSS:662M"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=guestbook",
+        "-Doptimize=Debug",
+        "--summary",
+        "all"
+      ],
+      "seconds": 7.366,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 28/28 steps succeeded",
+        "   +- compile exe guestbook debug native success 7s MaxRSS:681M",
+        "         +- compile exe translate-c debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=tasks",
+        "-Doptimize=Debug",
+        "--summary",
+        "all"
+      ],
+      "seconds": 7.426,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 28/28 steps succeeded",
+        "   +- compile exe tasks debug native success 7s MaxRSS:669M",
+        "         +- compile exe translate-c debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=chat",
+        "-Doptimize=Debug",
+        "--summary",
+        "all"
+      ],
+      "seconds": 7.432,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 28/28 steps succeeded",
+        "   +- compile exe chat debug native success 7s MaxRSS:669M",
+        "         +- compile exe translate-c debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=device_messaging",
+        "-Doptimize=Debug",
+        "--summary",
+        "all"
+      ],
+      "seconds": 7.393,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 28/28 steps succeeded",
+        "   +- compile exe device_messaging debug native success 7s MaxRSS:661M",
+        "         +- compile exe translate-c debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "guestbook-test",
+        "tasks-test",
+        "chat-test",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 80.028,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 34/34 steps succeeded; 13/13 tests passed",
+        "+- run test 2 pass (2 total) 2ms MaxRSS:4M",
+        "   +- compile test safe native success 1m MaxRSS:738M",
+        "         +- compile exe translate-c debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)",
+        "+- run test 9 pass (9 total) 4ms MaxRSS:5M",
+        "   +- compile test safe native success 1m MaxRSS:965M",
+        "+- run test 2 pass (2 total) 3ms MaxRSS:6M",
+        "   +- compile test safe native success 1m MaxRSS:736M"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=guestbook",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 68.567,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 28/28 steps succeeded",
+        "   +- compile exe guestbook safe native success 1m MaxRSS:969M",
+        "         +- compile exe translate-c debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=tasks",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 66.516,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 28/28 steps succeeded",
+        "   +- compile exe tasks safe native success 1m MaxRSS:1G",
+        "         +- compile exe translate-c debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=chat",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 65.954,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 28/28 steps succeeded",
+        "   +- compile exe chat safe native success 1m MaxRSS:949M",
+        "         +- compile exe translate-c debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 7ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)"
+      ]
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=device_messaging",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 66.417,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 28/28 steps succeeded",
+        "   +- compile exe device_messaging safe native success 1m MaxRSS:1G",
+        "         +- compile exe translate-c debug native cached 6ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native cached 6ms MaxRSS:41M",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "            |  +- compile exe generate-def debug native (reused)",
+        "               +- compile exe generate-def debug native (reused)"
+      ]
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/device_messaging",
+        "migrate-up"
+      ],
+      "seconds": 0.035,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/device_messaging",
+        "migrate-up"
+      ],
+      "seconds": 0.002,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "python3",
+        "tests/living_chat.py"
+      ],
+      "seconds": 0.072,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/guestbook",
+        "--print-schema"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/guestbook",
+        "akamata-capabilities",
+        "native"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/guestbook",
+        "akamata-capabilities",
+        "workers"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/guestbook",
+        "akamata-openapi"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/guestbook",
+        "akamata-client"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "node",
+        "/tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js",
+        "--strict",
+        "--noEmit",
+        "--target",
+        "ES2022",
+        "--lib",
+        "ES2022,DOM",
+        "/tmp/akamata-living-k2snn_hb/guestbook.ts"
+      ],
+      "seconds": 0.856,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=guestbook",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 4.661,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 5/5 steps succeeded",
+        "|  +- compile exe guestbook_worker small wasm32-freestanding success 4s MaxRSS:227M",
+        "   +- compile exe guestbook_worker small wasm32-freestanding (+1 more reused dependencies)"
+      ]
+    },
+    {
+      "command": [
+        "node",
+        "--experimental-wasm-jspi",
+        "tests/living_workers.mjs",
+        "guestbook",
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/guestbook_worker.wasm",
+        "/tmp/akamata-living-k2snn_hb/guestbook.sql"
+      ],
+      "seconds": 0.262,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/tasks",
+        "--print-schema"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/tasks",
+        "akamata-capabilities",
+        "native"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/tasks",
+        "akamata-capabilities",
+        "workers"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/tasks",
+        "akamata-openapi"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/tasks",
+        "akamata-client"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "node",
+        "/tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js",
+        "--strict",
+        "--noEmit",
+        "--target",
+        "ES2022",
+        "--lib",
+        "ES2022,DOM",
+        "/tmp/akamata-living-k2snn_hb/tasks.ts"
+      ],
+      "seconds": 0.801,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=tasks",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 3.148,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 5/5 steps succeeded",
+        "|  +- compile exe tasks_worker small wasm32-freestanding success 3s MaxRSS:208M",
+        "   +- compile exe tasks_worker small wasm32-freestanding (+1 more reused dependencies)"
+      ]
+    },
+    {
+      "command": [
+        "node",
+        "--experimental-wasm-jspi",
+        "tests/living_workers.mjs",
+        "tasks",
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/tasks_worker.wasm",
+        "/tmp/akamata-living-k2snn_hb/tasks.sql"
+      ],
+      "seconds": 0.646,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/chat",
+        "--print-schema"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/chat",
+        "akamata-capabilities",
+        "native"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/chat",
+        "akamata-capabilities",
+        "workers"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/chat",
+        "akamata-openapi"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/chat",
+        "akamata-client"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "node",
+        "/tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js",
+        "--strict",
+        "--noEmit",
+        "--target",
+        "ES2022",
+        "--lib",
+        "ES2022,DOM",
+        "/tmp/akamata-living-k2snn_hb/chat.ts"
+      ],
+      "seconds": 0.86,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/chat",
+        "akamata-protocol-ts"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "node",
+        "/tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js",
+        "--strict",
+        "--noEmit",
+        "--target",
+        "ES2022",
+        "--lib",
+        "ES2022,DOM",
+        "/tmp/akamata-living-k2snn_hb/chat-protocol.ts"
+      ],
+      "seconds": 0.791,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/chat",
+        "akamata-protocol-c"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "cc",
+        "-c",
+        "/tmp/akamata-living-k2snn_hb/chat-protocol.c",
+        "-o",
+        "/tmp/akamata-living-k2snn_hb/chat-protocol.o"
+      ],
+      "seconds": 0.03,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=chat",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 2.778,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 5/5 steps succeeded",
+        "|  +- compile exe chat_worker small wasm32-freestanding success 2s MaxRSS:202M",
+        "   +- compile exe chat_worker small wasm32-freestanding (+1 more reused dependencies)"
+      ]
+    },
+    {
+      "command": [
+        "node",
+        "--experimental-wasm-jspi",
+        "tests/living_workers.mjs",
+        "chat",
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/chat_worker.wasm",
+        "/tmp/akamata-living-k2snn_hb/chat.sql"
+      ],
+      "seconds": 0.34,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/device_messaging",
+        "--print-schema"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/device_messaging",
+        "akamata-capabilities",
+        "native"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/device_messaging",
+        "akamata-capabilities",
+        "workers"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/device_messaging",
+        "akamata-protocol-ts"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "node",
+        "/tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js",
+        "--strict",
+        "--noEmit",
+        "--target",
+        "ES2022",
+        "--lib",
+        "ES2022,DOM",
+        "/tmp/akamata-living-k2snn_hb/device_messaging-protocol.ts"
+      ],
+      "seconds": 0.78,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/device_messaging",
+        "akamata-protocol-c"
+      ],
+      "seconds": 0.001,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "cc",
+        "-c",
+        "/tmp/akamata-living-k2snn_hb/device_messaging-protocol.c",
+        "-o",
+        "/tmp/akamata-living-k2snn_hb/device_messaging-protocol.o"
+      ],
+      "seconds": 0.032,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "-Dexample=device_messaging",
+        "-Dbackend=workers",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 3.141,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 5/5 steps succeeded",
+        "|  +- compile exe device_messaging_worker small wasm32-freestanding success 3s MaxRSS:212M",
+        "   +- compile exe device_messaging_worker small wasm32-freestanding (+1 more reused dependencies)"
+      ]
+    },
+    {
+      "command": [
+        "node",
+        "--experimental-wasm-jspi",
+        "tests/living_workers.mjs",
+        "device_messaging",
+        "/home/runner/work/Akamata/Akamata/zig-out/bin/device_messaging_worker.wasm",
+        "/tmp/akamata-living-k2snn_hb/device_messaging.sql"
+      ],
+      "seconds": 0.603,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "build",
+        "documentation-test",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "seconds": 35.408,
+      "returncode": 0,
+      "test_summaries": [
+        "Build Summary: 30/30 steps succeeded; 15/15 tests passed",
+        "+- compile exe documentation-minimal safe native success 35s MaxRSS:979M",
+        "|     +- compile exe translate-c debug native cached 6ms MaxRSS:41M",
+        "|        |  +- compile exe generate-def debug native cached 6ms MaxRSS:41M",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|        |  +- compile exe generate-def debug native (reused)",
+        "|           +- compile exe generate-def debug native (reused)",
+        "+- run test 15 pass (15 total) 3ms MaxRSS:5M",
+        "   +- compile test safe native success 22s MaxRSS:552M"
+      ]
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "tests/workers_wasm_dispatch_test.mjs"
+      ],
+      "seconds": 0.984,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "python3",
+        "tests/documentation_links.py"
+      ],
+      "seconds": 0.027,
+      "returncode": 0,
+      "test_summaries": []
+    },
+    {
+      "command": [
+        "zig",
+        "fmt",
+        "--check",
+        "examples",
+        "tests/docs/minimal.zig"
+      ],
+      "seconds": 0.008,
+      "returncode": 0,
+      "test_summaries": []
+    }
+  ],
+  "os": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "zig": "0.17.0",
+  "node": "v24.22.2",
+  "commit": "9e2b233648f6ddde05544cf1a50e216c51bc5fe7",
+  "evidence": "Native application + actual WASM/managed JSPI/offline host; not live Cloudflare",
+  "artifacts": [
+    {
+      "example": "guestbook",
+      "target": "native",
+      "mode": "Debug",
+      "sha256": "554ebcb1672c5a7a7f5ae1c69f714991ae865fec639e58a6c6c3c7ab1886fee0"
+    },
+    {
+      "example": "tasks",
+      "target": "native",
+      "mode": "Debug",
+      "sha256": "b27e9c18bd293f9f701ed7571c9345da8c523e68d85b9cb028e52d0d550cfb57"
+    },
+    {
+      "example": "chat",
+      "target": "native",
+      "mode": "Debug",
+      "sha256": "d3a5e12382a7878c124fd93a11b476e4492c598800b4038f997361ab5ab6fa30"
+    },
+    {
+      "example": "device_messaging",
+      "target": "native",
+      "mode": "Debug",
+      "sha256": "b258249a38d677fc3aeb841eb5fa491f92c86bede5c1331debc7e61efa8b8959"
+    },
+    {
+      "example": "guestbook",
+      "target": "native",
+      "mode": "ReleaseSafe",
+      "sha256": "baf5b509591ab1462fa14fa88c876c7060c4d5f7da05fe652258b453d54ec8d8"
+    },
+    {
+      "example": "tasks",
+      "target": "native",
+      "mode": "ReleaseSafe",
+      "sha256": "6bc24bee70812e391a209ce149a8407aaad2c70dec4156282f04e5d7a2da177a"
+    },
+    {
+      "example": "chat",
+      "target": "native",
+      "mode": "ReleaseSafe",
+      "sha256": "bb7f717cd1613647928dabb9ffb640e5c1bbbe5ab12fd893da28666f87799026"
+    },
+    {
+      "example": "device_messaging",
+      "target": "native",
+      "mode": "ReleaseSafe",
+      "sha256": "132c87cc0cd373d5e2c6894e5744c65a01952b707c188648941ecb36ba325a2a"
+    },
+    {
+      "example": "guestbook",
+      "target": "workers",
+      "sha256": "b4a72e5069d044210f314fec9940acee7eea95d695e3fd8b4c8df422315e9fa1",
+      "host": {
+        "example": "guestbook",
+        "evidence": "actual WASM + managed JSPI + offline host",
+        "checks": 7,
+        "queue_messages": 0,
+        "remote_requests": 0
+      }
+    },
+    {
+      "example": "tasks",
+      "target": "workers",
+      "sha256": "f288cea38ae79c116865cf292e6d2455297ad1a67770eedf2c4a889967afd45d",
+      "host": {
+        "example": "tasks",
+        "evidence": "actual WASM + managed JSPI + offline host",
+        "checks": 8,
+        "queue_messages": 1,
+        "remote_requests": 0
+      }
+    },
+    {
+      "example": "chat",
+      "target": "workers",
+      "sha256": "96f6bb56e9b4fbc4be394f97ee2b933c8f470eca754feb073ec9f12c5fa39472",
+      "host": {
+        "example": "chat",
+        "evidence": "actual WASM + managed JSPI + offline host",
+        "checks": 6,
+        "queue_messages": 0,
+        "remote_requests": 0
+      }
+    },
+    {
+      "example": "device_messaging",
+      "target": "workers",
+      "sha256": "63d0bed2dee26573bcb3d2c80658617283da3d7b156a148a9f4d96db7bb4b96b",
+      "host": {
+        "example": "device_messaging",
+        "evidence": "actual WASM + managed JSPI + offline host",
+        "checks": 14,
+        "queue_messages": 1,
+        "remote_requests": 0
+      }
+    }
+  ],
+  "versioned_migration": "two invocations; one history entry",
+  "native_wire": {
+    "example": "chat",
+    "evidence": "Native loopback HTTP + masked WebSocket frames",
+    "clients": 2,
+    "persisted_messages": 2,
+    "shutdown_seconds": 0.003
+  }
+}

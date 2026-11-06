@@ -1,0 +1,47 @@
+Build Summary: 28/28 steps succeeded; 2/2 tests passed
+guestbook-test success
++- run test 2 pass (2 total) 273ms MaxRSS:4M
+   +- compile test safe native success 34s MaxRSS:927M
+      +- options success
+      +- translate-c sqlite3 success 447ms
+         +- compile exe translate-c debug native success 6s MaxRSS:852M
+            +- options success
+            +- options success
+            +- options success
+            +- run exe generate-def (aarch64.zig) success 344ms
+            |  +- compile exe generate-def debug native success 1s MaxRSS:264M
+            +- run exe generate-def (amdgcn.zig) success 217ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) success 331ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) success 272ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) success 249ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) success 289ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) success 209ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) success 109ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) success 277ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) success 188ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) success 366ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) success 20ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) success 317ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) success 474ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) success 46ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) success 338ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) success 435ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) success 3ms
+               +- compile exe generate-def debug native (reused)
+

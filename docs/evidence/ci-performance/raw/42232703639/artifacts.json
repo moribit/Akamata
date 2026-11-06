@@ -1,0 +1,105 @@
+{
+  "total_count": 5,
+  "artifacts": [
+    {
+      "id": 13510343319,
+      "node_id": "MDg6QXJ0aWZhY3QxMzUxMDM0MzMxOQ==",
+      "name": "runtime-stress-macos",
+      "size_in_bytes": 6955,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13510343319",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13510343319/zip",
+      "expired": false,
+      "digest": "sha256:b89910529e47673aeb9f858261549da3849f117d7cf7d897f5e308a5c41b4d51",
+      "created_at": "2026-11-06T14:26:31Z",
+      "updated_at": "2026-11-06T14:26:31Z",
+      "expires_at": "2027-02-04T14:18:11Z",
+      "workflow_run": {
+        "id": 42232703639,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "1e18babef91dc7e428c9b7dd80b00fbe9ee443a0"
+      }
+    },
+    {
+      "id": 13510048387,
+      "node_id": "MDg6QXJ0aWZhY3QxMzUxMDA0ODM4Nw==",
+      "name": "cli-command-timing",
+      "size_in_bytes": 1194,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13510048387",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13510048387/zip",
+      "expired": false,
+      "digest": "sha256:6c686013528625829b82c8a8ac493c26763b3a57ee307ab6e8ab1bc1381ff610",
+      "created_at": "2026-11-06T14:26:48Z",
+      "updated_at": "2026-11-06T14:26:48Z",
+      "expires_at": "2027-02-04T14:18:11Z",
+      "workflow_run": {
+        "id": 42232703639,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "1e18babef91dc7e428c9b7dd80b00fbe9ee443a0"
+      }
+    },
+    {
+      "id": 13509842612,
+      "node_id": "MDg6QXJ0aWZhY3QxMzUwOTg0MjYxMg==",
+      "name": "runtime-stress-linux",
+      "size_in_bytes": 6800,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13509842612",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13509842612/zip",
+      "expired": false,
+      "digest": "sha256:be15742cc1ab127a402dfbbfaf9122c03e04e4de63f277cb84367b829fa4e373",
+      "created_at": "2026-11-06T14:21:57Z",
+      "updated_at": "2026-11-06T14:21:57Z",
+      "expires_at": "2027-02-04T14:18:11Z",
+      "workflow_run": {
+        "id": 42232703639,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "1e18babef91dc7e428c9b7dd80b00fbe9ee443a0"
+      }
+    },
+    {
+      "id": 13509459192,
+      "node_id": "MDg6QXJ0aWZhY3QxMzUwOTQ1OTE5Mg==",
+      "name": "living-examples-macos-latest",
+      "size_in_bytes": 3078,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13509459192",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13509459192/zip",
+      "expired": false,
+      "digest": "sha256:c990b0e8b79e5690fe70708f8703204d8d06ed7832840e21aebfffd91f0d64bf",
+      "created_at": "2026-11-06T14:29:53Z",
+      "updated_at": "2026-11-06T14:29:53Z",
+      "expires_at": "2027-02-04T14:18:11Z",
+      "workflow_run": {
+        "id": 42232703639,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "1e18babef91dc7e428c9b7dd80b00fbe9ee443a0"
+      }
+    },
+    {
+      "id": 13509129345,
+      "node_id": "MDg6QXJ0aWZhY3QxMzUwOTEyOTM0NQ==",
+      "name": "living-examples-ubuntu-latest",
+      "size_in_bytes": 2896,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13509129345",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13509129345/zip",
+      "expired": false,
+      "digest": "sha256:933dad9fcf7ac8fd7f3b716f77146b8905632a840830476131d3ace59a64db82",
+      "created_at": "2026-11-06T14:28:55Z",
+      "updated_at": "2026-11-06T14:28:55Z",
+      "expires_at": "2027-02-04T14:18:11Z",
+      "workflow_run": {
+        "id": 42232703639,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "1e18babef91dc7e428c9b7dd80b00fbe9ee443a0"
+      }
+    }
+  ]
+}

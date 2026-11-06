@@ -1,0 +1,12 @@
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata"], "seconds": 14.739807251000002, "child_cpu_seconds": 22.104551999999998, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSmall"], "seconds": 5.3294715090000295, "child_cpu_seconds": 5.38149, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "-Doptimize=ReleaseSafe"], "seconds": 96.71109833899999, "child_cpu_seconds": 96.80773, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSafe"], "seconds": 7.061898251000002, "child_cpu_seconds": 7.093336000000001, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "run", "--", "migrate-up"], "seconds": 0.06848868299999822, "child_cpu_seconds": 0.068882, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "run", "--", "migrate-up"], "seconds": 0.06758892900001001, "child_cpu_seconds": 0.068845, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "run", "--", "migrate-up"], "seconds": 0.06350894799999196, "child_cpu_seconds": 0.065924, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "run", "--", "migrate-up"], "seconds": 1.5118731480000065, "child_cpu_seconds": 2.926527, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "run", "--", "akamata-capabilities", "workers"], "seconds": 3.923959883000009, "child_cpu_seconds": 7.077679, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSafe"], "seconds": 7.0107465719999595, "child_cpu_seconds": 7.0427859999999995, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "run", "--", "akamata-capabilities", "workers"], "seconds": 2.4780117089999862, "child_cpu_seconds": 4.164143999999999, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSafe"], "seconds": 7.043851581000013, "child_cpu_seconds": 7.0732610000000005, "returncode": 0}

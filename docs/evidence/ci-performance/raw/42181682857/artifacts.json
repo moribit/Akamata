@@ -1,0 +1,85 @@
+{
+  "total_count": 4,
+  "artifacts": [
+    {
+      "id": 13486312379,
+      "node_id": "MDg6QXJ0aWZhY3QxMzQ4NjMxMjM3OQ==",
+      "name": "living-examples-ubuntu-latest",
+      "size_in_bytes": 2151,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13486312379",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13486312379/zip",
+      "expired": false,
+      "digest": "sha256:b277ca76d31935abd0b2fc769709c16f509ef83d372d0e0fbb2541f7c2babe9c",
+      "created_at": "2026-11-06T07:45:14Z",
+      "updated_at": "2026-11-06T07:45:14Z",
+      "expires_at": "2027-02-04T07:33:46Z",
+      "workflow_run": {
+        "id": 42181682857,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "257c33d38c693b73127d5287806867d3d082c7cd"
+      }
+    },
+    {
+      "id": 13486311273,
+      "node_id": "MDg6QXJ0aWZhY3QxMzQ4NjMxMTI3Mw==",
+      "name": "runtime-stress-macos",
+      "size_in_bytes": 6976,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13486311273",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13486311273/zip",
+      "expired": false,
+      "digest": "sha256:6bdff2dbae3c91daee270146b0571d2c05d773fdb44dfa800cdaa04159312aac",
+      "created_at": "2026-11-06T07:39:46Z",
+      "updated_at": "2026-11-06T07:39:46Z",
+      "expires_at": "2027-02-04T07:33:46Z",
+      "workflow_run": {
+        "id": 42181682857,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "257c33d38c693b73127d5287806867d3d082c7cd"
+      }
+    },
+    {
+      "id": 13486180575,
+      "node_id": "MDg6QXJ0aWZhY3QxMzQ4NjE4MDU3NQ==",
+      "name": "runtime-stress-linux",
+      "size_in_bytes": 6795,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13486180575",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13486180575/zip",
+      "expired": false,
+      "digest": "sha256:b9cf88c940a08737aa28e49a44030bea22a734d5b6d06c8d0ac611faf3d3ed8c",
+      "created_at": "2026-11-06T07:37:36Z",
+      "updated_at": "2026-11-06T07:37:36Z",
+      "expires_at": "2027-02-04T07:33:46Z",
+      "workflow_run": {
+        "id": 42181682857,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "257c33d38c693b73127d5287806867d3d082c7cd"
+      }
+    },
+    {
+      "id": 13485713246,
+      "node_id": "MDg6QXJ0aWZhY3QxMzQ4NTcxMzI0Ng==",
+      "name": "living-examples-macos-latest",
+      "size_in_bytes": 2180,
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13485713246",
+      "archive_download_url": "https://api.github.com/repos/moribit/Akamata/actions/artifacts/13485713246/zip",
+      "expired": false,
+      "digest": "sha256:77b9e51ddb4c0ad011534b623345420831b26299bc6c38150512e2a9c1094255",
+      "created_at": "2026-11-06T07:42:20Z",
+      "updated_at": "2026-11-06T07:42:20Z",
+      "expires_at": "2027-02-04T07:33:46Z",
+      "workflow_run": {
+        "id": 42181682857,
+        "repository_id": 1256680895,
+        "head_repository_id": 1256680895,
+        "head_branch": "main",
+        "head_sha": "257c33d38c693b73127d5287806867d3d082c7cd"
+      }
+    }
+  ]
+}

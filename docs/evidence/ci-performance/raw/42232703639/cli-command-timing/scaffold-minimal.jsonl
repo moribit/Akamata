@@ -1,0 +1,7 @@
+{"command": ["/home/runner/work/Akamata/Akamata/.zig-cache/o/d00d6be8542c473ec2ca91abcb65718d/akamata", "init", "minimalapp", "--target=both"], "seconds": 0.045276997000001984, "child_cpu_seconds": 0.045147, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "-Doptimize=ReleaseSafe"], "seconds": 72.833814587, "child_cpu_seconds": 82.459675, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "test", "-Doptimize=ReleaseSafe"], "seconds": 63.362140425999996, "child_cpu_seconds": 63.44273, "returncode": 0}
+{"command": ["zig", "build", "--fork=/home/runner/work/Akamata/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSafe"], "seconds": 5.134155297000007, "child_cpu_seconds": 5.194598999999972, "returncode": 0}
+{"command": ["/tmp/akamata-minimal-zmg8hoea/minimalapp/zig-out/bin/minimalapp", "akamata-openapi"], "seconds": 0.0012430049999920811, "child_cpu_seconds": 0.0010200000000022413, "returncode": 0}
+{"command": ["/tmp/akamata-minimal-zmg8hoea/minimalapp/zig-out/bin/minimalapp", "akamata-capabilities", "workers"], "seconds": 0.0009943700000007993, "child_cpu_seconds": 0.0008530000000099847, "returncode": 0}
+{"command": ["/home/runner/work/Akamata/Akamata/.zig-cache/o/d00d6be8542c473ec2ca91abcb65718d/akamata", "inspect", "capabilities", "--target=workers", "--manifest=/tmp/akamata-minimal-zmg8hoea/minimalapp/contract.json"], "seconds": 0.02006875500001115, "child_cpu_seconds": 0.019918999999996245, "returncode": 0}

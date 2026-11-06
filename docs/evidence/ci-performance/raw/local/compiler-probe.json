@@ -1,0 +1,37 @@
+{
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "zig": "0.17.0",
+  "sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+  "runs": [
+    {
+      "phase": "fresh-local",
+      "seconds": 47.71007075000671,
+      "command": [
+        "zig",
+        "build",
+        "guestbook-test",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all",
+        "--cache-dir",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-ci-probe-a4lvz_hy"
+      ],
+      "returncode": 0
+    },
+    {
+      "phase": "warm-local",
+      "seconds": 0.22682099998928607,
+      "command": [
+        "zig",
+        "build",
+        "guestbook-test",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all",
+        "--cache-dir",
+        "/var/folders/5f/b2fp61w94sgfv8p2h507sn_00000gn/T/akamata-ci-probe-a4lvz_hy"
+      ],
+      "returncode": 0
+    }
+  ]
+}

@@ -1,0 +1,2537 @@
+{
+  "total_count": 23,
+  "jobs": [
+    {
+      "id": 127792752818,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqosg",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792752818",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792752818",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:31:12Z",
+      "name": "generated DX client strict typecheck",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:57Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:58Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:05Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        },
+        {
+          "name": "Run npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:05Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run zig build documentation-test -Dbackend=workers -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:31:09Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-06T08:31:09Z",
+          "completed_at": "2026-11-06T08:31:09Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:31:09Z",
+          "completed_at": "2026-11-06T08:31:09Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:31:09Z",
+          "completed_at": "2026-11-06T08:31:09Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:31:09Z",
+          "completed_at": "2026-11-06T08:31:10Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792752818",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002652,
+      "runner_name": "GitHub Actions 1000002652",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792752994,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqpYg",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792752994",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792752994",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:33:32Z",
+      "name": "private competitive fixture contracts",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:58Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:05Z",
+          "completed_at": "2026-11-06T08:29:08Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:08Z",
+          "completed_at": "2026-11-06T08:29:08Z"
+        },
+        {
+          "name": "Run zig build competitive-bench competitive-micro-build db-optimization-bench -Doptimize=ReleaseFast",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:29:08Z",
+          "completed_at": "2026-11-06T08:32:13Z"
+        },
+        {
+          "name": "Run python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T08:32:13Z",
+          "completed_at": "2026-11-06T08:32:13Z"
+        },
+        {
+          "name": "Run python3 benchmark/db-optimization/test_reporting.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T08:32:13Z",
+          "completed_at": "2026-11-06T08:32:13Z"
+        },
+        {
+          "name": "Run zig build db-optimization-bench -Doptimize=ReleaseSafe -Ddb-diagnostics=true",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-06T08:32:13Z",
+          "completed_at": "2026-11-06T08:33:18Z"
+        },
+        {
+          "name": "Run python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-06T08:33:18Z",
+          "completed_at": "2026-11-06T08:33:18Z"
+        },
+        {
+          "name": "Run zig build competitive-worker-build -Dbackend=workers -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:33:18Z",
+          "completed_at": "2026-11-06T08:33:26Z"
+        },
+        {
+          "name": "Run npm ci --prefix benchmark/competitive/workers --ignore-scripts --no-audit --no-fund",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:33:26Z",
+          "completed_at": "2026-11-06T08:33:28Z"
+        },
+        {
+          "name": "Run node benchmark/competitive/workers/wasm-host.mjs zig-out/bin/competitive-worker.wasm .zig-cache/competitive-workers-host.json",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:33:28Z",
+          "completed_at": "2026-11-06T08:33:29Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-11-06T08:33:29Z",
+          "completed_at": "2026-11-06T08:33:29Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-06T08:33:29Z",
+          "completed_at": "2026-11-06T08:33:29Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 26,
+          "started_at": "2026-11-06T08:33:29Z",
+          "completed_at": "2026-11-06T08:33:29Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 27,
+          "started_at": "2026-11-06T08:33:29Z",
+          "completed_at": "2026-11-06T08:33:30Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792752994",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002645,
+      "runner_name": "GitHub Actions 1000002645",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753027,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqpgw",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753027",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753027",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:31:31Z",
+      "name": "adversarial HTTP smoke",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:55Z",
+          "completed_at": "2026-11-06T08:28:57Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:57Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:03Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:03Z",
+          "completed_at": "2026-11-06T08:29:03Z"
+        },
+        {
+          "name": "Run zig build -Dexample=bench -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:03Z",
+          "completed_at": "2026-11-06T08:31:20Z"
+        },
+        {
+          "name": "Run ./zig-out/bin/bench >/tmp/akamata-fuzz-server.log 2>&1 &",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:31:20Z",
+          "completed_at": "2026-11-06T08:31:28Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:31:28Z",
+          "completed_at": "2026-11-06T08:31:28Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:31:28Z",
+          "completed_at": "2026-11-06T08:31:28Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:31:28Z",
+          "completed_at": "2026-11-06T08:31:28Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753027",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002648,
+      "runner_name": "GitHub Actions 1000002648",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753088,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqpwA",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753088",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753088",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:36:56Z",
+      "name": "cli init smoke test",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:11Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:11Z",
+          "completed_at": "2026-11-06T08:29:11Z"
+        },
+        {
+          "name": "Run zig build cli",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:11Z",
+          "completed_at": "2026-11-06T08:31:05Z"
+        },
+        {
+          "name": "Run zig build cli-operations-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:31:05Z",
+          "completed_at": "2026-11-06T08:31:07Z"
+        },
+        {
+          "name": "Run zig build cli-capabilities-test compile-fail-test workers-realtime-test workers-wasm-dispatch-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T08:31:07Z",
+          "completed_at": "2026-11-06T08:31:32Z"
+        },
+        {
+          "name": "Run zig build scaffold-local-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T08:31:32Z",
+          "completed_at": "2026-11-06T08:36:07Z"
+        },
+        {
+          "name": "Run zig build public-journey-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-06T08:36:07Z",
+          "completed_at": "2026-11-06T08:36:27Z"
+        },
+        {
+          "name": "Run zig build project-update-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-06T08:36:27Z",
+          "completed_at": "2026-11-06T08:36:41Z"
+        },
+        {
+          "name": "Run zig build workers-capability-sync-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:36:41Z",
+          "completed_at": "2026-11-06T08:36:51Z"
+        },
+        {
+          "name": "Run mkdir -p /tmp/cli-smoke && cd /tmp/cli-smoke",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:36:51Z",
+          "completed_at": "2026-11-06T08:36:51Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:36:51Z",
+          "completed_at": "2026-11-06T08:36:53Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25,
+          "started_at": "2026-11-06T08:36:53Z",
+          "completed_at": "2026-11-06T08:36:54Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 26,
+          "started_at": "2026-11-06T08:36:54Z",
+          "completed_at": "2026-11-06T08:36:54Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 27,
+          "started_at": "2026-11-06T08:36:54Z",
+          "completed_at": "2026-11-06T08:36:54Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753088",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002646,
+      "runner_name": "GitHub Actions 1000002646",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753109,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqp1Q",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753109",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753109",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:38:24Z",
+      "name": "native-openssl",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:11Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:11Z",
+          "completed_at": "2026-11-06T08:29:11Z"
+        },
+        {
+          "name": "Run zig build test -Dopenssl=true -Doptimize=ReleaseSafe --summary all",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:11Z",
+          "completed_at": "2026-11-06T08:38:14Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:38:14Z",
+          "completed_at": "2026-11-06T08:38:14Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:38:14Z",
+          "completed_at": "2026-11-06T08:38:21Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:38:21Z",
+          "completed_at": "2026-11-06T08:38:21Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:38:21Z",
+          "completed_at": "2026-11-06T08:38:22Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753109",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002654,
+      "runner_name": "GitHub Actions 1000002654",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753136,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqp8A",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753136",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753136",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:38:12Z",
+      "name": "living examples (macos-latest)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:29:17Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:17Z",
+          "completed_at": "2026-11-06T08:29:18Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:18Z",
+          "completed_at": "2026-11-06T08:29:18Z"
+        },
+        {
+          "name": "Run npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:29:18Z",
+          "completed_at": "2026-11-06T08:29:20Z"
+        },
+        {
+          "name": "Run python3 tests/living_examples.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T08:29:20Z",
+          "completed_at": "2026-11-06T08:37:55Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T08:37:55Z",
+          "completed_at": "2026-11-06T08:37:57Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T08:37:57Z",
+          "completed_at": "2026-11-06T08:37:57Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T08:37:57Z",
+          "completed_at": "2026-11-06T08:38:06Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-06T08:38:06Z",
+          "completed_at": "2026-11-06T08:38:06Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-06T08:38:06Z",
+          "completed_at": "2026-11-06T08:38:08Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753136",
+      "labels": [
+        "macos-latest"
+      ],
+      "runner_id": 1000002658,
+      "runner_name": "GitHub Actions 1000002658",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753145,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqp-Q",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753145",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753145",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:31:53Z",
+      "name": "docker-build (chat container)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:58Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run zig build -Dexample=chat -Dtarget=x86_64-linux-musl -Doptimize=ReleaseFast",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:31:47Z"
+        },
+        {
+          "name": "Run docker build -f deploy/Dockerfile -t akamata-chat .",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:31:47Z",
+          "completed_at": "2026-11-06T08:31:48Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:31:48Z",
+          "completed_at": "2026-11-06T08:31:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:31:48Z",
+          "completed_at": "2026-11-06T08:31:49Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:31:49Z",
+          "completed_at": "2026-11-06T08:31:49Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753145",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002647,
+      "runner_name": "GitHub Actions 1000002647",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753185,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqqIQ",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753185",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753185",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:34:57Z",
+      "name": "living examples (ubuntu-latest)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:55Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:58Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:09Z"
+        },
+        {
+          "name": "Run python3 tests/living_examples.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T08:29:09Z",
+          "completed_at": "2026-11-06T08:34:49Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T08:34:49Z",
+          "completed_at": "2026-11-06T08:34:50Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T08:34:50Z",
+          "completed_at": "2026-11-06T08:34:50Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T08:34:50Z",
+          "completed_at": "2026-11-06T08:34:54Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-06T08:34:54Z",
+          "completed_at": "2026-11-06T08:34:55Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-06T08:34:55Z",
+          "completed_at": "2026-11-06T08:34:55Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753185",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002649,
+      "runner_name": "GitHub Actions 1000002649",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753269,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqqdQ",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753269",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753269",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:29:06Z",
+      "name": "public documentation and PDF contract",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:56Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:28:58Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run node tools/docgen/build_slides.mjs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run git diff --exit-code -- tools/docgen/slides.html tools/docgen/slides.ja.html",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run python3 tests/documentation_links.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run python3 -B tests/ci_timing_test.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Competitive benchmark evidence reporting contract",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Run python3 -m venv /tmp/akamata-pdfcheck",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:03Z"
+        },
+        {
+          "name": "Run /tmp/akamata-pdfcheck/bin/pip install pypdf==6.19.0",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-06T08:29:03Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Run /tmp/akamata-pdfcheck/bin/python tests/public_slides.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-06T08:29:05Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753269",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002651,
+      "runner_name": "GitHub Actions 1000002651",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753391,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqq7w",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753391",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753391",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:31:09Z",
+      "name": "portable-application-workers",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run zig build portable-application-test documentation-test -Dbackend=workers -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:31:05Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:31:05Z",
+          "completed_at": "2026-11-06T08:31:05Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:31:05Z",
+          "completed_at": "2026-11-06T08:31:06Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:31:06Z",
+          "completed_at": "2026-11-06T08:31:06Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:31:06Z",
+          "completed_at": "2026-11-06T08:31:06Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753391",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002650,
+      "runner_name": "GitHub Actions 1000002650",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753408,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrAA",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753408",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753408",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:30:56Z",
+      "name": "chat-workers",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run zig build -Dexample=chat -Dbackend=workers -Doptimize=ReleaseSmall",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:30:51Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:30:51Z",
+          "completed_at": "2026-11-06T08:30:51Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:30:51Z",
+          "completed_at": "2026-11-06T08:30:52Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:30:52Z",
+          "completed_at": "2026-11-06T08:30:52Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:30:52Z",
+          "completed_at": "2026-11-06T08:30:52Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753408",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002655,
+      "runner_name": "GitHub Actions 1000002655",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753457,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrMQ",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753457",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753457",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:31:00Z",
+      "name": "native-integration",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:58Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Run zig build integration transport-contract-test runtime-poc-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:30:57Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:30:57Z",
+          "completed_at": "2026-11-06T08:30:57Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:30:57Z",
+          "completed_at": "2026-11-06T08:30:57Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:30:57Z",
+          "completed_at": "2026-11-06T08:30:57Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:30:57Z",
+          "completed_at": "2026-11-06T08:30:57Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753457",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002653,
+      "runner_name": "GitHub Actions 1000002653",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753469,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrPQ",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753469",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753469",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:31:14Z",
+      "name": "native-test",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:57Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:57Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Run zig build test db-pool-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:31:11Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:31:11Z",
+          "completed_at": "2026-11-06T08:31:11Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:31:11Z",
+          "completed_at": "2026-11-06T08:31:12Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:31:12Z",
+          "completed_at": "2026-11-06T08:31:12Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:31:12Z",
+          "completed_at": "2026-11-06T08:31:12Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753469",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002657,
+      "runner_name": "GitHub Actions 1000002657",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753477,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrRQ",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753477",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753477",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:30:31Z",
+      "completed_at": "2026-11-06T08:38:21Z",
+      "name": "macos native + kqueue contract",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:30:31Z",
+          "completed_at": "2026-11-06T08:30:35Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:30:35Z",
+          "completed_at": "2026-11-06T08:30:41Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:30:41Z",
+          "completed_at": "2026-11-06T08:30:51Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:30:51Z",
+          "completed_at": "2026-11-06T08:30:51Z"
+        },
+        {
+          "name": "Run zig build test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:30:51Z",
+          "completed_at": "2026-11-06T08:34:54Z"
+        },
+        {
+          "name": "Run zig build -Dexample=bench",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:34:54Z",
+          "completed_at": "2026-11-06T08:35:07Z"
+        },
+        {
+          "name": "Run zig build transport-contract-test runtime-poc-test runtime-stress-test runtime-isolation-test runtime-session-test -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T08:35:07Z",
+          "completed_at": "2026-11-06T08:38:10Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T08:38:10Z",
+          "completed_at": "2026-11-06T08:38:12Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T08:38:12Z",
+          "completed_at": "2026-11-06T08:38:13Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-06T08:38:13Z",
+          "completed_at": "2026-11-06T08:38:13Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-11-06T08:38:13Z",
+          "completed_at": "2026-11-06T08:38:17Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753477",
+      "labels": [
+        "macos-latest"
+      ],
+      "runner_id": 1000002666,
+      "runner_name": "GitHub Actions 1000002666",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753483,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrSw",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753483",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753483",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:33:19Z",
+      "name": "linux threaded + epoll contract",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:58Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:05Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        },
+        {
+          "name": "Run zig build transport-contract-test runtime-poc-test runtime-stress-test runtime-isolation-test runtime-session-test -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:05Z",
+          "completed_at": "2026-11-06T08:33:15Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T08:33:15Z",
+          "completed_at": "2026-11-06T08:33:16Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:33:16Z",
+          "completed_at": "2026-11-06T08:33:16Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:33:16Z",
+          "completed_at": "2026-11-06T08:33:16Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:33:16Z",
+          "completed_at": "2026-11-06T08:33:16Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753483",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002656,
+      "runner_name": "GitHub Actions 1000002656",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753501,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrXQ",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753501",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753501",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:30:57Z",
+      "completed_at": "2026-11-06T08:32:49Z",
+      "name": "tasks-test",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:30:58Z",
+          "completed_at": "2026-11-06T08:31:01Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:31:01Z",
+          "completed_at": "2026-11-06T08:31:03Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:31:03Z",
+          "completed_at": "2026-11-06T08:31:07Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:31:07Z",
+          "completed_at": "2026-11-06T08:31:07Z"
+        },
+        {
+          "name": "Run zig build tasks-test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:31:07Z",
+          "completed_at": "2026-11-06T08:32:46Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:32:46Z",
+          "completed_at": "2026-11-06T08:32:46Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:32:46Z",
+          "completed_at": "2026-11-06T08:32:46Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:32:46Z",
+          "completed_at": "2026-11-06T08:32:46Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:32:46Z",
+          "completed_at": "2026-11-06T08:32:46Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753501",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002667,
+      "runner_name": "GitHub Actions 1000002667",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753557,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrlQ",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753557",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753557",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:55Z",
+      "completed_at": "2026-11-06T08:31:17Z",
+      "name": "device-messaging-native",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:58Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:58Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:29:04Z"
+        },
+        {
+          "name": "Run zig build -Dexample=device_messaging -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:31:13Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:31:13Z",
+          "completed_at": "2026-11-06T08:31:13Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:31:13Z",
+          "completed_at": "2026-11-06T08:31:13Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:31:13Z",
+          "completed_at": "2026-11-06T08:31:14Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:31:14Z",
+          "completed_at": "2026-11-06T08:31:14Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753557",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002661,
+      "runner_name": "GitHub Actions 1000002661",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753581,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrrQ",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753581",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753581",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:56Z",
+      "completed_at": "2026-11-06T08:30:59Z",
+      "name": "guestbook-workers",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:57Z",
+          "completed_at": "2026-11-06T08:29:00Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:29:00Z",
+          "completed_at": "2026-11-06T08:29:03Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:03Z",
+          "completed_at": "2026-11-06T08:29:10Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:10Z",
+          "completed_at": "2026-11-06T08:29:10Z"
+        },
+        {
+          "name": "Run zig build -Dexample=guestbook -Dbackend=workers -Doptimize=ReleaseSmall",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:10Z",
+          "completed_at": "2026-11-06T08:30:53Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:30:53Z",
+          "completed_at": "2026-11-06T08:30:53Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:30:53Z",
+          "completed_at": "2026-11-06T08:30:54Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:30:54Z",
+          "completed_at": "2026-11-06T08:30:54Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:30:54Z",
+          "completed_at": "2026-11-06T08:30:54Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753581",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002662,
+      "runner_name": "GitHub Actions 1000002662",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753600,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrwA",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753600",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753600",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:56Z",
+      "completed_at": "2026-11-06T08:31:00Z",
+      "name": "device-messaging-workers",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:57Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run zig build -Dexample=device_messaging -Dbackend=workers -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:30:56Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:30:56Z",
+          "completed_at": "2026-11-06T08:30:56Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:30:56Z",
+          "completed_at": "2026-11-06T08:30:56Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:30:56Z",
+          "completed_at": "2026-11-06T08:30:56Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:30:56Z",
+          "completed_at": "2026-11-06T08:30:56Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753600",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002660,
+      "runner_name": "GitHub Actions 1000002660",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753603,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqrww",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753603",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753603",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:56Z",
+      "completed_at": "2026-11-06T08:30:28Z",
+      "name": "chat-native",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:56Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:05Z",
+          "completed_at": "2026-11-06T08:29:05Z"
+        },
+        {
+          "name": "Run zig build -Dexample=chat",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:05Z",
+          "completed_at": "2026-11-06T08:30:24Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:30:24Z",
+          "completed_at": "2026-11-06T08:30:24Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:30:24Z",
+          "completed_at": "2026-11-06T08:30:24Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:30:24Z",
+          "completed_at": "2026-11-06T08:30:24Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:30:24Z",
+          "completed_at": "2026-11-06T08:30:24Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753603",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002663,
+      "runner_name": "GitHub Actions 1000002663",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753652,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqr9A",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753652",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753652",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:29:09Z",
+      "completed_at": "2026-11-06T08:39:30Z",
+      "name": "native-release-safe",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:29:10Z",
+          "completed_at": "2026-11-06T08:29:12Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:29:12Z",
+          "completed_at": "2026-11-06T08:29:14Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:14Z",
+          "completed_at": "2026-11-06T08:29:20Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:20Z",
+          "completed_at": "2026-11-06T08:29:20Z"
+        },
+        {
+          "name": "Run zig build test documentation-test -Doptimize=ReleaseSafe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:20Z",
+          "completed_at": "2026-11-06T08:39:26Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:39:26Z",
+          "completed_at": "2026-11-06T08:39:26Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:39:26Z",
+          "completed_at": "2026-11-06T08:39:26Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:39:26Z",
+          "completed_at": "2026-11-06T08:39:26Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:39:26Z",
+          "completed_at": "2026-11-06T08:39:26Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753652",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002665,
+      "runner_name": "GitHub Actions 1000002665",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753667,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqsAw",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753667",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753667",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:28:56Z",
+      "completed_at": "2026-11-06T08:31:16Z",
+      "name": "cli-build",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:28:57Z",
+          "completed_at": "2026-11-06T08:28:59Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:28:59Z",
+          "completed_at": "2026-11-06T08:29:01Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:01Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:08Z"
+        },
+        {
+          "name": "Run zig build cli",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:08Z",
+          "completed_at": "2026-11-06T08:31:13Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:31:13Z",
+          "completed_at": "2026-11-06T08:31:13Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:31:13Z",
+          "completed_at": "2026-11-06T08:31:13Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:31:13Z",
+          "completed_at": "2026-11-06T08:31:13Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:31:13Z",
+          "completed_at": "2026-11-06T08:31:13Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753667",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002659,
+      "runner_name": "GitHub Actions 1000002659",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 127792753730,
+      "run_id": 42187971389,
+      "workflow_name": "ci",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/moribit/Akamata/actions/runs/42187971389",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOSudtv88AAAAdwQqsQg",
+      "head_sha": "54e83bf741754c5f1f21446ab3b2514ba06e35b3",
+      "url": "https://api.github.com/repos/moribit/Akamata/actions/jobs/127792753730",
+      "html_url": "https://github.com/moribit/Akamata/actions/runs/42187971389/job/127792753730",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T08:28:52Z",
+      "started_at": "2026-11-06T08:29:03Z",
+      "completed_at": "2026-11-06T08:30:55Z",
+      "name": "package-archive",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T08:29:04Z",
+          "completed_at": "2026-11-06T08:29:07Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T08:29:07Z",
+          "completed_at": "2026-11-06T08:29:08Z"
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T08:29:08Z",
+          "completed_at": "2026-11-06T08:29:14Z"
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T08:29:14Z",
+          "completed_at": "2026-11-06T08:29:14Z"
+        },
+        {
+          "name": "Run env ZIG_GLOBAL_CACHE_DIR=/tmp/akamata-package-cache zig fetch .",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T08:29:14Z",
+          "completed_at": "2026-11-06T08:30:51Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-06T08:30:51Z",
+          "completed_at": "2026-11-06T08:30:51Z"
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T08:30:51Z",
+          "completed_at": "2026-11-06T08:30:51Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-06T08:30:51Z",
+          "completed_at": "2026-11-06T08:30:51Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T08:30:51Z",
+          "completed_at": "2026-11-06T08:30:52Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/moribit/Akamata/check-runs/127792753730",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002664,
+      "runner_name": "GitHub Actions 1000002664",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "total_count": 18,
+  "actions_caches": [
+    {
+      "id": 9695630560,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-tarball-zig-x86_64-linux-0.17.0",
+      "version": "908a457b5755cb2b53a9a7e06a426ee4a41c29fd45fce69f4253ff326fcdfc59",
+      "last_accessed_at": "2026-11-06T14:45:00.926294Z",
+      "created_at": "2026-10-29T10:57:35.591992Z",
+      "size_in_bytes": 57335739
+    },
+    {
+      "id": 9695654568,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-tarball-zig-aarch64-macos-0.17.0",
+      "version": "d8b07f1877773fe81c61d611cc6e4876f29209e417af8b54b255386b27d6c76a",
+      "last_accessed_at": "2026-11-06T14:43:44.801863Z",
+      "created_at": "2026-10-29T10:58:07.479979Z",
+      "size_in_bytes": 53988424
+    },
+    {
+      "id": 10123416861,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-living_examples-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-living-42234525201-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T14:42:07.592325Z",
+      "created_at": "2026-11-06T14:42:07.592325Z",
+      "size_in_bytes": 360401811
+    },
+    {
+      "id": 10123356068,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-living_examples-zig-aarch64-macos-0.17.0-ci-v2-stable-toolchain-living-42234525201-1",
+      "version": "e824304e2672bd9df797e248b465b27e02da8c69246df49aa86f8a2c2a4c2020",
+      "last_accessed_at": "2026-11-06T14:40:53.832934Z",
+      "created_at": "2026-11-06T14:40:53.832934Z",
+      "size_in_bytes": 170456700
+    },
+    {
+      "id": 10123255184,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-cli_smoke-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-cli-smoke-42234525201-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T14:38:47.216138Z",
+      "created_at": "2026-11-06T14:38:47.216138Z",
+      "size_in_bytes": 347388371
+    },
+    {
+      "id": 10123158782,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-build-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-native-openssl-42234525201-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T14:36:50.357427Z",
+      "created_at": "2026-11-06T14:36:50.357427Z",
+      "size_in_bytes": 348126698
+    },
+    {
+      "id": 10122661187,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-cli_smoke-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-cli-smoke-42232703639-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T14:32:37.000538Z",
+      "created_at": "2026-11-06T14:26:54.853383Z",
+      "size_in_bytes": 234590184
+    },
+    {
+      "id": 10122816040,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-living_examples-zig-aarch64-macos-0.17.0-ci-v2-stable-toolchain-living-42232703639-1",
+      "version": "e824304e2672bd9df797e248b465b27e02da8c69246df49aa86f8a2c2a4c2020",
+      "last_accessed_at": "2026-11-06T14:31:09.053473Z",
+      "created_at": "2026-11-06T14:29:59.678164Z",
+      "size_in_bytes": 152266208
+    },
+    {
+      "id": 10122766585,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-living_examples-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-living-42232703639-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T14:30:51.939702Z",
+      "created_at": "2026-11-06T14:29:00.199120Z",
+      "size_in_bytes": 194301433
+    },
+    {
+      "id": 10122627174,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-build-zig-x86_64-linux-0.17.0-ci-v2-stable-toolchain-native-openssl-42232703639-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T14:30:50.888511Z",
+      "created_at": "2026-11-06T14:26:12.957001Z",
+      "size_in_bytes": 188166953
+    },
+    {
+      "id": 10107434994,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-build-zig-x86_64-linux-0.17.0-ci-v1-native-openssl-42187971389-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T08:38:21.683745Z",
+      "created_at": "2026-11-06T08:38:21.683745Z",
+      "size_in_bytes": 347738807
+    },
+    {
+      "id": 10107424186,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-living_examples-zig-aarch64-macos-0.17.0-ci-v1-living-42187971389-1",
+      "version": "e824304e2672bd9df797e248b465b27e02da8c69246df49aa86f8a2c2a4c2020",
+      "last_accessed_at": "2026-11-06T08:38:06.362478Z",
+      "created_at": "2026-11-06T08:38:06.362478Z",
+      "size_in_bytes": 275455439
+    },
+    {
+      "id": 10107376235,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-cli_smoke-zig-x86_64-linux-0.17.0-ci-v1-cli-smoke-42187971389-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T08:36:54.257299Z",
+      "created_at": "2026-11-06T08:36:54.257299Z",
+      "size_in_bytes": 186
+    },
+    {
+      "id": 10107293784,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-living_examples-zig-x86_64-linux-0.17.0-ci-v1-living-42187971389-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T08:34:54.805672Z",
+      "created_at": "2026-11-06T08:34:54.805672Z",
+      "size_in_bytes": 307181666
+    },
+    {
+      "id": 10107010554,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-living_examples-zig-aarch64-macos-0.17.0-ci-v1-living-42186696270-1",
+      "version": "e824304e2672bd9df797e248b465b27e02da8c69246df49aa86f8a2c2a4c2020",
+      "last_accessed_at": "2026-11-06T08:29:14.663251Z",
+      "created_at": "2026-11-06T08:27:55.767353Z",
+      "size_in_bytes": 152189192
+    },
+    {
+      "id": 10106908148,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-build-zig-x86_64-linux-0.17.0-ci-v1-native-openssl-42186696270-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T08:29:07.683640Z",
+      "created_at": "2026-11-06T08:25:14.692278Z",
+      "size_in_bytes": 188402188
+    },
+    {
+      "id": 10106895693,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-cli_smoke-zig-x86_64-linux-0.17.0-ci-v1-cli-smoke-42186696270-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T08:29:07.059550Z",
+      "created_at": "2026-11-06T08:24:55.643799Z",
+      "size_in_bytes": 233801794
+    },
+    {
+      "id": 10106917841,
+      "ref": "refs/heads/main",
+      "key": "setup-zig-cache-v2-living_examples-zig-x86_64-linux-0.17.0-ci-v1-living-42186696270-1",
+      "version": "73fd9c60d96dca644970502fbf23e3c13e8a7f68e33680ff3a6c7339aa981474",
+      "last_accessed_at": "2026-11-06T08:29:04.674405Z",
+      "created_at": "2026-11-06T08:25:29.878800Z",
+      "size_in_bytes": 196000941
+    }
+  ]
+}

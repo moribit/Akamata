@@ -1,0 +1,1363 @@
+{
+  "id": 42181682857,
+  "sha": "257c33d38c693b73127d5287806867d3d082c7cd",
+  "conclusion": "success",
+  "wall_seconds": 1232.0,
+  "job_seconds": 5328.0,
+  "jobs": [
+    {
+      "name": "public documentation and PDF contract",
+      "conclusion": "success",
+      "seconds": 12.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run node tools/docgen/build_slides.mjs",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run git diff --exit-code -- tools/docgen/slides.html tools/docgen/slides.ja.html",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run python3 tests/documentation_links.py",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Competitive benchmark evidence reporting contract",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run python3 -m venv /tmp/akamata-pdfcheck",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run /tmp/akamata-pdfcheck/bin/pip install pypdf==6.19.0",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run /tmp/akamata-pdfcheck/bin/python tests/public_slides.py",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "generated DX client strict typecheck",
+      "conclusion": "success",
+      "seconds": 83.0,
+      "start_offset": 3.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 4.0
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run zig build documentation-test -Dbackend=workers -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 69.0
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "private competitive fixture contracts",
+      "conclusion": "success",
+      "seconds": 171.0,
+      "start_offset": 3.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 4.0
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build competitive-bench competitive-micro-build db-optimization-bench -Doptimize=ReleaseFast",
+          "conclusion": "success",
+          "seconds": 113.0
+        },
+        {
+          "name": "Run python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run python3 benchmark/db-optimization/test_reporting.py",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run zig build db-optimization-bench -Doptimize=ReleaseSafe -Ddb-diagnostics=true",
+          "conclusion": "success",
+          "seconds": 38.0
+        },
+        {
+          "name": "Run python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build competitive-worker-build -Dbackend=workers -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run npm ci --prefix benchmark/competitive/workers --ignore-scripts --no-audit --no-fund",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run node benchmark/competitive/workers/wasm-host.mjs zig-out/bin/competitive-worker.wasm .zig-cache/competitive-workers-host.json",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "adversarial HTTP smoke",
+      "conclusion": "success",
+      "seconds": 172.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 6.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build -Dexample=bench -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 150.0
+        },
+        {
+          "name": "Run ./zig-out/bin/bench >/tmp/akamata-fuzz-server.log 2>&1 &",
+          "conclusion": "success",
+          "seconds": 7.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "living examples (ubuntu-latest)",
+      "conclusion": "success",
+      "seconds": 688.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 6.0
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run python3 tests/living_examples.py",
+          "conclusion": "success",
+          "seconds": 670.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "living examples (macos-latest)",
+      "conclusion": "success",
+      "seconds": 501.0,
+      "start_offset": 19.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 10.0
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run python3 tests/living_examples.py",
+          "conclusion": "success",
+          "seconds": 473.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 2.0
+        }
+      ]
+    },
+    {
+      "name": "linux threaded + epoll contract",
+      "conclusion": "success",
+      "seconds": 230.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 6.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build transport-contract-test runtime-poc-test runtime-stress-test runtime-isolation-test runtime-session-test -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 213.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "guestbook-workers",
+      "conclusion": "success",
+      "seconds": 122.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 6.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build -Dexample=guestbook -Dbackend=workers -Doptimize=ReleaseSmall",
+          "conclusion": "success",
+          "seconds": 106.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "portable-application-workers",
+      "conclusion": "success",
+      "seconds": 111.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 6.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build portable-application-test documentation-test -Dbackend=workers -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 94.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "package-archive",
+      "conclusion": "success",
+      "seconds": 110.0,
+      "start_offset": 3.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run env ZIG_GLOBAL_CACHE_DIR=/tmp/akamata-package-cache zig fetch .",
+          "conclusion": "success",
+          "seconds": 97.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "chat-native",
+      "conclusion": "success",
+      "seconds": 140.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build -Dexample=chat",
+          "conclusion": "success",
+          "seconds": 129.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "native-openssl",
+      "conclusion": "success",
+      "seconds": 451.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build test -Dopenssl=true -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 438.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "native-test",
+      "conclusion": "success",
+      "seconds": 121.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build test db-pool-test",
+          "conclusion": "success",
+          "seconds": 107.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "native-integration",
+      "conclusion": "success",
+      "seconds": 173.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 7.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build integration transport-contract-test runtime-poc-test",
+          "conclusion": "success",
+          "seconds": 157.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "device-messaging-native",
+      "conclusion": "success",
+      "seconds": 179.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 4.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 6.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build -Dexample=device_messaging -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 163.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "macos native + kqueue contract",
+      "conclusion": "success",
+      "seconds": 275.0,
+      "start_offset": 88.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 7.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build test",
+          "conclusion": "success",
+          "seconds": 101.0
+        },
+        {
+          "name": "Run zig build -Dexample=bench",
+          "conclusion": "success",
+          "seconds": 6.0
+        },
+        {
+          "name": "Run zig build transport-contract-test runtime-poc-test runtime-stress-test runtime-isolation-test runtime-session-test -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 149.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 1.0
+        }
+      ]
+    },
+    {
+      "name": "device-messaging-workers",
+      "conclusion": "success",
+      "seconds": 113.0,
+      "start_offset": 93.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build -Dexample=device_messaging -Dbackend=workers -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 99.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "native-release-safe",
+      "conclusion": "success",
+      "seconds": 584.0,
+      "start_offset": 116.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build test documentation-test -Doptimize=ReleaseSafe",
+          "conclusion": "success",
+          "seconds": 571.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "tasks-test",
+      "conclusion": "success",
+      "seconds": 90.0,
+      "start_offset": 106.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 4.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build tasks-test",
+          "conclusion": "success",
+          "seconds": 78.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "chat-workers",
+      "conclusion": "success",
+      "seconds": 100.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 4.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 4.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build -Dexample=chat -Dbackend=workers -Doptimize=ReleaseSmall",
+          "conclusion": "success",
+          "seconds": 82.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "cli-build",
+      "conclusion": "success",
+      "seconds": 144.0,
+      "start_offset": 4.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build cli",
+          "conclusion": "success",
+          "seconds": 131.0
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "conclusion": "skipped",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "docker-build (chat container)",
+      "conclusion": "success",
+      "seconds": 229.0,
+      "start_offset": 703.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 7.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build -Dexample=chat -Dtarget=x86_64-linux-musl -Doptimize=ReleaseFast",
+          "conclusion": "success",
+          "seconds": 211.0
+        },
+        {
+          "name": "Run docker build -f deploy/Dockerfile -t akamata-chat .",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    },
+    {
+      "name": "cli init smoke test",
+      "conclusion": "success",
+      "seconds": 529.0,
+      "start_offset": 703.0,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 3.0
+        },
+        {
+          "name": "Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 5.0
+        },
+        {
+          "name": "Run ./third_party/sqlite/fetch.sh",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run zig build cli",
+          "conclusion": "success",
+          "seconds": 129.0
+        },
+        {
+          "name": "Run zig build cli-operations-test",
+          "conclusion": "success",
+          "seconds": 2.0
+        },
+        {
+          "name": "Run zig build cli-capabilities-test compile-fail-test workers-realtime-test workers-wasm-dispatch-test",
+          "conclusion": "success",
+          "seconds": 27.0
+        },
+        {
+          "name": "Run zig build scaffold-local-test",
+          "conclusion": "success",
+          "seconds": 302.0
+        },
+        {
+          "name": "Run zig build public-journey-test",
+          "conclusion": "success",
+          "seconds": 26.0
+        },
+        {
+          "name": "Run zig build project-update-test",
+          "conclusion": "success",
+          "seconds": 15.0
+        },
+        {
+          "name": "Run zig build workers-capability-sync-test",
+          "conclusion": "success",
+          "seconds": 15.0
+        },
+        {
+          "name": "Run mkdir -p /tmp/cli-smoke && cd /tmp/cli-smoke",
+          "conclusion": "success",
+          "seconds": 1.0
+        },
+        {
+          "name": "Post Run mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "conclusion": "success",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0.0
+        }
+      ]
+    }
+  ]
+}

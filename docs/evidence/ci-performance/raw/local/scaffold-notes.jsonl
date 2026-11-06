@@ -1,0 +1,12 @@
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata"], "seconds": 20.1680040830106, "child_cpu_seconds": 21.228151, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSmall"], "seconds": 1.5346635000023525, "child_cpu_seconds": 1.537698, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "-Doptimize=ReleaseSafe"], "seconds": 41.89166399999522, "child_cpu_seconds": 41.910944, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSafe"], "seconds": 3.4674852089956403, "child_cpu_seconds": 3.277212, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "run", "--", "migrate-up"], "seconds": 0.6243136250122916, "child_cpu_seconds": 0.22741, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "run", "--", "migrate-up"], "seconds": 0.19720054100616835, "child_cpu_seconds": 0.18826299999999999, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "run", "--", "migrate-up"], "seconds": 0.1932528339966666, "child_cpu_seconds": 0.18275, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "run", "--", "migrate-up"], "seconds": 3.178689749998739, "child_cpu_seconds": 2.9805319999999997, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "run", "--", "akamata-capabilities", "workers"], "seconds": 7.414052458014339, "child_cpu_seconds": 6.953646, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSafe"], "seconds": 3.157861584011698, "child_cpu_seconds": 3.21434, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "run", "--", "akamata-capabilities", "workers"], "seconds": 4.397328124992782, "child_cpu_seconds": 4.144277, "returncode": 0}
+{"command": ["zig", "build", "--fork=/Users/mimoc/Akamata", "-Dbackend=workers", "-Doptimize=ReleaseSafe"], "seconds": 3.163666957989335, "child_cpu_seconds": 3.218686, "returncode": 0}
