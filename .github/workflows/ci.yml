@@ -73,7 +73,8 @@ jobs:
         with:
           version: 0.17.0
           use-cache: ${{ matrix.job.name == 'native-openssl' }}
-          cache-key: ci-v1-${{ matrix.job.name }}
+          use-tool-cache: ${{ matrix.job.name == 'native-openssl' }}
+          cache-key: ci-v2-stable-toolchain-${{ matrix.job.name }}
           cache-size-limit: 2048
       - run: ./third_party/sqlite/fetch.sh
       - run: ${{ matrix.job.cmd }}
@@ -100,7 +101,8 @@ jobs:
         with:
           version: 0.17.0
           use-cache: true
-          cache-key: ci-v1-living
+          use-tool-cache: true
+          cache-key: ci-v2-stable-toolchain-living
           cache-size-limit: 2048
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -184,7 +186,8 @@ jobs:
         with:
           version: 0.17.0
           use-cache: true
-          cache-key: ci-v1-cli-smoke
+          use-tool-cache: true
+          cache-key: ci-v2-stable-toolchain-cli-smoke
           cache-size-limit: 2048
       - run: ./third_party/sqlite/fetch.sh
       - run: zig build cli

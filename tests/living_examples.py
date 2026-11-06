@@ -33,7 +33,7 @@ def run(*args, **kwargs):
     try:
         result = subprocess.run(args, cwd=ROOT, capture_output=True, text=True, **kwargs)
         code = result.returncode
-        summaries = [line for line in result.stderr.splitlines() if "Build Summary:" in line or "run test" in line]
+        summaries = [line for line in result.stderr.splitlines() if "Build Summary:" in line or "run test" in line or "compile " in line]
         if code:
             print(result.stdout)
             print(result.stderr)
