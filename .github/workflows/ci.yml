@@ -44,7 +44,7 @@ jobs:
           - name: native-release-safe
             cmd: zig build test documentation-test -Doptimize=ReleaseSafe
           - name: native-openssl
-            cmd: zig build test -Dopenssl=true -Doptimize=ReleaseSafe
+            cmd: zig build test -Dopenssl=true -Doptimize=ReleaseSafe --summary all
           - name: native-integration
             cmd: zig build integration transport-contract-test runtime-poc-test
           - name: linux threaded + epoll contract
@@ -128,6 +128,7 @@ jobs:
       - run: node tools/docgen/build_slides.mjs
       - run: git diff --exit-code -- tools/docgen/slides.html tools/docgen/slides.ja.html
       - run: python3 tests/documentation_links.py
+      - run: python3 -B tests/ci_timing_test.py
       - name: Competitive benchmark evidence reporting contract
         run: python3 benchmark/competitive/scripts/test_reporting.py
       - run: python3 -m venv /tmp/akamata-pdfcheck

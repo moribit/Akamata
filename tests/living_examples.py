@@ -23,19 +23,24 @@ evidence = {"commands": results}
 
 
 def run(*args, **kwargs):
+    # Capture test counts as evidence that warm compiler caches do not skip tests.
+    if len(args) > 1 and args[0] == ZIG and args[1] == "build":
+        args = (*args, "--summary", "all")
     start = time.monotonic()
     print("+ " + " ".join(args), flush=True)
     code = None
+    summaries = []
     try:
         result = subprocess.run(args, cwd=ROOT, capture_output=True, text=True, **kwargs)
         code = result.returncode
+        summaries = [line for line in result.stderr.splitlines() if "Build Summary:" in line or "run test" in line]
         if code:
             print(result.stdout)
             print(result.stderr)
             result.check_returncode()
         return result.stdout
     finally:
-        results.append({"command": list(args), "seconds": round(time.monotonic() - start, 3), "returncode": code})
+        results.append({"command": list(args), "seconds": round(time.monotonic() - start, 3), "returncode": code, "test_summaries": summaries})
         REPORT.parent.mkdir(exist_ok=True)
         REPORT.write_text(json.dumps(evidence, indent=2) + "\n")
 
