@@ -18,3 +18,7 @@ Starting candidate: `280c53481b527b7c11e4d7edb2b1252b7f03f2e6`. Published stable
 - Staging E2E, mobile E2E, live provider coverage and candidate-specific full CI remain incomplete.
 
 Stable release is not approved. Threaded remains the Native production default; Reactor remains parked/fail-closed. Tag creation and Release publication require the user approval specified in the task.
+
+## Additional local candidate checks
+
+CLI fix `072b21e`, documentation `087793d`, migration checkpoint `85c36ae`. `zig build test documentation-test db-pool-test -Doptimize=ReleaseSafe -j2 --summary all`: 92/92 steps, 169 tests pass, one skip, exit 0. `zig build portable-application-test documentation-test -Dbackend=workers -Doptimize=ReleaseSafe -j2 --summary all`: 8/8 steps, exit 0, ten simulated-provider runs pass. CLI operations and project-update tests pass including current-tag dry-run and unknown-tag rejection. These local results do not replace Linux/macOS candidate CI or staging live tests.
