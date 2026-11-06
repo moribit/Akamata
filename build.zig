@@ -495,4 +495,18 @@ pub fn build(b: *std.Build) void {
         const tasks_test = b.addTest(.{ .root_module = tasks_test_mod });
         tasks_test_step.dependOn(&b.addRunArtifact(tasks_test).step);
     }
+    // Restoring compiler outputs must not restore a previous CI test verdict.
+    if (b.graph.environ_map.get("AKAMATA_CI_RERUN_TESTS") != null) {
+        var visited = std.AutoHashMap(*std.Build.Step, void).init(b.allocator);
+        for (b.top_level_steps.values()) |top| forceTestExecution(b, &top.step, &visited);
+    }
+}
+
+fn forceTestExecution(b: *std.Build, step: *std.Build.Step, visited: *std.AutoHashMap(*std.Build.Step, void)) void {
+    const entry = visited.getOrPut(step) catch @panic("OOM");
+    if (entry.found_existing) return;
+    if (step.cast(std.Build.Step.Run)) |run| {
+        if (run.stdio == .zig_test) run.has_side_effects = true;
+    }
+    for (step.dependencies.items) |dependency| forceTestExecution(b, dependency, visited);
 }

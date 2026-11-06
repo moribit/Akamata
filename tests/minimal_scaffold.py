@@ -8,12 +8,13 @@ import subprocess
 import sys
 import tempfile
 import time
+from command_timing import run
 
 cli = str(Path(sys.argv[1]).resolve())
 checkout = str(Path(sys.argv[2]).resolve()) if len(sys.argv) == 3 else None
 with tempfile.TemporaryDirectory(prefix="akamata-minimal-") as directory:
     root = Path(directory)
-    subprocess.run([cli, "init", "minimalapp", "--target=both"], cwd=root, check=True)
+    run([cli, "init", "minimalapp", "--target=both"], cwd=root, check=True)
     project = root / "minimalapp"
     source = (project / "src/main.zig").read_text()
     assert "fn hello() []const u8" in source
@@ -21,20 +22,20 @@ with tempfile.TemporaryDirectory(prefix="akamata-minimal-") as directory:
     assert not (project / "migrations").exists()
     assert not any((project / folder).exists() for folder in ["controllers", "services", "repositories", "providers"])
     build = ["zig", "build"] + ([f"--fork={checkout}"] if checkout else [])
-    subprocess.run(build + ["-Doptimize=ReleaseSafe"], cwd=project, check=True)
-    subprocess.run(build + ["test", "-Doptimize=ReleaseSafe"], cwd=project, check=True)
-    subprocess.run(build + ["-Dbackend=workers", "-Doptimize=ReleaseSafe"], cwd=project, check=True)
+    run(build + ["-Doptimize=ReleaseSafe"], cwd=project, check=True)
+    run(build + ["test", "-Doptimize=ReleaseSafe"], cwd=project, check=True)
+    run(build + ["-Dbackend=workers", "-Doptimize=ReleaseSafe"], cwd=project, check=True)
     binary = str(project / "zig-out/bin/minimalapp")
     if checkout:
         # Tooling reads the route declaration without opening an App/provider.
-        spec = subprocess.run([binary, "akamata-openapi"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
+        spec = run([binary, "akamata-openapi"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
         assert json.loads(spec.stdout)["paths"]["/"]["get"]["responses"]["200"]["content"].get("text/plain")
-        declaration = subprocess.run([binary, "akamata-capabilities", "workers"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
+        declaration = run([binary, "akamata-capabilities", "workers"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
         contract = json.loads(declaration.stdout)
         assert contract["target"] == "workers" and contract["requirements"] == []
         manifest = project / "contract.json"
         manifest.write_text(declaration.stdout)
-        inspected = subprocess.run([cli, "inspect", "capabilities", "--target=workers", f"--manifest={manifest}"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
+        inspected = run([cli, "inspect", "capabilities", "--target=workers", f"--manifest={manifest}"], cwd=project, check=True, capture_output=True, text=True, timeout=10)
         assert "GET /" in inspected.stderr
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))

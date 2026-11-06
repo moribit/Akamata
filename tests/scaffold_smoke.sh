@@ -41,11 +41,18 @@ fi
 test ! -e deploy/worker/realtime_object.mjs
 grep -F 'if (lower === "host" || lower === "content-length") continue' deploy/worker/index.mjs >/dev/null
 
+build_command() {
+  if [ -n "${AKAMATA_CI_TIMING_DIR:-}" ] && [ -n "$local_checkout" ]; then
+    python3 "$local_checkout/tests/command_timing.py" scaffold-notes "$@"
+  else
+    "$@"
+  fi
+}
 build_app() {
   if [ -n "$local_checkout" ]; then
-    zig build --fork="$local_checkout" "$@"
+    build_command zig build --fork="$local_checkout" "$@"
   else
-    zig build "$@"
+    build_command zig build "$@"
   fi
 }
 migrate_up() {

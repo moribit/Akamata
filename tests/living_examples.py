@@ -19,17 +19,26 @@ ZIG = os.environ.get("ZIG", "zig")
 EXAMPLES = ("guestbook", "tasks", "chat", "device_messaging")
 REPORT = ROOT / ".zig-cache/living-examples.json"
 results = []
+evidence = {"commands": results}
 
 
 def run(*args, **kwargs):
     start = time.monotonic()
-    result = subprocess.run(args, cwd=ROOT, capture_output=True, text=True, **kwargs)
-    if result.returncode:
-        print(result.stdout)
-        print(result.stderr)
-        result.check_returncode()
-    results.append({"command": list(args), "seconds": round(time.monotonic() - start, 3)})
-    return result.stdout
+    print("+ " + " ".join(args), flush=True)
+    code = None
+    try:
+        result = subprocess.run(args, cwd=ROOT, capture_output=True, text=True, **kwargs)
+        code = result.returncode
+        if code:
+            print(result.stdout)
+            print(result.stderr)
+            result.check_returncode()
+        return result.stdout
+    finally:
+        results.append({"command": list(args), "seconds": round(time.monotonic() - start, 3), "returncode": code})
+        REPORT.parent.mkdir(exist_ok=True)
+        REPORT.write_text(json.dumps(evidence, indent=2) + "\n")
+
 
 
 def sha(path):
@@ -37,11 +46,11 @@ def sha(path):
 
 
 def main():
-    evidence = {"os": platform.platform(), "zig": run(ZIG, "version").strip(),
+    evidence.update({"os": platform.platform(), "zig": run(ZIG, "version").strip(),
                 "node": run("node", "--version").strip(),
                 "commit": run("git", "rev-parse", "HEAD").strip(),
                 "evidence": "Native application + actual WASM/managed JSPI/offline host; not live Cloudflare",
-                "artifacts": [], "commands": results}
+                "artifacts": [], "commands": results})
     with tempfile.TemporaryDirectory(prefix="akamata-living-") as directory:
         output = Path(directory)
         for mode in ("Debug", "ReleaseSafe"):
