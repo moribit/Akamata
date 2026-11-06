@@ -8,7 +8,7 @@ on:
 # Cache compilation, never the previous CI unit-test verdict.
 env:
   AKAMATA_CI_RERUN_TESTS: "1"
-  AKAMATA_CI_TIMING_DIR: ${{ github.workspace }}/.zig-cache/ci-timing
+  AKAMATA_CI_TIMING_DIR: ${{ github.workspace }}/.ci-timing
 
 jobs:
   competitive-fixtures:
@@ -111,12 +111,13 @@ jobs:
       - run: npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund
       - run: python3 tests/living_examples.py
         env:
+          AKAMATA_LIVING_REPORT: ${{ github.workspace }}/.ci-evidence/living-examples.json
           AKAMATA_DX_TSC: /tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: living-examples-${{ matrix.os }}
-          path: .zig-cache/living-examples.json
+          path: .ci-evidence/living-examples.json
           if-no-files-found: ignore
 
   public-presentation:
@@ -208,7 +209,7 @@ jobs:
         if: always()
         with:
           name: cli-command-timing
-          path: .zig-cache/ci-timing/
+          path: .ci-timing/
           if-no-files-found: ignore
 
   docker-build:

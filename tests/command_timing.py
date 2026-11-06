@@ -16,6 +16,9 @@ def run(*args, label="scaffold-minimal", **kwargs):
         result = subprocess.run(*args, **kwargs)
         code = result.returncode
         return result
+    except subprocess.CalledProcessError as error:
+        code = error.returncode
+        raise
     finally:
         directory = os.environ.get("AKAMATA_CI_TIMING_DIR")
         if directory:

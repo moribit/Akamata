@@ -1,6 +1,5 @@
 """Failure-path contract for the CI measurement helpers (no Zig/network)."""
 import contextlib
-import importlib.util
 import io
 import json
 import os
@@ -26,6 +25,14 @@ class TimingContract(unittest.TestCase):
             row = json.loads((Path(directory) / "scaffold-minimal.jsonl").read_text())
             self.assertEqual(row["returncode"], 7)
             self.assertGreater(row["seconds"], 0)
+
+    def test_checked_failure_is_recorded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.dict(os.environ, AKAMATA_CI_TIMING_DIR=directory):
+                with self.assertRaises(subprocess.CalledProcessError):
+                    run([sys.executable, "-c", "raise SystemExit(5)"], check=True)
+            row = json.loads((Path(directory) / "scaffold-minimal.jsonl").read_text())
+            self.assertEqual(row["returncode"], 5)
 
     def test_living_failure_saves_partial_evidence(self):
         with tempfile.TemporaryDirectory() as directory:

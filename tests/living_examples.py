@@ -17,7 +17,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 ZIG = os.environ.get("ZIG", "zig")
 EXAMPLES = ("guestbook", "tasks", "chat", "device_messaging")
-REPORT = ROOT / ".zig-cache/living-examples.json"
+REPORT = Path(os.environ.get("AKAMATA_LIVING_REPORT", ROOT / ".zig-cache/living-examples.json"))
 results = []
 evidence = {"commands": results}
 
@@ -41,7 +41,7 @@ def run(*args, **kwargs):
         return result.stdout
     finally:
         results.append({"command": list(args), "seconds": round(time.monotonic() - start, 3), "returncode": code, "test_summaries": summaries})
-        REPORT.parent.mkdir(exist_ok=True)
+        REPORT.parent.mkdir(parents=True, exist_ok=True)
         REPORT.write_text(json.dumps(evidence, indent=2) + "\n")
 
 
@@ -108,7 +108,7 @@ def main():
         run(ZIG, "fmt", "--check", "examples", "tests/docs/minimal.zig")
         assert (ROOT / "deploy/worker/index.mjs").read_bytes() == (ROOT / "tools/akamata/src/templates/worker_index.mjs.tpl").read_bytes()
         assert (ROOT / "examples/chat/src/schema.sql").read_bytes() == (ROOT / "deploy/worker/d1_schema.sql").read_bytes()
-    REPORT.parent.mkdir(exist_ok=True)
+    REPORT.parent.mkdir(parents=True, exist_ok=True)
     REPORT.write_text(json.dumps(evidence, indent=2) + "\n")
     print(f"Living reference passed: {len(results)} commands; evidence: {REPORT}")
 
