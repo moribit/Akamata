@@ -1,4 +1,5 @@
 const std = @import("std");
+const release = @import("../release.zig");
 const STABLE_HASH = @import("../release.zig").STABLE_HASH;
 const STABLE_VERSION = @import("../release.zig").STABLE_VERSION;
 const SyncOptions = @import("../project/managed_files.zig").SyncOptions;
@@ -31,7 +32,7 @@ pub fn cmdUpdate(parent_alloc: std.mem.Allocator, args: []const [:0]const u8) !v
     var arena_state: std.heap.ArenaAllocator = .init(parent_alloc);
     defer arena_state.deinit();
     const alloc = arena_state.allocator();
-    var target: []const u8 = STABLE_VERSION;
+    var target: []const u8 = release.CURRENT_TAG;
     var with_sync = false;
     var sync_opts: SyncOptions = .{};
     for (args) |raw| {
@@ -53,8 +54,8 @@ pub fn cmdUpdate(parent_alloc: std.mem.Allocator, args: []const [:0]const u8) !v
     const hash = try resolveReleaseHash(alloc, target);
     const updated = try updateDependencyContent(alloc, old, target, hash);
     std.debug.print("update: Akamata {s} -> {s}\n", .{ current, target });
-    if (with_sync and !std.mem.eql(u8, target, STABLE_VERSION)) {
-        std.debug.print("update: this CLI only bundles managed templates for {s}; install the {s} CLI before using --sync.\n", .{ STABLE_VERSION, target });
+    if (with_sync and !release.supportsManagedTemplates(target)) {
+        std.debug.print("update: this CLI only bundles managed templates for {s}; install the {s} CLI before using --sync.\n", .{ release.CURRENT_TAG, target });
         return error.TemplateVersionMismatch;
     }
     sync_opts.assumed_version = target;

@@ -97,4 +97,24 @@ grep -F '// user-owned-source-marker' src/main.zig >/dev/null
 
 zig build
 zig build -Dbackend=workers -Doptimize=ReleaseSmall
+# Exercise template compatibility without fetching an unpublished archive.
+# The synthetic URL is used only for dry-run metadata validation, then restored.
+python3 - "$cli" "$repo_dir" <<'PY'
+import pathlib, re, subprocess, sys
+cli, repo = sys.argv[1:]
+zon = pathlib.Path("build.zig.zon")
+original = zon.read_text()
+version = re.search(r'pub const VERSION = "([^"]+)"', pathlib.Path(repo, "tools/akamata/src/release.zig").read_text()).group(1)
+try:
+    for tag, accepted in (("v" + version, True), ("v99.0.0", False)):
+        zon.write_text(re.sub(r"refs/tags/[^/]+\.tar\.gz", "refs/tags/" + tag + ".tar.gz", original))
+        before = zon.read_bytes()
+        result = subprocess.run([cli, "sync", "--dry-run"], capture_output=True, text=True)
+        assert (result.returncode == 0) == accepted, result.stdout + result.stderr
+        if not accepted:
+            assert "TemplateVersionMismatch" in result.stderr
+        assert zon.read_bytes() == before
+finally:
+    zon.write_text(original)
+PY
 echo "project update/sync regression test: OK"

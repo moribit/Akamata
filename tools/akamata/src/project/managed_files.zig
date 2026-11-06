@@ -1,5 +1,5 @@
 const std = @import("std");
-const STABLE_VERSION = @import("../release.zig").STABLE_VERSION;
+const release = @import("../release.zig");
 const VERSION = @import("../release.zig").VERSION;
 const appendPrint = @import("../format.zig").appendPrint;
 const defaultConfigPath = @import("../cloudflare/config.zig").defaultConfigPath;
@@ -168,8 +168,8 @@ pub fn syncManaged(alloc: std.mem.Allocator, opts: SyncOptions) !void {
         std.debug.print("sync: build.zig.zon has no tagged .akamata dependency.\n", .{});
         return error.AkamataDependencyNotFound;
     };
-    if (!std.mem.eql(u8, project_version, STABLE_VERSION)) {
-        std.debug.print("sync: project uses {s}, but this CLI bundles {s} templates; run `akamata update --sync`.\n", .{ project_version, STABLE_VERSION });
+    if (!release.supportsManagedTemplates(project_version)) {
+        std.debug.print("sync: project uses {s}, but this CLI bundles {s} templates; run `akamata update --sync`.\n", .{ project_version, release.CURRENT_TAG });
         return error.TemplateVersionMismatch;
     }
     const cfg = opts.config_path orelse defaultConfigPath() orelse {
