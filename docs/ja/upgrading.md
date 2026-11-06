@@ -111,3 +111,7 @@ replaces or rejects the identity. This is a safety correction, not an auth bypas
 Validation preserves existing 400/422 payloads and model rules. Typed DTO metadata
 adds strict diagnostics; byte-length/heuristic format constraints are not guessed
 as stronger JSON Schema guarantees. Native remains Threaded, Reactor parked.
+
+## CLIとscaffoldのバージョン
+
+`akamata update`の既定targetはCLI自身に対応するタグです（CLI 0.2.1ならv0.2.1）。scaffoldのbootstrap用に固定された旧安定版とは独立しています。対応タグが未公開ならhash取得で失敗し、旧版へ暗黙に戻しません。`sync`は明示された対応版だけを受理し、未知の版とmanaged fileの未承認変更は引き続き拒否します。

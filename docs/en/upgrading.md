@@ -13,7 +13,7 @@ akamata update --to=v0.1.1 --sync
 `akamata update` detects the pinned `.akamata` release, resolves the target
 archive hash, rewrites only that dependency's URL/hash, and validates a Native
 build plus a Workers build when a Wrangler config is present. With no `--to`,
-it selects the latest stable release bundled with that CLI. `--dry-run` prints
+it selects the matching CLI release tag (for example CLI 0.2.1 targets v0.2.1), independently of the older scaffold bootstrap pin. An unpublished matching tag fails closed during hash resolution; it does not silently downgrade. `--dry-run` prints
 planned changes without writing or building.
 
 `akamata sync` manages only files recorded in `.akamata/managed-files.json`:
