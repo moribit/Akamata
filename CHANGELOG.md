@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Consumer release validation fixes
+
+- Keep Storage download response headers alive after the object reader closes.
+  HEAD and buffered Workers responses now snapshot reader-owned ETag and
+  Content-Type into the request arena; poison-on-close regression tests cover
+  deferred HTTP serialization. This fixes a Native firmware HEAD crash found
+  during Consumer migration validation.
+- Separate CLI managed-template compatibility from the previous scaffold
+  bootstrap pin, preserving old-release support and unknown-version rejection.
+
 ### Native SQLite cost and reliability investigation
 
 - Add private A-F DB microbenchmarks and opt-in phase/allocation diagnostics,

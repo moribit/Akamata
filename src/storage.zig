@@ -191,8 +191,11 @@ pub fn serveDownload(c: anytype, store: Store, key: []const u8) !void {
     c.status(if (requested_range != null) 206 else 200);
     try c.header("accept-ranges", "bytes");
     try c.header("content-length", try std.fmt.allocPrint(c.arena, "{d}", .{length}));
-    try c.header("content-type", full.content_type orelse mime.fromExt(key));
-    if (full.etag) |etag| try c.header("etag", etag);
+    // Response headers borrow their values until serialization. In particular,
+    // HEAD and the Workers buffered path serialize after this reader is closed.
+    // Snapshot reader-owned metadata into the request lifetime before closing it.
+    try c.header("content-type", try c.arena.dupe(u8, full.content_type orelse mime.fromExt(key)));
+    if (full.etag) |etag| try c.header("etag", try c.arena.dupe(u8, etag));
     if (requested_range) |range| try c.header("content-range", try std.fmt.allocPrint(c.arena, "bytes {d}-{d}/{d}", .{ range.offset, range.offset + length - 1, full.size }));
     if (std.ascii.eqlIgnoreCase(c.req.method(), "HEAD")) return;
     if (requested_range) |range| {
@@ -201,6 +204,69 @@ pub fn serveDownload(c: anytype, store: Store, key: []const u8) !void {
         return streamDownloadBody(c, ranged.body, length);
     }
     return streamDownloadBody(c, probe.body, length);
+}
+
+test "download headers survive reader cleanup for HEAD and buffered GET" {
+    const Response = @import("http/response.zig").Response;
+    const Provider = struct {
+        etag: [5]u8 = "tag-1".*,
+        content_type: [10]u8 = "text/plain".*,
+        closed: bool = false,
+        fn get(raw: *anyopaque, _: []const u8, _: GetOptions) Error!Object {
+            const self: *@This() = @ptrCast(@alignCast(raw));
+            return .{ .metadata = .{ .size = 0, .etag = &self.etag, .content_type = &self.content_type }, .body = .{ .ptr = raw, .read_fn = read, .close_fn = close } };
+        }
+        fn read(_: *anyopaque, _: []u8) stream.Error!usize {
+            return 0;
+        }
+        fn close(raw: *anyopaque) void {
+            const self: *@This() = @ptrCast(@alignCast(raw));
+            self.closed = true;
+            @memset(&self.etag, '#');
+            @memset(&self.content_type, '#');
+        }
+        const vtable: Store.VTable = .{ .get = get, .put = undefined, .delete = undefined, .head = undefined, .list = undefined };
+    };
+    const Request = struct {
+        verb: []const u8,
+        pub fn header(_: @This(), _: []const u8) ?[]const u8 {
+            return null;
+        }
+        pub fn method(self: @This()) []const u8 {
+            return self.verb;
+        }
+    };
+    const Context = struct {
+        arena: std.mem.Allocator,
+        req: Request,
+        res: *Response,
+        pub fn status(self: *@This(), code: u16) void {
+            self.res.status_code = code;
+        }
+        pub fn header(self: *@This(), name: []const u8, value: []const u8) !void {
+            try self.res.header(name, value);
+        }
+        pub fn startStream(_: *@This(), _: @import("http/response.zig").StreamOptions) anyerror!*std.Io.Writer {
+            return error.UnsupportedOnTarget;
+        }
+        pub fn body(self: *@This(), bytes: []const u8) !void {
+            try self.res.writeAll(bytes);
+        }
+    };
+    inline for (.{ "HEAD", "GET" }) |verb| {
+        var arena: std.heap.ArenaAllocator = .init(std.testing.allocator);
+        defer arena.deinit();
+        var provider: Provider = .{};
+        var res: Response = .init(arena.allocator());
+        var context: Context = .{ .arena = arena.allocator(), .req = .{ .verb = verb }, .res = &res };
+        try serveDownload(&context, .{ .ptr = &provider, .vtable = &Provider.vtable }, "fixture");
+        try std.testing.expect(provider.closed);
+        var output: std.Io.Writer.Allocating = .init(std.testing.allocator);
+        defer output.deinit();
+        try res.writeTo(&output.writer);
+        try std.testing.expect(std.mem.indexOf(u8, output.written(), "etag: tag-1\r\n") != null);
+        try std.testing.expect(std.mem.indexOf(u8, output.written(), "content-type: text/plain\r\n") != null);
+    }
 }
 
 fn streamDownloadBody(c: anytype, body: stream.Reader, length: u64) !void {
