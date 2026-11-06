@@ -1,0 +1,142 @@
+{
+  "date": "2026-11-06",
+  "repos": [
+    {
+      "repo": "Akamata",
+      "default_branch": "main",
+      "sha": "280c53481b527b7c11e4d7edb2b1252b7f03f2e6",
+      "dirty_paths": [],
+      "dependency_url": null,
+      "dependency_hash": null,
+      "minimum_zig": "0.17.0"
+    },
+    {
+      "repo": "Yaku",
+      "default_branch": "main",
+      "sha": "f1f809fb6cba61b819dab35592b59ca7fae27db8",
+      "dirty_paths": [],
+      "dependency_url": "git+https://github.com/appleuser634/Akamata.git#c332887a56065b70d4db6edb19b603715ccd7fa7",
+      "dependency_hash": "akamata-0.2.1-uJIoI-ZKPAHSiRv4eniA4zlZmgT9jUXz7vexaOWnqPdP",
+      "minimum_zig": "0.17.0"
+    },
+    {
+      "repo": "mimoc_news",
+      "default_branch": "main",
+      "sha": "24eb3e140f9e669ec62c842b4074d5ee63e548d4",
+      "dirty_paths": [
+        "?? .DS_Store",
+        "?? deploy/.DS_Store"
+      ],
+      "dependency_url": "https://github.com/moribit/Akamata/archive/refs/tags/v0.2.0.tar.gz",
+      "dependency_hash": "akamata-0.2.0-uJIoI5q4OgFWiDgjeemHhRKrz22T9j6WdfVIWxIPfpUt",
+      "minimum_zig": "0.17.0"
+    },
+    {
+      "repo": "Ehagaki",
+      "default_branch": "main",
+      "sha": "9962b4a12bda794b4ceaf7304ca02f02c2f47d23",
+      "dirty_paths": [
+        "?? .DS_Store",
+        "?? deploy/.DS_Store",
+        "?? zig-pkg/"
+      ],
+      "dependency_url": "https://github.com/moribit/Akamata/archive/refs/tags/v0.2.0.tar.gz",
+      "dependency_hash": "akamata-0.2.0-uJIoI5q4OgFWiDgjeemHhRKrz22T9j6WdfVIWxIPfpUt",
+      "minimum_zig": "0.17.0"
+    },
+    {
+      "repo": "mobus-backend",
+      "default_branch": "main",
+      "sha": "da3f9c025c46e7c17ddb53f539c3bed6ecb76f0d",
+      "dirty_paths": [],
+      "dependency_url": "https://github.com/moribit/Akamata/archive/refs/tags/v0.2.0.tar.gz",
+      "dependency_hash": "akamata-0.2.0-uJIoI5q4OgFWiDgjeemHhRKrz22T9j6WdfVIWxIPfpUt",
+      "minimum_zig": "0.17.0"
+    }
+  ],
+  "workers": [
+    {
+      "repo": "Yaku",
+      "worker": "yaku-mvp",
+      "secret_names": [],
+      "deployment_id": "c26ecc38-ed46-4aac-8b2a-3d73e222f0c5",
+      "created_on": "2026-11-06T01:22:54.390085Z",
+      "versions": [
+        {
+          "version_id": "902175ab-8d7a-45dd-8e02-83dfb013b4be",
+          "percentage": 100
+        }
+      ],
+      "read_only_exit": 0
+    },
+    {
+      "repo": "mimoc_news",
+      "worker": "mimoc-news",
+      "secret_names": [
+        "BASIC_AUTH_TOKEN"
+      ],
+      "deployment_id": "a306ad23-4451-41cd-8e15-7c868ca7be94",
+      "created_on": "2026-10-07T01:48:59.685271Z",
+      "versions": [
+        {
+          "version_id": "199079db-6915-424e-8182-f96cf7c33984",
+          "percentage": 100
+        }
+      ],
+      "read_only_exit": 0
+    },
+    {
+      "repo": "Ehagaki",
+      "worker": "ehagaki",
+      "secret_names": [
+        "JWT_SECRET"
+      ],
+      "deployment_id": "87ff645f-9b88-46d5-836a-b78131a96fc1",
+      "created_on": "2026-10-07T01:51:23.212154Z",
+      "versions": [
+        {
+          "version_id": "5082d8fd-af87-4a35-b306-e8a613c6e5aa",
+          "percentage": 100
+        }
+      ],
+      "read_only_exit": 0
+    },
+    {
+      "repo": "mobus-backend",
+      "worker": "mobus-backend",
+      "secret_names": [
+        "ADMIN_SECRET",
+        "JWT_SECRET"
+      ],
+      "deployment_id": "4e661645-3241-4e2b-b063-a9a53ee8cd84",
+      "created_on": "2026-10-18T04:22:26.420486Z",
+      "versions": [
+        {
+          "version_id": "5fd6ea15-f2cc-42fc-bc43-417e46a6a107",
+          "percentage": 100
+        }
+      ],
+      "read_only_exit": 0
+    },
+    {
+      "repo": "mobus-backend",
+      "worker": "mobus-realtime-handler",
+      "secret_names": [
+        "JWT_SECRET"
+      ],
+      "deployment_id": "41ea1ac4-3431-490b-a8e0-4670c9e7233d",
+      "created_on": "2026-10-18T04:20:19.86211Z",
+      "versions": [
+        {
+          "version_id": "75d3d501-a46c-4e60-b8a8-53a50da97c58",
+          "percentage": 100
+        }
+      ],
+      "read_only_exit": 0
+    }
+  ],
+  "zig": "0.17.0",
+  "wrangler": "4.120.0",
+  "cli_source": "280c53481b527b7c11e4d7edb2b1252b7f03f2e6",
+  "published_release": "v0.2.0"
+}
