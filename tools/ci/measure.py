@@ -6,7 +6,7 @@ python3 tools/ci/measure.py report
 Requires authenticated gh; never changes repository settings or workflow runs.
 """
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import subprocess
@@ -59,6 +59,7 @@ def collect(run_id):
             subprocess.run(["gh", "run", "download", str(run_id), "--repo", REPO,
                             "--name", artifact["name"], "--dir", str(target)], check=True)
     (directory / "cache-inventory.json").write_text(json.dumps(api("actions/caches?per_page=100"), indent=2) + "\n")
+    (directory / "collection.json").write_text(json.dumps({"collected_at": datetime.now(timezone.utc).isoformat(), "cache_inventory_note": "Repository cache snapshot at collection time, not a historical inventory at workflow start."}, indent=2) + "\n")
     observations = []
     for job in jobs["jobs"]:
         if job["name"] in ("native-openssl", "living examples (ubuntu-latest)", "living examples (macos-latest)", "cli init smoke test") and job["status"] == "completed":

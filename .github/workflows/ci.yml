@@ -5,7 +5,7 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Cache compilation, never the previous CI unit-test verdict.
+# Always execute CI unit tests; compiler-cache trials are documented separately.
 env:
   AKAMATA_CI_RERUN_TESTS: "1"
   AKAMATA_CI_TIMING_DIR: ${{ github.workspace }}/.ci-timing
@@ -72,10 +72,7 @@ jobs:
       - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2.2.1
         with:
           version: 0.17.0
-          use-cache: ${{ matrix.job.name == 'native-openssl' }}
-          use-tool-cache: ${{ matrix.job.name == 'native-openssl' }}
-          cache-key: ci-v2-stable-toolchain-${{ matrix.job.name }}
-          cache-size-limit: 2048
+          use-cache: false
       - run: ./third_party/sqlite/fetch.sh
       - run: ${{ matrix.job.cmd }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -100,10 +97,7 @@ jobs:
       - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29
         with:
           version: 0.17.0
-          use-cache: true
-          use-tool-cache: true
-          cache-key: ci-v2-stable-toolchain-living
-          cache-size-limit: 2048
+          use-cache: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24'
@@ -116,6 +110,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
+          include-hidden-files: true
           name: living-examples-${{ matrix.os }}
           path: .ci-evidence/living-examples.json
           if-no-files-found: ignore
@@ -186,10 +181,7 @@ jobs:
       - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29 # v2.2.1
         with:
           version: 0.17.0
-          use-cache: true
-          use-tool-cache: true
-          cache-key: ci-v2-stable-toolchain-cli-smoke
-          cache-size-limit: 2048
+          use-cache: false
       - run: ./third_party/sqlite/fetch.sh
       - run: zig build cli
       - run: zig build cli-operations-test
@@ -208,6 +200,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
+          include-hidden-files: true
           name: cli-command-timing
           path: .ci-timing/
           if-no-files-found: ignore
