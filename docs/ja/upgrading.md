@@ -115,3 +115,6 @@ as stronger JSON Schema guarantees. Native remains Threaded, Reactor parked.
 ## CLIとscaffoldのバージョン
 
 `akamata update`の既定targetはCLI自身に対応するタグです（CLI 0.2.1ならv0.2.1）。scaffoldのbootstrap用に固定された旧安定版とは独立しています。対応タグが未公開ならhash取得で失敗し、旧版へ暗黙に戻しません。`sync`は明示された対応版だけを受理し、未知の版とmanaged fileの未承認変更は引き続き拒否します。
+
+
+`akamata deploy`は未対応の引数を外部コマンド実行前に拒否します。`--dry-run`は実装していません。設定を確認してから`wrangler deploy --dry-run --config PATH`でartifactを検証してください。これはAkamataのdeployment preflightやremote readinessの検証ではありません。

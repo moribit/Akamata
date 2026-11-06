@@ -23,7 +23,13 @@ pub fn cmdDeploy(alloc: std.mem.Allocator, args: []const [:0]const u8) !void {
     var preflight = false;
     for (args) |raw| {
         const a = std.mem.sliceTo(raw, 0);
-        if (std.mem.eql(u8, a, "--workers")) target_workers = true else if (std.mem.eql(u8, a, "--containers")) target_containers = true else if (std.mem.eql(u8, a, "--preflight")) preflight = true else if (std.mem.startsWith(u8, a, "--environment=")) environment = a[14..] else if (std.mem.startsWith(u8, a, "--manifest=")) manifest = a[11..] else if (std.mem.startsWith(u8, a, "--config=")) config_path = a[9..] else if (std.mem.startsWith(u8, a, "--migrate=")) migrate_path = a[10..];
+        if (std.mem.eql(u8, a, "--workers")) target_workers = true else if (std.mem.eql(u8, a, "--containers")) target_containers = true else if (std.mem.eql(u8, a, "--preflight")) preflight = true else if (std.mem.startsWith(u8, a, "--environment=")) environment = a[14..] else if (std.mem.startsWith(u8, a, "--manifest=")) manifest = a[11..] else if (std.mem.startsWith(u8, a, "--config=")) config_path = a[9..] else if (std.mem.startsWith(u8, a, "--migrate=")) migrate_path = a[10..] else if (std.mem.startsWith(u8, a, "--optimize=")) {
+            // Validated by the build tool before deployment.
+        } else {
+            std.debug.print("deploy: unsupported option {s}; no action taken.\n", .{a});
+            if (std.mem.eql(u8, a, "--dry-run")) std.debug.print("For an artifact-only preview, review the config and use `wrangler deploy --dry-run --config PATH`.\n", .{});
+            return error.UsageError;
+        }
     }
     if (!target_workers and !target_containers) target_workers = true;
 

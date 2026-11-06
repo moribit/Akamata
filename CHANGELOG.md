@@ -4,6 +4,10 @@
 
 ### Consumer release validation fixes
 
+- Reject unsupported deploy options before any build, migration or remote
+  operation. In particular, unsupported `akamata deploy --dry-run` no longer
+  falls through to a real deployment; use the explicit Wrangler dry-run.
+
 - Keep Storage download response headers alive after the object reader closes.
   HEAD and buffered Workers responses now snapshot reader-owned ETag and
   Content-Type into the request arena; poison-on-close regression tests cover

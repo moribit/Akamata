@@ -123,3 +123,6 @@ replaces or rejects the identity. This is a safety correction, not an auth bypas
 Validation preserves existing 400/422 payloads and model rules. Typed DTO metadata
 adds strict diagnostics; byte-length/heuristic format constraints are not guessed
 as stronger JSON Schema guarantees. Native remains Threaded, Reactor parked.
+
+
+`akamata deploy` rejects unsupported options before invoking external tools. It does not implement `--dry-run`: use `wrangler deploy --dry-run --config PATH` for artifact-only validation after reviewing the config. This does not run Akamata deployment preflight or prove remote readiness.

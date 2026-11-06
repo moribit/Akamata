@@ -51,6 +51,10 @@ elif mode == 'fail-build' and args[0] == 'zig': sys.exit(1)
     assert calls == [], calls
     assert config.read_text() == initial, "deploy provisioned or mutated placeholder resource"
     config.write_text(initial.replace("00000000-0000-0000-0000-000000000000", uuid))
+    # Unsupported dry-run must never fall through to migration or deployment.
+    for option in ['--dry-run', '--unknown-option']:
+        calls = run(['deploy', '--workers', '--config=custom.toml', '--migrate=schema.sql', option], success=False)
+        assert calls == [], calls
     calls = run(["deploy", "--workers", "--config=custom.toml", "--migrate=schema.sql"])
     assert calls == [
         ["npx", "wrangler", "d1", "execute", "test-db", "--remote", "--config", "custom.toml", "--file", "schema.sql", "--yes"],
