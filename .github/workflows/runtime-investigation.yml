@@ -64,10 +64,10 @@ jobs:
           done
       - name: Session memory, mixed workload and races
         run: |
-          zig build runtime-certify-fixture -Doptimize=ReleaseSafe --prefix fixture
-          python3 tools/bench/runtime_certify.py fixture/bin/runtime-contract-server --adapters threaded --output certification/sessions-threaded.json --idle-levels 1000 --mixed-idle 100 --soak-seconds 30
+          zig build ci-runner runtime-certify-fixture -Doptimize=ReleaseSafe --prefix fixture
+          fixture/bin/akamata-tests sessions fixture/bin/runtime-contract-server --adapters threaded --output certification/sessions-threaded.json --idle-levels 1000 --mixed-idle 100 --soak-seconds 30
           if [[ "$RUNNER_OS" == Linux ]]; then adapter=epoll; else adapter=kqueue; fi
-          python3 tools/bench/runtime_certify.py fixture/bin/runtime-contract-server --adapters "$adapter" --output certification/sessions-reactor.json --idle-levels 1000 5000 --mixed-idle 1000 --soak-seconds 240
+          fixture/bin/akamata-tests sessions fixture/bin/runtime-contract-server --adapters "$adapter" --output certification/sessions-reactor.json --idle-levels 1000 5000 --mixed-idle 1000 --soak-seconds 240
       - name: Full regression prerequisites
         run: zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-session-test runtime-stress-test -Doptimize=ReleaseSafe
       - name: Record source and environment

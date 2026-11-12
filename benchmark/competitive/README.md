@@ -5,6 +5,12 @@ new production runtime. Native fixtures share HTTP/1.1 bodies, Content-Type,
 payload limit and keep-alive policy. Dedicated runtime entrypoints cannot enable
 Reactor through public App.serve. Dependencies here are benchmark-only.
 
+Run `zig build ci-runner` before using the manual Python measurement/reporting
+utilities. Their matrix, provenance, summary, disk-reserve and spill-file guards
+now call the same native Zig code exercised by CI. `AKAMATA_BENCHMARK_TOOL` may
+select a prebuilt `akamata-tests` executable. No tool is built during a measured
+interval. Benchmark raw data and frozen application binaries remain unchanged.
+
 The [completed 1,890-case report](../../benchmark-results/competitive/final-report.md)
 links all raw rounds, errors, identities and the Not Ready runtime decision.
 Regenerate its tables offline with `python3 benchmark/competitive/scripts/report_matrix.py`
@@ -35,7 +41,8 @@ generator at the same **total** connection count:
 ```sh
 python3 benchmark/competitive/scripts/calibrate.py benchmark-results/competitive/raw/baseline-manifest.json --output benchmark-results/competitive/raw/generator-calibration-32.json
 python3 benchmark/competitive/scripts/summarize.py benchmark-results/competitive/raw/native-baseline.json
-python3 benchmark/competitive/scripts/test_reporting.py
+zig build ci-runner
+./zig-out/bin/akamata-tests reporting
 ```
 
 Calibration retains each generator's distribution; it does not average latency

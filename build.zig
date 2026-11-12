@@ -9,6 +9,7 @@ pub const BenchRouteKind = enum { static, parameter, wildcard };
 pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
     const test_layout = b.option(TestLayout, "test-layout", "unit-test compilation layout (same test cases)") orelse .isolated;
+    const cache_test_results = b.option(bool, "cache-test-results", "reuse test verdicts (default false; compilation is still cached)") orelse false;
     const backend = b.option(Backend, "backend", "deployment backend (native | workers)") orelse .native;
     const example = b.option(Example, "example", "which example to build (chat | guestbook | bench | tasks | device_messaging)") orelse .chat;
     // OpenSSL is opt-in and only needed for FCM RS256 signing. The HTTPS
@@ -51,8 +52,9 @@ pub fn build(b: *std.Build) void {
     }) });
     b.step("ci-runner", "build Native Zig test orchestration").dependOn(&b.addInstallArtifact(ci_runner, .{}).step);
     const ci_run = b.addRunArtifact(ci_runner);
+    ci_run.addArgs(&.{ "--zig", b.graph.zig_exe });
     ci_run.addPassthruArgs();
-    ci_run.setEnvironmentVariable("ZIG", b.graph.zig_exe);
+    ci_run.has_side_effects = true;
     b.step("ci-test", "run a Native Zig contract suite").dependOn(&ci_run.step);
     const documentation_links = testRunner(b, ci_runner, "docs");
     b.step("living-examples-test", "compile and exercise the living Native/Workers learning path with the Zig driver").dependOn(&testRunner(b, ci_runner, "living").step);
@@ -258,7 +260,7 @@ pub fn build(b: *std.Build) void {
     const project_update_sync = testRunner(b, ci_runner, "update");
     project_update_sync.addArtifactArg(cli_exe);
     b.step("project-update-test", "upgrade and sync a legacy Native/Workers project safely").dependOn(&project_update_sync.step);
-    const workers_capability_sync = b.addSystemCommand(&.{ "sh", "tests/workers_capability_sync.sh" });
+    const workers_capability_sync = testRunner(b, ci_runner, "capability-sync");
     workers_capability_sync.addArtifactArg(cli_exe);
     b.step("workers-capability-sync-test", "preserve Workers capabilities while regenerating managed glue").dependOn(&workers_capability_sync.step);
 
@@ -272,7 +274,7 @@ pub fn build(b: *std.Build) void {
     // === Tests ===
     const test_step = b.step("test", "run unit tests");
     if (backend == .native) b.step("portable-application-test", "run shared application semantics on Native").dependOn(test_step);
-    const compile_fail_command = b.addSystemCommand(&.{ "bash", "tests/compile_fail.sh" });
+    const compile_fail_command = testRunner(b, ci_runner, "compile-fail");
     const compile_fail_step = b.step("compile-fail-test", "verify compile-time diagnostics");
     compile_fail_step.dependOn(&compile_fail_command.step);
     const workers_realtime_command = b.addSystemCommand(&.{ "node", "--test", "tests/workers_realtime_test.mjs" });
@@ -302,6 +304,22 @@ pub fn build(b: *std.Build) void {
 
     if (backend == .native) {
         const db_bench_mod = b.createModule(.{ .root_source_file = b.path("src/db_optimization_bench.zig"), .target = native_target, .optimize = optimize });
+        // Same four artifacts and three application suites as the sequential
+        // living driver, in one dependency graph. Zig schedules compilation
+        // with its normal resource limits and can share compilation inputs.
+        const living_native = b.step("living-native-check", "build all teaching applications and run their shared application suites");
+        living_native.dependOn(guestbook_test_step);
+        living_native.dependOn(tasks_test_step);
+        living_native.dependOn(chat_test_step);
+        inline for (.{ "guestbook", "tasks", "chat", "device_messaging" }) |name| {
+            const application = if (std.mem.eql(u8, example_name, name)) exe else b.addExecutable(.{ .name = name, .root_module = b.createModule(.{
+                .root_source_file = b.path("examples/" ++ name ++ "/src/main.zig"),
+                .target = target,
+                .optimize = optimize,
+                .imports = &.{.{ .name = "akamata", .module = am_mod }},
+            }) });
+            living_native.dependOn(&b.addInstallArtifact(application, .{}).step);
+        }
         const db_bench_options = b.addOptions();
         db_bench_options.addOption(bool, "diagnostics", b.option(bool, "db-diagnostics", "enable DB diagnostic timestamps and allocation accounting") orelse false);
         db_bench_mod.addOptions("db_bench_options", db_bench_options);
@@ -401,7 +419,7 @@ pub fn build(b: *std.Build) void {
         isolation.addArtifactArg(contract_server);
         isolation.addArgs(&.{ "--sharded", "--output", ".zig-cache/runtime-application-isolation.json" });
         b.step("runtime-isolation-test", "require HTTP isolation from long-lived application execution (Phase 6 gate)").dependOn(&isolation.step);
-        const session_validation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_certify.py" });
+        const session_validation = testRunner(b, ci_runner, "sessions");
         session_validation.addArtifactArg(contract_server);
         session_validation.addArgs(&.{ "--adapters", "threaded", if (native_target.result.os.tag == .linux) "epoll" else "kqueue", "sharded" });
         session_validation.addArgs(&.{ "--idle-levels", "100", "--mixed-idle", "20", "--soak-seconds", "5", "--session-rounds", "10", "--output", ".zig-cache/runtime-session-validation.json" });
@@ -498,7 +516,7 @@ pub fn build(b: *std.Build) void {
         tasks_test_step.dependOn(&b.addRunArtifact(tasks_test).step);
     }
     // Restoring compiler outputs must not restore a previous CI test verdict.
-    if (b.graph.environ_map.get("AKAMATA_CI_RERUN_TESTS") != null) {
+    if (!cache_test_results) {
         var visited = std.AutoHashMap(*std.Build.Step, void).init(b.allocator);
         for (b.top_level_steps.values()) |top| forceTestExecution(b, &top.step, &visited);
     }
@@ -515,11 +533,8 @@ fn forceTestExecution(b: *std.Build, step: *std.Build.Step, visited: *std.AutoHa
 
 fn testRunner(b: *std.Build, executable: *std.Build.Step.Compile, suite: []const u8) *std.Build.Step.Run {
     const run = b.addRunArtifact(executable);
+    run.addArgs(&.{ "--zig", b.graph.zig_exe });
     run.addArg(suite);
-    run.setEnvironmentVariable("ZIG", b.graph.zig_exe);
-    for ([_][]const u8{ "AKAMATA_DX_TSC", "AKAMATA_LIVING_REPORT", "AKAMATA_CI_TIMING_DIR", "AKAMATA_CI_RERUN_TESTS" }) |key| {
-        if (b.graph.environ_map.get(key)) |value| run.setEnvironmentVariable(key, value);
-    }
     run.has_side_effects = true;
     return run;
 }

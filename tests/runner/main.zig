@@ -2,7 +2,15 @@ const std = @import("std");
 const s = @import("support.zig");
 pub fn main(init: std.process.Init) !void {
     const a = init.arena.allocator();
-    const args = try init.minimal.args.toSlice(a);
+    const raw_args = try init.minimal.args.toSlice(a);
+    var args = raw_args;
+    if (args.len >= 4 and std.mem.eql(u8, args[1], "--zig")) {
+        try init.environ_map.put("ZIG", args[2]);
+        const filtered = try a.alloc([:0]const u8, args.len - 2);
+        filtered[0] = args[0];
+        @memcpy(filtered[1..], args[3..]);
+        args = filtered;
+    }
     if (init.environ_map.get("ZIG")) |zig| {
         if (std.fs.path.dirname(zig)) |directory| try init.environ_map.put("PATH", try std.fmt.allocPrint(a, "{s}:{s}", .{ directory, init.environ_map.get("PATH") orelse "" }));
     }
@@ -67,5 +75,20 @@ pub fn main(init: std.process.Init) !void {
     if (std.mem.eql(u8, args[1], "isolation")) return @import("isolation.zig").run(h, args[2..]);
     if (std.mem.eql(u8, args[1], "limit-exec")) return @import("resources.zig").execLimited(h, args[2..]);
     if (std.mem.eql(u8, args[1], "stress")) return @import("stress.zig").run(h, args[2..]);
+    if (std.mem.eql(u8, args[1], "sessions")) return @import("sessions.zig").run(h, args[2..]);
+    if (std.mem.eql(u8, args[1], "db-smoke")) return @import("db_smoke.zig").run(h, args[2]);
+    if (std.mem.eql(u8, args[1], "reporting")) return @import("reporting.zig").run(h);
+    if (std.mem.eql(u8, args[1], "evidence")) return @import("benchmark_evidence.zig").cli(h, args[2..]);
+    if (std.mem.eql(u8, args[1], "compile-fail")) return @import("compile_fail.zig").run(h);
+    if (std.mem.eql(u8, args[1], "capability-sync")) return @import("capability_sync.zig").run(h, args[2]);
+    if (std.mem.eql(u8, args[1], "adversarial")) return @import("adversarial.zig").run(h, args[2]);
+    if (std.mem.eql(u8, args[1], "scaffold-files")) {
+        const cli = try h.absolute(args[2]);
+        const temp = try h.temp();
+        defer temp.deinit();
+        _ = try h.run(&.{ cli, "init", "testapp", "--target=both", "--template=notes" }, temp.path, h.env);
+        for ([_][]const u8{ "src/main.zig", "deploy/wrangler.toml", "deploy/Dockerfile" }) |file| try s.check(h.exists(try temp.file(try h.fmt("testapp/{s}", .{file}))), "default notes scaffold file");
+        return;
+    }
     return error.UnknownTestSuite;
 }

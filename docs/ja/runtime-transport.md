@@ -16,8 +16,8 @@ App → Shared HTTP (session / connection / response cursor)
 
 ```sh
 zig build transport-contract-test runtime-contract-unit runtime-isolation-test runtime-stress-test -Doptimize=ReleaseSafe
-zig build runtime-certify-fixture -Doptimize=ReleaseSafe
-python3 tools/bench/runtime_certify.py zig-out/bin/runtime-contract-server --output certification.json --idle-levels 100 1000 --mixed-idle 100 --soak-seconds 1200
+zig build ci-runner runtime-certify-fixture -Doptimize=ReleaseSafe
+./zig-out/bin/akamata-tests sessions zig-out/bin/runtime-contract-server --output certification.json --idle-levels 100 1000 --mixed-idle 100 --soak-seconds 1200
 ```
 
 `http/session.zig`が入力/framing・absolute read budget・limit・pipeline残留、`http/connection.zig`が共通dispatch/error、`http/response_cursor.zig`がHEAD/upgradeを含む共有serializerを担当します。WebSocket fragment/control/UTF-8/close validationは`ws/message_state.zig`に集約します。selector側にHTTP実装を持ちません。

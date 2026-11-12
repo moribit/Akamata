@@ -26,7 +26,13 @@ def main():
     parser.add_argument("--seconds", type=int, default=20)
     parser.add_argument("--rounds", type=int, default=3)
     args = parser.parse_args()
-    if min(args.connections) < 1 or max(args.connections) > 1024 or args.seconds < 1:
+    from native_evidence import query
+    try:
+        for count in args.connections:
+            query("idle-connections", arguments=(count,))
+    except ValueError:
+        parser.error("safe connection range is 1..1024; duration must be positive")
+    if args.seconds < 1:
         parser.error("safe connection range is 1..1024; duration must be positive")
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
     resource.setrlimit(resource.RLIMIT_NOFILE, (max(soft, min(4096, hard)), hard))

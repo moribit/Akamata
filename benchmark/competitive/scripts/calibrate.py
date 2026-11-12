@@ -30,7 +30,10 @@ def main():
     parser.add_argument("--warmup", type=int, default=10)
     parser.add_argument("--duration", type=int, default=30)
     args = parser.parse_args()
-    if args.connections < 2 or args.connections % 2 or args.connections > 1024:
+    from native_evidence import query
+    try:
+        query("calibration-connections", arguments=(args.connections,))
+    except ValueError:
         parser.error("connections must be even, between 2 and 1024")
     manifest = json.loads(Path(args.manifest).read_text())
     output = Path(args.output)

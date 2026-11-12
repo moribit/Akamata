@@ -5,9 +5,8 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Always execute CI unit tests; compiler-cache trials are documented separately.
+# Compile outputs may be cached; test verdicts rerun by default.
 env:
-  AKAMATA_CI_RERUN_TESTS: "1"
   AKAMATA_CI_TIMING_DIR: ${{ github.workspace }}/.ci-timing
 
 jobs:
@@ -24,11 +23,11 @@ jobs:
         with:
           node-version: '24'
       - run: ./third_party/sqlite/fetch.sh
-      - run: zig build competitive-bench competitive-micro-build db-optimization-bench -Doptimize=ReleaseFast
-      - run: python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench
-      - run: python3 benchmark/db-optimization/test_reporting.py
+      - run: zig build ci-runner competitive-bench competitive-micro-build db-optimization-bench -Doptimize=ReleaseFast
+      - run: ./zig-out/bin/akamata-tests db-smoke zig-out/bin/db-optimization-bench
+      - run: ./zig-out/bin/akamata-tests reporting
       - run: zig build db-optimization-bench -Doptimize=ReleaseSafe -Ddb-diagnostics=true
-      - run: python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench
+      - run: ./zig-out/bin/akamata-tests db-smoke zig-out/bin/db-optimization-bench
       - run: zig build competitive-worker-build -Dbackend=workers -Doptimize=ReleaseSafe
       - run: npm ci --prefix benchmark/competitive/workers --ignore-scripts --no-audit --no-fund
       - run: node benchmark/competitive/workers/wasm-host.mjs zig-out/bin/competitive-worker.wasm .zig-cache/competitive-workers-host.json
@@ -131,11 +130,11 @@ jobs:
           node-version: '24'
       - run: node tools/docgen/build_slides.mjs
       - run: git diff --exit-code -- tools/docgen/slides.html tools/docgen/slides.ja.html
-      - run: zig build ci-runner
+      - run: zig build ci-runner -Dbackend=workers
       - run: ./zig-out/bin/akamata-tests docs
       - run: ./zig-out/bin/akamata-tests support
       - name: Competitive benchmark evidence reporting contract
-        run: python3 benchmark/competitive/scripts/test_reporting.py
+        run: ./zig-out/bin/akamata-tests reporting
       - name: PDF decoder (assertions run in Zig)
         run: |
           if ! command -v pdfinfo >/dev/null || ! command -v pdftotext >/dev/null; then
@@ -194,19 +193,14 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
-      - run: zig build cli
+      - run: zig build cli ci-runner
       - run: zig build cli-operations-test
       - run: zig build cli-capabilities-test compile-fail-test workers-realtime-test workers-wasm-dispatch-test
       - run: zig build scaffold-local-test
       - run: zig build public-journey-test
       - run: zig build project-update-test
       - run: zig build workers-capability-sync-test
-      - run: |
-          mkdir -p /tmp/cli-smoke && cd /tmp/cli-smoke
-          ${GITHUB_WORKSPACE}/zig-out/bin/akamata init testapp --target=both --template=notes
-          test -f testapp/src/main.zig
-          test -f testapp/deploy/wrangler.toml
-          test -f testapp/deploy/Dockerfile
+      - run: ./zig-out/bin/akamata-tests scaffold-files zig-out/bin/akamata
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -239,9 +233,14 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
-      - run: zig build -Dexample=bench -Doptimize=ReleaseSafe
-      - run: |
-          ./zig-out/bin/bench >/tmp/akamata-fuzz-server.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
-          node tools/fuzz/http_fuzz.mjs http://127.0.0.1:8080 --duration=5s --workers=4
+      - run: zig build ci-runner install -Dexample=bench -Doptimize=ReleaseSafe
+      - run: ./zig-out/bin/akamata-tests adversarial zig-out/bin/bench
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          include-hidden-files: true
+          name: adversarial-http
+          path: |
+            .zig-cache/adversarial-http.json
+            .zig-cache/adversarial-http-server.log
+          if-no-files-found: ignore

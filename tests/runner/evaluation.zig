@@ -11,7 +11,8 @@ pub const Report = struct {
     pub fn init(h: s.H, path: []const u8, binary: []const u8, scope: []const u8) !Report {
         var r: Report = .{ .h = h, .path = path, .runs = .init(h.a) };
         try r.put("platform", @tagName(builtin.os.tag));
-        try r.put("binary_sha256", try h.sha256(binary));
+        const digest = try h.sha256(binary);
+        try r.put("binary_sha256", digest[0..]);
         try r.put("scope", scope);
         return r;
     }
@@ -45,8 +46,13 @@ pub const Entry = struct {
         const server = &e.f.server;
         const h = server.h;
         const start = h.now();
-        if (server.child.id != null) server.signal(.TERM);
-        try server.wait(timeout_ms);
+        const requested = if (e.fields.get("shutdown_requested")) |flag| flag == .bool and flag.bool else false;
+        if (server.child.id != null and !requested) server.signal(.TERM);
+        server.wait(timeout_ms) catch |err| {
+            server.signal(.KILL);
+            server.wait(1000) catch {};
+            return err;
+        };
         if (!e.fields.contains("shutdown_ms")) try e.put("shutdown_ms", milliseconds(h.now() - start));
         for (server.clients.items) |client| client.close();
         const log = try h.read(server.log_path);

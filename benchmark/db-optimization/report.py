@@ -8,36 +8,27 @@ sys.path.insert(0, str(root / 'benchmark/competitive/scripts'))
 from compare_matrix import metrics
 
 def validate_micro(data, paired=False):
-    expected = {(r, c, t, v) for r in range(1, 4) for c in 'ABCDEF' for t in [1, 8, 32, 128] for v in ('AB' if paired else 'A')}
+    from native_evidence import query
+    query("micro", data, arguments=("--paired",) if paired else ())
     groups = {}
     for row in data['runs']:
         key = (row['round'], row['case'], row['threads'], row.get('variant', 'A'))
-        assert key in expected, key
-        assert row['errors'] == 0, row
-        assert row['checksum'] == (row['operations'] + 100 * row['threads']) * 534, row
         groups.setdefault(key, []).append(row)
-    assert groups.keys() == expected, ('missing micro cases', expected - groups.keys())
-    assert all((len(rows) == (2 if paired else 1) for rows in groups.values())), 'duplicate/missing ABBA'
     return groups
 
 def validate_http(data):
-    expected = set(itertools.product(range(1, 3), ['db', 'plaintext', 'json', 'echo-1024'], [1, 8, 32, 128, 512, 1024], range(4)))
-    completed = {}
-    failed = []
+    from native_evidence import query
+    query("http", data)
+    completed, failed = {}, []
     for row in data['runs']:
-        key = tuple((row[k] for k in ['cycle', 'workload', 'connections', 'position']))
-        assert key in expected, key
+        key = tuple(row[k] for k in ['cycle', 'workload', 'connections', 'position'])
         if 'failure' in row:
             failed.append(row)
-            continue
-        assert key not in completed, ('duplicate', key)
-        assert row['variant'] == 'ABBA'[row['position']], row
-        assert len(row['wire_checks']) == 7, row
-        if row.get('forced_cleanup'):
-            row['forced_runner_cleanup'] = True
-        completed[key] = row
-    assert completed.keys() == expected, ('incomplete HTTP', len(completed), len(expected))
-    return (completed, failed)
+        else:
+            if row.get('forced_cleanup'):
+                row['forced_runner_cleanup'] = True
+            completed[key] = row
+    return completed, failed
 
 def main():
     ordinary = json.loads((base / 'raw/micro-before.json').read_text())

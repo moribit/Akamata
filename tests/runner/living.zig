@@ -66,9 +66,8 @@ pub fn run(h: s.H) !void {
     const temp = try h.temp();
     defer temp.deinit();
     for ([_][]const u8{ "Debug", "ReleaseSafe" }) |mode| {
-        _ = try r.run(&.{ zig, "build", "guestbook-test", "tasks-test", "chat-test", try h.fmt("-Doptimize={s}", .{mode}), "--summary", "all" });
+        _ = try r.run(&.{ zig, "build", "living-native-check", try h.fmt("-Doptimize={s}", .{mode}), "--summary", "all" });
         for (examples) |example| {
-            _ = try r.run(&.{ zig, "build", try h.fmt("-Dexample={s}", .{example}), try h.fmt("-Doptimize={s}", .{mode}), "--summary", "all" });
             try artifacts.append(try h.json(try h.encode(.{ .example = example, .target = "native", .mode = mode, .sha256 = try sha(h, try h.fmt("zig-out/bin/{s}", .{example})) })));
             try r.put("artifacts", .{ .array = artifacts });
         }

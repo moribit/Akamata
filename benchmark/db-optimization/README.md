@@ -35,12 +35,15 @@ For allocation and phase timings build **separately**:
 ```sh
 zig build db-optimization-bench -Doptimize=ReleaseFast -Ddb-diagnostics=true -j2
 python3 benchmark/db-optimization/micro.py zig-out/bin/db-optimization-bench --rounds 1 --output /path/to/diagnostic.json
-python3 benchmark/db-optimization/smoke.py zig-out/bin/db-optimization-bench
+zig build ci-runner
+./zig-out/bin/akamata-tests db-smoke zig-out/bin/db-optimization-bench
 ```
 
 Diagnostics include clock/allocator overhead, warm retained-arena capacity, and
 exclude SQLite/libc malloc. Do not merge their throughput with ordinary runs.
-Raw CSV/report regeneration: `python3 benchmark/db-optimization/report.py`.
+Build `zig build ci-runner` before offline CSV/report regeneration with
+`python3 benchmark/db-optimization/report.py`; evidence validation uses the
+same native Zig guards as CI.
 Existing competitive evidence is read-only for this investigation.
 
 Additional controls (run serially after builds/tests finish):

@@ -35,27 +35,15 @@ for size in (64, 1024, 65536):
     WORKLOADS[f"echo-{size}"] = ("POST", "/echo", b"x" * size, "application/octet-stream", b"x" * size)
 
 def require_disk_reserve(output_directory, reserve_bytes=1024**3):
-    # A full disk can destroy the next checkpoint and even the failure report.
-    # Check before admitting a case, keeping the previous checkpoint intact.
-    # This does not change the workload or run a background sampler during load.
-    for directory in (output_directory, Path(tempfile.gettempdir())):
-        free = shutil.disk_usage(directory).free
-        if free < reserve_bytes:
-            raise RuntimeError(f"insufficient disk reserve at {directory}: {free} bytes free; "
-                               f"need {reserve_bytes}; checkpoint retained, no case started")
+    from native_evidence import query
+    query("disk-reserve", arguments=(output_directory, reserve_bytes))
 
 def cpu_time(value):
     return sum(float(part) * 60 ** i for i, part in enumerate(reversed(value.split(":"))))
 
 def runtime_reports(log):
-    reports = {}
-    for line in log.splitlines():
-        for marker, field in (("RUNTIME_COST ", "runtime_cost"), ("BENCH_STATS ", "allocator"), ("RUNTIME_MEMORY ", "runtime_memory")):
-            if line.startswith(marker):
-                if field in reports:
-                    raise ValueError(f"duplicate diagnostic report: {field}")
-                reports[field] = json.loads(line[len(marker):])
-    return reports
+    from native_evidence import query
+    return query("diagnostics", log)
 
 def sample(pid):
     data = subprocess.check_output(["ps", "-o", "rss=,time=", "-p", str(pid)], text=True).split()

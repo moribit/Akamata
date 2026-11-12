@@ -25,9 +25,31 @@ Python test assertions/orchestration migrate to the native Zig runner. Actual Ja
 
 The driver uses a fixed Native Debug build so application Debug/ReleaseSafe and WASM builds do not multiply driver compilation. No application build mode is removed.
 
-## Pending
+## Final migration validation
 
-Session certification, benchmark reporting guards, remaining workflow wiring and hosted before/after measurements are still in progress. Python transport support remains only while the session caller depends on it. Historical evidence commands are historical records, not instructions for the current runner.
+All framework test-driver entrypoints in `build.zig`, normal CI and the sanitizer
+workflow now use Zig. The retired shell compile-fail and Workers-sync drivers
+also migrated. No Python test files remain under `tests/`; manual Python benchmark
+measurement/reporting programs remain separate and use shared native evidence
+guards. See [coverage and commands](coverage.md) for the explicit migration ledger.
+
+Local final regression passed 60/60 build steps and 89/89 ordinary Zig tests
+(74 lifecycle + 15 DX), plus 170 socket cases, 24 quick stress scenarios, 15
+session/race/mixed scenarios, 12 isolation scenarios, all 33 compile-fail cases,
+CLI operations/capabilities, scaffold/journey/update/sync and five Workers binding
+combinations. The separate full unit suite passed 202/203 with the existing one
+RS256 skip when OpenSSL is disabled. The OpenSSL CI job tests that backend.
+The 51-command batched living path passed with all five strict TS invocations.
+Real saved data also passed the new guards: 288 paired DB micro rows, 192 HTTP
+ABBA cases and the full 1,260/630 competitive before/after matrices. No raw
+benchmark data or frozen application binary was changed.
+
+Intermediate commit `d3aa062` passed all 23 hosted CI jobs in
+[run 43211221165](https://github.com/moribit/Akamata/actions/runs/43211221165).
+This is evidence for the intermediate migration, **not** the final batched
+configuration or a statistically controlled speed result. Final hosted timing
+and sanitizer results are recorded separately once complete. Historical evidence
+commands are historical records, not current runner instructions.
 
 First hosted run `43210370724` found Linux Debug example ELF files exceeding the test helper's 64 MiB text-read cap during artifact hashing. The application build itself passed. Hashing now streams fixed-size blocks and has a >64 MiB sparse-file regression check; the cap remains for textual test inputs. Cross-compilation of the complete runner to x86_64-linux-musl succeeds; actual hosted tests are still required.
 
@@ -44,4 +66,11 @@ Local wall time fell 41.1%; max RSS rose 25.6%. CI tries `-Dtest-layout=grouped`
 
 Raw `/usr/bin/time -l` output: `isolated-local.time`, `grouped-local.time`. `grouped-invalid-*.time` are failed setup attempts (literal import / comptime quota), **excluded** from the comparison. Reproduce with `AKAMATA_CI_RERUN_TESTS=1 zig build test -Dtest-layout=isolated|grouped -Doptimize=ReleaseSafe --cache-dir <new-directory> --summary all`, sequentially. No test or application runtime behavior was removed for this result.
 
-Zig 0.17 uses `.protocol` for unit-test runs. The prior forced-rerun guard checked only legacy `.zig_test`; it now accepts both so warm cached compiler results cannot silently stand in for test execution when `AKAMATA_CI_RERUN_TESTS` is enabled.
+Zig 0.17 uses `.protocol` for unit-test runs. The prior forced-rerun guard checked
+only legacy `.zig_test`; it now accepts both. Further warm testing exposed that
+configure-cache reuse can freeze environment-conditioned choices. Test verdicts
+therefore rerun **by default**, independently of environment variables. Explicit
+`-Dcache-test-results=true` is the local opt-out; CI does not use it. Compilation
+still uses the ordinary Zig cache. Compiler selection is passed to the native
+driver as `--zig`, keeping runtime TS/timing/report settings out of cached Run
+environment snapshots.

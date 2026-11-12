@@ -41,9 +41,9 @@ pub fn run(h: s.H, args: []const []const u8) !void {
         try runs.append(h.a, .{ .repeat = index + 1, .passed = failure == null, .failure = if (failure) |err| @errorName(err) else null, .diagnostic = diagnostic });
         try h.write(path, try h.encode(.{
             .platform = @tagName(builtin.os.tag),
-            .binary_sha256 = digest,
+            .binary_sha256 = digest[0..],
             .adapter = target,
-            .test_name = try h.fmt("test_{s}", .{@tagName(selected)}),
+            .@"test" = try h.fmt("test_{s}", .{@tagName(selected)}),
             .requested_repeats = repeats,
             .runs = runs.items,
         }));

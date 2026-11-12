@@ -14,71 +14,28 @@ AFTER = ("akamata-threaded-after", "akamata-reactor-single-after", "akamata-reac
 
 
 def validate(data, frameworks):
-    for key, expected in (("warmup_seconds", 10), ("duration_seconds", 30), ("rounds", 5)):
-        if data.get(key) != expected:
-            raise ValueError(f"requested matrix requires {key}={expected}")
-    if set(data["binaries"]) != set(frameworks):
-        raise ValueError("unexpected frozen framework set")
-    expected = set(itertools.product(frameworks, WORKLOADS, CONNECTIONS, range(1, 6)))
+    from native_evidence import query
+    frameworks = tuple(frameworks)
+    arguments = ("baseline",) if frameworks == BASE else ("after",) if frameworks == AFTER else ("--frameworks", *frameworks)
+    query("matrix", data, arguments=arguments)
     complete, failures = {}, []
     for row in data["runs"]:
-        key = tuple(row[k] for k in ("framework", "workload", "connections", "round"))
-        if key not in expected:
-            raise ValueError(f"unexpected case: {key}")
         if "failure" in row or "oha" not in row:
             failures.append(row)
-            continue
-        if key in complete:
-            raise ValueError(f"duplicate completed case: {key}")
-        if len(row.get("wire_checks", [])) != len(WORKLOADS):
-            raise ValueError(f"missing wire conformance: {key}")
-        complete[key] = row
-    missing = expected - complete.keys()
-    if missing:
-        raise ValueError(f"incomplete matrix: {len(complete)}/{len(expected)} completed; "
-                         f"first missing: {sorted(missing)[0]}")
+        else:
+            key = tuple(row[k] for k in ("framework", "workload", "connections", "round"))
+            complete[key] = row
     return complete, failures
 
 
 def metrics(rows):
-    med = lambda f: statistics.median(f(row) for row in rows)
-    clients = sum(sum(r["oha"]["errorDistribution"].values()) for r in rows)
-    non200 = sum(sum(n for status, n in r["oha"]["statusCodeDistribution"].items()
-                     if status != "200") for r in rows)
-    attempts = clients + sum(sum(r["oha"]["statusCodeDistribution"].values()) for r in rows)
-    return {"http_200_per_second": med(lambda r: r["oha"]["statusCodeDistribution"].get("200", 0)
-                                       / r["oha"]["summary"]["total"]),
-            **{k + "_ms": med(lambda r: r["oha"]["latencyPercentiles"][k] * 1000)
-               for k in ("p50", "p95", "p99", "p99.9")},
-            "cpu_percent": med(lambda r: r["cpu_percent"]),
-            "rss_kib": med(lambda r: r["rss_mean_kib"]),
-            "threads": med(lambda r: r["threads_peak"]),
-            "client_errors": clients, "non_200": non200,
-            "error_percent": 100 * (clients + non200) / attempts if attempts else 0,
-            "forced_cleanup": sum(bool(r.get("forced_runner_cleanup")) for r in rows),
-            "server_exits": [r.get("server_exit") for r in rows]}
+    from native_evidence import query
+    return query("metrics", {"runs": rows})
 
 
 def compare(before, after):
-    left, failed_left = validate(before, BASE)
-    right, failed_right = validate(after, AFTER)
-    for field in ("os", "cpu_count", "oha", "warmup_seconds", "duration_seconds", "rounds"):
-        if before[field] != after[field]:
-            raise ValueError(f"before/after environment drift: {field}")
-    comparisons = []
-    for workload, connections in itertools.product(WORKLOADS, CONNECTIONS):
-        baseline = metrics([left["akamata-threaded", workload, connections, n] for n in range(1, 6)])
-        for framework in AFTER:
-            current = metrics([right[framework, workload, connections, n] for n in range(1, 6)])
-            comparisons.append({"workload": workload, "connections": connections, "framework": framework,
-                                "before_threaded": baseline, "after": current,
-                                "throughput_change_percent": 100 * (current["http_200_per_second"]
-                                                                     / baseline["http_200_per_second"] - 1)})
-    return {"complete": True, "baseline_cases": len(left), "after_cases": len(right),
-            "failed_attempts": {"baseline": failed_left, "after": failed_right},
-            "excluded_prior_runs": {"baseline": before.get("excluded_runs", []),
-                                    "after": after.get("excluded_runs", [])},
-            "comparisons": comparisons}
+    from native_evidence import query
+    return query("compare", before, after)
 
 
 def main():
