@@ -19,7 +19,7 @@ Python test assertions/orchestration migrate to the native Zig runner. Actual Ja
 - Scaffold: notes/minimal Native/Workers build modes, migrations applied twice, public build helper, named D1 and Turso metadata, actual HTTP and clean shutdown.
 - Public journey: init, ordinary/typed function editing, CLI test/check/dev, actual 201 JSON response, Workers ReleaseSafe and bounded dev shutdown.
 - Project update/sync: old v0.1.0 fixture, dry-run immutability, edited managed-file refusal, backup/force recovery, application-owned markers, Native/Workers build and template version rejection.
-- Living path: 59 commands with strict TypeScript checks, eight Native example builds, six application-test target invocations, four real Workers WASM/JSPI hosts, protocol TS/C output, migration history, two-peer Native WebSocket/persistence and documentation/source equality checks. SQLite host is Zig with the repository's bundled SQLite, not Python sqlite3.
+- Living path: 51 commands (batched from 59) with strict TypeScript checks, eight Native example builds, six application-test target invocations, four real Workers WASM/JSPI hosts, protocol TS/C output, migration history, two-peer Native WebSocket/persistence and documentation/source equality checks. SQLite host is Zig with the repository's bundled SQLite, not Python sqlite3.
 - Application isolation: Threaded/kqueue/sharded, held upgrades/slow streams, admission overflow/recovery, bounded I/O drain and zero allocator/session leaks. Repeated sanitizer case checkpoints retain binary hash and live failure diagnostics.
 - Stress: all 24 quick scenarios across Threaded/kqueue/sharded passed locally, including concurrent pipeline/reset churn, slowloris, 512 KiB partial echo, stream/upgrade errors, slow-reader forced drain, latency probes, isolation, and a child-only RLIMIT_NOFILE=64 accept-exhaustion/recovery test. Resource/allocator/session samples are retained. Each parallel client has its own allocator; all threads join before result inspection.
 
@@ -54,6 +54,28 @@ commands are historical records, not current runner instructions.
 First hosted run `43210370724` found Linux Debug example ELF files exceeding the test helper's 64 MiB text-read cap during artifact hashing. The application build itself passed. Hashing now streams fixed-size blocks and has a >64 MiB sparse-file regression check; the cap remains for textual test inputs. Cross-compilation of the complete runner to x86_64-linux-musl succeeds; actual hosted tests are still required.
 
 ## Shared compilation experiment
+
+Final code candidate `0958306` passed **23/23** normal jobs in
+[43228855537](https://github.com/moribit/Akamata/actions/runs/43228855537) and
+**2/2** Linux/macOS sanitizer jobs in
+[43228878885](https://github.com/moribit/Akamata/actions/runs/43228878885).
+Cold normal job span was 719 s and total job duration 5,229 s. See the
+[comparison and limitations](results.ja.md); this is not a controlled estimate
+of a stable overall speedup. Raw job and sanitizer records are adjacent JSON.
+
+Subsequent code `2d6ab98` (including the manual DB regression driver migration)
+passed 23/23 in [43231952334](https://github.com/moribit/Akamata/actions/runs/43231952334).
+Warm span was **674 s**, total job duration **5,309 s**, OpenSSL **223 s**.
+The fastest baseline was 679 s / 5,550 job-seconds / 391 s OpenSSL: overall span
+is essentially unchanged, total job duration fell 4.3%, and OpenSSL fell 43.0%.
+Linux living and CLI smoke were slower than that baseline in this warm sample;
+do not describe every job as faster. Source-cache logs show **16/16 hits**, with
+603,068 bytes on Linux and 605,303 bytes on macOS. A 0–2 s cache step does not
+represent a ~100 s net speedup: cold bootstrap also compiled Zig standard-library
+code that subsequent builds reused. Source caching is primarily reliability work.
+No test flakes were observed in the two final successful normal runs or the
+successful two-platform sanitizer run; the earlier ELF cap and cold-bootstrap
+failures were genuine migration defects fixed above, not ignored flakes.
 
 Zig 0.17.0, Apple M2 (8 CPU), 16 GiB RAM, macOS 27.0.1 (26A434), ReleaseSafe. Sequential runs used distinct initially empty **local** caches and an existing global compiler cache; these are not clean hosted-runner or repeated statistical measurements. Source was the working changes on `63cc519` (catalog plus literal imports). Both layouts actually ran the same 203 cases: 202 pass, 1 skip.
 
@@ -100,3 +122,18 @@ Zig locates its build root using build.zig. A genuinely empty local/global cache
 in `/tmp` then fetched both exact pins, materialized both directories and left
 the original manifest byte-for-byte unchanged. This failed trial is excluded
 from speed claims; it does not represent a framework/test failure.
+
+Cold bootstrap reproduction (run outside measurement intervals):
+
+```sh
+repo=$(pwd)
+scratch=$(mktemp -d)
+cp build.zig build.zig.zon "$scratch/"
+cd "$scratch"
+export ZIG_GLOBAL_CACHE_DIR="$scratch/global-cache"
+zig run "$repo/tools/ci/prepare_dependencies.zig" -- "$(command -v zig)"
+cmp build.zig.zon "$repo/build.zig.zon"
+ls zig-pkg
+```
+
+Use Zig 0.17.0. Warm verification alone does not exercise materialization.

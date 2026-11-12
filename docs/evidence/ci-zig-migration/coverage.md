@@ -27,6 +27,7 @@ TypeScript checking stay in their actual runtimes, as requested by the user.
 | runtime_contract_repeat.py | runner/repeat.zig | bounded repeat count, binary identity, per-run checkpoint, failure log/runtime snapshot |
 | runtime_certify.py | runner/sessions.zig | 100-peer broadcast, concurrent streams, 256 fd reuse races, 64-peer shutdown race, idle levels, mixed HTTP/DB/stream/WS and bounded soak |
 | db-optimization/smoke.py | runner/db_smoke.zig | 6 equivalent paths, complete row checksum, zero errors and latency ordering |
+| db-optimization/validate.py | runner/db_regression.zig | same six serial Native/Workers/Transport/TSan commands, exact logs and partial run manifest; new evidence directory by default |
 | db-optimization/test_reporting.py | runner/reporting.zig | 10 original completeness/duplicate/error/checksum/ABBA/failed-attempt contracts |
 | competitive/scripts/test_reporting.py | runner/reporting.zig | 9 original guard intents: matrix/errors/drift, reserve boundary, owned-process cleanup, future counters, summary failures, unsafe counts and spill-file ownership |
 

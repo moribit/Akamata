@@ -1,0 +1,167 @@
+{
+  "run": 43231952334,
+  "source": "2d6ab98",
+  "compiler_outputs_cached": false,
+  "records": [
+    {
+      "id": 131229268559,
+      "name": "private competitive fixture contracts",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:41.7965800Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:42.3745989Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269059,
+      "name": "living examples (macos-latest)",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:53.6423780Z Cache hit for: zig-sources-macOS-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:54.0966820Z Cache restored from key: zig-sources-macOS-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269100,
+      "name": "native-integration",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:41.3772827Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:42.0706136Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269123,
+      "name": "living examples (ubuntu-latest)",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:42.3606739Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:43.0819653Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269185,
+      "name": "cli init smoke test",
+      "lines": [
+        "2026-11-12T13:55:38.7832457Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:38.9252443Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true,
+      "exit_code": 0
+    },
+    {
+      "id": 131229269236,
+      "name": "adversarial HTTP smoke",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:39.6487887Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:39.9998710Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269328,
+      "name": "docker-build (chat container)",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:57:30.9296435Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:57:31.1272073Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269513,
+      "name": "device-messaging-native",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:41.2651622Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:41.6553301Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269518,
+      "name": "linux threaded + epoll contract",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:38.8545358Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:38.9887826Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269527,
+      "name": "native-test",
+      "lines": [
+        "2026-11-12T13:55:40.0711345Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:40.8001428Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true,
+      "exit_code": 0
+    },
+    {
+      "id": 131229269544,
+      "name": "cli-build",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:40.7127824Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:41.0532123Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269703,
+      "name": "tasks-test",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:41.0338787Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:41.7761677Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269710,
+      "name": "macos native + kqueue contract",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:57.7537480Z Cache hit for: zig-sources-macOS-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:58.7142340Z Cache restored from key: zig-sources-macOS-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269731,
+      "name": "native-openssl",
+      "lines": [
+        "2026-11-12T13:55:39.5244859Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:40.0893060Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true,
+      "exit_code": 0
+    },
+    {
+      "id": 131229269747,
+      "name": "native-release-safe",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:38.4940754Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:38.8350625Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    },
+    {
+      "id": 131229269809,
+      "name": "chat-native",
+      "exit_code": 0,
+      "lines": [
+        "2026-11-12T13:55:40.7784558Z Cache hit for: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d",
+        "2026-11-12T13:55:41.3445480Z Cache restored from key: zig-sources-Linux-0.17.0-v1-a12ab0ff464ed1d2ba73fae330239f48ed2ae9784dacec03b07193cbc7f8012d"
+      ],
+      "hit": true
+    }
+  ]
+}

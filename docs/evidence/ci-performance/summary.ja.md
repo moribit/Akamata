@@ -1,5 +1,9 @@
 # CI高速化の検証結果
 
+この文書は `9f6d645` までの依存関係・compiler cache試験の記録です。
+続くPythonテストのZig移行、コンパイル単位の統合、依存ソースcacheの検証は
+[Zig移行の比較結果](../ci-zig-migration/results.ja.md)を参照してください。
+
 詳細・再現手順・依存関係図は [README](README.md)、全ジョブ・step別の実測は
 [measurements](measurements.md)、原データは [raw](raw/) を参照してください。
 

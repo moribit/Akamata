@@ -1,0 +1,4 @@
+{"command":["/home/runner/work/Akamata/Akamata/.zig-cache/o/40c420d44c497c8b8480499045190e21/akamata","init","journey","--target=both"],"seconds":0.046244796,"child_cpu_seconds":0.045537,"returncode":0}
+{"command":["/home/runner/work/Akamata/Akamata/.zig-cache/o/40c420d44c497c8b8480499045190e21/akamata","test"],"seconds":13.657436176,"child_cpu_seconds":20.262191,"returncode":0}
+{"command":["/home/runner/work/Akamata/Akamata/.zig-cache/o/40c420d44c497c8b8480499045190e21/akamata","check","--quick"],"seconds":0.020320444,"child_cpu_seconds":0.01976099999999903,"returncode":0}
+{"command":["/home/runner/work/_temp/61ad3209-3486-49e2-b725-96ed850a6a50/zig-x86_64-linux-0.17.0/zig","build","-Dbackend=workers","-Doptimize=ReleaseSafe"],"seconds":4.215760034,"child_cpu_seconds":4.2528739999999985,"returncode":0}
