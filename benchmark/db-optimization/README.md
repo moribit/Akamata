@@ -56,6 +56,9 @@ python3 benchmark/db-optimization/sample_db.py /path/to/final-micro /path/to/pro
 The SQL control only changes the known literal's length argument in direct C
 case A; all three modes have valid NUL-backed storage. `sample_db.py` owns and
 joins its process; macOS sampling may require permission outside an app sandbox.
-It records blocked-thread wall stacks, not CPU percentages. `validate.py` runs
-the local Native/Workers/Transport/TSan command sequence and retains exact logs.
+It records blocked-thread wall stacks, not CPU percentages.
+`./zig-out/bin/akamata-tests db-regression /path/to/new-evidence-directory` runs
+the same six local Native/Workers/Transport/TSan commands serially and retains
+exact logs. Build `ci-runner` first; use `--zig /absolute/zig` before the suite
+to select the exact compiler. Historical raw results are not overwritten by default.
 The final report links revision-scoped GitHub CI/TSan evidence separately.

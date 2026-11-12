@@ -82,6 +82,7 @@ pub fn main(init: std.process.Init) !void {
     if (std.mem.eql(u8, args[1], "stress")) return @import("stress.zig").run(h, args[2..]);
     if (std.mem.eql(u8, args[1], "sessions")) return @import("sessions.zig").run(h, args[2..]);
     if (std.mem.eql(u8, args[1], "db-smoke")) return @import("db_smoke.zig").run(h, args[2]);
+    if (std.mem.eql(u8, args[1], "db-regression")) return @import("db_regression.zig").run(h, args[2..]);
     if (std.mem.eql(u8, args[1], "reporting")) return @import("reporting.zig").run(h);
     if (std.mem.eql(u8, args[1], "evidence")) return @import("benchmark_evidence.zig").cli(h, args[2..]);
     if (std.mem.eql(u8, args[1], "compile-fail")) return @import("compile_fail.zig").run(h);
