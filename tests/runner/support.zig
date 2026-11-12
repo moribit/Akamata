@@ -28,14 +28,42 @@ pub const H = struct {
         std.Io.sleep(h.io, .fromMilliseconds(@intCast(ms)), .awake) catch {};
     }
     pub fn command(h: H, argv: []const []const u8, cwd: ?[]const u8, env: ?*const std.process.Environ.Map) !std.process.RunResult {
-        return std.process.run(h.a, h.io, .{
+        return h.commandFor(argv, cwd, env, 600);
+    }
+    pub fn commandFor(h: H, argv: []const []const u8, cwd: ?[]const u8, env: ?*const std.process.Environ.Map, seconds: u32) !std.process.RunResult {
+        const start = h.now();
+        const cpu_start = childCpu();
+        const result = std.process.run(h.a, h.io, .{
             .argv = argv,
             .cwd = if (cwd) |p| .{ .path = p } else .inherit,
             .environ_map = env,
             .stdout_limit = .limited(32 * 1024 * 1024),
             .stderr_limit = .limited(32 * 1024 * 1024),
-            .timeout = .{ .duration = .{ .clock = .awake, .raw = .fromSeconds(600) } },
-        });
+            .timeout = .{ .duration = .{ .clock = .awake, .raw = .fromSeconds(seconds) } },
+        }) catch |err| {
+            try h.trace(argv, start, cpu_start, null);
+            return err;
+        };
+        try h.trace(argv, start, cpu_start, if (result.term == .exited) result.term.exited else null);
+        return result;
+    }
+    pub fn append(h: H, path: []const u8, data: []const u8) !void {
+        if (std.fs.path.dirname(path)) |parent| try std.Io.Dir.cwd().createDirPath(h.io, parent);
+        const file = try std.Io.Dir.cwd().createFile(h.io, path, .{ .truncate = false });
+        defer file.close(h.io);
+        const flags = std.c.fcntl(file.handle, std.c.F.GETFL);
+        const append_flag: c_int = @bitCast(std.c.O{ .APPEND = true });
+        if (flags < 0 or std.c.fcntl(file.handle, std.c.F.SETFL, flags | append_flag) < 0) return error.Append;
+        try file.writeStreamingAll(h.io, data);
+    }
+    fn trace(h: H, argv: []const []const u8, start: i96, cpu_start: ?f64, code: ?u8) !void {
+        const directory = h.env.get("AKAMATA_CI_TIMING_DIR") orelse return;
+        const suite = h.env.get("AKAMATA_TEST_SUITE") orelse "commands";
+        const elapsed: f64 = @as(f64, @floatFromInt(h.now() - start)) / std.time.ns_per_s;
+        const cpu_end = childCpu();
+        const cpu: ?f64 = if (cpu_start != null and cpu_end != null) cpu_end.? - cpu_start.? else null;
+        const row = try h.encode(.{ .command = argv, .seconds = elapsed, .child_cpu_seconds = cpu, .returncode = code });
+        try h.append(try h.fmt("{s}/{s}.jsonl", .{ directory, suite }), try h.fmt("{s}\n", .{row}));
     }
     pub fn run(h: H, argv: []const []const u8, cwd: ?[]const u8, env: ?*const std.process.Environ.Map) ![]const u8 {
         const result = try h.command(argv, cwd, env);
@@ -59,6 +87,11 @@ pub const H = struct {
         return true;
     }
 };
+fn childCpu() ?f64 {
+    var usage: std.c.rusage = undefined;
+    if (std.c.getrusage(std.c.rusage.CHILDREN, &usage) != 0) return null;
+    return @as(f64, @floatFromInt(usage.utime.sec + usage.stime.sec)) + @as(f64, @floatFromInt(usage.utime.usec + usage.stime.usec)) / 1_000_000;
+}
 pub const Temp = struct {
     h: H,
     path: []const u8,

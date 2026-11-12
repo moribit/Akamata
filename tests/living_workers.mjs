@@ -14,7 +14,7 @@ assert.ok(["guestbook", "tasks", "chat", "device_messaging"].includes(name));
 const directory = mkdtempSync(join(tmpdir(), "akamata-example-host-"));
 const database = join(directory, "isolated.sqlite");
 const sql = (request) => {
-  const result = spawnSync(process.env.PYTHON ?? "python3", [resolve("tests/living_sqlite.py"), database], {
+  const result = spawnSync(process.env.AKAMATA_SQLITE_HOST ?? resolve("zig-out/bin/akamata-sqlite-host"), [database], {
     input: JSON.stringify(request), encoding: "utf8", timeout: 10_000,
   });
   assert.equal(result.status, 0, result.stderr);

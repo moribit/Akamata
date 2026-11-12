@@ -3,10 +3,12 @@ const std = @import("std");
 pub const Backend = enum { native, workers };
 pub const Example = enum { chat, guestbook, bench, tasks, device_messaging };
 pub const BenchRouter = enum { runtime, static };
+pub const TestLayout = enum { isolated, grouped };
 pub const BenchRouteKind = enum { static, parameter, wildcard };
 
 pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
+    const test_layout = b.option(TestLayout, "test-layout", "unit-test compilation layout (same test cases)") orelse .isolated;
     const backend = b.option(Backend, "backend", "deployment backend (native | workers)") orelse .native;
     const example = b.option(Example, "example", "which example to build (chat | guestbook | bench | tasks | device_messaging)") orelse .chat;
     // OpenSSL is opt-in and only needed for FCM RS256 signing. The HTTPS
@@ -53,6 +55,7 @@ pub fn build(b: *std.Build) void {
     ci_run.setEnvironmentVariable("ZIG", b.graph.zig_exe);
     b.step("ci-test", "run a Native Zig contract suite").dependOn(&ci_run.step);
     const documentation_links = testRunner(b, ci_runner, "docs");
+    b.step("living-examples-test", "compile and exercise the living Native/Workers learning path with the Zig driver").dependOn(&testRunner(b, ci_runner, "living").step);
     documentation_step.dependOn(&documentation_links.step);
     const opts = b.addOptions();
     opts.addOption(Backend, "backend", backend);
@@ -86,6 +89,13 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
         });
         am_mod.addImport("sqlite3", sqlite_bindings.mod);
+        const sqlite_host_mod = b.createModule(.{ .root_source_file = b.path("tests/runner/sqlite_host.zig"), .target = native_target, .optimize = .ReleaseSafe });
+        sqlite_host_mod.link_libc = true;
+        sqlite_host_mod.addImport("sqlite3", sqlite_bindings.mod);
+        sqlite_host_mod.addIncludePath(b.path("third_party/sqlite"));
+        sqlite_host_mod.addCSourceFile(.{ .file = b.path("third_party/sqlite/sqlite3.c"), .flags = sqlite_flags });
+        const sqlite_host = b.addExecutable(.{ .name = "akamata-sqlite-host", .root_module = sqlite_host_mod });
+        b.step("ci-sqlite-host", "build isolated SQLite host for real example WASM tests").dependOn(&b.addInstallArtifact(sqlite_host, .{}).step);
         am_mod.link_libc = true;
         if (with_openssl) {
             const openssl_bindings: Translator = .init(translate_c, .{
@@ -225,27 +235,27 @@ pub fn build(b: *std.Build) void {
 
     // End-to-end scaffold regression test. Kept as an explicit step because
     // the default scaffold resolves its commit-pinned dependency over HTTPS.
-    const scaffold_smoke = b.addSystemCommand(&.{ "sh", "tests/scaffold_smoke.sh" });
+    const scaffold_smoke = testRunner(b, ci_runner, "scaffold");
     scaffold_smoke.addArtifactArg(cli_exe);
     const scaffold_step = b.step("scaffold-test", "generate and build portable scaffolds against the pinned release");
     scaffold_step.dependOn(&scaffold_smoke.step);
-    const minimal_release = b.addSystemCommand(&.{ "python3", "tests/minimal_scaffold.py" });
+    const minimal_release = testRunner(b, ci_runner, "minimal");
     minimal_release.addArtifactArg(cli_exe);
     scaffold_step.dependOn(&minimal_release.step);
-    const scaffold_local = b.addSystemCommand(&.{ "sh", "tests/scaffold_smoke.sh" });
+    const scaffold_local = testRunner(b, ci_runner, "scaffold");
     scaffold_local.addArtifactArg(cli_exe);
     scaffold_local.addDirectoryArg2(b.path("."), .{});
     const scaffold_local_step = b.step("scaffold-local-test", "generate and build a scaffold against this checkout");
-    const public_journey = b.addSystemCommand(&.{ "python3", "tests/public_journey.py" });
+    const public_journey = testRunner(b, ci_runner, "journey");
     public_journey.addArtifactArg(cli_exe);
     public_journey.addDirectoryArg2(b.path("."), .{});
     b.step("public-journey-test", "verify the published init/dev/test and typed Native/Workers journey").dependOn(&public_journey.step);
     scaffold_local_step.dependOn(&scaffold_local.step);
-    const minimal_scaffold = b.addSystemCommand(&.{ "python3", "tests/minimal_scaffold.py" });
+    const minimal_scaffold = testRunner(b, ci_runner, "minimal");
     minimal_scaffold.addArtifactArg(cli_exe);
     minimal_scaffold.addDirectoryArg2(b.path("."), .{});
     scaffold_local_step.dependOn(&minimal_scaffold.step);
-    const project_update_sync = b.addSystemCommand(&.{ "sh", "tests/project_update_sync.sh" });
+    const project_update_sync = testRunner(b, ci_runner, "update");
     project_update_sync.addArtifactArg(cli_exe);
     b.step("project-update-test", "upgrade and sync a legacy Native/Workers project safely").dependOn(&project_update_sync.step);
     const workers_capability_sync = b.addSystemCommand(&.{ "sh", "tests/workers_capability_sync.sh" });
@@ -276,37 +286,7 @@ pub fn build(b: *std.Build) void {
     const cloudflare_live_command = b.addSystemCommand(&.{ "node", "tests/cloudflare_live.mjs" });
     const cloudflare_live_step = b.step("cloudflare-live-test", "run opt-in live D1/R2 smoke tests");
     cloudflare_live_step.dependOn(&cloudflare_live_command.step);
-    const test_targets = [_][]const u8{
-        "tests/http_parser_test.zig",
-        "tests/dx_test.zig",
-        "tests/ws_frame_test.zig",
-        "tests/db_sqlite_test.zig",
-        "tests/d1_mock_test.zig",
-        "tests/jwt_test.zig",
-        "tests/bcrypt_test.zig",
-        "tests/mq_test.zig",
-        "tests/app_test.zig",
-        "tests/db_factory_test.zig",
-        "tests/model_schema_test.zig",
-        "tests/model_internal_test.zig",
-        "tests/openapi_test.zig",
-        "tests/testing_client_test.zig",
-        "tests/negotiate_test.zig",
-        "tests/etag_test.zig",
-        "tests/client_gen_test.zig",
-        "tests/jobs_test.zig",
-        "tests/observability_test.zig",
-        "tests/security_middleware_test.zig",
-        "tests/docs_examples_test.zig",
-        "tests/comptime_framework_test.zig",
-        "tests/portable_application_test.zig",
-        "examples/device_messaging/src/integration_test.zig",
-        "tests/mimoc_parts_improvements_test.zig",
-        "src/storage.zig",
-        "src/events.zig",
-        "src/realtime.zig",
-        "src/protocol_gen.zig",
-    };
+    const test_targets = @import("tests/unit_catalog.zig").paths;
 
     const integration_step = b.step("integration", "build integration test (manual run)");
     const integration_targets = [_][]const u8{
@@ -400,7 +380,7 @@ pub fn build(b: *std.Build) void {
         b.step("db-pool-profile", "measure bounded native pool saturation (after-only diagnostic)").dependOn(&b.addRunArtifact(pool_bench).step);
         const contract_server = b.addExecutable(.{ .name = "runtime-contract-server", .root_module = contract_mod });
         b.step("runtime-certify-fixture", "build private incremental session certification fixture").dependOn(&b.addInstallArtifact(contract_server, .{}).step);
-        const contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
+        const contract = testRunner(b, ci_runner, "transport");
         contract.addArtifactArg(contract_server);
         contract.addArg("--sharded");
         b.step("transport-contract-test", "run shared socket Contract on Threaded and host multiplexed Reactor").dependOn(&contract.step);
@@ -417,7 +397,7 @@ pub fn build(b: *std.Build) void {
         stress_full.addArtifactArg(contract_server);
         stress_full.addArgs(&.{ "--output", ".zig-cache/runtime-stress-full.json" });
         b.step("runtime-stress-full", "run full local runtime stress matrix").dependOn(&stress_full.step);
-        const isolation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_application_isolation.py" });
+        const isolation = testRunner(b, ci_runner, "isolation");
         isolation.addArtifactArg(contract_server);
         isolation.addArgs(&.{ "--sharded", "--output", ".zig-cache/runtime-application-isolation.json" });
         b.step("runtime-isolation-test", "require HTTP isolation from long-lived application execution (Phase 6 gate)").dependOn(&isolation.step);
@@ -426,11 +406,11 @@ pub fn build(b: *std.Build) void {
         session_validation.addArgs(&.{ "--adapters", "threaded", if (native_target.result.os.tag == .linux) "epoll" else "kqueue", "sharded" });
         session_validation.addArgs(&.{ "--idle-levels", "100", "--mixed-idle", "20", "--soak-seconds", "5", "--session-rounds", "10", "--output", ".zig-cache/runtime-session-validation.json" });
         b.step("runtime-session-test", "run bounded incremental stream/frame performance and lifecycle race validation (not long soak)").dependOn(&session_validation.step);
-        const isolation_evaluation = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_application_isolation.py" });
+        const isolation_evaluation = testRunner(b, ci_runner, "isolation");
         isolation_evaluation.addArtifactArg(contract_server);
         isolation_evaluation.addArgs(&.{ "--record-blockers", "--output", ".zig-cache/runtime-application-isolation.json" });
         b.step("runtime-isolation-evaluate", "record incomplete Phase 6 isolation and bounded admission without certification").dependOn(&isolation_evaluation.step);
-        const poc_contract = b.addSystemCommand(&.{ "python3", "tests/transport_contract.py" });
+        const poc_contract = testRunner(b, ci_runner, "transport");
         poc_contract.addArtifactArg(contract_server);
         poc_contract.addArgs(&.{ "--group", "--only-group" });
         poc_step.dependOn(&poc_contract.step);
@@ -441,22 +421,31 @@ pub fn build(b: *std.Build) void {
             .imports = &.{.{ .name = "akamata", .module = am_mod }},
         }) });
         documentation_step.dependOn(&minimal.step);
+        if (test_layout == .grouped) {
+            const grouped_mod = b.createModule(.{ .root_source_file = b.path("tests/unit_all.zig"), .target = native_target, .optimize = optimize, .imports = &.{.{ .name = "akamata", .module = am_mod }} });
+            grouped_mod.addOptions("build_options", opts);
+            test_step.dependOn(&b.addRunArtifact(b.addTest(.{ .root_module = grouped_mod })).step);
+        }
         inline for (test_targets) |tf| {
-            const t_mod = b.createModule(.{
-                .root_source_file = b.path(tf),
-                .target = native_target,
-                .optimize = optimize,
-                .imports = &.{.{ .name = "akamata", .module = am_mod }},
-            });
-            const t = b.addTest(.{ .root_module = t_mod });
-            // Standalone src tests can import synchronization/cost directly,
-            // outside the akamata module's dependency namespace.
-            t_mod.addOptions("build_options", opts);
-            const run_test = b.addRunArtifact(t);
-            test_step.dependOn(&run_test.step);
-            if (comptime std.mem.eql(u8, tf, "tests/dx_test.zig")) {
-                b.step("dx-test", "run developer API and documentation source contracts").dependOn(&run_test.step);
-                documentation_step.dependOn(&run_test.step);
+            const grouped = std.mem.startsWith(u8, tf, "tests/");
+            const is_docs = std.mem.eql(u8, tf, "tests/dx_test.zig");
+            if (test_layout == .isolated or !grouped or is_docs) {
+                const t_mod = b.createModule(.{
+                    .root_source_file = b.path(tf),
+                    .target = native_target,
+                    .optimize = optimize,
+                    .imports = &.{.{ .name = "akamata", .module = am_mod }},
+                });
+                const t = b.addTest(.{ .root_module = t_mod });
+                // Standalone src tests can import synchronization/cost directly,
+                // outside the akamata module's dependency namespace.
+                t_mod.addOptions("build_options", opts);
+                const run_test = b.addRunArtifact(t);
+                if (test_layout == .isolated or !grouped) test_step.dependOn(&run_test.step);
+                if (comptime std.mem.eql(u8, tf, "tests/dx_test.zig")) {
+                    b.step("dx-test", "run developer API and documentation source contracts").dependOn(&run_test.step);
+                    documentation_step.dependOn(&run_test.step);
+                }
             }
         }
         // CLI tests (parsing wrangler.toml, UUID extraction)
@@ -519,7 +508,7 @@ fn forceTestExecution(b: *std.Build, step: *std.Build.Step, visited: *std.AutoHa
     const entry = visited.getOrPut(step) catch @panic("OOM");
     if (entry.found_existing) return;
     if (step.cast(std.Build.Step.Run)) |run| {
-        if (run.stdio == .zig_test) run.has_side_effects = true;
+        if (run.stdio == .zig_test or run.stdio == .protocol) run.has_side_effects = true;
     }
     for (step.dependencies.items) |dependency| forceTestExecution(b, dependency, visited);
 }
@@ -528,6 +517,9 @@ fn testRunner(b: *std.Build, executable: *std.Build.Step.Compile, suite: []const
     const run = b.addRunArtifact(executable);
     run.addArg(suite);
     run.setEnvironmentVariable("ZIG", b.graph.zig_exe);
+    for ([_][]const u8{ "AKAMATA_DX_TSC", "AKAMATA_LIVING_REPORT", "AKAMATA_CI_TIMING_DIR", "AKAMATA_CI_RERUN_TESTS" }) |key| {
+        if (b.graph.environ_map.get(key)) |value| run.setEnvironmentVariable(key, value);
+    }
     run.has_side_effects = true;
     return run;
 }

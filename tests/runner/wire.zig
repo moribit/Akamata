@@ -12,7 +12,7 @@ fn socket() !c_int {
     const fd = std.c.socket(std.c.AF.INET, std.c.SOCK.STREAM, 0);
     if (fd < 0) return error.Socket;
     errdefer _ = std.c.close(fd);
-    _ = std.c.fcntl(fd, std.c.F.SETFD, @as(c_int, std.c.FD_CLOEXEC));
+    if (std.c.fcntl(fd, std.c.F.SETFD, @as(c_int, std.c.FD_CLOEXEC)) < 0) return error.CloseOnExec;
     if (builtin.os.tag == .macos) {
         const yes: c_int = 1;
         if (std.c.setsockopt(fd, std.c.SOL.SOCKET, std.c.SO.NOSIGPIPE, &yes, @sizeOf(c_int)) != 0) return error.SocketOption;
@@ -103,19 +103,23 @@ pub const Client = struct {
         return result;
     }
     pub fn response(c: *Client) !Response {
-        while (std.mem.indexOf(u8, c.pending.items, "\r\n\r\n") == null) try c.fill();
-        const end = std.mem.indexOf(u8, c.pending.items, "\r\n\r\n").?;
-        const head = try c.take(end + 4);
+        const head = try c.headers();
         var words = std.mem.tokenizeScalar(u8, head, ' ');
         _ = words.next();
         const status = try std.fmt.parseInt(u16, words.next() orelse return error.Status, 10);
         var length: usize = 0;
-        var headers = std.mem.splitSequence(u8, head, "\r\n");
-        while (headers.next()) |line| if (std.mem.indexOfScalar(u8, line, ':')) |colon| {
+        var header_lines = std.mem.splitSequence(u8, head, "\r\n");
+        while (header_lines.next()) |line| if (std.mem.indexOfScalar(u8, line, ':')) |colon| {
             if (std.ascii.eqlIgnoreCase(line[0..colon], "content-length")) length = try std.fmt.parseInt(usize, std.mem.trim(u8, line[colon + 1 ..], " \t"), 10);
         };
         if (length > 32 * 1024 * 1024) return error.ResponseLimit;
         return .{ .status = status, .head = head, .body = try c.take(length) };
+    }
+    pub fn headers(c: *Client) ![]const u8 {
+        while (std.mem.indexOf(u8, c.pending.items, "\r\n\r\n") == null) try c.fill();
+        const end = std.mem.indexOf(u8, c.pending.items, "\r\n\r\n").?;
+        if (end > 65536) return error.HeaderLimit;
+        return c.take(end + 4);
     }
     pub fn collect(c: *Client) ![]const u8 {
         var out: std.ArrayList(u8) = .empty;
@@ -138,7 +142,7 @@ pub const Client = struct {
         if (std.c.setsockopt(c.fd, std.c.SOL.SOCKET, std.c.SO.RCVBUF, &bytes, @sizeOf(c_int)) != 0) return error.SocketOption;
     }
     pub fn reset(c: *Client) !void {
-        const linger = std.c.linger{ .l_onoff = 1, .l_linger = 0 };
+        const linger = std.c.linger{ .onoff = 1, .linger = 0 };
         if (std.c.setsockopt(c.fd, std.c.SOL.SOCKET, std.c.SO.LINGER, &linger, @sizeOf(@TypeOf(linger))) != 0) return error.SocketOption;
         c.close();
     }

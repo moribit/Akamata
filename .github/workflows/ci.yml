@@ -40,11 +40,11 @@ jobs:
       matrix:
         job:
           - name: native-test
-            cmd: zig build test db-pool-test
+            cmd: zig build test db-pool-test -Dtest-layout=grouped
           - name: native-release-safe
-            cmd: zig build test documentation-test -Doptimize=ReleaseSafe
+            cmd: zig build test documentation-test -Doptimize=ReleaseSafe -Dtest-layout=grouped
           - name: native-openssl
-            cmd: zig build test -Dopenssl=true -Doptimize=ReleaseSafe --summary all
+            cmd: zig build test -Dopenssl=true -Doptimize=ReleaseSafe -Dtest-layout=grouped --summary all
           - name: native-integration
             cmd: zig build integration transport-contract-test runtime-poc-test
           - name: linux threaded + epoll contract
@@ -103,8 +103,10 @@ jobs:
           node-version: '24'
       - run: ./third_party/sqlite/fetch.sh
       - run: npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund
-      - run: python3 tests/living_examples.py
+      - run: zig build ci-runner
+      - run: ./zig-out/bin/akamata-tests living
         env:
+          ZIG: zig
           AKAMATA_LIVING_REPORT: ${{ github.workspace }}/.ci-evidence/living-examples.json
           AKAMATA_DX_TSC: /tmp/akamata-dx-ts/node_modules/typescript/lib/tsc.js
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -120,18 +122,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29
+        with:
+          version: 0.17.0
+          use-cache: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
       - run: node tools/docgen/build_slides.mjs
       - run: git diff --exit-code -- tools/docgen/slides.html tools/docgen/slides.ja.html
-      - run: python3 tests/documentation_links.py
-      - run: python3 -B tests/ci_timing_test.py
+      - run: zig build ci-runner
+      - run: ./zig-out/bin/akamata-tests docs
+      - run: ./zig-out/bin/akamata-tests support
       - name: Competitive benchmark evidence reporting contract
         run: python3 benchmark/competitive/scripts/test_reporting.py
-      - run: python3 -m venv /tmp/akamata-pdfcheck
-      - run: /tmp/akamata-pdfcheck/bin/pip install pypdf==6.19.0
-      - run: /tmp/akamata-pdfcheck/bin/python tests/public_slides.py
+      - name: PDF decoder (assertions run in Zig)
+        run: |
+          if ! command -v pdfinfo >/dev/null || ! command -v pdftotext >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends poppler-utils
+          fi
+      - run: ./zig-out/bin/akamata-tests slides
 
   dx-typescript:
     name: generated DX client strict typecheck
@@ -160,7 +171,7 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
-      - run: zig build test
+      - run: zig build test -Dtest-layout=grouped
       - run: zig build -Dexample=bench
       - run: zig build transport-contract-test runtime-poc-test runtime-stress-test runtime-isolation-test runtime-session-test -Doptimize=ReleaseSafe
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

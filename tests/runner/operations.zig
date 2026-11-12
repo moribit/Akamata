@@ -11,6 +11,21 @@ fn stop(_: std.posix.SIG) callconv(.c) void {
 /// They can only record local commands; they never run wrangler/docker/builds.
 pub fn mock(h: s.H, args: []const [:0]const u8) !bool {
     const name = std.fs.path.basename(args[0]);
+    if (std.mem.eql(u8, name, "zig")) {
+        if (h.env.get("AKAMATA_TEST_CHECKOUT")) |checkout| {
+            const zig = h.env.get("AKAMATA_TEST_ZIG") orelse return error.MissingRealCompiler;
+            var argv: std.ArrayList([]const u8) = .empty;
+            try argv.append(h.a, zig);
+            if (args.len > 1 and std.mem.eql(u8, args[1], "build")) {
+                try argv.appendSlice(h.a, &.{ "build", try h.fmt("--fork={s}", .{checkout}) });
+                for (args[2..]) |arg| try argv.append(h.a, arg);
+            } else for (args[1..]) |arg| try argv.append(h.a, arg);
+            const result = try h.command(argv.items, null, h.env);
+            try std.Io.File.stdout().writeStreamingAll(h.io, result.stdout);
+            try std.Io.File.stderr().writeStreamingAll(h.io, result.stderr);
+            std.process.exit(if (result.term == .exited) result.term.exited else 1);
+        }
+    }
     if (!std.mem.eql(u8, name, "zig") and !std.mem.eql(u8, name, "npx") and !std.mem.eql(u8, name, "docker") and !std.mem.eql(u8, name, "watch_app")) return false;
     const log_path = h.env.get("MOCK_LOG") orelse return error.MockLogMissing;
     const log = try std.Io.Dir.cwd().openFile(h.io, log_path, .{ .mode = .write_only });

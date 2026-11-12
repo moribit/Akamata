@@ -43,8 +43,8 @@ compiled minimal source and saved public benchmark raw data. `npm run build:slid
 regenerates HTML before both PDFs. It keeps the repository's green/amber ASCII
 branding and uses selectable text, embedded fonts and real PDF links.
 
-Verify committed PDF structure/links with `python tests/public_slides.py` in a
-venv containing `pypdf==6.19.0`, and render every page with Poppler for visual
+Verify committed PDF structure/links with `zig build ci-runner` followed by
+`./zig-out/bin/akamata-tests slides` (Poppler's `pdfinfo` and `pdftotext` must be installed), and render every page with Poppler for visual
 review. CI checks deterministic HTML regeneration and PDF links/page counts;
 it does not claim that those checks replace visual review.
 

@@ -2,6 +2,7 @@ zig-cache/
 zig-out/
 benchmark-results/
 .zig-cache/
+.zig-cache-ci-*/
 zig-pkg/
 .DS_Store
 *.db

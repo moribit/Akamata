@@ -1,0 +1,281 @@
+[
+  {
+    "file": "tests/http_parser_test.zig",
+    "test_names": [
+      "parses minimal GET request",
+      "parses POST with content-length body",
+      "extracts query string",
+      "header lookup is case-insensitive",
+      "returns Incomplete on truncated request",
+      "decodes chunked body",
+      "security regression corpus is rejected deterministically",
+      "random raw requests never panic or overrun"
+    ]
+  },
+  {
+    "file": "tests/dx_test.zig",
+    "test_names": [
+      "README source executes through the in-process client",
+      "application metadata generates schemas without initializing provider state",
+      "test storage owner asserts effects without changing Store",
+      "request failure releases staged test-client allocations",
+      "principal and mapped errors share a unique discriminator schema",
+      "typed route retains existing endpoint documentation and limits",
+      "ordinary functions use shared routing binding validation and responses",
+      "Context and existing App(State) remain explicit compatible escape hatches",
+      "typed parameter metadata matches actual binding",
+      "principal binding uses middleware and rejects absent or incorrectly typed identity",
+      "shared Native Workers developer application contract",
+      "client derives scalar responses and typed path and required query from endpoint metadata",
+      "ordinary multi-route typed application needs no caller branch quota",
+      "one endpoint error contract agrees across HTTP OpenAPI and TypeScript",
+      "complex DTO wire contracts share Native and Workers fixture"
+    ]
+  },
+  {
+    "file": "tests/ws_frame_test.zig",
+    "test_names": [
+      "accept key matches RFC example",
+      "encode small text frame",
+      "decode unmasked text frame",
+      "decode masked text frame unmasks payload",
+      "server decoder rejects unmasked and invalid control frames",
+      "handshake rejects malformed websocket key",
+      "decode returns null on incomplete frame",
+      "encode 126-length frame (extended payload)"
+    ]
+  },
+  {
+    "file": "tests/db_sqlite_test.zig",
+    "test_names": [
+      "open in-memory, insert, and read back",
+      "execAll runs multiple statements",
+      "execAll preserves semicolons in strings and trigger bodies",
+      "columnIsNull distinguishes SQL NULL from zero and empty text",
+      "model repository preserves optional NULL values",
+      "explicit transaction rolls back unless committed",
+      "database pool leases independent handles",
+      "byte arrays, pointers, and slices bind their complete value",
+      "pool exhaustion, absolute expiry, and stale release",
+      "pool release wakes acquisition and close wakes blocked borrowers",
+      "pool serializes concurrent borrowers without double lending",
+      "pool deinit joins waiters and outstanding leases before freeing handles",
+      "pool initialization failure retains caller ownership without leaks",
+      "pool gauges and wait timeout counts balance through close"
+    ]
+  },
+  {
+    "file": "tests/d1_mock_test.zig",
+    "test_names": [
+      "Value union round-trips through Db vtable",
+      "portable exec result and batch expose write metadata"
+    ]
+  },
+  {
+    "file": "tests/jwt_test.zig",
+    "test_names": [
+      "JWT HS256 sign and verify round-trip",
+      "JWT rejects wrong secret",
+      "JWT middleware enforces exp and nbf with injected clock",
+      "optional OpenSSL binding signs RSA SHA256 with the expected wire bytes"
+    ]
+  },
+  {
+    "file": "tests/bcrypt_test.zig",
+    "test_names": [
+      "bcrypt hash then verify"
+    ]
+  },
+  {
+    "file": "tests/mq_test.zig",
+    "test_names": [
+      "mq module exposes Publisher type"
+    ]
+  },
+  {
+    "file": "tests/app_test.zig",
+    "test_names": [
+      "App routes match and dispatch",
+      "App resolves :id path parameter",
+      "App returns 404 for unmatched route",
+      "basePath registers routes on the parent app",
+      "static routing handles trailing slash and paths over 256 bytes",
+      "route registration rejects conflicts and freezes after dispatch",
+      "HEAD falls back to GET and unsupported methods return 405 Allow",
+      "default 500 response hides internal error names",
+      "input treats non-optional fields as required without schema metadata",
+      "client IP ignores forwarding headers unless explicitly trusted",
+      "Query parameter accessor works",
+      "secureHeaders middleware injects default API-safe headers",
+      "compress middleware gzip-encodes large responses",
+      "compress skips below min_bytes",
+      "secureHeaders honors per-field opt-out",
+      "only the current App HTTP API is exported",
+      "App middleware wraps endpoint in registration order"
+    ]
+  },
+  {
+    "file": "tests/db_factory_test.zig",
+    "test_names": [
+      "am.db.open returns UnknownScheme for garbage URLs",
+      "am.db.open returns UnknownScheme for empty URL",
+      "am.db.open file: works on native and parses path correctly",
+      "am.db.open libsql:// returns a Db without hitting the network"
+    ]
+  },
+  {
+    "file": "tests/model_schema_test.zig",
+    "test_names": [
+      "am.model.tableDef: explicit table and unique index",
+      "am.model.tableDef: default table name + bool maps to integer"
+    ]
+  },
+  {
+    "file": "tests/model_internal_test.zig",
+    "test_names": []
+  },
+  {
+    "file": "tests/openapi_test.zig",
+    "test_names": [
+      "openapi.generate produces a spec with documented endpoints",
+      "OpenAPI rejects distinct schemas with the same short type name"
+    ]
+  },
+  {
+    "file": "tests/testing_client_test.zig",
+    "test_names": [
+      "test client: simple GET roundtrip",
+      "test client: path parameter capture",
+      "test client: JSON body",
+      "test client: bearer token",
+      "test client: response.json typed parse"
+    ]
+  },
+  {
+    "file": "tests/negotiate_test.zig",
+    "test_names": [
+      "ctx.negotiate picks JSON for Accept: application/json",
+      "ctx.negotiate picks HTML when client prefers text/*",
+      "ctx.negotiate returns 406 when no candidate matches"
+    ]
+  },
+  {
+    "file": "tests/etag_test.zig",
+    "test_names": [
+      "etag middleware sets ETag header on the first response",
+      "etag returns 304 when If-None-Match matches",
+      "etag honors wildcard If-None-Match: *"
+    ]
+  },
+  {
+    "file": "tests/client_gen_test.zig",
+    "test_names": [
+      "client_gen.typescript emits interfaces and functions",
+      "client_gen.zig fails closed until transport is implemented"
+    ]
+  },
+  {
+    "file": "tests/jobs_test.zig",
+    "test_names": [
+      "jobs: enqueue + worker drains pending row",
+      "jobs: unknown handler marks job as failed",
+      "jobs: schema is idempotent"
+    ]
+  },
+  {
+    "file": "tests/observability_test.zig",
+    "test_names": [
+      "request id, route template, DB timing, span, metrics and Server-Timing",
+      "disabled Server-Timing emits no header",
+      "phase counters share the existing exporter without request labels"
+    ]
+  },
+  {
+    "file": "tests/security_middleware_test.zig",
+    "test_names": [
+      "CSRF accepts an application-owned session verifier",
+      "CSRF dynamic origin helper matches the request Host",
+      "invalid response status cannot reach the wire",
+      "session expiry is signed, enforced server-side, and cleaned up",
+      "rate limiter bounds high-cardinality keys and evicts oldest",
+      "rate limiter state is isolated between App instances"
+    ]
+  },
+  {
+    "file": "tests/docs_examples_test.zig",
+    "test_names": [
+      "documented handler and websocket snippets compile"
+    ]
+  },
+  {
+    "file": "tests/comptime_framework_test.zig",
+    "test_names": [
+      "static graph and runtime registration have matching behavior",
+      "typed handler drives HTTP errors and inferred response",
+      "capability matrix distinguishes native and Workers",
+      "portable route metadata preserves typed endpoint schema and handler",
+      "DI graph emits dependency-first order",
+      "static middleware preserves declaration order",
+      "SQL descriptor validates placeholders and row types",
+      "static DB adapter dispatches directly to its concrete backend"
+    ]
+  },
+  {
+    "file": "tests/portable_application_test.zig",
+    "test_names": [
+      "portable application effects, typed HTTP and generated contract",
+      "filesystem and in-memory storage satisfy the same provider contract",
+      "owned storage pages clean up every allocation failure",
+      "short empty pages continue by cursor and reject a nonadvancing backend",
+      "native queue provider preserves envelopes and actual retry delivery",
+      "queue startup failure cleans partially initialized owner",
+      "partial application startup releases earlier DB and realtime owners",
+      "all page metadata survives adapter destruction with allocation-failure cleanup",
+      "filesystem pagination releases walker and page after allocation failure"
+    ]
+  },
+  {
+    "file": "examples/device_messaging/src/integration_test.zig",
+    "test_names": [
+      "reference production owners deliver queued reports and clean test effects"
+    ]
+  },
+  {
+    "file": "tests/mimoc_parts_improvements_test.zig",
+    "test_names": [
+      "randomHex supports runtime byte counts",
+      "portable utility surface is available",
+      "query builder and arbitrary DTO mapping"
+    ]
+  },
+  {
+    "file": "src/storage.zig",
+    "test_names": [
+      "download headers survive reader cleanup for HEAD and buffered GET",
+      "HTTP range and conditionals",
+      "portable object keys reject traversal"
+    ]
+  },
+  {
+    "file": "src/events.zig",
+    "test_names": [
+      "event descriptor and versioned protocol",
+      "protocol honors bounded application wire values"
+    ]
+  },
+  {
+    "file": "src/realtime.zig",
+    "test_names": [
+      "native room isolation, direct send, broadcast and presence",
+      "inbound events always pass through application handler",
+      "native transport callbacks execute outside registry lock"
+    ]
+  },
+  {
+    "file": "src/protocol_gen.zig",
+    "test_names": [
+      "generate TypeScript and C realtime clients",
+      "C generator preserves embedded bounds without heap metadata"
+    ]
+  }
+]
