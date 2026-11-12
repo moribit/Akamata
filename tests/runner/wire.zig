@@ -210,9 +210,15 @@ pub const Server = struct {
             server.h.sleep(5);
         }
         if (server.status.? != 0) {
-            std.debug.print("fixture exited {d}: {s}\n", .{ server.status.?, try server.h.read(server.log_path) });
+            std.debug.print("fixture exited code={d}, wait_status={d}: {s}\n", .{ server.exitCode() orelse -1, server.status.?, try server.h.read(server.log_path) });
             return error.FixtureExit;
         }
+    }
+    pub fn exitCode(server: *const Server) ?i32 {
+        const raw: u32 = @bitCast(server.status orelse return null);
+        if (std.c.W.IFEXITED(raw)) return std.c.W.EXITSTATUS(raw);
+        if (std.c.W.IFSIGNALED(raw)) return -@as(i32, @intCast(@backingInt(std.c.W.TERMSIG(raw))));
+        return null;
     }
     pub fn finish(server: *Server) !void {
         for (server.clients.items) |c| c.close();

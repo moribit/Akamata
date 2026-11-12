@@ -56,6 +56,11 @@ pub fn main(init: std.process.Init) !void {
         var server = try wire.Server.start(h, &.{ "sh", "-c", "exit 0" }, temp.path, null, port);
         defer server.deinit();
         try server.wait(1000);
+        try s.check(server.exitCode() == 0, "normal exit code preserved");
+        var failed_child = try wire.Server.start(h, &.{ "sh", "-c", "exit 7" }, temp.path, null, port);
+        defer failed_child.deinit();
+        const failed_wait = failed_child.wait(1000);
+        try s.check(failed_wait == error.FixtureExit and failed_child.exitCode() == 7, "wait status is decoded to the actual exit code");
         _ = wire.Client.connect(h, port) catch |err| {
             try s.check(err == error.ConnectionRefused, "bounded failed connect");
             return;

@@ -74,3 +74,20 @@ therefore rerun **by default**, independently of environment variables. Explicit
 still uses the ordinary Zig cache. Compiler selection is passed to the native
 driver as `--zig`, keeping runtime TS/timing/report settings out of cached Run
 environment snapshots.
+
+## Dependency transport reliability
+
+Final batching candidate `4ccebf7` passed 22/23 normal jobs in run
+`43218854054`; `cli-build` failed before compilation while fetching the pinned
+Codeberg aro source (`ProtocolError`). Linux TSan passed in `43218871134`;
+macOS TSan failed at the same dependency download, before instrumented tests.
+These failures are not recorded as passing tests or speed improvements.
+
+The follow-up caches only immutable translate-c/aro source directories, keyed by
+OS, Zig version and the dependency manifest. Generated projects share that source
+directory through `ZIG_LOCAL_PKG_DIR`. Cold downloads get at most three bounded
+attempts, and their package hashes must match the existing manifest pins. Tests
+and builds are never retried by this helper. Compiler outputs and test verdicts
+are excluded; the previously rejected compiler-cache experiment remains disabled.
+Local rehashing verified both pins, and the runner support test plus Linux
+cross-compilation passed after exit-status diagnostic normalization.

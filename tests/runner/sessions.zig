@@ -79,17 +79,20 @@ pub fn run(h: s.H, args: []const []const u8) !void {
                     };
                     try entry.fields.put(h.a, "failure_snapshot", snapshot);
                 };
+                var clean = true;
                 entry.finish(5000) catch |err| {
+                    clean = false;
                     failure = err;
                 };
-                try entry.put("clean", failure == null);
+                try entry.put("clean", clean);
                 const log = try h.read(entry.f.server.log_path);
                 for ([_][]const u8{ "RUNTIME_MEMORY ", "APPLICATION_MEMORY " }, [_][]const u8{ "runtime_memory", "application_memory" }) |marker, key| {
                     if (std.mem.indexOf(u8, log, marker) != null) try entry.fields.put(h.a, key, try e.stats(h, log, marker));
                 }
                 if (entry.fields.get("allocator")) |v| try entry.fields.put(h.a, "allocator_final", v);
                 if (entry.fields.get("sessions")) |v| try entry.fields.put(h.a, "sessions_final", v);
-                try entry.put("exit_code", entry.f.server.status orelse -1);
+                try entry.put("exit_code", entry.f.server.exitCode());
+                try entry.put("wait_status", entry.f.server.status);
                 if (failure != null) {
                     passed = false;
                     if (kind == .mixed) long_soak = false;

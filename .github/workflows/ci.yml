@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: '24'
       - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
       - run: zig build ci-runner competitive-bench competitive-micro-build db-optimization-bench -Doptimize=ReleaseFast
       - run: ./zig-out/bin/akamata-tests db-smoke zig-out/bin/db-optimization-bench
       - run: ./zig-out/bin/akamata-tests reporting
@@ -73,6 +74,8 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
+        if: matrix.job.name != 'package-archive' && !contains(matrix.job.cmd, '-Dbackend=workers')
       - run: ${{ matrix.job.cmd }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always() && matrix.job.name == 'linux threaded + epoll contract'
@@ -101,6 +104,7 @@ jobs:
         with:
           node-version: '24'
       - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
       - run: npm install --prefix /tmp/akamata-dx-ts typescript@5.9.3 --ignore-scripts --no-audit --no-fund
       - run: zig build ci-runner
       - run: ./zig-out/bin/akamata-tests living
@@ -170,6 +174,7 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
       - run: zig build test -Dtest-layout=grouped
       - run: zig build -Dexample=bench
       - run: zig build transport-contract-test runtime-poc-test runtime-stress-test runtime-isolation-test runtime-session-test -Doptimize=ReleaseSafe
@@ -193,6 +198,7 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
       - run: zig build cli ci-runner
       - run: zig build cli-operations-test
       - run: zig build cli-capabilities-test compile-fail-test workers-realtime-test workers-wasm-dispatch-test
@@ -220,6 +226,7 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
       - run: zig build -Dexample=chat -Dtarget=x86_64-linux-musl -Doptimize=ReleaseFast
       - run: docker build -f deploy/Dockerfile -t akamata-chat .
 
@@ -233,6 +240,7 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
       - run: zig build ci-runner install -Dexample=bench -Doptimize=ReleaseSafe
       - run: ./zig-out/bin/akamata-tests adversarial zig-out/bin/bench
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

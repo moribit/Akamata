@@ -16,6 +16,7 @@ jobs:
           version: 0.17.0
           use-cache: false
       - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
       - name: Instrumented Contract, isolation and lifecycle races
         shell: bash
         run: |
