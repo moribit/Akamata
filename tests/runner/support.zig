@@ -11,6 +11,20 @@ pub const H = struct {
     pub fn read(h: H, path: []const u8) ![]u8 {
         return std.Io.Dir.cwd().readFileAlloc(h.io, path, h.a, .limited(64 * 1024 * 1024));
     }
+    pub fn sha256(h: H, path: []const u8) ![64]u8 {
+        const file = try std.Io.Dir.cwd().openFile(h.io, path, .{});
+        defer file.close(h.io);
+        var buffer: [64 * 1024]u8 = undefined;
+        var reader_buffer: [4096]u8 = undefined;
+        var reader = file.readerStreaming(h.io, &reader_buffer);
+        var hash = std.crypto.hash.sha2.Sha256.init(.{});
+        while (true) {
+            const count = try reader.interface.readSliceShort(&buffer);
+            if (count == 0) break;
+            hash.update(buffer[0..count]);
+        }
+        return std.fmt.bytesToHex(hash.finalResult(), .lower);
+    }
     pub fn write(h: H, path: []const u8, data: []const u8) !void {
         if (std.fs.path.dirname(path)) |parent| try std.Io.Dir.cwd().createDirPath(h.io, parent);
         try std.Io.Dir.cwd().writeFile(h.io, .{ .sub_path = path, .data = data });

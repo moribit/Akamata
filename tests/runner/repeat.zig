@@ -30,8 +30,7 @@ pub fn run(h: s.H, args: []const []const u8) !void {
     if (repeats < 1 or repeats > 100) return error.InvalidRepeatCount;
     const target = adapter orelse return error.MissingAdapter;
     const path = output orelse return error.MissingOutput;
-    var digest: [32]u8 = undefined;
-    std.crypto.hash.sha2.Sha256.hash(try h.read(binary), &digest, .{});
+    const digest = try h.sha256(binary);
     var runs: std.ArrayList(Row) = .empty;
     for (0..repeats) |index| {
         var diagnostic: transport.Diagnostic = .{};
@@ -42,7 +41,7 @@ pub fn run(h: s.H, args: []const []const u8) !void {
         try runs.append(h.a, .{ .repeat = index + 1, .passed = failure == null, .failure = if (failure) |err| @errorName(err) else null, .diagnostic = diagnostic });
         try h.write(path, try h.encode(.{
             .platform = @tagName(builtin.os.tag),
-            .binary_sha256 = std.fmt.bytesToHex(digest, .lower),
+            .binary_sha256 = digest,
             .adapter = target,
             .test_name = try h.fmt("test_{s}", .{@tagName(selected)}),
             .requested_repeats = repeats,

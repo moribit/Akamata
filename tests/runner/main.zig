@@ -20,6 +20,12 @@ pub fn main(init: std.process.Init) !void {
         const file = try temp.file("sample");
         try h.write(file, "sample");
         try s.eq(try h.read(file), "sample");
+        try s.eq(&try h.sha256(file), "af2bdbe1aa9b6ec1e2ade1d694f41fc71a831d0268e9891562113d8a62add1bf");
+        const large_path = try temp.file("large-artifact");
+        const large = try std.Io.Dir.cwd().createFile(h.io, large_path, .{});
+        try large.setLength(h.io, 64 * 1024 * 1024 + 1);
+        large.close(h.io);
+        _ = try h.sha256(large_path); // ELF Debug artifacts can exceed the text-read limit.
         const failure = try h.command(&.{ "sh", "-c", "printf diagnostic; exit 7" }, temp.path, null);
         try s.check(!s.success(failure.term), "nonzero command rejected");
         try s.eq(failure.stdout, "diagnostic");
@@ -59,5 +65,7 @@ pub fn main(init: std.process.Init) !void {
     if (std.mem.eql(u8, args[1], "living")) return @import("living.zig").run(h);
     if (std.mem.eql(u8, args[1], "update")) return @import("update.zig").run(h, args[2]);
     if (std.mem.eql(u8, args[1], "isolation")) return @import("isolation.zig").run(h, args[2..]);
+    if (std.mem.eql(u8, args[1], "limit-exec")) return @import("resources.zig").execLimited(h, args[2..]);
+    if (std.mem.eql(u8, args[1], "stress")) return @import("stress.zig").run(h, args[2..]);
     return error.UnknownTestSuite;
 }

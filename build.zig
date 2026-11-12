@@ -389,11 +389,11 @@ pub fn build(b: *std.Build) void {
         const poc_unit = b.addTest(.{ .root_module = contract_mod });
         poc_step.dependOn(&b.addRunArtifact(poc_unit).step);
         b.step("runtime-contract-unit", "run lifecycle, allocation and bounded-output fault tests").dependOn(&b.addRunArtifact(poc_unit).step);
-        const stress = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_stress.py" });
+        const stress = testRunner(b, ci_runner, "stress");
         stress.addArtifactArg(contract_server);
         stress.addArgs(&.{ "--quick", "--sharded", "--output", ".zig-cache/runtime-stress.json" });
         b.step("runtime-stress-test", "run bounded CI stress and production-gate evidence").dependOn(&stress.step);
-        const stress_full = b.addSystemCommand(&.{ "python3", "tools/bench/runtime_stress.py" });
+        const stress_full = testRunner(b, ci_runner, "stress");
         stress_full.addArtifactArg(contract_server);
         stress_full.addArgs(&.{ "--output", ".zig-cache/runtime-stress-full.json" });
         b.step("runtime-stress-full", "run full local runtime stress matrix").dependOn(&stress_full.step);

@@ -44,8 +44,13 @@ pub const Fixture = struct {
     server: w.Server,
     adapter: []const u8,
     pub fn start(h: s.H, binary: []const u8, adapter: []const u8, profile: []const u8, incremental: bool) !Fixture {
+        return startLimited(h, binary, adapter, profile, incremental, null);
+    }
+    pub fn startLimited(h: s.H, binary: []const u8, adapter: []const u8, profile: []const u8, incremental: bool, fd_limit: ?u64) !Fixture {
         const port = try w.freePort();
-        var result: Fixture = .{ .adapter = adapter, .server = try w.Server.start(h, &.{ binary, adapter, try h.fmt("{d}", .{port}), if (incremental) try h.fmt("incremental-{s}", .{profile}) else profile }, null, null, port) };
+        const options = [_][]const u8{ binary, adapter, try h.fmt("{d}", .{port}), if (incremental) try h.fmt("incremental-{s}", .{profile}) else profile };
+        const argv: []const []const u8 = if (fd_limit) |limit| &.{ h.self, "limit-exec", try h.fmt("{d}", .{limit}), options[0], options[1], options[2], options[3] } else &options;
+        var result: Fixture = .{ .adapter = adapter, .server = try w.Server.start(h, argv, null, null, port) };
         errdefer result.server.deinit();
         var ready = false;
         for (0..100) |_| {

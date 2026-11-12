@@ -21,12 +21,15 @@ Python test assertions/orchestration migrate to the native Zig runner. Actual Ja
 - Project update/sync: old v0.1.0 fixture, dry-run immutability, edited managed-file refusal, backup/force recovery, application-owned markers, Native/Workers build and template version rejection.
 - Living path: 59 commands with strict TypeScript checks, eight Native example builds, six application-test target invocations, four real Workers WASM/JSPI hosts, protocol TS/C output, migration history, two-peer Native WebSocket/persistence and documentation/source equality checks. SQLite host is Zig with the repository's bundled SQLite, not Python sqlite3.
 - Application isolation: Threaded/kqueue/sharded, held upgrades/slow streams, admission overflow/recovery, bounded I/O drain and zero allocator/session leaks. Repeated sanitizer case checkpoints retain binary hash and live failure diagnostics.
+- Stress: all 24 quick scenarios across Threaded/kqueue/sharded passed locally, including concurrent pipeline/reset churn, slowloris, 512 KiB partial echo, stream/upgrade errors, slow-reader forced drain, latency probes, isolation, and a child-only RLIMIT_NOFILE=64 accept-exhaustion/recovery test. Resource/allocator/session samples are retained. Each parallel client has its own allocator; all threads join before result inspection.
 
 The driver uses a fixed Native Debug build so application Debug/ReleaseSafe and WASM builds do not multiply driver compilation. No application build mode is removed.
 
 ## Pending
 
-Stress/session certification, benchmark reporting guards, remaining workflow wiring and hosted before/after measurements are still in progress. Python transport support remains only while the stress/session callers depend on it. Historical evidence commands are historical records, not instructions for the current runner.
+Session certification, benchmark reporting guards, remaining workflow wiring and hosted before/after measurements are still in progress. Python transport support remains only while the session caller depends on it. Historical evidence commands are historical records, not instructions for the current runner.
+
+First hosted run `43210370724` found Linux Debug example ELF files exceeding the test helper's 64 MiB text-read cap during artifact hashing. The application build itself passed. Hashing now streams fixed-size blocks and has a >64 MiB sparse-file regression check; the cap remains for textual test inputs. Cross-compilation of the complete runner to x86_64-linux-musl succeeds; actual hosted tests are still required.
 
 ## Shared compilation experiment
 

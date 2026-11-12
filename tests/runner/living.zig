@@ -134,7 +134,5 @@ fn typecheck(r: *Recorder, path: []const u8) !void {
     if (r.h.env.get("AKAMATA_DX_TSC")) |compiler| _ = try r.run(&.{ "node", compiler, "--strict", "--noEmit", "--target", "ES2022", "--lib", "ES2022,DOM", path });
 }
 fn sha(h: s.H, path: []const u8) ![]const u8 {
-    var digest: [32]u8 = undefined;
-    std.crypto.hash.sha2.Sha256.hash(try h.read(path), &digest, .{});
-    return h.a.dupe(u8, &std.fmt.bytesToHex(digest, .lower));
+    return h.a.dupe(u8, &try h.sha256(path));
 }

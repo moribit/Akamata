@@ -10,10 +10,8 @@ pub const Report = struct {
     runs: std.json.Array,
     pub fn init(h: s.H, path: []const u8, binary: []const u8, scope: []const u8) !Report {
         var r: Report = .{ .h = h, .path = path, .runs = .init(h.a) };
-        var digest: [32]u8 = undefined;
-        std.crypto.hash.sha2.Sha256.hash(try h.read(binary), &digest, .{});
         try r.put("platform", @tagName(builtin.os.tag));
-        try r.put("binary_sha256", std.fmt.bytesToHex(digest, .lower));
+        try r.put("binary_sha256", try h.sha256(binary));
         try r.put("scope", scope);
         return r;
     }
@@ -29,7 +27,10 @@ pub const Entry = struct {
     f: t.Fixture,
     fields: std.json.ObjectMap = .empty,
     pub fn init(h: s.H, binary: []const u8, adapter: []const u8, name: []const u8, profile: []const u8) !Entry {
-        var e: Entry = .{ .f = try t.Fixture.start(h, binary, adapter, profile, false) };
+        return initLimited(h, binary, adapter, name, profile, null);
+    }
+    pub fn initLimited(h: s.H, binary: []const u8, adapter: []const u8, name: []const u8, profile: []const u8, fd_limit: ?u64) !Entry {
+        var e: Entry = .{ .f = try t.Fixture.startLimited(h, binary, adapter, profile, false, fd_limit) };
         errdefer e.f.deinit();
         try e.put("adapter", adapter);
         try e.put("scenario", name);
