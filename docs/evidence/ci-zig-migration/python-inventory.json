@@ -1,0 +1,142 @@
+[
+  {
+    "source": "tests/documentation_links.py",
+    "lines": 22,
+    "test_functions": []
+  },
+  {
+    "source": "tests/public_slides.py",
+    "lines": 35,
+    "test_functions": []
+  },
+  {
+    "source": "tests/cli_operations_smoke.py",
+    "lines": 119,
+    "test_functions": []
+  },
+  {
+    "source": "tests/cli_capabilities_smoke.py",
+    "lines": 108,
+    "test_functions": []
+  },
+  {
+    "source": "tests/transport_contract.py",
+    "lines": 685,
+    "test_functions": [
+      "test_partial_upgrade_budget_survives_external_broadcast",
+      "test_application_execution_capability_is_explicit",
+      "test_fragment_control_utf8_and_invalid_upgrade_cleanup",
+      "test_application_isolation_with_active_idle_upgrades_and_slow_streams",
+      "test_normal_request_and_disconnect",
+      "test_large_keep_alive_body_does_not_wait_for_next_request",
+      "test_malformed_and_transfer_encoding",
+      "test_header_and_body_limits",
+      "test_keep_alive_multiple_and_request_limit",
+      "test_pipeline_and_buffer_residue",
+      "test_partial_request_and_partial_next_header",
+      "test_chunked_request",
+      "test_idle_timeout",
+      "test_trickle_does_not_reset_header_deadline",
+      "test_shutdown_with_partial_request",
+      "test_header_body_and_total_timeout",
+      "test_stream_and_stream_error",
+      "test_upgrade_ownership",
+      "test_fixed_length_stream_and_truncation",
+      "test_peer_and_trusted_proxy",
+      "test_upgrade_preserves_coalesced_frame",
+      "test_max_connections_overload_and_recovery",
+      "test_backpressure_does_not_starve_other_connections",
+      "test_graceful_shutdown_and_idle_connections",
+      "test_shutdown_drains_inflight_response",
+      "test_absolute_write_deadline_slow_reader",
+      "test_stream_write_deadline_while_producer_pauses",
+      "test_zero_write_budget_permits_no_socket_output",
+      "test_upgrade_hub_snapshot_disconnect_ownership",
+      "test_forced_drain_slow_writer_and_repeated_signal",
+      "test_forced_drain_partial_request",
+      "test_forced_drain_upgraded_connection",
+      "test_upgraded_writer_forced_drain_and_disconnect",
+      "test_handler_and_stream_outlive_grace_without_preemption"
+    ]
+  },
+  {
+    "source": "tools/bench/runtime_stress.py",
+    "lines": 195,
+    "test_functions": []
+  },
+  {
+    "source": "tools/bench/runtime_application_isolation.py",
+    "lines": 170,
+    "test_functions": []
+  },
+  {
+    "source": "tools/bench/runtime_certify.py",
+    "lines": 375,
+    "test_functions": []
+  },
+  {
+    "source": "tools/bench/runtime_contract_repeat.py",
+    "lines": 56,
+    "test_functions": []
+  },
+  {
+    "source": "tests/living_examples.py",
+    "lines": 123,
+    "test_functions": []
+  },
+  {
+    "source": "tests/living_chat.py",
+    "lines": 111,
+    "test_functions": []
+  },
+  {
+    "source": "tests/minimal_scaffold.py",
+    "lines": 74,
+    "test_functions": []
+  },
+  {
+    "source": "tests/public_journey.py",
+    "lines": 84,
+    "test_functions": []
+  },
+  {
+    "source": "tests/ci_timing_test.py",
+    "lines": 50,
+    "test_functions": [
+      "test_exit_status_and_output_are_preserved",
+      "test_checked_failure_is_recorded",
+      "test_living_failure_saves_partial_evidence"
+    ]
+  },
+  {
+    "source": "benchmark/db-optimization/test_reporting.py",
+    "lines": 73,
+    "test_functions": [
+      "test_complete_micro",
+      "test_missing_micro",
+      "test_duplicate_micro",
+      "test_micro_error",
+      "test_micro_lost_row",
+      "test_complete_http",
+      "test_missing_http",
+      "test_duplicate_http",
+      "test_wrong_order_http",
+      "test_failed_attempt_is_retained"
+    ]
+  },
+  {
+    "source": "benchmark/competitive/scripts/test_reporting.py",
+    "lines": 129,
+    "test_functions": [
+      "test_zap_cleanup_respects_payload_owner_window_and_links",
+      "test_full_matrix_comparison_keeps_errors",
+      "test_matrix_rejects_missing_duplicate_and_drift",
+      "test_disk_reserve_fails_before_case_admission",
+      "test_interrupted_owner_reaps_its_load_generator",
+      "test_runtime_diagnostics_preserve_unknown_counters",
+      "test_all_rounds_and_failures_remain_visible",
+      "test_calibration_rejects_unequal_connection_split",
+      "test_idle_rejects_unsafe_connection_count"
+    ]
+  }
+]

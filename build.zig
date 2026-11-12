@@ -39,7 +39,20 @@ pub fn build(b: *std.Build) void {
     });
 
     const documentation_step = b.step("documentation-test", "compile README source and run documentation application contracts");
-    const documentation_links = b.addSystemCommand(&.{ "python3", "tests/documentation_links.py" });
+    // Test orchestration is Native Zig even when the application target is WASM.
+    // Its fixed Debug mode avoids recompiling the harness for every app mode.
+    const ci_runner = b.addExecutable(.{ .name = "akamata-tests", .root_module = b.createModule(.{
+        .root_source_file = b.path("tests/runner/main.zig"),
+        .target = native_target,
+        .optimize = .Debug,
+        .link_libc = true,
+    }) });
+    b.step("ci-runner", "build Native Zig test orchestration").dependOn(&b.addInstallArtifact(ci_runner, .{}).step);
+    const ci_run = b.addRunArtifact(ci_runner);
+    ci_run.addPassthruArgs();
+    ci_run.setEnvironmentVariable("ZIG", b.graph.zig_exe);
+    b.step("ci-test", "run a Native Zig contract suite").dependOn(&ci_run.step);
+    const documentation_links = testRunner(b, ci_runner, "docs");
     documentation_step.dependOn(&documentation_links.step);
     const opts = b.addOptions();
     opts.addOption(Backend, "backend", backend);
@@ -239,10 +252,10 @@ pub fn build(b: *std.Build) void {
     workers_capability_sync.addArtifactArg(cli_exe);
     b.step("workers-capability-sync-test", "preserve Workers capabilities while regenerating managed glue").dependOn(&workers_capability_sync.step);
 
-    const cli_operations = b.addSystemCommand(&.{ "python3", "tests/cli_operations_smoke.py" });
+    const cli_operations = testRunner(b, ci_runner, "operations");
     cli_operations.addArtifactArg(cli_exe);
     b.step("cli-operations-test", "verify external CLI contracts without deployment").dependOn(&cli_operations.step);
-    const cli_capabilities = b.addSystemCommand(&.{ "python3", "tests/cli_capabilities_smoke.py" });
+    const cli_capabilities = testRunner(b, ci_runner, "capabilities");
     cli_capabilities.addArtifactArg(cli_exe);
     b.step("cli-capabilities-test", "validate portable capability inspection without external services").dependOn(&cli_capabilities.step);
 
@@ -509,4 +522,12 @@ fn forceTestExecution(b: *std.Build, step: *std.Build.Step, visited: *std.AutoHa
         if (run.stdio == .zig_test) run.has_side_effects = true;
     }
     for (step.dependencies.items) |dependency| forceTestExecution(b, dependency, visited);
+}
+
+fn testRunner(b: *std.Build, executable: *std.Build.Step.Compile, suite: []const u8) *std.Build.Step.Run {
+    const run = b.addRunArtifact(executable);
+    run.addArg(suite);
+    run.setEnvironmentVariable("ZIG", b.graph.zig_exe);
+    run.has_side_effects = true;
+    return run;
 }
