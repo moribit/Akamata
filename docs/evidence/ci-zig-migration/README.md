@@ -91,3 +91,12 @@ and builds are never retried by this helper. Compiler outputs and test verdicts
 are excluded; the previously rejected compiler-cache experiment remains disabled.
 Local rehashing verified both pins, and the runner support test plus Linux
 cross-compilation passed after exit-status diagnostic normalization.
+
+The first cold hosted trial (`7dc5f33`, run `43222536489`) exposed a bootstrap
+bug: `zig fetch --pkg-dir` without `--save` only filled the global archive cache,
+so reading the local package manifest failed. Warm local verification had missed
+this. The fix uses `--save` with a private scratch **build.zig and manifest**;
+Zig locates its build root using build.zig. A genuinely empty local/global cache
+in `/tmp` then fetched both exact pins, materialized both directories and left
+the original manifest byte-for-byte unchanged. This failed trial is excluded
+from speed claims; it does not represent a framework/test failure.
