@@ -1,6 +1,6 @@
 # Akamata
 
-![Akamata ASCII art hero](assets/branding/akamata-ascii-hero.png)
+![Akamata — One application. Native or edge.](assets/branding/akamata-hero.png)
 
 [日本語](README.ja.md) | English
 
