@@ -21,6 +21,8 @@ pub fn main(init: std.process.Init) !void {
     try init.environ_map.put("AKAMATA_TEST_SUITE", args[1]);
     const h: s.H = .{ .a = a, .io = init.io, .env = init.environ_map, .self = try std.Io.Dir.cwd().realPathFileAlloc(init.io, args[0], a) };
     if (std.mem.eql(u8, args[1], "docs")) return @import("documents.zig").links(h);
+    if (std.mem.eql(u8, args[1], "simd")) return @import("simd.zig").run(h, args[2..]);
+    if (std.mem.eql(u8, args[1], "simd-http")) return @import("simd_http.zig").run(h, args[2..]);
     if (std.mem.eql(u8, args[1], "slides")) return @import("documents.zig").slides(h);
     if (std.mem.eql(u8, args[1], "support")) {
         const temp = try h.temp();

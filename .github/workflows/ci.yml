@@ -25,6 +25,7 @@ jobs:
       - run: ./third_party/sqlite/fetch.sh
       - uses: ./.github/actions/zig-dependencies
       - run: zig build ci-runner competitive-bench competitive-micro-build db-optimization-bench -Doptimize=ReleaseFast
+      - run: zig build simd-evaluation-test -Doptimize=ReleaseSafe
       - run: ./zig-out/bin/akamata-tests db-smoke zig-out/bin/db-optimization-bench
       - run: ./zig-out/bin/akamata-tests reporting
       - run: zig build db-optimization-bench -Doptimize=ReleaseSafe -Ddb-diagnostics=true
@@ -229,6 +230,42 @@ jobs:
       - uses: ./.github/actions/zig-dependencies
       - run: zig build -Dexample=chat -Dtarget=x86_64-linux-musl -Doptimize=ReleaseFast
       - run: docker build -f deploy/Dockerfile -t akamata-chat .
+
+  simd-evidence:
+    name: SIMD evidence (${{ matrix.os }})
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29
+        with:
+          version: 0.17.0
+          use-cache: false
+      - run: ./third_party/sqlite/fetch.sh
+      - uses: ./.github/actions/zig-dependencies
+      - run: zig build simd-evaluation-test -Doptimize=ReleaseSafe
+      - run: zig build simd-evaluation-build ci-runner -Doptimize=ReleaseFast -p /tmp/akamata-simd-fast
+      - run: zig build simd-evaluation-build -Doptimize=ReleaseSafe -p /tmp/akamata-simd-safe
+      - name: Record environment and independent samples
+        shell: bash
+        run: |
+          mkdir -p /tmp/simd-evidence
+          git rev-parse HEAD > /tmp/simd-evidence/environment.txt
+          zig version >> /tmp/simd-evidence/environment.txt
+          uname -a >> /tmp/simd-evidence/environment.txt
+          if command -v lscpu >/dev/null; then lscpu >> /tmp/simd-evidence/environment.txt; else sysctl -n machdep.cpu.brand_string >> /tmp/simd-evidence/environment.txt; fi
+          /tmp/akamata-simd-fast/bin/akamata-tests simd /tmp/akamata-simd-fast/bin/simd-evaluation /tmp/akamata-simd-safe/bin/simd-evaluation /tmp/simd-evidence
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: simd-evidence-${{ matrix.os }}
+          path: /tmp/simd-evidence/
+          if-no-files-found: error
 
   http-fuzz:
     name: adversarial HTTP smoke

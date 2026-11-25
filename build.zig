@@ -25,6 +25,21 @@ pub fn build(b: *std.Build) void {
     const runtime_cost = b.option(bool, "runtime-cost", "private Native runtime cost attribution (not performance benchmark)") orelse false;
 
     const native_target = b.standardTargetOptions(.{});
+    const simd_mod = b.createModule(.{ .root_source_file = b.path("src/simd_evaluation.zig"), .target = native_target, .optimize = optimize, .link_libc = true });
+    const simd_exe = b.addExecutable(.{ .name = "simd-evaluation", .root_module = simd_mod });
+    b.step("simd-evaluation-build", "build private offline SIMD candidate experiments").dependOn(&b.addInstallArtifact(simd_exe, .{}).step);
+    const simd_test = b.addTest(.{ .root_module = b.createModule(.{ .root_source_file = b.path("src/simd_candidates.zig"), .target = native_target, .optimize = optimize, .link_libc = true }) });
+    b.step("simd-evaluation-test", "differential tests for private SIMD candidates").dependOn(&b.addRunArtifact(simd_test).step);
+    const simd_codegen = b.addObject(.{ .name = "simd-codegen", .root_module = b.createModule(.{ .root_source_file = b.path("src/simd_codegen.zig"), .target = native_target, .optimize = optimize, .strip = true }), .use_llvm = true });
+    const simd_codegen_step = b.step("simd-codegen", "emit private candidate assembly for the selected target");
+    simd_codegen_step.dependOn(&b.addInstallFile(simd_codegen.getEmittedAsm(), "simd-codegen.s").step);
+    simd_codegen_step.dependOn(&b.addInstallFile(simd_codegen.getEmittedBin(), "simd-codegen.o").step);
+    if (native_target.result.cpu.arch == .wasm32) {
+        const probe = b.addExecutable(.{ .name = "simd-wasm-probe", .root_module = simd_codegen.root_module, .use_llvm = true });
+        probe.entry = .disabled;
+        probe.rdynamic = true;
+        b.step("simd-wasm-probe", "build standalone private Wasm instruction probe").dependOn(&b.addInstallArtifact(probe, .{}).step);
+    }
     const target = switch (backend) {
         .native => native_target,
         .workers => b.resolveTargetQuery(.{
