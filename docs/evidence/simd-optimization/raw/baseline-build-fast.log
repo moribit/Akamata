@@ -1,0 +1,30 @@
+typed_event_encode ns/op=174
+broadcast connections=1 ns/op=198
+broadcast connections=10 ns/op=291
+broadcast connections=100 ns/op=1003
+ALLOCATION_PHASE {"phase":"parse","calls":1,"requested":896}
+ALLOCATION_PHASE {"phase":"route_and_empty_handler","calls":0,"requested":0}
+ALLOCATION_PHASE {"phase":"route_with_passthrough_middleware","calls":0,"requested":0}
+ALLOCATION_PHASE {"phase":"header","calls":1,"requested":160}
+ALLOCATION_PHASE {"phase":"static_body_copy","calls":1,"requested":150}
+ALLOCATION_PHASE {"phase":"json_header_and_body","calls":2,"requested":291}
+ALLOCATION_PHASE {"phase":"cursor_and_write","heap_calls":0}
+ALLOCATION_PHASE {"phase":"warm_json_1000","heap_calls":0}
+       40.06 real       108.44 user         3.24 sys
+           851230720  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              469337  page reclaims
+                2753  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                2913  voluntary context switches
+              133621  involuntary context switches
+          1276136866  instructions retired
+           611069316  cycles elapsed
+             5505528  peak memory footprint
