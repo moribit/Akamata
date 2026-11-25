@@ -9,16 +9,17 @@ pub fn containsFieldControl(bytes: []const u8) bool {
         const ch = bytes[0];
         return (ch < 32 and ch != '\t') or ch == 127;
     }
-    var i: usize = 0;
+    var rest = bytes;
     if (comptime std.simd.suggestVectorLength(u8) != null) {
         const V = @Vector(16, u8);
-        while (bytes.len - i >= 16) : (i += 16) {
-            const v: V = bytes[i..][0..16].*;
+        while (rest.len >= 16) {
+            const v: V = rest[0..16].*;
             const forbidden = ((v < @as(V, @splat(32))) & (v != @as(V, @splat('\t')))) | (v == @as(V, @splat(127)));
             if (@reduce(.Or, forbidden)) return true;
+            rest = rest[16..];
         }
     }
-    return scalar(bytes[i..]);
+    return scalar(rest);
 }
 
 fn scalar(bytes: []const u8) bool {
