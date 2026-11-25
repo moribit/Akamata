@@ -4,6 +4,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      simd_evidence:
+        description: Collect independent SIMD timings on Linux and macOS
+        type: boolean
+        default: false
 
 # Compile outputs may be cached; test verdicts rerun by default.
 env:
@@ -233,7 +238,7 @@ jobs:
 
   simd-evidence:
     name: SIMD evidence (${{ matrix.os }})
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.simd_evidence
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     strategy:

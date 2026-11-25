@@ -28,6 +28,8 @@ pub fn build(b: *std.Build) void {
     const simd_mod = b.createModule(.{ .root_source_file = b.path("src/simd_evaluation.zig"), .target = native_target, .optimize = optimize, .link_libc = true });
     const simd_exe = b.addExecutable(.{ .name = "simd-evaluation", .root_module = simd_mod });
     b.step("simd-evaluation-build", "build private offline SIMD candidate experiments").dependOn(&b.addInstallArtifact(simd_exe, .{}).step);
+    const simd_followup = b.addExecutable(.{ .name = "simd-followup", .root_module = b.createModule(.{ .root_source_file = b.path("src/simd_followup_evaluation.zig"), .target = native_target, .optimize = optimize, .link_libc = true }) });
+    b.step("simd-followup-build", "build exact field and Form decomposition experiments").dependOn(&b.addInstallArtifact(simd_followup, .{}).step);
     const simd_test = b.addTest(.{ .root_module = b.createModule(.{ .root_source_file = b.path("src/simd_candidates.zig"), .target = native_target, .optimize = optimize, .link_libc = true }) });
     b.step("simd-evaluation-test", "differential tests for private SIMD candidates").dependOn(&b.addRunArtifact(simd_test).step);
     const simd_codegen = b.addObject(.{ .name = "simd-codegen", .root_module = b.createModule(.{ .root_source_file = b.path("src/simd_codegen.zig"), .target = native_target, .optimize = optimize, .strip = true }), .use_llvm = true });

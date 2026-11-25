@@ -11,7 +11,8 @@ const Group = struct {
 };
 
 pub fn run(h: s.H, args: []const []const u8) !void {
-    if (args.len != 3) return error.ExpectedFastBinarySafeBinaryOutputDirectory;
+    if (args.len != 3 and args.len != 4) return error.ExpectedFastBinarySafeBinaryOutputDirectory;
+    const expected_cases = if (args.len == 4) try std.fmt.parseInt(usize, args[3], 10) else 800;
     // Each process performs its own warmup, then one retained sample per case.
     // Existing complete files allow safe resumption after an interrupted run.
     for (0..10) |index| {
@@ -29,10 +30,10 @@ pub fn run(h: s.H, args: []const []const u8) !void {
             std.debug.print("SIMD independent process {s} {d}/10 completed\n", .{ name, index + 1 });
         }
     }
-    for ([_][]const u8{ "fast", "safe" }) |name| try summarize(h, args[2], name);
+    for ([_][]const u8{ "fast", "safe" }) |name| try summarize(h, args[2], name, expected_cases);
 }
 
-fn summarize(h: s.H, directory: []const u8, name: []const u8) !void {
+fn summarize(h: s.H, directory: []const u8, name: []const u8, expected_cases: usize) !void {
     var groups: std.ArrayList(Group) = .empty;
     for (0..10) |index| {
         const bytes = try h.read(try h.fmt("{s}/{s}-{d}.jsonl", .{ directory, name, index }));
@@ -67,7 +68,7 @@ fn summarize(h: s.H, directory: []const u8, name: []const u8) !void {
             try groups.items[found.?].values.append(h.a, @as(f64, @floatFromInt(elapsed)) / @as(f64, @floatFromInt(iterations)));
             retained += 1;
         }
-        if (retained != 800) return error.IncompleteProcessResults;
+        if (retained != expected_cases) return error.IncompleteProcessResults;
     }
     var output: std.Io.Writer.Allocating = .init(h.a);
     const w = &output.writer;

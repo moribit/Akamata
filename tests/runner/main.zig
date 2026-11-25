@@ -23,6 +23,7 @@ pub fn main(init: std.process.Init) !void {
     if (std.mem.eql(u8, args[1], "docs")) return @import("documents.zig").links(h);
     if (std.mem.eql(u8, args[1], "simd")) return @import("simd.zig").run(h, args[2..]);
     if (std.mem.eql(u8, args[1], "simd-http")) return @import("simd_http.zig").run(h, args[2..]);
+    if (std.mem.eql(u8, args[1], "simd-http-summary")) return @import("simd_http.zig").summarize(h, args[2]);
     if (std.mem.eql(u8, args[1], "slides")) return @import("documents.zig").slides(h);
     if (std.mem.eql(u8, args[1], "support")) {
         const temp = try h.temp();

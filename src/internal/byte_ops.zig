@@ -2,6 +2,13 @@
 const std = @import("std");
 
 pub fn containsFieldControl(bytes: []const u8) bool {
+    // Avoid vector-loop setup (and a stack frame on some backends) for the
+    // empty/single-byte fields common in framing headers.
+    if (bytes.len == 0) return false;
+    if (bytes.len == 1) {
+        const ch = bytes[0];
+        return (ch < 32 and ch != '\t') or ch == 127;
+    }
     var i: usize = 0;
     if (comptime std.simd.suggestVectorLength(u8) != null) {
         const V = @Vector(16, u8);

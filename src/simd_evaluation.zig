@@ -2,9 +2,9 @@
 const std = @import("std");
 const ops = @import("simd_candidates.zig");
 const clock = @import("observability/clock.zig");
-const sizes = [_]usize{ 0, 1, 7, 8, 15, 16, 17, 31, 32, 33, 63, 64, 65, 128, 256, 512, 1024, 4096, 16384, 65536 };
+pub const sizes = [_]usize{ 0, 1, 7, 8, 15, 16, 17, 31, 32, 33, 63, 64, 65, 128, 256, 512, 1024, 4096, 16384, 65536 };
 
-fn report(kind: []const u8, mode: []const u8, size: usize, round: usize, n: usize, ns: u64, checksum: usize) void {
+pub fn report(kind: []const u8, mode: []const u8, size: usize, round: usize, n: usize, ns: u64, checksum: usize) void {
     std.debug.print("SIMD {{\"kind\":\"{s}\",\"mode\":\"{s}\",\"size\":{d},\"round\":{d},\"iterations\":{d},\"elapsed_ns\":{d},\"checksum\":{d}}}\n", .{ kind, mode, size, round, n, ns, checksum });
 }
 
@@ -58,7 +58,7 @@ fn json(comptime mode: ops.Scan, kind: []const u8, input: []const u8, output: []
     report(kind, @tagName(mode), input.len, round, total, clock.elapsedNs(start), sum);
 }
 
-fn form(comptime mode: ops.Form, kind: []const u8, input: []const u8, n: usize, round: usize) !void {
+pub fn form(comptime mode: ops.Form, kind: []const u8, input: []const u8, n: usize, round: usize) !void {
     var arena: std.heap.ArenaAllocator = .init(std.heap.smp_allocator);
     defer arena.deinit();
     // Reserve backing memory before measuring; allocation operations remain timed.

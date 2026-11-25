@@ -95,9 +95,27 @@ pub noinline fn escape(comptime mode: Scan, s: []const u8, w: *std.Io.Writer) !v
     if (start < s.len) try w.writeAll(s[start..]);
 }
 
-pub const Form = enum { byte, bulk_scalar, bulk_vector };
+pub const Form = enum { byte, bulk_scalar, bulk_vector, direct };
 pub noinline fn decode(comptime mode: Form, allocator: std.mem.Allocator, s: []const u8) ![]u8 {
     var buf = try std.ArrayList(u8).initCapacity(allocator, s.len);
+    if (mode == .direct) {
+        var i: usize = 0;
+        var used: usize = 0;
+        while (i < s.len) : (i += 1) {
+            var c = s[i];
+            if (c == '+') c = ' ' else if (c == '%') {
+                if (s.len - i < 3) return error.InvalidEscape;
+                const hi = hex(s[i + 1]) orelse return error.InvalidEscape;
+                const lo = hex(s[i + 2]) orelse return error.InvalidEscape;
+                c = (hi << 4) | lo;
+                i += 2;
+            }
+            buf.allocatedSlice()[used] = c;
+            used += 1;
+        }
+        buf.items = buf.allocatedSlice()[0..used];
+        return buf.toOwnedSlice(allocator);
+    }
     // Match production allocation/error behavior (caller supplies an arena).
     var i: usize = 0;
     while (i < s.len) : (i += 1) {
@@ -145,14 +163,14 @@ test "Form arbitrary input, invalid escapes and allocation failures" {
             c.* = @truncate(state >> 32);
         }
         const expected = decode(.byte, arena.allocator(), input);
-        inline for (.{ Form.bulk_scalar, Form.bulk_vector }) |mode| {
+        inline for (.{ Form.bulk_scalar, Form.bulk_vector, Form.direct }) |mode| {
             const actual = decode(mode, arena.allocator(), input);
             if (expected) |bytes| {
                 try std.testing.expectEqualSlices(u8, bytes, try actual);
             } else |err| try std.testing.expectError(err, actual);
         }
     }
-    inline for (.{ Form.byte, Form.bulk_scalar, Form.bulk_vector }) |mode| {
+    inline for (.{ Form.byte, Form.bulk_scalar, Form.bulk_vector, Form.direct }) |mode| {
         var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = 0 });
         try std.testing.expectError(error.OutOfMemory, decode(mode, failing.allocator(), "abc"));
         inline for (.{ "%", "%0", "%GG", "x%0x", "東京%" }) |bad| {
