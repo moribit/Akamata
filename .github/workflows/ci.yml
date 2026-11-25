@@ -244,7 +244,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: mlugg/setup-zig@d1434d08867e3ee9daa34448df10607b98908d29
@@ -254,8 +254,8 @@ jobs:
       - run: ./third_party/sqlite/fetch.sh
       - uses: ./.github/actions/zig-dependencies
       - run: zig build simd-evaluation-test -Doptimize=ReleaseSafe
-      - run: zig build simd-evaluation-build ci-runner -Doptimize=ReleaseFast -p /tmp/akamata-simd-fast
-      - run: zig build simd-evaluation-build -Doptimize=ReleaseSafe -p /tmp/akamata-simd-safe
+      - run: zig build simd-evaluation-build simd-followup-build ci-runner -Doptimize=ReleaseFast -p /tmp/akamata-simd-fast
+      - run: zig build simd-evaluation-build simd-followup-build -Doptimize=ReleaseSafe -p /tmp/akamata-simd-safe
       - name: Record environment and independent samples
         shell: bash
         run: |
@@ -265,6 +265,7 @@ jobs:
           uname -a >> /tmp/simd-evidence/environment.txt
           if command -v lscpu >/dev/null; then lscpu >> /tmp/simd-evidence/environment.txt; else sysctl -n machdep.cpu.brand_string >> /tmp/simd-evidence/environment.txt; fi
           /tmp/akamata-simd-fast/bin/akamata-tests simd /tmp/akamata-simd-fast/bin/simd-evaluation /tmp/akamata-simd-safe/bin/simd-evaluation /tmp/simd-evidence
+          /tmp/akamata-simd-fast/bin/akamata-tests simd /tmp/akamata-simd-fast/bin/simd-followup /tmp/akamata-simd-safe/bin/simd-followup /tmp/simd-evidence/followup 600
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
