@@ -244,7 +244,7 @@ pub fn build(b: *std.Build) void {
     const portable_bench_mod = b.createModule(.{
         .root_source_file = b.path("benchmark/portable.zig"),
         .target = native_target,
-        .optimize = .ReleaseFast,
+        .optimize = optimize,
         .imports = &.{.{ .name = "akamata", .module = am_mod }},
     });
     portable_bench_mod.link_libc = true;

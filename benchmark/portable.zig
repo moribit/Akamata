@@ -12,9 +12,12 @@ fn send(_: ?*anyopaque, _: []const u8) am.realtime.Error!void {
 pub fn main() !void {
     const allocator = std.heap.smp_allocator;
     const iterations = 100_000;
+    var checksum: usize = 0;
     var started = am.observability.clock.monotonicNs();
     for (0..iterations) |_| {
         const bytes = try Protocol.encode(allocator, .{ .signal = .{ .session_id = "bench", .value = 1 } }, .{});
+        std.mem.doNotOptimizeAway(bytes);
+        checksum +%= bytes.len;
         allocator.free(bytes);
     }
     const serialize_ns = am.observability.clock.monotonicNs() - started;
@@ -30,4 +33,5 @@ pub fn main() !void {
         const elapsed = am.observability.clock.monotonicNs() - started;
         std.debug.print("broadcast connections={d} ns/op={d}\n", .{ count, elapsed / 10_000 });
     }
+    std.debug.print("portable checksum encoded={d} delivered={d}\n", .{ checksum, delivered });
 }
