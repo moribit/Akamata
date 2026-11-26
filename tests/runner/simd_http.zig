@@ -5,6 +5,17 @@ const w = @import("wire.zig");
 const evidence = @import("benchmark_evidence.zig");
 extern "c" fn wait4(pid: std.c.pid_t, status: *c_int, options: c_int, usage: *std.c.rusage) std.c.pid_t;
 
+fn saveFailure(h: s.H, output: []const u8, log_path: []const u8, stdout: []const u8, stderr: []const u8) void {
+    const prefix = h.fmt("{s}.failed-{d}", .{ output, h.now() }) catch return;
+    const out_path = h.fmt("{s}.oha.stdout", .{prefix}) catch return;
+    h.write(out_path, stdout) catch {};
+    const err_path = h.fmt("{s}.oha.stderr", .{prefix}) catch return;
+    h.write(err_path, stderr) catch {};
+    const log = h.read(log_path) catch return;
+    const saved_log = h.fmt("{s}.server.log", .{prefix}) catch return;
+    h.write(saved_log, log) catch {};
+}
+
 fn finishProfile(server: *w.Server) !std.c.rusage {
     server.signal(.TERM);
     const deadline = server.h.now() + 4 * std.time.ns_per_s;
@@ -44,6 +55,9 @@ pub fn run(h: s.H, args: []const []const u8) !void {
                         const binary = args[optimization * 2 + variant];
                         var server = try w.Server.start(h, &.{binary}, null, h.env, 8088);
                         defer server.deinit();
+                        var failed_stdout: []const u8 = "";
+                        var failed_stderr: []const u8 = "";
+                        errdefer saveFailure(h, output, server.log_path, failed_stdout, failed_stderr);
                         // Probe readiness and exact wire body outside timed runs.
                         const deadline = h.now() + 10 * std.time.ns_per_s;
                         while (true) {
@@ -62,6 +76,8 @@ pub fn run(h: s.H, args: []const []const u8) !void {
                         const url = "http://127.0.0.1:8088/json";
                         const warmup = try h.run(&.{ "oha", "--no-tui", "--output-format", "json", "-z", "1s", "-w", "-c", "8", "-H", header, url }, null, h.env);
                         const result = try h.command(&.{ "oha", "--no-tui", "--output-format", "json", "-z", "5s", "-w", "-c", "8", "-H", header, url }, null, h.env);
+                        failed_stdout = result.stdout;
+                        failed_stderr = result.stderr;
                         try s.check(s.success(result.term), "SIMD HTTP load generator exit");
                         const data = try h.json(result.stdout);
                         const errors = try s.field(data, "errorDistribution");
