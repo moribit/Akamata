@@ -182,7 +182,8 @@ fn validHeaderName(name: []const u8) bool {
 }
 
 fn containsCtl(value: []const u8) bool {
-    return @import("../internal/byte_ops.zig").containsFieldControl(value);
+    for (value) |ch| if (ch == '\r' or ch == '\n' or ch == 0 or (ch < 0x20 and ch != '\t') or ch == 0x7f) return true;
+    return false;
 }
 
 fn parseContentDisposition(value: []const u8, name_out: *?[]const u8, filename_out: *?[]const u8) void {
