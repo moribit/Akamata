@@ -1,0 +1,67 @@
+info(verbose): /Users/mimoc/.zvm/0.17.1/zig build-exe --cache-dir .zig-cache --global-cache-dir /Users/mimoc/.cache/zig --build-root . --zig-lib-dir /Users/mimoc/.zvm/0.17.1/lib --name configurer -fsingle-threaded --dep @build --dep @dependencies -Mroot=/Users/mimoc/.zvm/0.17.1/lib/compiler/configurer.zig -Maro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa=zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/build.zig --dep aro=aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa -Mtranslate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/build.zig --dep aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa --dep translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5 -M@dependencies=.zig-cache/o/b8aefa631e10f0201cc23d344dd1a11c/dependencies.zig --dep translate_c=translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5 -M@build=build.zig --listen=-
+info(verbose): /Users/mimoc/.zvm/0.17.1/zig build-exe -fsingle-threaded -Mroot=zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/build/generate_def.zig --cache-dir .zig-cache --global-cache-dir /Users/mimoc/.cache/zig --build-root . --name generate-def --zig-lib-dir /Users/mimoc/.zvm/0.17.1/lib/ --listen=-
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/mips.def ./.zig-cache/o/1d28de214bee4d09512cbbd8dcdf3e5b/mips.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/arm.def ./.zig-cache/o/32f104ed3b059027672a8293dedda5a1/arm.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/x86_64.def ./.zig-cache/o/fd8c104143c499de81d2098e19083c63/x86_64.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/s390x.def ./.zig-cache/o/2d5bde469f53e0228609a728d82a72de/s390x.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/nvptx.def ./.zig-cache/o/1bc348e51fa31e24e50107854779bc54/nvptx.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/common.def ./.zig-cache/o/8c543c6e2701e89853e8f5ecbed43cd1/common.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/bpf.def ./.zig-cache/o/b1e62688dfe2e3d4702558087fa8b970/bpf.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/aarch64.def ./.zig-cache/o/a78091b11f3bd7dffa77568825fa74c8/aarch64.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/neon.def ./.zig-cache/o/2966f7fae9237773cff8f3e951426ac3/neon.zig
+info(verbose): ./.zig-cache/o/4140a6caadada757a41bed52f892d260/generate-def ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro/Builtins/riscv.def ./.zig-cache/o/736e3a69e5b934bacca881670b8db420/riscv.zig
+info(verbose): /Users/mimoc/.zvm/0.17.1/zig build-exe -Odebug --dep aro --dep helpers --dep c_builtins --dep build_options -Mroot=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/src/main.zig --dep system_defaults --dep build_options=build_options0 --dep backend --dep Builtins/aarch64.def --dep Builtins/amdgcn.def --dep Builtins/arm.def --dep Builtins/bpf.def --dep Builtins/common.def --dep Builtins/hexagon.def --dep Builtins/loongarch.def --dep Builtins/mips.def --dep Builtins/neon.def --dep Builtins/nvptx.def --dep Builtins/powerpc.def --dep Builtins/riscv.def --dep Builtins/s390x.def --dep Builtins/ve.def --dep Builtins/wasm.def --dep Builtins/x86_64.def --dep Builtins/x86.def --dep Builtins/xcore.def -Maro=zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro.zig -Mhelpers=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/lib/helpers.zig -Mc_builtins=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/lib/c_builtins.zig -Mbuild_options=.zig-cache/o/7bff915ae03e6a8338feee18f4a5d6c4/options.zig -Msystem_defaults=.zig-cache/o/59dd3355c348d3e59bab9eb91bbea286/options.zig -Mbuild_options0=.zig-cache/o/f1fbba186fe71ae294d523226aa69a52/options.zig --dep build_options=build_options0 -Mbackend=zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/backend.zig -MBuiltins/aarch64.def=.zig-cache/o/a78091b11f3bd7dffa77568825fa74c8/aarch64.zig -MBuiltins/amdgcn.def=.zig-cache/o/60762dade49a7a43105523acea6e5dc3/amdgcn.zig -MBuiltins/arm.def=.zig-cache/o/32f104ed3b059027672a8293dedda5a1/arm.zig -MBuiltins/bpf.def=.zig-cache/o/b1e62688dfe2e3d4702558087fa8b970/bpf.zig -MBuiltins/common.def=.zig-cache/o/8c543c6e2701e89853e8f5ecbed43cd1/common.zig -MBuiltins/hexagon.def=.zig-cache/o/8d2e964b1612690eee7b52fd4aa4a5be/hexagon.zig -MBuiltins/loongarch.def=.zig-cache/o/5750dbcf7594a0207fc9634423e5445d/loongarch.zig -MBuiltins/mips.def=.zig-cache/o/1d28de214bee4d09512cbbd8dcdf3e5b/mips.zig -MBuiltins/neon.def=.zig-cache/o/2966f7fae9237773cff8f3e951426ac3/neon.zig -MBuiltins/nvptx.def=.zig-cache/o/1bc348e51fa31e24e50107854779bc54/nvptx.zig -MBuiltins/powerpc.def=.zig-cache/o/72d653c364d51b8223b6239486ed94d9/powerpc.zig -MBuiltins/riscv.def=.zig-cache/o/736e3a69e5b934bacca881670b8db420/riscv.zig -MBuiltins/s390x.def=.zig-cache/o/2d5bde469f53e0228609a728d82a72de/s390x.zig -MBuiltins/ve.def=.zig-cache/o/39000543a95b23d68dd531fecd5d9012/ve.zig -MBuiltins/wasm.def=.zig-cache/o/440e034d92a58395c0fa85b7b97d66a7/wasm.zig -MBuiltins/x86_64.def=.zig-cache/o/fd8c104143c499de81d2098e19083c63/x86_64.zig -MBuiltins/x86.def=.zig-cache/o/45c9fa97509d0ab1ad99c13fdf89f546/x86.zig -MBuiltins/xcore.def=.zig-cache/o/af9f477bc3902d288c1dab750f6f56a3/xcore.zig --cache-dir .zig-cache --global-cache-dir /Users/mimoc/.cache/zig --build-root . --name translate-c --zig-lib-dir /Users/mimoc/.zvm/0.17.1/lib/ --listen=-
+info(verbose): ./.zig-cache/o/820ecbf8728654fa2240ebb39bb72d4a/translate-c -o=./.zig-cache/tmp/8023e074a78c2bc6/sqlite3.zig -O=safe -lc --zig-lib=/Users/mimoc/.zvm/0.17.1/lib -fmodule-libs -- ./third_party/sqlite/sqlite3.h -MD -MV -MF ./.zig-cache/tmp/8023e074a78c2bc6/deps.d -w -resource-dir ./zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa
+info(verbose): /Users/mimoc/.zvm/0.17.1/zig build-exe -Osafe --dep akamata -Mroot=benchmark/portable.zig -cflags -DSQLITE_THREADSAFE=1 -DSQLITE_DQS=0 -DSQLITE_OMIT_LOAD_EXTENSION -DSQLITE_DEFAULT_FOREIGN_KEYS=1 -DSQLITE_USE_URI=1 -std=c99 -- third_party/sqlite/sqlite3.c -cflags -DSQLITE_THREADSAFE=1 -DSQLITE_DQS=0 -DSQLITE_OMIT_LOAD_EXTENSION -DSQLITE_DEFAULT_FOREIGN_KEYS=1 -DSQLITE_USE_URI=1 -std=c99 -- third_party/sqlite/akamata_sqlite_shim.c -Osafe -I third_party/sqlite --dep build_options --dep sqlite3 -Makamata=src/akamata.zig -Mbuild_options=.zig-cache/o/07321dc91ed4549a158b211056c26fa6/options.zig -Osafe --dep c_builtins --dep helpers -Msqlite3=.zig-cache/o/c9a8282e61e459675f886368fdf60ae1/sqlite3.zig -Mc_builtins=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/lib/c_builtins.zig -Mhelpers=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/lib/helpers.zig -lc --cache-dir .zig-cache --global-cache-dir /Users/mimoc/.cache/zig --build-root . --name portable-bench --zig-lib-dir /Users/mimoc/.zvm/0.17.1/lib/ --listen=-
+info(verbose): ./.zig-cache/o/c772868dde6beaec13688c2dd9942d6d/portable-bench
+typed_event_encode ns/op=285
+broadcast connections=1 ns/op=268
+broadcast connections=10 ns/op=334
+broadcast connections=100 ns/op=1156
+portable checksum encoded=8700000 delivered=1110000
+Build Summary: 28/28 steps succeeded
+portable-bench success
++- run exe portable-bench success 275ms
+   +- compile exe portable-bench safe native success 25s MaxRSS:929M
+      +- options cached
+      +- translate-c sqlite3 success 427ms
+         +- compile exe translate-c debug native success 7s MaxRSS:853M
+            +- options success
+            +- options success
+            +- options cached
+            +- run exe generate-def (aarch64.zig) success 53ms
+            |  +- compile exe generate-def debug native cached 1s MaxRSS:31M
+            +- run exe generate-def (amdgcn.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) success 260ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) success 7ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) success 298ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) success 315ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) success 226ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) success 196ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) success 22ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) success 28ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) success 63ms
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) cached
+               +- compile exe generate-def debug native (reused)

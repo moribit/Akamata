@@ -1,0 +1,2 @@
+e4ea3af6269dac2b74136b4ba4c9d29cf33bb048422401ee904f15c21e8504b5  /tmp/akamata-final-v3-fast/bin/competitive-akamata
+6a543fe65b99c8aa1a3e404cf66c8d9101b9277bb70c5bf4fa49b99bde3134bc  /tmp/akamata-final-v3-safe-full/bin/competitive-akamata

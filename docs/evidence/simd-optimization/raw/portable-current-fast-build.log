@@ -1,0 +1,55 @@
+info(verbose): /Users/mimoc/.zvm/0.17.1/zig build-exe -fsingle-threaded -Mroot=zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/build/generate_def.zig --cache-dir .zig-cache --global-cache-dir /Users/mimoc/.cache/zig --build-root . --name generate-def --zig-lib-dir /Users/mimoc/.zvm/0.17.1/lib/ --listen=-
+info(verbose): /Users/mimoc/.zvm/0.17.1/zig build-exe -Odebug --dep aro --dep helpers --dep c_builtins --dep build_options -Mroot=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/src/main.zig --dep system_defaults --dep build_options=build_options0 --dep backend --dep Builtins/aarch64.def --dep Builtins/amdgcn.def --dep Builtins/arm.def --dep Builtins/bpf.def --dep Builtins/common.def --dep Builtins/hexagon.def --dep Builtins/loongarch.def --dep Builtins/mips.def --dep Builtins/neon.def --dep Builtins/nvptx.def --dep Builtins/powerpc.def --dep Builtins/riscv.def --dep Builtins/s390x.def --dep Builtins/ve.def --dep Builtins/wasm.def --dep Builtins/x86_64.def --dep Builtins/x86.def --dep Builtins/xcore.def -Maro=zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/aro.zig -Mhelpers=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/lib/helpers.zig -Mc_builtins=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/lib/c_builtins.zig -Mbuild_options=.zig-cache/o/7bff915ae03e6a8338feee18f4a5d6c4/options.zig -Msystem_defaults=.zig-cache/o/59dd3355c348d3e59bab9eb91bbea286/options.zig -Mbuild_options0=.zig-cache/o/f1fbba186fe71ae294d523226aa69a52/options.zig --dep build_options=build_options0 -Mbackend=zig-pkg/aro-0.0.0-JSD1QtuBNwCASyBtNF3pqTl_W3oAJQGEVyFAtrBSE_Pa/src/backend.zig -MBuiltins/aarch64.def=.zig-cache/o/9415a1cc9450f9f8df00b1f7eddc4641/aarch64.zig -MBuiltins/amdgcn.def=.zig-cache/o/afdcd492f7d4956de35fafaa4fa76f50/amdgcn.zig -MBuiltins/arm.def=.zig-cache/o/89d2bebedcb5ba301920b8046cf805c0/arm.zig -MBuiltins/bpf.def=.zig-cache/o/ae3e6f62ca525b4c885199854573564b/bpf.zig -MBuiltins/common.def=.zig-cache/o/4e491265d466302e005620186322dd12/common.zig -MBuiltins/hexagon.def=.zig-cache/o/6d0669bf7eac3d4de89eabafbf1bdaac/hexagon.zig -MBuiltins/loongarch.def=.zig-cache/o/b8de246ff9628149e534dabf9d39eaba/loongarch.zig -MBuiltins/mips.def=.zig-cache/o/4ed92c685dd3c0f5774611513e1bd1b3/mips.zig -MBuiltins/neon.def=.zig-cache/o/e3e17a50e66764369bbfe6835b17883e/neon.zig -MBuiltins/nvptx.def=.zig-cache/o/f4b23abc0e67b2562c68ffef99b04da5/nvptx.zig -MBuiltins/powerpc.def=.zig-cache/o/6f5bf13d8178471843c41e0c55b81762/powerpc.zig -MBuiltins/riscv.def=.zig-cache/o/4234a30a66431adc2b96f15cfe879845/riscv.zig -MBuiltins/s390x.def=.zig-cache/o/cc4cee9d4cee756cb4776adc44461d31/s390x.zig -MBuiltins/ve.def=.zig-cache/o/3c37e03d1da5b632ab1b07d1ff0c15dd/ve.zig -MBuiltins/wasm.def=.zig-cache/o/67fbcecd13abad46e7c4b9dee4414c60/wasm.zig -MBuiltins/x86_64.def=.zig-cache/o/cf8349c41c7b353a64bdbf88fe58da5b/x86_64.zig -MBuiltins/x86.def=.zig-cache/o/86754a36783bbd5eb4bec39017e06996/x86.zig -MBuiltins/xcore.def=.zig-cache/o/715d2f4b7d63623f8d2bb893eb9c4bd5/xcore.zig --cache-dir .zig-cache --global-cache-dir /Users/mimoc/.cache/zig --build-root . --name translate-c --zig-lib-dir /Users/mimoc/.zvm/0.17.1/lib/ --listen=-
+info(verbose): /Users/mimoc/.zvm/0.17.1/zig build-exe -Ofast --dep akamata -Mroot=benchmark/portable.zig -cflags -DSQLITE_THREADSAFE=1 -DSQLITE_DQS=0 -DSQLITE_OMIT_LOAD_EXTENSION -DSQLITE_DEFAULT_FOREIGN_KEYS=1 -DSQLITE_USE_URI=1 -std=c99 -- third_party/sqlite/sqlite3.c -cflags -DSQLITE_THREADSAFE=1 -DSQLITE_DQS=0 -DSQLITE_OMIT_LOAD_EXTENSION -DSQLITE_DEFAULT_FOREIGN_KEYS=1 -DSQLITE_USE_URI=1 -std=c99 -- third_party/sqlite/akamata_sqlite_shim.c -Ofast -I third_party/sqlite --dep build_options --dep sqlite3 -Makamata=src/akamata.zig -Mbuild_options=.zig-cache/o/07321dc91ed4549a158b211056c26fa6/options.zig -Ofast --dep c_builtins --dep helpers -Msqlite3=.zig-cache/o/831bf3bb8892060eb22d1e8cc21478be/sqlite3.zig -Mc_builtins=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/lib/c_builtins.zig -Mhelpers=zig-pkg/translate_c-2.0.0-Q_BUWltOBwBYABF84EUL208pIFeUIwbBs29FmVBaafN5/lib/helpers.zig -lc --cache-dir .zig-cache --global-cache-dir /Users/mimoc/.cache/zig --build-root . --name portable-bench --zig-lib-dir /Users/mimoc/.zvm/0.17.1/lib/ --listen=-
+info(verbose): ./.zig-cache/o/c8aa304f181a5aca9447a79fa22e0028/portable-bench
+typed_event_encode ns/op=107
+broadcast connections=1 ns/op=123
+broadcast connections=10 ns/op=160
+broadcast connections=100 ns/op=626
+portable checksum encoded=8700000 delivered=1110000
+Build Summary: 28/28 steps succeeded
+portable-bench success
++- run exe portable-bench success 246ms
+   +- compile exe portable-bench fast native success 5s MaxRSS:329M
+      +- options cached
+      +- translate-c sqlite3 cached
+         +- compile exe translate-c debug native cached 68ms MaxRSS:31M
+            +- options cached
+            +- options cached
+            +- options cached
+            +- run exe generate-def (aarch64.zig) cached
+            |  +- compile exe generate-def debug native cached 60ms MaxRSS:31M
+            +- run exe generate-def (amdgcn.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) cached
+               +- compile exe generate-def debug native (reused)

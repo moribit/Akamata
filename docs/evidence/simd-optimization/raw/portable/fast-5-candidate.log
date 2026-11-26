@@ -1,0 +1,5 @@
+typed_event_encode ns/op=99
+broadcast connections=1 ns/op=113
+broadcast connections=10 ns/op=142
+broadcast connections=100 ns/op=587
+portable checksum encoded=8700000 delivered=1110000

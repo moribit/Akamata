@@ -1,0 +1,1 @@
+{"scope":"local workerd; not live Cloudflare performance","results":[{"features":"baseline","checks":116359,"passed":true},{"features":"simd128","checks":116359,"passed":true}]}

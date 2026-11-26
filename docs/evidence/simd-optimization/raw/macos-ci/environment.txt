@@ -1,0 +1,4 @@
+487561e506102a1b928eea2a282da1b8c4bc5f22
+0.17.0
+Darwin sjc22-be108-f8bfe759-9235-495b-9bf3-dc337276c9d7-52821F7ABFB7.local 25.6.0 Darwin Kernel Version 25.6.0: Mon Oct 12 00:39:04 PDT 2026; root:xnu-12377.161.15.701.48~2/RELEASE_ARM64_VMAPPLE arm64
+Apple M1 (Virtual)

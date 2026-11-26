@@ -1,0 +1,55 @@
+ALLOCATION_PHASE {"phase":"parse","calls":1,"requested":896}
+ALLOCATION_PHASE {"phase":"route_and_empty_handler","calls":0,"requested":0}
+ALLOCATION_PHASE {"phase":"route_with_passthrough_middleware","calls":0,"requested":0}
+ALLOCATION_PHASE {"phase":"header","calls":1,"requested":160}
+ALLOCATION_PHASE {"phase":"static_body_copy","calls":1,"requested":150}
+ALLOCATION_PHASE {"phase":"json_header_and_body","calls":2,"requested":291}
+ALLOCATION_PHASE {"phase":"cursor_and_write","heap_calls":0}
+ALLOCATION_PHASE {"phase":"warm_json_1000","heap_calls":0}
+Build Summary: 28/28 steps succeeded
+http-allocation-profile success
++- run exe http-allocation-profile success 243ms
+   +- compile exe http-allocation-profile safe native success 6s MaxRSS:374M
+      +- options cached
+      +- translate-c sqlite3 cached
+         +- compile exe translate-c debug native cached 41ms MaxRSS:31M
+            +- options cached
+            +- options cached
+            +- options cached
+            +- run exe generate-def (aarch64.zig) cached
+            |  +- compile exe generate-def debug native cached 39ms MaxRSS:31M
+            +- run exe generate-def (amdgcn.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) cached
+               +- compile exe generate-def debug native (reused)
+

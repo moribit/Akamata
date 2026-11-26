@@ -1,4 +1,5 @@
-//! Internal HTTP/MIME field-value validation. All loads are slice bounded.
+//! Experimental HTTP/MIME field validation; not imported by the public library.
+//! All loads are slice bounded. See docs/evidence/simd-optimization/results.md.
 const std = @import("std");
 
 pub fn containsFieldControl(bytes: []const u8) bool {

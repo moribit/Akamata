@@ -1,0 +1,1 @@
+{"peak_rss_kib":5088,"cpu_seconds":10.190381,"requests_including_warmup_and_probe":367128,"cpu_ns_per_request":27757.024797890655,"scope":"server lifetime including startup, 1s warmup, 5s load and shutdown; excludes oha CPU"}

@@ -1,0 +1,36 @@
+diff --git a/benchmark/portable.zig b/benchmark/portable.zig
+index e29f781..22e684a 100644
+--- a/benchmark/portable.zig
++++ b/benchmark/portable.zig
+@@ -12,9 +12,12 @@ fn send(_: ?*anyopaque, _: []const u8) am.realtime.Error!void {
+ pub fn main() !void {
+     const allocator = std.heap.smp_allocator;
+     const iterations = 100_000;
++    var checksum: usize = 0;
+     var started = am.observability.clock.monotonicNs();
+     for (0..iterations) |_| {
+         const bytes = try Protocol.encode(allocator, .{ .signal = .{ .session_id = "bench", .value = 1 } }, .{});
++        std.mem.doNotOptimizeAway(bytes);
++        checksum +%= bytes.len;
+         allocator.free(bytes);
+     }
+     const serialize_ns = am.observability.clock.monotonicNs() - started;
+@@ -30,4 +33,5 @@ pub fn main() !void {
+         const elapsed = am.observability.clock.monotonicNs() - started;
+         std.debug.print("broadcast connections={d} ns/op={d}\n", .{ count, elapsed / 10_000 });
+     }
++    std.debug.print("portable checksum encoded={d} delivered={d}\n", .{ checksum, delivered });
+ }
+diff --git a/build.zig b/build.zig
+index 8b67248..fbe1020 100644
+--- a/build.zig
++++ b/build.zig
+@@ -227,7 +227,7 @@ pub fn build(b: *std.Build) void {
+     const portable_bench_mod = b.createModule(.{
+         .root_source_file = b.path("benchmark/portable.zig"),
+         .target = native_target,
+-        .optimize = .ReleaseFast,
++        .optimize = optimize,
+         .imports = &.{.{ .name = "akamata", .module = am_mod }},
+     });
+     portable_bench_mod.link_libc = true;

@@ -1,0 +1,5 @@
+ 1879184 /tmp/akamata-baseline-server-fast
+ 1879296 /tmp/akamata-candidate-fast/bin/competitive-akamata
+ 2287680 /tmp/akamata-baseline-server-safe
+ 2287776 /tmp/akamata-candidate-safe/bin/competitive-akamata
+ 8333936 total

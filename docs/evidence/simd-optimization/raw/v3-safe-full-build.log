@@ -1,0 +1,52 @@
+Build Summary: 34/34 steps succeeded
+ci-runner success
++- install akamata-tests success
+   +- compile exe akamata-tests debug native cached 65ms MaxRSS:31M
+competitive-bench success
++- install competitive-akamata success
+   +- compile exe competitive-akamata safe native success 9s MaxRSS:444M
+      +- options cached
+      +- translate-c sqlite3 cached
+         +- compile exe translate-c debug native cached 51ms MaxRSS:31M
+            +- options cached
+            +- options cached
+            +- options cached
+            +- run exe generate-def (aarch64.zig) cached
+            |  +- compile exe generate-def debug native cached 57ms MaxRSS:31M
+            +- run exe generate-def (amdgcn.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) cached
+               +- compile exe generate-def debug native (reused)
+simd-followup-build success
++- install simd-followup success
+   +- compile exe simd-followup safe native cached 60ms MaxRSS:31M

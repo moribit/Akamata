@@ -1,0 +1,7 @@
+Build Summary: 6/6 steps succeeded; 10/10 tests passed
+simd-evaluation-test success
++- run test 10 pass (10 total) 17s MaxRSS:2M
+   +- compile test safe native success 8s MaxRSS:408M
+simd-followup-build success
++- install simd-followup success
+   +- compile exe simd-followup safe native success 7s MaxRSS:354M

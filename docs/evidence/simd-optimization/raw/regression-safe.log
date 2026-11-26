@@ -1,0 +1,326 @@
+✔ gateway namespace uses explicit binding configuration with legacy default (0.47925ms)
+✔ internal realtime handlers are not public HTTP routes (28.640292ms)
+✔ portable control uses lossless u64 identities without changing UUID extensions (2.543833ms)
+✔ inbound event is never implicitly broadcast (0.962ms)
+✔ application explicitly controls broadcast except sender (0.719875ms)
+✔ malformed, oversized and unsupported messages close predictably (0.384166ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 114.682041
+✔ live contract fails closed before fetch without isolation or valid expiring manifest (207.133208ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 253.496917
+developer documentation links: 37 documents passed
+ok compile-fail: duplicate_routes
+ok compile-fail: ambiguous_routes
+ok compile-fail: duplicate_operation_id
+ok compile-fail: invalid_wildcard
+ok compile-fail: missing_path_input
+ok compile-fail: duplicate_json_body
+ok compile-fail: incomplete_error_map
+ok compile-fail: unsupported_capability
+ok compile-fail: di_missing
+ok compile-fail: di_cycle
+ok compile-fail: native_r2_binding
+ok compile-fail: untagged_protocol
+ok compile-fail: unsupported_db_bind
+ok compile-fail: missing_portable_provider
+ok compile-fail: wrong_portable_target
+ok compile-fail: missing_portable_binding
+ok compile-fail: wrong_portable_binding
+ok compile-fail: undeclared_route_service
+ok compile-fail: missing_portable_service
+ok compile-fail: missing_provider_binding
+ok compile-fail: duplicate_provider_binding
+ok compile-fail: duplicate_portable_requirement
+ok compile-fail: dx_missing_path
+ok compile-fail: dx_duplicate_body
+ok compile-fail: dx_unsupported_parameter
+ok compile-fail: dx_unmapped_error
+ok compile-fail: dx_anyerror
+ok compile-fail: dx_unsupported_response
+ok compile-fail: dx_invalid_validation
+ok compile-fail: dx_invalid_error_status
+ok compile-fail: dx_bodyless_status
+ok compile-fail: dx_unknown_option
+ok compile-fail: dx_untagged_union
+✔ JSPI-suspended fetches keep response length, buffer, allocator, and request state isolated (1010.939667ms)
+✔ a rejected dispatch releases the isolate queue (0.324792ms)
+✔ ../deploy/worker/index.mjs: bodyless HTTP statuses produce a valid Fetch response (1.280333ms)
+✔ ../tools/akamata/src/templates/worker_index.mjs.tpl: bodyless HTTP statuses produce a valid Fetch response (0.789959ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1056.159583
+portable-application-test
++- test
+   +- run test stderr
+[default] (warn): unhandled handler error on GET /fail: SecretDatabaseFailure
+failed command: ./.zig-cache/o/1997423bc6fb60c8cec80051378d234d/test --cache-dir=./.zig-cache --seed=0x264658f4 --listen=-
+
+portable-application-test
++- test
+   +- run test stderr
+==> akamata: wrangler deploy
+==> akamata: wrangler deploy
+failed command: ./.zig-cache/o/224d39ec492be841a535ce77b9ca6ee3/test --cache-dir=./.zig-cache --seed=0x264658f4 --listen=-
+
+PASS threaded test_partial_upgrade_budget_survives_external_broadcast
+PASS threaded test_application_execution_capability_is_explicit
+PASS threaded test_fragment_control_utf8_and_invalid_upgrade_cleanup
+PASS threaded test_application_isolation_with_active_idle_upgrades_and_slow_streams
+PASS threaded test_normal_request_and_disconnect
+PASS threaded test_large_keep_alive_body_does_not_wait_for_next_request
+PASS threaded test_malformed_and_transfer_encoding
+PASS threaded test_header_and_body_limits
+PASS threaded test_keep_alive_multiple_and_request_limit
+PASS threaded test_pipeline_and_buffer_residue
+PASS threaded test_partial_request_and_partial_next_header
+PASS threaded test_chunked_request
+PASS threaded test_idle_timeout
+PASS threaded test_trickle_does_not_reset_header_deadline
+PASS threaded test_shutdown_with_partial_request
+PASS threaded test_header_body_and_total_timeout
+PASS threaded test_stream_and_stream_error
+PASS threaded test_upgrade_ownership
+PASS threaded test_fixed_length_stream_and_truncation
+PASS threaded test_peer_and_trusted_proxy
+PASS threaded test_upgrade_preserves_coalesced_frame
+PASS threaded test_max_connections_overload_and_recovery
+PASS threaded test_backpressure_does_not_starve_other_connections
+PASS threaded test_graceful_shutdown_and_idle_connections
+PASS threaded test_shutdown_drains_inflight_response
+PASS threaded test_absolute_write_deadline_slow_reader
+PASS threaded test_stream_write_deadline_while_producer_pauses
+PASS threaded test_zero_write_budget_permits_no_socket_output
+PASS threaded test_upgrade_hub_snapshot_disconnect_ownership
+PASS threaded test_forced_drain_slow_writer_and_repeated_signal
+PASS threaded test_forced_drain_partial_request
+PASS threaded test_forced_drain_upgraded_connection
+PASS threaded test_upgraded_writer_forced_drain_and_disconnect
+PASS threaded test_handler_and_stream_outlive_grace_without_preemption
+PASS kqueue test_partial_upgrade_budget_survives_external_broadcast
+PASS kqueue test_application_execution_capability_is_explicit
+PASS kqueue test_fragment_control_utf8_and_invalid_upgrade_cleanup
+PASS kqueue test_application_isolation_with_active_idle_upgrades_and_slow_streams
+PASS kqueue test_normal_request_and_disconnect
+PASS kqueue test_large_keep_alive_body_does_not_wait_for_next_request
+PASS kqueue test_malformed_and_transfer_encoding
+PASS kqueue test_header_and_body_limits
+PASS kqueue test_keep_alive_multiple_and_request_limit
+PASS kqueue test_pipeline_and_buffer_residue
+PASS kqueue test_partial_request_and_partial_next_header
+PASS kqueue test_chunked_request
+PASS kqueue test_idle_timeout
+PASS kqueue test_trickle_does_not_reset_header_deadline
+PASS kqueue test_shutdown_with_partial_request
+PASS kqueue test_header_body_and_total_timeout
+PASS kqueue test_stream_and_stream_error
+PASS kqueue test_upgrade_ownership
+PASS kqueue test_fixed_length_stream_and_truncation
+PASS kqueue test_peer_and_trusted_proxy
+PASS kqueue test_upgrade_preserves_coalesced_frame
+PASS kqueue test_max_connections_overload_and_recovery
+PASS kqueue test_backpressure_does_not_starve_other_connections
+PASS kqueue test_graceful_shutdown_and_idle_connections
+PASS kqueue test_shutdown_drains_inflight_response
+PASS kqueue test_absolute_write_deadline_slow_reader
+PASS kqueue test_stream_write_deadline_while_producer_pauses
+PASS kqueue test_zero_write_budget_permits_no_socket_output
+PASS kqueue test_upgrade_hub_snapshot_disconnect_ownership
+PASS kqueue test_forced_drain_slow_writer_and_repeated_signal
+PASS kqueue test_forced_drain_partial_request
+PASS kqueue test_forced_drain_upgraded_connection
+PASS kqueue test_upgraded_writer_forced_drain_and_disconnect
+PASS kqueue test_handler_and_stream_outlive_grace_without_preemption
+PASS sharded test_partial_upgrade_budget_survives_external_broadcast
+PASS sharded test_application_execution_capability_is_explicit
+PASS sharded test_fragment_control_utf8_and_invalid_upgrade_cleanup
+PASS sharded test_application_isolation_with_active_idle_upgrades_and_slow_streams
+PASS sharded test_normal_request_and_disconnect
+PASS sharded test_large_keep_alive_body_does_not_wait_for_next_request
+PASS sharded test_malformed_and_transfer_encoding
+PASS sharded test_header_and_body_limits
+PASS sharded test_keep_alive_multiple_and_request_limit
+PASS sharded test_pipeline_and_buffer_residue
+PASS sharded test_partial_request_and_partial_next_header
+PASS sharded test_chunked_request
+PASS sharded test_idle_timeout
+PASS sharded test_trickle_does_not_reset_header_deadline
+PASS sharded test_shutdown_with_partial_request
+PASS sharded test_header_body_and_total_timeout
+PASS sharded test_stream_and_stream_error
+PASS sharded test_upgrade_ownership
+PASS sharded test_fixed_length_stream_and_truncation
+PASS sharded test_peer_and_trusted_proxy
+PASS sharded test_upgrade_preserves_coalesced_frame
+PASS sharded test_max_connections_overload_and_recovery
+PASS sharded test_backpressure_does_not_starve_other_connections
+PASS sharded test_graceful_shutdown_and_idle_connections
+PASS sharded test_shutdown_drains_inflight_response
+PASS sharded test_absolute_write_deadline_slow_reader
+PASS sharded test_stream_write_deadline_while_producer_pauses
+PASS sharded test_zero_write_budget_permits_no_socket_output
+PASS sharded test_upgrade_hub_snapshot_disconnect_ownership
+PASS sharded test_forced_drain_slow_writer_and_repeated_signal
+PASS sharded test_forced_drain_partial_request
+PASS sharded test_forced_drain_upgraded_connection
+PASS sharded test_upgraded_writer_forced_drain_and_disconnect
+PASS sharded test_handler_and_stream_outlive_grace_without_preemption
+PASS threaded-incremental test_partial_upgrade_budget_survives_external_broadcast
+PASS threaded-incremental test_application_execution_capability_is_explicit
+PASS threaded-incremental test_fragment_control_utf8_and_invalid_upgrade_cleanup
+PASS threaded-incremental test_application_isolation_with_active_idle_upgrades_and_slow_streams
+PASS threaded-incremental test_normal_request_and_disconnect
+PASS threaded-incremental test_large_keep_alive_body_does_not_wait_for_next_request
+PASS threaded-incremental test_malformed_and_transfer_encoding
+PASS threaded-incremental test_header_and_body_limits
+PASS threaded-incremental test_keep_alive_multiple_and_request_limit
+PASS threaded-incremental test_pipeline_and_buffer_residue
+PASS threaded-incremental test_partial_request_and_partial_next_header
+PASS threaded-incremental test_chunked_request
+PASS threaded-incremental test_idle_timeout
+PASS threaded-incremental test_trickle_does_not_reset_header_deadline
+PASS threaded-incremental test_shutdown_with_partial_request
+PASS threaded-incremental test_header_body_and_total_timeout
+PASS threaded-incremental test_stream_and_stream_error
+PASS threaded-incremental test_upgrade_ownership
+PASS threaded-incremental test_fixed_length_stream_and_truncation
+PASS threaded-incremental test_peer_and_trusted_proxy
+PASS threaded-incremental test_upgrade_preserves_coalesced_frame
+PASS threaded-incremental test_max_connections_overload_and_recovery
+PASS threaded-incremental test_backpressure_does_not_starve_other_connections
+PASS threaded-incremental test_graceful_shutdown_and_idle_connections
+PASS threaded-incremental test_shutdown_drains_inflight_response
+PASS threaded-incremental test_absolute_write_deadline_slow_reader
+PASS threaded-incremental test_stream_write_deadline_while_producer_pauses
+PASS threaded-incremental test_zero_write_budget_permits_no_socket_output
+PASS threaded-incremental test_upgrade_hub_snapshot_disconnect_ownership
+PASS threaded-incremental test_forced_drain_slow_writer_and_repeated_signal
+PASS threaded-incremental test_forced_drain_partial_request
+PASS threaded-incremental test_forced_drain_upgraded_connection
+PASS threaded-incremental test_upgraded_writer_forced_drain_and_disconnect
+PASS threaded-incremental test_handler_and_stream_outlive_grace_without_preemption
+Transport Contract: 136/136 cases passed (34 per adapter/mode)
+Build Summary: 59/59 steps succeeded; 217/218 tests passed (1 skipped)
+runtime-session-test success
++- run exe akamata-tests success 21s
+   +- compile exe akamata-tests debug native cached 85ms MaxRSS:31M
+   +- compile exe runtime-contract-server safe native cached 96ms MaxRSS:32M
+      +- options cached
+      +- translate-c sqlite3 cached
+         +- compile exe translate-c debug native cached 54ms MaxRSS:31M
+            +- options cached
+            +- options cached
+            +- options cached
+            +- run exe generate-def (aarch64.zig) cached
+            |  +- compile exe generate-def debug native cached 85ms MaxRSS:31M
+            +- run exe generate-def (amdgcn.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) cached
+               +- compile exe generate-def debug native (reused)
+transport-contract-test success
++- run exe akamata-tests success 36s
+   +- compile exe akamata-tests debug native (reused)
+   +- compile exe runtime-contract-server safe native (+2 more reused dependencies)
+workers-wasm-dispatch-test success
++- run node success 1s
+workers-realtime-test success
++- run node success 316ms
++- run node success 293ms
+portable-application-test success
++- test success
+   +- run test 123 pass, 1 skip (124 total) 254ms MaxRSS:6M
+   |  +- compile test safe native cached 81ms MaxRSS:32M
+   |     +- options (reused)
+   |     +- options (reused)
+   |     +- translate-c sqlite3 (+1 more reused dependencies)
+   +- run test 2 pass (2 total) 14ms MaxRSS:4M
+   |  +- compile test safe native cached 71ms MaxRSS:32M
+   |     +- options (reused)
+   |     +- options (reused)
+   |     +- translate-c sqlite3 (+1 more reused dependencies)
+   +- run test 28 pass (28 total) 9ms MaxRSS:2M
+   |  +- compile test safe native cached 70ms MaxRSS:32M
+   |     +- options (reused)
+   |     +- options (reused)
+   |     +- translate-c sqlite3 (+1 more reused dependencies)
+   +- run test 4 pass (4 total) 5ms MaxRSS:2M
+   |  +- compile test safe native cached 72ms MaxRSS:31M
+   |     +- options (reused)
+   |     +- options (reused)
+   |     +- translate-c sqlite3 (+1 more reused dependencies)
+   +- run test 9 pass (9 total) 4ms MaxRSS:2M
+   |  +- compile test safe native cached 71ms MaxRSS:32M
+   |     +- options (reused)
+   |     +- options (reused)
+   |     +- translate-c sqlite3 (+1 more reused dependencies)
+   +- run test 6 pass (6 total) 5ms MaxRSS:2M
+   |  +- compile test safe native cached 62ms MaxRSS:31M
+   |     +- options (reused)
+   |     +- options (reused)
+   |     +- translate-c sqlite3 (+1 more reused dependencies)
+   +- run test 30 pass (30 total) 10ms MaxRSS:2M
+      +- compile test safe native cached 72ms MaxRSS:31M
+         +- options (reused)
+         +- translate-c sqlite3 (+1 more reused dependencies)
+documentation-test success
++- run exe akamata-tests success 23ms
+|  +- compile exe akamata-tests debug native (reused)
++- compile exe documentation-minimal safe native cached 71ms MaxRSS:31M
+|  +- options (reused)
+|  +- translate-c sqlite3 (+1 more reused dependencies)
++- run test 15 pass (15 total) 4ms MaxRSS:2M
+   +- compile test safe native cached 62ms MaxRSS:32M
+      +- options (reused)
+      +- options (reused)
+      +- translate-c sqlite3 (+1 more reused dependencies)
+compile-fail-test success
++- run exe akamata-tests success 14s
+   +- compile exe akamata-tests debug native (reused)
+test (+7 more reused dependencies)

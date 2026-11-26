@@ -1,5 +1,10 @@
 # Candidate design and reproduction
 
+Final decision: experiments only. After measurement, commit `6c1280f` restored
+the original HTTP/MIME call sites because small-input rejection and tail-latency
+criteria were not met. The candidate descriptions below document the evaluated
+implementation, not a currently adopted public-library optimization.
+
 Experiments live in `src/simd_candidates.zig`, isolated from the public library.
 `src/simd_evaluation.zig` compares the candidates and the production JSON emitter.
 `tests/runner/simd.zig` extends the existing Zig harness; no Python orchestrator,
@@ -23,6 +28,8 @@ new dependency, runtime CPU dispatch, or public SIMD setting is introduced.
   appendSlice, and vector search plus appendSlice. The latter two isolate the
   benefits of bulk copying/ArrayList operation reduction from SIMD searching.
   Initial capacity and toOwnedSlice behavior match the existing implementation.
+  A fourth control reserves the same capacity and writes directly into the
+  ArrayList backing slice, isolating per-byte ArrayList overhead.
 - Boundary search: retain std.mem; its existing vector search is inspected in
   the code-generation probe. No unmeasured replacement is adopted.
 
@@ -64,3 +71,60 @@ each process. It reports the median and minimum/maximum of 10 process samples.
 These are batch timings, not individual request P95/P99 latency distributions.
 Existing complete raw files are reused on resume; use a fresh output directory
 when changing binaries or measurement conditions.
+
+The `json-utf8` fixture repeats the bytes of `東京🙂` and truncates to each exact
+input length. Lengths 16, 256 and 65,536 end on complete code points and include
+both Japanese and emoji; other lengths can intentionally end inside a code
+point. Such tails test the existing opaque-byte contract, not UTF-8 validation.
+The existing competitive-micro nested-object fixture also uses valid Japanese.
+
+## HTTP/MIME application candidate
+
+`src/internal/byte_ops.zig:containsFieldControl` is shared by HTTP field-value
+validation and Multipart header-value validation. It uses 16-byte unsigned
+comparisons and an OR reduction only when `std.simd.suggestVectorLength(u8)`
+reports native SIMD support. Short tails and unsupported targets use the exact
+original scalar predicate. Other HTTP/MIME validation/search logic is untouched.
+
+Full-server comparison uses the original compiled main binaries and candidate
+binaries with identical optimization settings. `akamata-tests simd-http`
+alternates AB/BA across ten independent server pairs, each with a 1s warmup and
+5s measured load, eight keep-alive connections, the existing `/json` endpoint,
+and Cookie value lengths 0 and 4,096. It runs Threaded and Reactor in ReleaseFast
+and ReleaseSafe, records complete oha request/latency/error reports and a
+post-load RSS snapshot, verifies the exact response before load, and requires
+all measured requests to return HTTP 200 with no errors. Network and client
+costs are present here, unlike in the kernel benchmark. SQLite is initialized
+for fixture parity, but the timed endpoint performs no DB work or TLS.
+
+```sh
+# Baseline binaries were copied before application changes; build them from
+# baseline 107ad5d in a separate worktree with the same compiler/CPU settings.
+zig build competitive-bench ci-runner -Doptimize=ReleaseFast -p /tmp/akamata-final-fast
+zig build competitive-bench -Doptimize=ReleaseSafe -p /tmp/akamata-final-safe
+/tmp/akamata-final-fast/bin/akamata-tests simd-http /tmp/akamata-baseline-server-fast /tmp/akamata-final-fast/bin/competitive-akamata /tmp/akamata-baseline-server-safe /tmp/akamata-final-safe/bin/competitive-akamata docs/evidence/simd-optimization/raw/new-http
+/tmp/akamata-final-fast/bin/akamata-tests simd-http-summary docs/evidence/simd-optimization/raw/new-http
+
+zig build simd-followup-build -Doptimize=ReleaseFast -p /tmp/akamata-followup-fast
+zig build simd-followup-build -Doptimize=ReleaseSafe -p /tmp/akamata-followup-safe
+/tmp/akamata-final-fast/bin/akamata-tests simd /tmp/akamata-followup-fast/bin/simd-followup /tmp/akamata-followup-safe/bin/simd-followup docs/evidence/simd-optimization/raw/new-followup 600
+```
+
+`http-summary.csv` reports median throughput/latency/RSS across ten independent
+processes and a paired mean throughput-gain 95% Student-t interval (9 degrees of
+freedom). This interval describes local paired samples, not all deployments.
+RSS snapshots are explicitly not peak RSS or allocated-byte accounting. Final
+collection additionally uses OS wait4 process usage on graceful server exit,
+recording peak RSS and user+system CPU in `.process.json`. CPU/request includes
+all successful preflight, warmup and measured requests. This excludes oha CPU.
+Failed load output is preserved with unique `.failed-*` names. Completion markers
+are written only after all validations succeed; see the final results for the
+two failed baseline attempts and complete-pair repetition policy.
+
+The authoritative local final datasets are `raw/followup-v3/` and
+`raw/final-http/`; older directory names containing "final" are intermediate
+iterations (see `raw/provenance.md`). Last evaluated candidate source is
+`09a18f9`; restored application source is `6c1280f`.
+Dispatching CI with `simd_evidence=true` runs both kernel matrices, both modes,
+on Linux x86-64, Linux ARM64 and macOS and uploads all samples. Mandatory CI
+does not use absolute performance gates.

@@ -1,0 +1,56 @@
+{
+  "classification": "offline-host-simulation",
+  "source_sha": "487561e506102a1b928eea2a282da1b8c4bc5f22",
+  "command": [
+    "/Users/mimoc/.nvm/versions/node/v24.19.0/bin/node",
+    "/Users/mimoc/Akamata/benchmark/competitive/workers/wasm-host.mjs",
+    "/tmp/akamata-worker-baseline-fast/bin/competitive-worker.wasm",
+    "docs/evidence/simd-optimization/raw/workers-baseline-fast.json"
+  ],
+  "node": "v24.19.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "wasm_bytes": 1172489,
+  "wasm_sha256": "2c95ac54e276c6b7b1eef33818444df148a58115e78ae2a2c3ad4e0d4b9911b1",
+  "compile_ms": 0.35449999999999804,
+  "instantiate_and_initialize_ms": 0.38074999999999903,
+  "scope": "WASM ABI and fake D1; no JSPI await, remote D1, Workers CPU/cold start or edge network. No performance ranking.",
+  "completed": true,
+  "runs": [
+    {
+      "workload": "plaintext",
+      "wire_match": true,
+      "first_local_wasm_request_ms": 1.0134589999999974
+    },
+    {
+      "workload": "json",
+      "wire_match": true,
+      "first_local_wasm_request_ms": 0.16375000000000028
+    },
+    {
+      "workload": "routing",
+      "wire_match": true,
+      "first_local_wasm_request_ms": 0.11537500000000023
+    },
+    {
+      "workload": "db",
+      "wire_match": true,
+      "first_local_wasm_request_ms": 0.4133330000000015
+    },
+    {
+      "workload": "echo-64",
+      "wire_match": true,
+      "first_local_wasm_request_ms": 0.07345899999999972
+    },
+    {
+      "workload": "echo-1024",
+      "wire_match": true,
+      "first_local_wasm_request_ms": 0.040542000000002076
+    },
+    {
+      "workload": "echo-65536",
+      "wire_match": true,
+      "first_local_wasm_request_ms": 0.09741700000000009
+    }
+  ]
+}

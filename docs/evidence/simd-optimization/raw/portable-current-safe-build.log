@@ -1,0 +1,52 @@
+info(verbose): ./.zig-cache/o/04760eb4d085c9cd3751ae16f4e4a854/portable-bench
+typed_event_encode ns/op=155
+broadcast connections=1 ns/op=190
+broadcast connections=10 ns/op=245
+broadcast connections=100 ns/op=867
+portable checksum encoded=8700000 delivered=1110000
+Build Summary: 28/28 steps succeeded
+portable-bench success
++- run exe portable-bench success 256ms
+   +- compile exe portable-bench safe native success 26s MaxRSS:937M
+      +- options cached
+      +- translate-c sqlite3 cached
+         +- compile exe translate-c debug native cached 59ms MaxRSS:31M
+            +- options cached
+            +- options cached
+            +- options cached
+            +- run exe generate-def (aarch64.zig) cached
+            |  +- compile exe generate-def debug native cached 70ms MaxRSS:31M
+            +- run exe generate-def (amdgcn.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (arm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (bpf.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (common.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (hexagon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (loongarch.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (mips.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (neon.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (nvptx.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (powerpc.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (riscv.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (s390x.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (ve.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (wasm.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86_64.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (x86.zig) cached
+            |  +- compile exe generate-def debug native (reused)
+            +- run exe generate-def (xcore.zig) cached
+               +- compile exe generate-def debug native (reused)

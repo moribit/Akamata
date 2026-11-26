@@ -1,0 +1,3 @@
+ 1879296 /tmp/akamata-final-v3-fast/bin/competitive-akamata
+ 2287776 /tmp/akamata-final-v3-safe-full/bin/competitive-akamata
+ 4167072 total

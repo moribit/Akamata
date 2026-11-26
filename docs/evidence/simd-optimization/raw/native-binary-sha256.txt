@@ -1,0 +1,4 @@
+8466285c71f07cdf5019f675c5a0d10df526677d532f603dd34097b4aee5ca39  /tmp/akamata-baseline-server-fast
+b54d725034d6493bee138e5e40a542690c7e36e58de9fe90a15bb53362469e87  /tmp/akamata-candidate-fast/bin/competitive-akamata
+84c21b14e1e06025705016d5982ccd0a3fa6122a99bfd64c8d8efb5c9915fdd5  /tmp/akamata-baseline-server-safe
+788175dc879535b4d677159701ff262238ac9e355d7f03346a1678ee8a1901bc  /tmp/akamata-candidate-safe/bin/competitive-akamata

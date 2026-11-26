@@ -1,0 +1,9 @@
+mode,case,processes,baseline_median_ns_op,candidate_median_ns_op,baseline_min,baseline_max,candidate_min,candidate_max
+fast,typed_event_encode,10,101.5,101.5,99,262,99,221
+fast,broadcast connections=1,10,120,120.5,111,235,113,224
+fast,broadcast connections=10,10,152.5,154,143,289,142,261
+fast,broadcast connections=100,10,600.5,591.5,582,952,571,880
+safe,typed_event_encode,10,134,135,131,282,131,145
+safe,broadcast connections=1,10,176.5,175.5,167,263,167,185
+safe,broadcast connections=10,10,231,233,215,335,225,267
+safe,broadcast connections=100,10,865,854.5,831,1134,841,934

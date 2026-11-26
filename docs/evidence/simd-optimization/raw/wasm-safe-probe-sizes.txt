@@ -1,0 +1,3 @@
+    7735 /tmp/akamata-wasm-safe-scalar/bin/simd-wasm-probe.wasm
+    7476 /tmp/akamata-wasm-safe-simd/bin/simd-wasm-probe.wasm
+   15211 total

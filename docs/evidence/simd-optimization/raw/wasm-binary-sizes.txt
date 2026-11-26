@@ -1,0 +1,5 @@
+ 1084507 zig-out/bin/competitive-worker.wasm
+ 1084704 /tmp/akamata-worker-candidate-safe/bin/competitive-worker.wasm
+ 1172489 /tmp/akamata-worker-baseline-fast/bin/competitive-worker.wasm
+ 1172632 /tmp/akamata-worker-candidate-fast/bin/competitive-worker.wasm
+ 4514332 total
